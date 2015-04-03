@@ -1,0 +1,37 @@
+{
+  "name": "react-hotkeys",
+  "version": "0.0.1",
+  "description": "A declarative library for handling hotkeys and focus traps within a React application",
+  "main": "lib",
+  "directories": {
+    "doc": "docs"
+  },
+  "devDependencies": {
+    "babel-core": "^4.7.16",
+    "babel-eslint": "^2.0.2",
+    "babel-loader": "^4.3.0",
+    "prompt": "^0.2.14",
+    "webpack": "^1.7.3"
+  },
+  "dependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-global": "scripts/build-global",
+    "build-npm": "scripts/build-npm"
+  },
+  "author": "Chris Pearce",
+  "license": "MIT",
+  "keywords": [
+    "react-component",
+    "hotkeys",
+    "focus",
+    "react"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chrisui/react-hotkeys.git"
+  },
+  "homepage": "https://github.com/chrisui/react-hotkeys",
+  "bugs": "https://github.com/chrisui/react-hotkeys/issues",
+  "globalExport": "ReactHotkeys"
+}

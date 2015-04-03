@@ -1,0 +1,7 @@
+#!/bin/bash -e
+
+rm -rf build/npm
+babel -d build/npm/lib ./lib
+cp README.md build/npm/
+#find -X build/npm/lib -type d -name __tests__ | xargs rm -rf
+node -p "p=require(\"./package.json\");p.main=\"lib\";p.scripts=p.devDependencies=undefined;JSON.stringify(p,null,2)" > build/npm/package.json

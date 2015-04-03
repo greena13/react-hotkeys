@@ -1,0 +1,24 @@
+{
+  "name": "open-source-template",
+  "version": "0.0.1",
+  "description": "A template for f/e open source projects (really more aimed towards JS)",
+  "main": "lib",
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {},
+  "author": "Chris Pearce",
+  "license": "MIT",
+  "keywords": [
+    "open",
+    "template",
+    "starter"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chrisui/open-source-template.git"
+  },
+  "homepage": "https://github.com/chrisui/open-source-template",
+  "bugs": "https://github.com/chrisui/open-source-template/issues",
+  "globalExport": "OS"
+}

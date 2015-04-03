@@ -1,0 +1,12 @@
+# Common directories where we don't care about linting
+cordova/*
+grunt/*
+hooks/*
+node_modules/*
+platforms/*
+plugins/*
+res/*
+scripts/*
+www/*
+webpack.config.js
+Gruntfile.js

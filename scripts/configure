@@ -1,0 +1,62 @@
+#!/usr/bin/env node
+
+process.bin = process.title = 'configure';
+
+var prompt = require('prompt');
+var pkg = require('../package.json');
+var fs = require('fs');
+
+prompt.start();
+
+var schema = {
+  properties: {
+    name: {
+      description: 'Project name?'.magenta,
+      required: true,
+      default: pkg.name
+    },
+    description: {
+      description: 'Project description?'.magenta,
+      required: true,
+      default: pkg.description
+    },
+    github: {
+      description: 'Project GitHub url?'.magenta,
+      required: true,
+      default: pkg.homepage
+    },
+    globalExport: {
+      description: 'Project global export var name?'.magenta,
+      required: true,
+      default: pkg.globalExport
+    },
+    keywords: {
+      description: 'Comma separated keywords?'.magenta,
+      required: false,
+      default: pkg.keywords.join(',')
+    }
+  }
+};
+
+prompt.get(schema, function(err, result) {
+  if (err) {
+    console.log('Failed to write new package!'.red);
+    process.exit(1);
+  }
+
+  pkg.name = result.name;
+  pkg.description = result.description;
+  pkg.globalExport = result.globalExport;
+  pkg.homepage = result.github;
+  pkg.repository.url = result.github + '.git';
+  pkg.bugs = result.github + '/issues';
+  pkg.keywords = result.keywords.split(',');
+
+  fs.writeFile('./package.json', JSON.stringify(pkg, null, 2), function(err) {
+      if (err) {
+          return console.log(err);
+      }
+
+      console.log('Package was configured!');
+  });
+});
