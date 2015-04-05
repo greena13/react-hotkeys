@@ -5,11 +5,12 @@ var libDir = __dirname + '/lib';
 var projectVar = pkg.globalExport;
 var ENV = process.env.NODE_ENV;
 var COMPRESS = process.env.COMPRESS;
+var SOURCEMAPS = process.env.SOURCEMAPS;
 
 var plugins = [
   new webpack.DefinePlugin({
     'process.env.NODE_ENV': JSON.stringify(ENV),
-    '__VER__': pkg.version
+    '__VER__': JSON.stringify(pkg.version)
   })
 ];
 
@@ -21,7 +22,7 @@ if (COMPRESS) {
   );
 }
 
-module.exports = {
+exports = module.exports = {
   entry: './lib/index',
   output: {
     library: projectVar,
@@ -40,3 +41,7 @@ module.exports = {
   },
   plugins: plugins
 };
+
+if (SOURCEMAPS) {
+  exports.devtool = 'source-map';
+}

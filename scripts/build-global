@@ -4,8 +4,8 @@ rm -rf build/global
 
 name=$(node -p "require('./package').name")
 
-NODE_ENV=production webpack index.js "build/global/${name}.js"
+NODE_ENV=production webpack lib/index.js "build/global/${name}.js"
 
-NODE_ENV=production COMPRESS=1 webpack index.js "build/global/${name}.min.js"
+NODE_ENV=production COMPRESS=1 webpack lib/index.js "build/global/${name}.min.js"
 
 echo "gzipped, the global build is `gzip -c build/global/${name}.min.js | wc -c` bytes"

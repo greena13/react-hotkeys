@@ -1,15 +1,17 @@
 React HotKeys
 -------------
-A declarative library for handling "hotkeys" and "focus traps" within a React application.
+A declarative library for handling "hotkeysand "focus traps" within a React application.
 
-See [Exploring HotKeys and FocusTraps in React](http://chrispearce.co/exploring-hotkeys-and-focustrap-in-react/) for an introductory look into the problems we're trying to solve or if you're eager to get going check out the [Getting Started ](docs/getting-started.md) guide!
+See [Exploring HotKeys and FocusTraps in React](http://chrispearce.co/exploring-hotkeys-and-focus-in-react/) for an introductory look into the problems we're trying to solve or if you're eager to get going check out the [Getting Started ](docs/getting-started.md) guide!
+
+#### NOTE: This project is very much still in it's very early initial experimental a development period. Don't use just yet!
 
 Quick Example
 -------------
 ```javascript
 import {HotKeys} from 'react-hotkeys';
 
-// Simple name:key sequence/s to create a hotkey map
+// Simple "name:key sequence/s" to create a hotkey map
 const map = {
   'snapLeft': 'command+left',
   'deleteNode': ['del', 'backspace']
