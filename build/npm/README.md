@@ -6,7 +6,7 @@ A declarative library for handling hotkeys and focus areas in React applications
 
 See [Exploring HotKeys and FocusTraps in React](http://chrispearce.co/exploring-hotkeys-and-focus-in-react/) for an introductory look into the problems we're trying to solve or if you're eager to get going check out the [Getting Started ](docs/getting-started.md) guide!
 
-#### NOTE: This project is still in early development stages. Expect breaking changes on minor version upgrades until `1.0.0`!
+##### NOTE: This project is still in it's development stages. While I'm pretty confident on the API you should expect breaking changes on minor version upgrades until `1.0.0`!
 
 Quick Example
 -------------
