@@ -95,6 +95,7 @@ Awesome! Contributions of all kinds are greatly appreciated. To help smoothen th
 - Delegate hotkeys to root handler (Rather than mousetrap instance for each)
 - Provide HoC API
 - Write tests
+- Generate API docs
 
 Thanks
 ------

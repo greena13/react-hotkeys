@@ -1,41 +1,79 @@
-Open Source Template
---------------------
-A simple open source project template geared towards f/e open source projects! You will want to update this readme for your own project.
+React HotKeys
+-------------
+[![Join the chat at https://gitter.im/Chrisui/react-hotkeys](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Chrisui/react-hotkeys?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Run `scripts/configure` when you first clone this repo.
+A declarative library for handling hotkeys and focus areas in React applications.
 
-Overview
---------
-Quick overview of the project fundamentals, philosophies and specific features to go here.
+See [Exploring HotKeys and FocusTraps in React](http://chrispearce.co/exploring-hotkeys-and-focus-in-react/) for an introductory look into the problems we're trying to solve or if you're eager to get going check out the [Getting Started ](docs/getting-started.md) guide!
+
+#### NOTE: This project is still in early development stages. Expect breaking changes on minor version upgrades until `1.0.0`!
 
 Quick Example
 -------------
+```javascript
+import {HotKeys} from 'react-hotkeys';
+
+// Simple "name:key sequence/s" to create a hotkey map
+const map = {
+  'snapLeft': 'command+left',
+  'deleteNode': ['del', 'backspace']
+};
+
+// Create a root component with the hotkey map
+const App = React.createClass({
+  render() {
+    return (
+      <HotKeys keyMap={map}>
+        <div>
+          <Node></Node>
+          <Node></Node>
+        </WorkSpace>
+      </div>
+    );
+  }
+});
+
+// Create a component with hotkey handlers - handlers only called when component is within
+// the applications 'focus tree' and prevents cascading hotkeys from being called
+const Node = React.createClass({
+  render() {
+    const handlers = {
+      'deleteNode': this.deleteNode
+    };
+
+    return (
+      <HotKeys handlers={handlers}>
+        Node contents
+      </HotKeys>
+    );
+  }
+});
 ```
-// Raw and dirty code example can go here...
-```
+
+Feature Overview
+----------------
+- Minimal and declarative API
+- Named hotkeys for easy customization
+- Intuitive key commands thanks to [Mousetrap](https://github.com/ccampbell/mousetrap)
+- Tree based priority - the deepest focused handler wins
 
 Install
 -------
 ```
-npm install project
-```
-
-Basic Usage
------------
-```
-import Project from  'project';
-// Usage code here...
+npm install react-hotkeys
 ```
 
 Documentation
 -------------
 The [Getting Started](docs/getting-started.md) guide is probably a good first point of call!
-  
+
 You can find full docs in the [/docs](docs) folder and generated api docs in [/docs/api](docs/api).
+
+You may also find various example projects in the [/examples](examples) folder.
 
 Support
 -------
-Information and links on how best to find support for the project to go here.
+See "Using GitHub Issues" under "Contribute" below for most things but feel free to jump on [Gitter](https://gitter.im/Chrisui/react-hotkeys) or give me a shout (@chrisui) in the [reactiflux Slack group](http://reactiflux.herokuapp.com/)!
 
 Contribute
 ----------
@@ -53,9 +91,15 @@ Awesome! Contributions of all kinds are greatly appreciated. To help smoothen th
 - Lint your code with eslint (config provided)
 - Include relevant test updates/additions
 
+##### TODO List
+- Delegate hotkeys to root handler (Rather than mousetrap instance for each)
+- Provide HoC API
+- Write tests
+- Generate API docs
+
 Thanks
 ------
-Any special thanks or credits can go here.
+Thanks to @ccampbell for [Mousetrap](https://github.com/ccampbell/mousetrap)
 
 License
 -------

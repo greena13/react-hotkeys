@@ -1,7 +1,7 @@
 {
   "name": "react-hotkeys",
   "version": "0.0.1",
-  "description": "A declarative library for handling hotkeys and focus traps within a React application",
+  "description": "A declarative library for handling hotkeys and focus within a React application",
   "main": "lib",
   "directories": {
     "doc": "docs"
@@ -14,14 +14,18 @@
     "webpack": "^1.7.3"
   },
   "dependencies": {
-    "mousetrap": "^1.5.2"
+    "mousetrap": "^1.5.2",
+    "lodash": "^3.1.0"
+  },
+  "peerDependencies": {
+    "react": ">=0.12.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-global": "scripts/build-global",
     "build-npm": "scripts/build-npm"
   },
-  "author": "Chris Pearce",
+  "author": "Chris Pearce <hello@chrispearce.me> (chrispearce.co)",
   "license": "MIT",
   "keywords": [
     "react-component",

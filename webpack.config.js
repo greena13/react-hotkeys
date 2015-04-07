@@ -39,7 +39,17 @@ exports = module.exports = {
     extensions: ['', '.js', '.jsx'],
     modulesDirectories: ['node_modules']
   },
-  plugins: plugins
+  plugins: plugins,
+  externals: [
+    {
+      'react': {
+        root: 'React',
+        commonjs2: 'react',
+        commonjs: 'react',
+        amd: 'react'
+      }
+    }
+  ]
 };
 
 if (SOURCEMAPS) {
