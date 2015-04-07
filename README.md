@@ -27,8 +27,8 @@ const App = React.createClass({
         <div>
           <Node></Node>
           <Node></Node>
-        </WorkSpace>
-      </div>
+        </div>
+      </HotKeys>
     );
   }
 });
