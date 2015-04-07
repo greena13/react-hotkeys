@@ -1,12 +1,14 @@
-import {FocusTrap, HotKeys} from '../../lib';
+import {FocusTrap, HotKeys, HotKeyMapMixin} from '../../lib';
 import React from 'react';
 
 const keyMap = {
-  'buildUp': 'pageup',
-  'buildDown': 'pagedown'
+  'buildUp': 'up',
+  'buildDown': 'down'
 };
 
 const App = React.createClass({
+  
+  mixins: [HotKeyMapMixin(keyMap)],
 
   render() {
     const handlers = {
@@ -15,7 +17,7 @@ const App = React.createClass({
     };
     
     return (
-      <HotKeys keyMap={keyMap} handlers={handlers}>
+      <HotKeys handlers={handlers}>
         <Viewport />
       </HotKeys>
     );
