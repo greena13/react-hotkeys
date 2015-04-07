@@ -7,6 +7,8 @@ This non-exhaustive guide will aim to get you working with the project as quickl
 npm install react-hotkeys
 ```
 
+or use the old-skool [UMD](http://bob.yexley.net/umd-javascript-that-runs-anywhere/) packaged library found in [/build/global](build/global).
+
 ## Defining HotKey Maps
 The most future-proof and flexible way of defining hotkeys is to create a 'generic hotkey name' to 'key sequence' mapping.
 

@@ -63,6 +63,8 @@ Install
 npm install react-hotkeys
 ```
 
+or use the old-skool [UMD](http://bob.yexley.net/umd-javascript-that-runs-anywhere/) packaged library found in [/build/global](build/global).
+
 Documentation
 -------------
 The [Getting Started](docs/getting-started.md) guide is probably a good first point of call!
