@@ -1,10 +1,12 @@
 React HotKeys
 -------------
-A declarative library for handling "hotkeysand "focus traps" within a React application.
+[![Join the chat at https://gitter.im/Chrisui/react-hotkeys](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Chrisui/react-hotkeys?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+A declarative library for handling hotkeys and focus areas in React applications.
 
 See [Exploring HotKeys and FocusTraps in React](http://chrispearce.co/exploring-hotkeys-and-focus-in-react/) for an introductory look into the problems we're trying to solve or if you're eager to get going check out the [Getting Started ](docs/getting-started.md) guide!
 
-#### NOTE: This project is very much still in it's very early initial experimental a development period. Don't use just yet!
+#### NOTE: This project is still in early development stages. Expect breaking changes on minor version upgrades until `1.0.0`!
 
 Quick Example
 -------------
@@ -21,7 +23,7 @@ const map = {
 const App = React.createClass({
   render() {
     return (
-      <HotKeys map={map}>
+      <HotKeys keyMap={map}>
         <div>
           <Node></Node>
           <Node></Node>
@@ -53,7 +55,6 @@ Feature Overview
 - Minimal and declarative API
 - Named hotkeys for easy customization
 - Intuitive key commands thanks to [Mousetrap](https://github.com/ccampbell/mousetrap)
-- `FocusTrap` component when you just want to know when something is in focus
 - Tree based priority - the deepest focused handler wins
 
 Install
@@ -68,9 +69,11 @@ The [Getting Started](docs/getting-started.md) guide is probably a good first po
 
 You can find full docs in the [/docs](docs) folder and generated api docs in [/docs/api](docs/api).
 
+You may also find various example projects in the [/examples](examples) folder.
+
 Support
 -------
-See "Using GitHub Issues" under "Contribute" below for most things but feel free to give me a shout in the [reactiflux Slack group](http://reactiflux.herokuapp.com/)!
+See "Using GitHub Issues" under "Contribute" below for most things but feel free to jump on [Gitter](https://gitter.im/Chrisui/react-hotkeys) or give me a shout (@chrisui) in the [reactiflux Slack group](http://reactiflux.herokuapp.com/)!
 
 Contribute
 ----------
@@ -87,6 +90,11 @@ Awesome! Contributions of all kinds are greatly appreciated. To help smoothen th
 - Squash commits
 - Lint your code with eslint (config provided)
 - Include relevant test updates/additions
+
+##### TODO List
+- Delegate hotkeys to root handler (Rather than mousetrap instance for each)
+- Provide HoC API
+- Write tests
 
 Thanks
 ------
