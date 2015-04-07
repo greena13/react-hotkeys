@@ -1,5 +1,7 @@
 React HotKeys
 -------------
+
+[![Join the chat at https://gitter.im/Chrisui/react-hotkeys](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Chrisui/react-hotkeys?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 A declarative library for handling "hotkeysand "focus traps" within a React application.
 
 See [Exploring HotKeys and FocusTraps in React](http://chrispearce.co/exploring-hotkeys-and-focus-in-react/) for an introductory look into the problems we're trying to solve or if you're eager to get going check out the [Getting Started ](docs/getting-started.md) guide!
