@@ -1,0 +1,4 @@
+#!/bin/bash -e
+
+#SOURCEMAPS=1 would be nice but breaks atm
+webpack examples/index.js examples/bundle.js --config examples/webpack.config.js

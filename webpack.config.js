@@ -35,7 +35,6 @@ exports = module.exports = {
     modulesDirectories: ['node_modules']
   },
   resolve: {
-    root: [libDir],
     extensions: ['', '.js', '.jsx'],
     modulesDirectories: ['node_modules']
   },

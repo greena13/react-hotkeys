@@ -1,0 +1,55 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Helvetica Neue", Arial;
+  margin: 0;
+}
+
+.app {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.tips {
+  background: #ccc;
+  padding: 15px;
+}
+
+.viewport {
+  position: relative;
+  overflow: hidden;
+  flex: 1;
+}
+
+@keyframes konamiTime {
+  0% {background-color: #45CEEF;}
+  25% {background-color: #FFF5A5;}
+  50% {background-color: #FFD4DA;}
+  75% {background-color: #99D2E4;}
+  100% {background-color: #D8CAB4;}
+}
+
+.viewport.konamiTime {
+  animation: konamiTime 2s infinite linear;
+}
+
+.node {
+  z-index: 5;
+  position: absolute;
+  background: black;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.node:focus {
+  background: blue;
+}
