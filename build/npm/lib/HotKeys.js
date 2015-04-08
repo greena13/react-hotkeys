@@ -19,8 +19,10 @@ var forEach = _interopRequire(require("lodash/collection/forEach"));
 function getSequencesFromMap(hotKeyMap, hotKeyName) {
   var sequences = hotKeyMap[hotKeyName];
 
+  // If no sequence is found with this name we assume
+  // the user is passing a hard-coded sequence as a key
   if (!sequences) {
-    return undefined;
+    return [hotKeyName];
   }
 
   if (isArray(sequences)) {
@@ -81,6 +83,8 @@ var HotKeys = React.createClass({
       forEach(handlerSequences, function (sequence) {
         sequenceHandlers[sequence] = function (event) {
           if (_this.__isFocused__) {
+            // Stopping propagation breaks long key sequences if a portion is handled
+            // up the tree. We need the central manager/delegator!
             event.stopPropagation();
             return handler(event);
           }
