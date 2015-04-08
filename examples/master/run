@@ -1,3 +1,0 @@
-#!/bin/bash -e
-
-SOURCEMAPS=1 webpack-dev-server --progress --colors --config ../../webpack.config.js --host "0.0.0.0" index.js
