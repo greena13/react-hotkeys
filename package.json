@@ -26,7 +26,7 @@
     "react": ">=0.12.2"
   },
   "scripts": {
-    "test": "mocha --compilers js:babel/register",
+    "test": "scripts/test",
     "build-global": "scripts/build-global",
     "build-npm": "scripts/build-npm"
   },

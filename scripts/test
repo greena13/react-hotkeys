@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+mocha --compilers js:babel/register lib/**/__tests__/*.js
