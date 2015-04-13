@@ -64,7 +64,7 @@ const handlers = {
 ## HotKey Map Context
 Key mappings will be passed down the React tree in context to all child components meaning you do not have to explicitly define your key maps everytime you use the `HotKeys` component. You could simply define one root `HotKeys` component with a `keyMap` and all your application would have access to those mappings.
 
-To achieve this currently (pre-[parent-based context](https://github.com/facebook/react/issues/2112) which [**React 0.14** is aiming for](https://github.com/facebook/react/issues/2112#issuecomment-90156578)) we must use the `HotKeyMapMixin` so all our child components receive the key map.
+To achieve this currently (pre-[parent-based context](https://github.com/facebook/react/issues/2112) which is now in React `master` but awaiting `0.14` release) we must use the `HotKeyMapMixin` so that all our child components will have access to the keyMap.
 
 ```javascript
 import {HotKeys, HotKeyMapMixin} from 'react-hotkeys';
@@ -81,7 +81,7 @@ React.createClass({
 });
 ```
 
-When parent-based context comes into play soon you will no longer need the mixin and all children of `HotKeys` with `keyMap` set will simply have access to those mappings.
+When parent-based context comes into play soon you will no longer need the mixin and all children of `HotKeys` with `keyMap` set will simply have access to those mappings in their context.
 
 ```javascript
 import {HotKeys} from 'react-hotkeys';

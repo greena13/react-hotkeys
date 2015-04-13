@@ -34,6 +34,7 @@ const App = React.createClass({
             <li>Expand or contract a node with `alt+up` or `alt+down` respectively</li>
             <li>Delete a node with `delete` or `backspace`</li>
             <li>How about the konami code? `up up down down left right left right b a enter`</li>
+            <li>Want to get started? <a href="https://github.com/Chrisui/react-hotkeys/blob/master/docs/getting-started.md">Read the guide.</a></li>
           </ul>
         </div>
         <HotKeys handlers={handlers} className={'viewport ' + (this.state && this.state.konamiTime ? 'konamiTime' : '')}>
