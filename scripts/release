@@ -17,7 +17,7 @@ fi
 
 next_ref="v$next_version"
 
-#npm test -- --single-run
+npm test
 
 update_version 'package.json' $next_version
 #update_version 'bower.json' $next_version

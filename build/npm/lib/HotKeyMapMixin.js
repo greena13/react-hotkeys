@@ -1,12 +1,23 @@
-"use strict";
+'use strict';
 
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
 
-module.exports = HotKeyMapMixin;
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports['default'] = HotKeyMapMixin;
 
-var React = _interopRequire(require("react"));
+var _React = require('react');
 
-var assign = _interopRequire(require("lodash/object/assign"));
+var _React2 = _interopRequireWildcard(_React);
+
+var _assign = require('lodash/object/assign');
+
+var _assign2 = _interopRequireWildcard(_assign);
+
+var _isEqual = require('lodash/lang/isEqual');
+
+var _isEqual2 = _interopRequireWildcard(_isEqual);
 
 function HotKeyMapMixin() {
   var hotKeyMap = arguments[0] === undefined ? {} : arguments[0];
@@ -14,11 +25,11 @@ function HotKeyMapMixin() {
   return {
 
     contextTypes: {
-      hotKeyMap: React.PropTypes.object
+      hotKeyMap: _React2['default'].PropTypes.object
     },
 
     childContextTypes: {
-      hotKeyMap: React.PropTypes.object
+      hotKeyMap: _React2['default'].PropTypes.object
     },
 
     getChildContext: function getChildContext() {
@@ -32,14 +43,21 @@ function HotKeyMapMixin() {
     },
 
     updateMap: function updateMap() {
-      this.__hotKeyMap__ = this.buildMap();
+      var newMap = this.buildMap();
+
+      if (!_isEqual2['default'](newMap, this.__hotKeyMap__)) {
+        this.__hotKeyMap__ = newMap;
+        return true;
+      }
+
+      return false;
     },
 
     buildMap: function buildMap() {
       var parentMap = this.context.hotKeyMap || {};
       var thisMap = this.props.keyMap || {};
 
-      return assign({}, parentMap, hotKeyMap, thisMap);
+      return _assign2['default']({}, parentMap, hotKeyMap, thisMap);
     },
 
     getMap: function getMap() {
@@ -48,3 +66,6 @@ function HotKeyMapMixin() {
 
   };
 }
+
+;
+module.exports = exports['default'];

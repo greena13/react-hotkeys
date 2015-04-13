@@ -1,28 +1,35 @@
 "use strict";
 
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { "default": obj }; };
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var React = _interopRequire(require("react"));
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var FocusTrap = React.createClass({
+var _React = require("react");
+
+var _React2 = _interopRequireWildcard(_React);
+
+var FocusTrap = _React2["default"].createClass({
   displayName: "FocusTrap",
 
   propTypes: {
-    onFocus: React.PropTypes.func,
-    onBlur: React.PropTypes.func,
-    focusName: React.PropTypes.string // Currently unused
+    onFocus: _React2["default"].PropTypes.func,
+    onBlur: _React2["default"].PropTypes.func,
+    focusName: _React2["default"].PropTypes.string // Currently unused
   },
 
   render: function render() {
-    return React.createElement(
+    return _React2["default"].createElement(
       "div",
-      _extends({ tabIndex: "0" }, this.props),
+      _extends({ tabIndex: "-1" }, this.props),
       this.props.children
     );
   }
 
 });
 
-module.exports = FocusTrap;
+exports["default"] = FocusTrap;
+module.exports = exports["default"];

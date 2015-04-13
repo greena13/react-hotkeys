@@ -1,20 +1,36 @@
-"use strict";
+'use strict';
 
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var React = _interopRequire(require("react"));
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
-var FocusTrap = _interopRequire(require("./FocusTrap"));
+var _React = require('react');
 
-var HotKeyMapMixin = _interopRequire(require("./HotKeyMapMixin"));
+var _React2 = _interopRequireWildcard(_React);
 
-var Mousetrap = _interopRequire(require("mousetrap"));
+var _FocusTrap = require('./FocusTrap');
 
-var isArray = _interopRequire(require("lodash/lang/isArray"));
+var _FocusTrap2 = _interopRequireWildcard(_FocusTrap);
 
-var forEach = _interopRequire(require("lodash/collection/forEach"));
+var _HotKeyMapMixin = require('./HotKeyMapMixin');
+
+var _HotKeyMapMixin2 = _interopRequireWildcard(_HotKeyMapMixin);
+
+var _Mousetrap = require('mousetrap');
+
+var _Mousetrap2 = _interopRequireWildcard(_Mousetrap);
+
+var _isArray = require('lodash/lang/isArray');
+
+var _isArray2 = _interopRequireWildcard(_isArray);
+
+var _forEach = require('lodash/collection/forEach');
+
+var _forEach2 = _interopRequireWildcard(_forEach);
 
 function getSequencesFromMap(hotKeyMap, hotKeyName) {
   var sequences = hotKeyMap[hotKeyName];
@@ -25,47 +41,70 @@ function getSequencesFromMap(hotKeyMap, hotKeyName) {
     return [hotKeyName];
   }
 
-  if (isArray(sequences)) {
+  if (_isArray2['default'](sequences)) {
     return sequences;
   }
 
   return [sequences];
 }
 
-var HotKeys = React.createClass({
-  displayName: "HotKeys",
+var HotKeys = _React2['default'].createClass({
+  displayName: 'HotKeys',
 
-  mixins: [HotKeyMapMixin()],
+  mixins: [_HotKeyMapMixin2['default']()],
 
   propTypes: {
-    onFocus: React.PropTypes.func,
-    onBlur: React.PropTypes.func,
-    focusName: React.PropTypes.string, // Currently unused
-    keyMap: React.PropTypes.object,
-    handlers: React.PropTypes.object
+    onFocus: _React2['default'].PropTypes.func,
+    onBlur: _React2['default'].PropTypes.func,
+    focusName: _React2['default'].PropTypes.string, // Currently unused
+    keyMap: _React2['default'].PropTypes.object,
+    handlers: _React2['default'].PropTypes.object
+  },
+
+  contextTypes: {
+    hotKeyParent: _React2['default'].PropTypes.any
+  },
+
+  childContextTypes: {
+    hotKeyParent: _React2['default'].PropTypes.any
+  },
+
+  getChildContext: function getChildContext() {
+    return {
+      hotKeyParent: this
+    };
   },
 
   componentDidMount: function componentDidMount() {
     // Not optimal - imagine hundreds of this component. We need a top level
     // delegation point for mousetrap
-    this.__mousetrap__ = new Mousetrap(React.findDOMNode(this.refs.focusTrap));
+    this.__mousetrap__ = new _Mousetrap2['default'](_React2['default'].findDOMNode(this.refs.focusTrap));
 
-    this.updateHotKeys();
+    this.updateHotKeys(true);
   },
 
-  componentWillReceiveProps: function componentWillReceiveProps() {
+  componentDidUpdate: function componentDidUpdate() {
     this.updateHotKeys();
   },
 
   componentWillUnmount: function componentWillUnmount() {
+    if (this.context.hotKeyParent) {
+      this.context.hotKeyParent.childHandledSequence(null);
+    }
+
     this.__mousetrap__.reset();
   },
 
   updateHotKeys: function updateHotKeys() {
     var _this = this;
 
+    var force = arguments[0] === undefined ? false : arguments[0];
+
     // Ensure map is up-to-date to begin with
-    this.updateMap();
+    // We will only bother continuing if the map was actually updated
+    if (!this.updateMap() && !force) {
+      return;
+    }
 
     var _props$handlers = this.props.handlers;
     var handlers = _props$handlers === undefined ? {} : _props$handlers;
@@ -75,18 +114,20 @@ var HotKeys = React.createClass({
     var mousetrap = this.__mousetrap__;
 
     // Group all our handlers by sequence
-    forEach(handlers, function (handler, hotKey) {
+    _forEach2['default'](handlers, function (handler, hotKey) {
       var handlerSequences = getSequencesFromMap(hotKeyMap, hotKey);
 
       // Could be optimized as every handler will get called across every bound
       // component - imagine making a node a focus point and then having hundreds!
-      forEach(handlerSequences, function (sequence) {
-        sequenceHandlers[sequence] = function (event) {
-          if (_this.__isFocused__) {
-            // Stopping propagation breaks long key sequences if a portion is handled
-            // up the tree. We need the central manager/delegator!
-            event.stopPropagation();
-            return handler(event);
+      _forEach2['default'](handlerSequences, function (sequence) {
+        sequenceHandlers[sequence] = function (event, sequence) {
+          // Check we are actually in focus and that a child hasn't already handled this sequence
+          if (_this.__isFocused__ && sequence !== _this.__lastChildSequence__) {
+            if (_this.context.hotKeyParent) {
+              _this.context.hotKeyParent.childHandledSequence(sequence);
+            }
+
+            return handler(event, sequence);
           }
         };
       });
@@ -94,9 +135,20 @@ var HotKeys = React.createClass({
 
     // Hard reset our handlers (probably could be more efficient)
     mousetrap.reset();
-    forEach(sequenceHandlers, function (handler, sequence) {
+    _forEach2['default'](sequenceHandlers, function (handler, sequence) {
       return mousetrap.bind(sequence, handler);
     });
+  },
+
+  childHandledSequence: function childHandledSequence() {
+    var sequence = arguments[0] === undefined ? null : arguments[0];
+
+    this.__lastChildSequence__ = sequence;
+
+    // Traverse up any hot key parents so everyone is aware a child has handled a certain sequence
+    if (this.context.hotKeyParent) {
+      this.context.hotKeyParent.childHandledSequence(sequence);
+    }
   },
 
   onFocus: function onFocus() {
@@ -113,20 +165,21 @@ var HotKeys = React.createClass({
     this.__isFocused__ = false;
 
     if (this.props.onBlur) {
-      var _props;
+      var _props2;
 
-      (_props = this.props).onBlur.apply(_props, arguments);
+      (_props2 = this.props).onBlur.apply(_props2, arguments);
     }
   },
 
   render: function render() {
-    return React.createElement(
-      FocusTrap,
-      _extends({ ref: "focusTrap" }, this.props, { onFocus: this.onFocus, onBlur: this.onBlur }),
+    return _React2['default'].createElement(
+      _FocusTrap2['default'],
+      _extends({ ref: 'focusTrap' }, this.props, { onFocus: this.onFocus, onBlur: this.onBlur }),
       this.props.children
     );
   }
 
 });
 
-module.exports = HotKeys;
+exports['default'] = HotKeys;
+module.exports = exports['default'];
