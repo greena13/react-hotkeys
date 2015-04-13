@@ -30,9 +30,10 @@ const App = React.createClass({
       <div className="app">
         <div className="tips">
           <ul>
-            <li>Select a node and move it with your arrow keys!</li>
+            <li>Select a node and move it with your arrow keys</li>
+            <li>Expand or contract a node with `alt+up` or `alt+down` respectively</li>
             <li>Delete a node with `delete` or `backspace`</li>
-            <li>How about the konami code? `up up down down left right left right b a enter` (currently shows a break in impl. where if part of a long sequence is handled by a short sequence. Ie `up` in the konami sequence then hotkeys break.)</li>
+            <li>How about the konami code? `up up down down left right left right b a enter`</li>
           </ul>
         </div>
         <HotKeys handlers={handlers} className={'viewport ' + (this.state && this.state.konamiTime ? 'konamiTime' : '')}>
@@ -91,8 +92,11 @@ const Node = React.createClass({
       opacity: deleted ? 0.2 : 1
     };
 
+    // tabIndex is explicitly set here so we can use the tab key to move between nodes
+    // - by default we would set it to -1 so it can only be directly clicked (& tapped?)
+    //   or focused programattically
     return (
-      <HotKeys handlers={handlers} className="node" style={style}>
+      <HotKeys tabIndex="0" handlers={handlers} className="node" style={style}>
         Node
       </HotKeys>
     );
