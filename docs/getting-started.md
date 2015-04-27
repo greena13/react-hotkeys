@@ -35,6 +35,22 @@ const keyMap: {
 #### Key Sequences
 Under the hood we use the brilliant Mousetrap library for binding to key sequences. To find out all the sequence patterns and supported keys (there's a lot) checkout [their documentation](https://craig.is/killing/mice)!
 
+Below is an extract for quick reference.
+
+```
+'4'                   // Single key sequence
+'?'                   // Special single key sequence (ie. shift is handled automagically)
+'command+shift+k'     // Combination sequence
+['del', 'backspace']  // Multiple sequences
+'up down left right'  // gmail style sequences
+```
+
+Modifier keys: `shift`, `ctrl`, `alt`/`option`, `command`/`meta`
+
+Special keys: `backspace`, `tab`, `enter`, `return`, `capslock`, `esc`, `escape`, `space`, `pageup`, `pagedown`, `end`, `home`, `left`, `up`, `right`, `down`, `ins`, `del`, and `plus`
+
+Any other key you should be able to reference by name like `a`, `/`, `$`, `*`, or `=` and all the rest ...
+
 #### Specifying Key Event
 Under the hood we try to determine the best key event (usually `keypress`) to monitor based on the key sequence given. You can explicitly set which event (we call them actions) you would like your sequence based on by specifying in your keyMap.
 
