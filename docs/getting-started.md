@@ -35,6 +35,11 @@ const keyMap: {
 #### Key Sequences
 Under the hood we use the brilliant Mousetrap library for binding to key sequences. To find out all the sequence patterns and supported keys (there's a lot) checkout [their documentation](https://craig.is/killing/mice)!
 
+#### Specifying Key Event
+Under the hood we try to determine the best key event (usually `keypress`) to monitor based on the key sequence given. You can explicitly set which event (we call them actions) you would like your sequence based on by specifying in your keyMap.
+
+Possible values here are `keypress`, `keydown`, and `keyup`. See [example code](https://github.com/Chrisui/react-hotkeys/blob/cd98268094ee459b23eb8b180f1f03f0e0a38841/examples/master/index.js#L10-L15) for usage details.
+
 ## Using HotKeys
 Using the `HotKeys` component you can provide your newly created hotkey map and some handlers and when the component is 'in focus' the magic will happen for you!
 
