@@ -10,7 +10,9 @@ const keyMap = {
   'delete': ['del', {sequence: 'backspace', action: 'keyup'}],
   'expand': 'alt+up',
   'contract': 'alt+down',
-  'konami': 'up up down down left right left right b a enter'
+  'konami': 'up up down down left right left right b a enter',
+  'commandDown': {sequence: 'command', action: 'keydown'},
+  'commandUp': {sequence: 'command', action: 'keyup'}
 };
 
 const App = React.createClass({
@@ -21,9 +23,19 @@ const App = React.createClass({
     this.setState({konamiTime: true});
   },
 
+  commandDown() {
+    console.log('comm down');
+  },
+
+  commandUp() {
+    console.log('comm up');
+  },
+
   render() {
     const handlers = {
-      'konami': this.onKonami
+      'konami': this.onKonami,
+      'commandDown': this.commandDown,
+      'commandUp': this.commandUp
     };
 
     return (
