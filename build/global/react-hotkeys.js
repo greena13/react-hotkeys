@@ -83,9 +83,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Mousetrap = _interopRequire(__webpack_require__(5));
 
-	var isArray = _interopRequire(__webpack_require__(6));
+	var isArray = _interopRequire(__webpack_require__(8));
 
-	var forEach = _interopRequire(__webpack_require__(8));
+	var isObject = _interopRequire(__webpack_require__(9));
+
+	var forEach = _interopRequire(__webpack_require__(10));
 
 	function getSequencesFromMap(hotKeyMap, hotKeyName) {
 	  var sequences = hotKeyMap[hotKeyName];
@@ -165,7 +167,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var handlers = _props$handlers === undefined ? {} : _props$handlers;
 
 	    var hotKeyMap = this.getMap();
-	    var sequenceHandlers = {};
+	    var sequenceHandlers = [];
 	    var mousetrap = this.__mousetrap__;
 
 	    // Group all our handlers by sequence
@@ -175,7 +177,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Could be optimized as every handler will get called across every bound
 	      // component - imagine making a node a focus point and then having hundreds!
 	      forEach(handlerSequences, function (sequence) {
-	        sequenceHandlers[sequence] = function (event, sequence) {
+	        var action = undefined;
+
+	        var callback = function (event, sequence) {
 	          // Check we are actually in focus and that a child hasn't already handled this sequence
 	          if (_this.__isFocused__ && sequence !== _this.__lastChildSequence__) {
 	            if (_this.context.hotKeyParent) {
@@ -185,13 +189,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return handler(event, sequence);
 	          }
 	        };
+
+	        if (isObject(sequence)) {
+	          action = sequence.action;
+	          sequence = sequence.sequence;
+	        }
+
+	        sequenceHandlers.push({ callback: callback, action: action, sequence: sequence });
 	      });
 	    });
 
 	    // Hard reset our handlers (probably could be more efficient)
 	    mousetrap.reset();
-	    forEach(sequenceHandlers, function (handler, sequence) {
-	      return mousetrap.bind(sequence, handler);
+	    forEach(sequenceHandlers, function (handler) {
+	      return mousetrap.bind(handler.sequence, handler.callback, handler.action);
 	    });
 	  },
 
@@ -283,7 +294,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var React = _interopRequire(__webpack_require__(4));
 
-	var assign = _interopRequire(__webpack_require__(9));
+	var assign = _interopRequire(__webpack_require__(6));
 
 	var isEqual = _interopRequire(__webpack_require__(7));
 
@@ -1372,55 +1383,50 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isLength = __webpack_require__(10),
-	    isNative = __webpack_require__(11),
-	    isObjectLike = __webpack_require__(12);
-
-	/** `Object#toString` result references. */
-	var arrayTag = '[object Array]';
-
-	/** Used for native method references. */
-	var objectProto = Object.prototype;
+	var baseAssign = __webpack_require__(14),
+	    createAssigner = __webpack_require__(15);
 
 	/**
-	 * Used to resolve the [`toStringTag`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
-	 * of values.
-	 */
-	var objToString = objectProto.toString;
-
-	/* Native method references for those with the same name as other `lodash` methods. */
-	var nativeIsArray = isNative(nativeIsArray = Array.isArray) && nativeIsArray;
-
-	/**
-	 * Checks if `value` is classified as an `Array` object.
+	 * Assigns own enumerable properties of source object(s) to the destination
+	 * object. Subsequent sources overwrite property assignments of previous sources.
+	 * If `customizer` is provided it is invoked to produce the assigned values.
+	 * The `customizer` is bound to `thisArg` and invoked with five arguments:
+	 * (objectValue, sourceValue, key, object, source).
 	 *
 	 * @static
 	 * @memberOf _
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
+	 * @alias extend
+	 * @category Object
+	 * @param {Object} object The destination object.
+	 * @param {...Object} [sources] The source objects.
+	 * @param {Function} [customizer] The function to customize assigning values.
+	 * @param {*} [thisArg] The `this` binding of `customizer`.
+	 * @returns {Object} Returns `object`.
 	 * @example
 	 *
-	 * _.isArray([1, 2, 3]);
-	 * // => true
+	 * _.assign({ 'user': 'barney' }, { 'age': 40 }, { 'user': 'fred' });
+	 * // => { 'user': 'fred', 'age': 40 }
 	 *
-	 * _.isArray(function() { return arguments; }());
-	 * // => false
+	 * // using a customizer callback
+	 * var defaults = _.partialRight(_.assign, function(value, other) {
+	 *   return typeof value == 'undefined' ? other : value;
+	 * });
+	 *
+	 * defaults({ 'user': 'barney' }, { 'age': 36 }, { 'user': 'fred' });
+	 * // => { 'user': 'barney', 'age': 36 }
 	 */
-	var isArray = nativeIsArray || function(value) {
-	  return isObjectLike(value) && isLength(value.length) && objToString.call(value) == arrayTag;
-	};
+	var assign = createAssigner(baseAssign);
 
-	module.exports = isArray;
+	module.exports = assign;
 
 
 /***/ },
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseIsEqual = __webpack_require__(13),
-	    bindCallback = __webpack_require__(14),
-	    isStrictComparable = __webpack_require__(15);
+	var baseIsEqual = __webpack_require__(11),
+	    bindCallback = __webpack_require__(12),
+	    isStrictComparable = __webpack_require__(13);
 
 	/**
 	 * Performs a deep comparison between two values to determine if they are
@@ -1481,9 +1487,89 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrayEach = __webpack_require__(16),
-	    baseEach = __webpack_require__(17),
-	    createForEach = __webpack_require__(18);
+	var isLength = __webpack_require__(16),
+	    isNative = __webpack_require__(17),
+	    isObjectLike = __webpack_require__(18);
+
+	/** `Object#toString` result references. */
+	var arrayTag = '[object Array]';
+
+	/** Used for native method references. */
+	var objectProto = Object.prototype;
+
+	/**
+	 * Used to resolve the [`toStringTag`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var objToString = objectProto.toString;
+
+	/* Native method references for those with the same name as other `lodash` methods. */
+	var nativeIsArray = isNative(nativeIsArray = Array.isArray) && nativeIsArray;
+
+	/**
+	 * Checks if `value` is classified as an `Array` object.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
+	 * @example
+	 *
+	 * _.isArray([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isArray(function() { return arguments; }());
+	 * // => false
+	 */
+	var isArray = nativeIsArray || function(value) {
+	  return isObjectLike(value) && isLength(value.length) && objToString.call(value) == arrayTag;
+	};
+
+	module.exports = isArray;
+
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
+	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+	 * @example
+	 *
+	 * _.isObject({});
+	 * // => true
+	 *
+	 * _.isObject([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObject(1);
+	 * // => false
+	 */
+	function isObject(value) {
+	  // Avoid a V8 JIT bug in Chrome 19-20.
+	  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
+	  var type = typeof value;
+	  return type == 'function' || (!!value && type == 'object');
+	}
+
+	module.exports = isObject;
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var arrayEach = __webpack_require__(19),
+	    baseEach = __webpack_require__(20),
+	    createForEach = __webpack_require__(21);
 
 	/**
 	 * Iterates over elements of `collection` invoking `iteratee` for each element.
@@ -1521,48 +1607,209 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 9 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseAssign = __webpack_require__(19),
-	    createAssigner = __webpack_require__(20);
+	var baseIsEqualDeep = __webpack_require__(22);
 
 	/**
-	 * Assigns own enumerable properties of source object(s) to the destination
-	 * object. Subsequent sources overwrite property assignments of previous sources.
-	 * If `customizer` is provided it is invoked to produce the assigned values.
-	 * The `customizer` is bound to `thisArg` and invoked with five arguments:
-	 * (objectValue, sourceValue, key, object, source).
+	 * The base implementation of `_.isEqual` without support for `this` binding
+	 * `customizer` functions.
 	 *
-	 * @static
-	 * @memberOf _
-	 * @alias extend
-	 * @category Object
-	 * @param {Object} object The destination object.
-	 * @param {...Object} [sources] The source objects.
-	 * @param {Function} [customizer] The function to customize assigning values.
-	 * @param {*} [thisArg] The `this` binding of `customizer`.
-	 * @returns {Object} Returns `object`.
-	 * @example
-	 *
-	 * _.assign({ 'user': 'barney' }, { 'age': 40 }, { 'user': 'fred' });
-	 * // => { 'user': 'fred', 'age': 40 }
-	 *
-	 * // using a customizer callback
-	 * var defaults = _.partialRight(_.assign, function(value, other) {
-	 *   return typeof value == 'undefined' ? other : value;
-	 * });
-	 *
-	 * defaults({ 'user': 'barney' }, { 'age': 36 }, { 'user': 'fred' });
-	 * // => { 'user': 'barney', 'age': 36 }
+	 * @private
+	 * @param {*} value The value to compare.
+	 * @param {*} other The other value to compare.
+	 * @param {Function} [customizer] The function to customize comparing values.
+	 * @param {boolean} [isLoose] Specify performing partial comparisons.
+	 * @param {Array} [stackA] Tracks traversed `value` objects.
+	 * @param {Array} [stackB] Tracks traversed `other` objects.
+	 * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
 	 */
-	var assign = createAssigner(baseAssign);
+	function baseIsEqual(value, other, customizer, isLoose, stackA, stackB) {
+	  // Exit early for identical values.
+	  if (value === other) {
+	    // Treat `+0` vs. `-0` as not equal.
+	    return value !== 0 || (1 / value == 1 / other);
+	  }
+	  var valType = typeof value,
+	      othType = typeof other;
 
-	module.exports = assign;
+	  // Exit early for unlike primitive values.
+	  if ((valType != 'function' && valType != 'object' && othType != 'function' && othType != 'object') ||
+	      value == null || other == null) {
+	    // Return `false` unless both values are `NaN`.
+	    return value !== value && other !== other;
+	  }
+	  return baseIsEqualDeep(value, other, baseIsEqual, customizer, isLoose, stackA, stackB);
+	}
+
+	module.exports = baseIsEqual;
 
 
 /***/ },
-/* 10 */
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var identity = __webpack_require__(23);
+
+	/**
+	 * A specialized version of `baseCallback` which only supports `this` binding
+	 * and specifying the number of arguments to provide to `func`.
+	 *
+	 * @private
+	 * @param {Function} func The function to bind.
+	 * @param {*} thisArg The `this` binding of `func`.
+	 * @param {number} [argCount] The number of arguments to provide to `func`.
+	 * @returns {Function} Returns the callback.
+	 */
+	function bindCallback(func, thisArg, argCount) {
+	  if (typeof func != 'function') {
+	    return identity;
+	  }
+	  if (typeof thisArg == 'undefined') {
+	    return func;
+	  }
+	  switch (argCount) {
+	    case 1: return function(value) {
+	      return func.call(thisArg, value);
+	    };
+	    case 3: return function(value, index, collection) {
+	      return func.call(thisArg, value, index, collection);
+	    };
+	    case 4: return function(accumulator, value, index, collection) {
+	      return func.call(thisArg, accumulator, value, index, collection);
+	    };
+	    case 5: return function(value, other, key, object, source) {
+	      return func.call(thisArg, value, other, key, object, source);
+	    };
+	  }
+	  return function() {
+	    return func.apply(thisArg, arguments);
+	  };
+	}
+
+	module.exports = bindCallback;
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var isObject = __webpack_require__(9);
+
+	/**
+	 * Checks if `value` is suitable for strict equality comparisons, i.e. `===`.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` if suitable for strict
+	 *  equality comparisons, else `false`.
+	 */
+	function isStrictComparable(value) {
+	  return value === value && (value === 0 ? ((1 / value) > 0) : !isObject(value));
+	}
+
+	module.exports = isStrictComparable;
+
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var baseCopy = __webpack_require__(24),
+	    keys = __webpack_require__(25);
+
+	/**
+	 * The base implementation of `_.assign` without support for argument juggling,
+	 * multiple sources, and `this` binding `customizer` functions.
+	 *
+	 * @private
+	 * @param {Object} object The destination object.
+	 * @param {Object} source The source object.
+	 * @param {Function} [customizer] The function to customize assigning values.
+	 * @returns {Object} Returns the destination object.
+	 */
+	function baseAssign(object, source, customizer) {
+	  var props = keys(source);
+	  if (!customizer) {
+	    return baseCopy(source, object, props);
+	  }
+	  var index = -1,
+	      length = props.length;
+
+	  while (++index < length) {
+	    var key = props[index],
+	        value = object[key],
+	        result = customizer(value, source[key], key, object, source);
+
+	    if ((result === result ? (result !== value) : (value === value)) ||
+	        (typeof value == 'undefined' && !(key in object))) {
+	      object[key] = result;
+	    }
+	  }
+	  return object;
+	}
+
+	module.exports = baseAssign;
+
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var bindCallback = __webpack_require__(12),
+	    isIterateeCall = __webpack_require__(26);
+
+	/**
+	 * Creates a function that assigns properties of source object(s) to a given
+	 * destination object.
+	 *
+	 * **Note:** This function is used to create `_.assign`, `_.defaults`, and `_.merge`.
+	 *
+	 * @private
+	 * @param {Function} assigner The function to assign values.
+	 * @returns {Function} Returns the new assigner function.
+	 */
+	function createAssigner(assigner) {
+	  return function() {
+	    var args = arguments,
+	        length = args.length,
+	        object = args[0];
+
+	    if (length < 2 || object == null) {
+	      return object;
+	    }
+	    var customizer = args[length - 2],
+	        thisArg = args[length - 1],
+	        guard = args[3];
+
+	    if (length > 3 && typeof customizer == 'function') {
+	      customizer = bindCallback(customizer, thisArg, 5);
+	      length -= 2;
+	    } else {
+	      customizer = (length > 2 && typeof thisArg == 'function') ? thisArg : null;
+	      length -= (customizer ? 1 : 0);
+	    }
+	    if (guard && isIterateeCall(args[1], args[2], guard)) {
+	      customizer = length == 3 ? null : customizer;
+	      length = 2;
+	    }
+	    var index = 0;
+	    while (++index < length) {
+	      var source = args[index];
+	      if (source) {
+	        assigner(object, source, customizer);
+	      }
+	    }
+	    return object;
+	  };
+	}
+
+	module.exports = createAssigner;
+
+
+/***/ },
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -1588,11 +1835,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var escapeRegExp = __webpack_require__(21),
-	    isObjectLike = __webpack_require__(12);
+	var escapeRegExp = __webpack_require__(27),
+	    isObjectLike = __webpack_require__(18);
 
 	/** `Object#toString` result references. */
 	var funcTag = '[object Function]';
@@ -1648,7 +1895,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -1666,113 +1913,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var baseIsEqualDeep = __webpack_require__(22);
-
-	/**
-	 * The base implementation of `_.isEqual` without support for `this` binding
-	 * `customizer` functions.
-	 *
-	 * @private
-	 * @param {*} value The value to compare.
-	 * @param {*} other The other value to compare.
-	 * @param {Function} [customizer] The function to customize comparing values.
-	 * @param {boolean} [isLoose] Specify performing partial comparisons.
-	 * @param {Array} [stackA] Tracks traversed `value` objects.
-	 * @param {Array} [stackB] Tracks traversed `other` objects.
-	 * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
-	 */
-	function baseIsEqual(value, other, customizer, isLoose, stackA, stackB) {
-	  // Exit early for identical values.
-	  if (value === other) {
-	    // Treat `+0` vs. `-0` as not equal.
-	    return value !== 0 || (1 / value == 1 / other);
-	  }
-	  var valType = typeof value,
-	      othType = typeof other;
-
-	  // Exit early for unlike primitive values.
-	  if ((valType != 'function' && valType != 'object' && othType != 'function' && othType != 'object') ||
-	      value == null || other == null) {
-	    // Return `false` unless both values are `NaN`.
-	    return value !== value && other !== other;
-	  }
-	  return baseIsEqualDeep(value, other, baseIsEqual, customizer, isLoose, stackA, stackB);
-	}
-
-	module.exports = baseIsEqual;
-
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var identity = __webpack_require__(23);
-
-	/**
-	 * A specialized version of `baseCallback` which only supports `this` binding
-	 * and specifying the number of arguments to provide to `func`.
-	 *
-	 * @private
-	 * @param {Function} func The function to bind.
-	 * @param {*} thisArg The `this` binding of `func`.
-	 * @param {number} [argCount] The number of arguments to provide to `func`.
-	 * @returns {Function} Returns the callback.
-	 */
-	function bindCallback(func, thisArg, argCount) {
-	  if (typeof func != 'function') {
-	    return identity;
-	  }
-	  if (typeof thisArg == 'undefined') {
-	    return func;
-	  }
-	  switch (argCount) {
-	    case 1: return function(value) {
-	      return func.call(thisArg, value);
-	    };
-	    case 3: return function(value, index, collection) {
-	      return func.call(thisArg, value, index, collection);
-	    };
-	    case 4: return function(accumulator, value, index, collection) {
-	      return func.call(thisArg, accumulator, value, index, collection);
-	    };
-	    case 5: return function(value, other, key, object, source) {
-	      return func.call(thisArg, value, other, key, object, source);
-	    };
-	  }
-	  return function() {
-	    return func.apply(thisArg, arguments);
-	  };
-	}
-
-	module.exports = bindCallback;
-
-
-/***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var isObject = __webpack_require__(24);
-
-	/**
-	 * Checks if `value` is suitable for strict equality comparisons, i.e. `===`.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` if suitable for strict
-	 *  equality comparisons, else `false`.
-	 */
-	function isStrictComparable(value) {
-	  return value === value && (value === 0 ? ((1 / value) > 0) : !isObject(value));
-	}
-
-	module.exports = isStrictComparable;
-
-
-/***/ },
-/* 16 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -1800,11 +1941,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 17 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseForOwn = __webpack_require__(25),
-	    createBaseEach = __webpack_require__(26);
+	var baseForOwn = __webpack_require__(28),
+	    createBaseEach = __webpack_require__(29);
 
 	/**
 	 * The base implementation of `_.forEach` without support for callback
@@ -1821,11 +1962,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 18 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var bindCallback = __webpack_require__(14),
-	    isArray = __webpack_require__(6);
+	var bindCallback = __webpack_require__(12),
+	    isArray = __webpack_require__(8);
 
 	/**
 	 * Creates a function for `_.forEach` or `_.forEachRight`.
@@ -1847,148 +1988,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var baseCopy = __webpack_require__(27),
-	    keys = __webpack_require__(28);
-
-	/**
-	 * The base implementation of `_.assign` without support for argument juggling,
-	 * multiple sources, and `this` binding `customizer` functions.
-	 *
-	 * @private
-	 * @param {Object} object The destination object.
-	 * @param {Object} source The source object.
-	 * @param {Function} [customizer] The function to customize assigning values.
-	 * @returns {Object} Returns the destination object.
-	 */
-	function baseAssign(object, source, customizer) {
-	  var props = keys(source);
-	  if (!customizer) {
-	    return baseCopy(source, object, props);
-	  }
-	  var index = -1,
-	      length = props.length;
-
-	  while (++index < length) {
-	    var key = props[index],
-	        value = object[key],
-	        result = customizer(value, source[key], key, object, source);
-
-	    if ((result === result ? (result !== value) : (value === value)) ||
-	        (typeof value == 'undefined' && !(key in object))) {
-	      object[key] = result;
-	    }
-	  }
-	  return object;
-	}
-
-	module.exports = baseAssign;
-
-
-/***/ },
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var bindCallback = __webpack_require__(14),
-	    isIterateeCall = __webpack_require__(29);
-
-	/**
-	 * Creates a function that assigns properties of source object(s) to a given
-	 * destination object.
-	 *
-	 * **Note:** This function is used to create `_.assign`, `_.defaults`, and `_.merge`.
-	 *
-	 * @private
-	 * @param {Function} assigner The function to assign values.
-	 * @returns {Function} Returns the new assigner function.
-	 */
-	function createAssigner(assigner) {
-	  return function() {
-	    var args = arguments,
-	        length = args.length,
-	        object = args[0];
-
-	    if (length < 2 || object == null) {
-	      return object;
-	    }
-	    var customizer = args[length - 2],
-	        thisArg = args[length - 1],
-	        guard = args[3];
-
-	    if (length > 3 && typeof customizer == 'function') {
-	      customizer = bindCallback(customizer, thisArg, 5);
-	      length -= 2;
-	    } else {
-	      customizer = (length > 2 && typeof thisArg == 'function') ? thisArg : null;
-	      length -= (customizer ? 1 : 0);
-	    }
-	    if (guard && isIterateeCall(args[1], args[2], guard)) {
-	      customizer = length == 3 ? null : customizer;
-	      length = 2;
-	    }
-	    var index = 0;
-	    while (++index < length) {
-	      var source = args[index];
-	      if (source) {
-	        assigner(object, source, customizer);
-	      }
-	    }
-	    return object;
-	  };
-	}
-
-	module.exports = createAssigner;
-
-
-/***/ },
-/* 21 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var baseToString = __webpack_require__(30);
-
-	/**
-	 * Used to match `RegExp` [special characters](http://www.regular-expressions.info/characters.html#special).
-	 * In addition to special characters the forward slash is escaped to allow for
-	 * easier `eval` use and `Function` compilation.
-	 */
-	var reRegExpChars = /[.*+?^${}()|[\]\/\\]/g,
-	    reHasRegExpChars = RegExp(reRegExpChars.source);
-
-	/**
-	 * Escapes the `RegExp` special characters "\", "/", "^", "$", ".", "|", "?",
-	 * "*", "+", "(", ")", "[", "]", "{" and "}" in `string`.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category String
-	 * @param {string} [string=''] The string to escape.
-	 * @returns {string} Returns the escaped string.
-	 * @example
-	 *
-	 * _.escapeRegExp('[lodash](https://lodash.com/)');
-	 * // => '\[lodash\]\(https:\/\/lodash\.com\/\)'
-	 */
-	function escapeRegExp(string) {
-	  string = baseToString(string);
-	  return (string && reHasRegExpChars.test(string))
-	    ? string.replace(reRegExpChars, '\\$&')
-	    : string;
-	}
-
-	module.exports = escapeRegExp;
-
-
-/***/ },
 /* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var equalArrays = __webpack_require__(31),
-	    equalByTag = __webpack_require__(32),
-	    equalObjects = __webpack_require__(33),
-	    isArray = __webpack_require__(6),
-	    isTypedArray = __webpack_require__(34);
+	var equalArrays = __webpack_require__(30),
+	    equalByTag = __webpack_require__(31),
+	    equalObjects = __webpack_require__(32),
+	    isArray = __webpack_require__(8),
+	    isTypedArray = __webpack_require__(33);
 
 	/** `Object#toString` result references. */
 	var argsTag = '[object Arguments]',
@@ -2124,99 +2131,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
-	 * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
-	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
-	 * @example
-	 *
-	 * _.isObject({});
-	 * // => true
-	 *
-	 * _.isObject([1, 2, 3]);
-	 * // => true
-	 *
-	 * _.isObject(1);
-	 * // => false
-	 */
-	function isObject(value) {
-	  // Avoid a V8 JIT bug in Chrome 19-20.
-	  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
-	  var type = typeof value;
-	  return type == 'function' || (!!value && type == 'object');
-	}
-
-	module.exports = isObject;
-
-
-/***/ },
-/* 25 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var baseFor = __webpack_require__(35),
-	    keys = __webpack_require__(28);
-
-	/**
-	 * The base implementation of `_.forOwn` without support for callback
-	 * shorthands and `this` binding.
-	 *
-	 * @private
-	 * @param {Object} object The object to iterate over.
-	 * @param {Function} iteratee The function invoked per iteration.
-	 * @returns {Object} Returns `object`.
-	 */
-	function baseForOwn(object, iteratee) {
-	  return baseFor(object, iteratee, keys);
-	}
-
-	module.exports = baseForOwn;
-
-
-/***/ },
-/* 26 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var isLength = __webpack_require__(10),
-	    toObject = __webpack_require__(36);
-
-	/**
-	 * Creates a `baseEach` or `baseEachRight` function.
-	 *
-	 * @private
-	 * @param {Function} eachFunc The function to iterate over a collection.
-	 * @param {boolean} [fromRight] Specify iterating from right to left.
-	 * @returns {Function} Returns the new base function.
-	 */
-	function createBaseEach(eachFunc, fromRight) {
-	  return function(collection, iteratee) {
-	    var length = collection ? collection.length : 0;
-	    if (!isLength(length)) {
-	      return eachFunc(collection, iteratee);
-	    }
-	    var index = fromRight ? length : -1,
-	        iterable = toObject(collection);
-
-	    while ((fromRight ? index-- : ++index < length)) {
-	      if (iteratee(iterable[index], index, iterable) === false) {
-	        break;
-	      }
-	    }
-	    return collection;
-	  };
-	}
-
-	module.exports = createBaseEach;
-
-
-/***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
 	 * Copies the properties of `source` to `object`.
 	 *
 	 * @private
@@ -2244,13 +2158,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 28 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isLength = __webpack_require__(10),
-	    isNative = __webpack_require__(11),
-	    isObject = __webpack_require__(24),
-	    shimKeys = __webpack_require__(37);
+	var isLength = __webpack_require__(16),
+	    isNative = __webpack_require__(17),
+	    isObject = __webpack_require__(9),
+	    shimKeys = __webpack_require__(34);
 
 	/* Native method references for those with the same name as other `lodash` methods. */
 	var nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys;
@@ -2298,12 +2212,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 29 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isIndex = __webpack_require__(38),
-	    isLength = __webpack_require__(10),
-	    isObject = __webpack_require__(24);
+	var isIndex = __webpack_require__(35),
+	    isLength = __webpack_require__(16),
+	    isObject = __webpack_require__(9);
 
 	/**
 	 * Checks if the provided arguments are from an iteratee call.
@@ -2336,29 +2250,104 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 30 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var baseToString = __webpack_require__(36);
+
 	/**
-	 * Converts `value` to a string if it is not one. An empty string is returned
-	 * for `null` or `undefined` values.
-	 *
-	 * @private
-	 * @param {*} value The value to process.
-	 * @returns {string} Returns the string.
+	 * Used to match `RegExp` [special characters](http://www.regular-expressions.info/characters.html#special).
+	 * In addition to special characters the forward slash is escaped to allow for
+	 * easier `eval` use and `Function` compilation.
 	 */
-	function baseToString(value) {
-	  if (typeof value == 'string') {
-	    return value;
-	  }
-	  return value == null ? '' : (value + '');
+	var reRegExpChars = /[.*+?^${}()|[\]\/\\]/g,
+	    reHasRegExpChars = RegExp(reRegExpChars.source);
+
+	/**
+	 * Escapes the `RegExp` special characters "\", "/", "^", "$", ".", "|", "?",
+	 * "*", "+", "(", ")", "[", "]", "{" and "}" in `string`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category String
+	 * @param {string} [string=''] The string to escape.
+	 * @returns {string} Returns the escaped string.
+	 * @example
+	 *
+	 * _.escapeRegExp('[lodash](https://lodash.com/)');
+	 * // => '\[lodash\]\(https:\/\/lodash\.com\/\)'
+	 */
+	function escapeRegExp(string) {
+	  string = baseToString(string);
+	  return (string && reHasRegExpChars.test(string))
+	    ? string.replace(reRegExpChars, '\\$&')
+	    : string;
 	}
 
-	module.exports = baseToString;
+	module.exports = escapeRegExp;
 
 
 /***/ },
-/* 31 */
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var baseFor = __webpack_require__(37),
+	    keys = __webpack_require__(25);
+
+	/**
+	 * The base implementation of `_.forOwn` without support for callback
+	 * shorthands and `this` binding.
+	 *
+	 * @private
+	 * @param {Object} object The object to iterate over.
+	 * @param {Function} iteratee The function invoked per iteration.
+	 * @returns {Object} Returns `object`.
+	 */
+	function baseForOwn(object, iteratee) {
+	  return baseFor(object, iteratee, keys);
+	}
+
+	module.exports = baseForOwn;
+
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var isLength = __webpack_require__(16),
+	    toObject = __webpack_require__(38);
+
+	/**
+	 * Creates a `baseEach` or `baseEachRight` function.
+	 *
+	 * @private
+	 * @param {Function} eachFunc The function to iterate over a collection.
+	 * @param {boolean} [fromRight] Specify iterating from right to left.
+	 * @returns {Function} Returns the new base function.
+	 */
+	function createBaseEach(eachFunc, fromRight) {
+	  return function(collection, iteratee) {
+	    var length = collection ? collection.length : 0;
+	    if (!isLength(length)) {
+	      return eachFunc(collection, iteratee);
+	    }
+	    var index = fromRight ? length : -1,
+	        iterable = toObject(collection);
+
+	    while ((fromRight ? index-- : ++index < length)) {
+	      if (iteratee(iterable[index], index, iterable) === false) {
+	        break;
+	      }
+	    }
+	    return collection;
+	  };
+	}
+
+	module.exports = createBaseEach;
+
+
+/***/ },
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -2418,7 +2407,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 32 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** `Object#toString` result references. */
@@ -2473,10 +2462,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 33 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var keys = __webpack_require__(28);
+	var keys = __webpack_require__(25);
 
 	/** Used for native method references. */
 	var objectProto = Object.prototype;
@@ -2553,11 +2542,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 34 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isLength = __webpack_require__(10),
-	    isObjectLike = __webpack_require__(12);
+	var isLength = __webpack_require__(16),
+	    isObjectLike = __webpack_require__(18);
 
 	/** `Object#toString` result references. */
 	var argsTag = '[object Arguments]',
@@ -2633,58 +2622,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 35 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var createBaseFor = __webpack_require__(39);
-
-	/**
-	 * The base implementation of `baseForIn` and `baseForOwn` which iterates
-	 * over `object` properties returned by `keysFunc` invoking `iteratee` for
-	 * each property. Iterator functions may exit iteration early by explicitly
-	 * returning `false`.
-	 *
-	 * @private
-	 * @param {Object} object The object to iterate over.
-	 * @param {Function} iteratee The function invoked per iteration.
-	 * @param {Function} keysFunc The function to get the keys of `object`.
-	 * @returns {Object} Returns `object`.
-	 */
-	var baseFor = createBaseFor();
-
-	module.exports = baseFor;
-
-
-/***/ },
-/* 36 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var isObject = __webpack_require__(24);
-
-	/**
-	 * Converts `value` to an object if it is not one.
-	 *
-	 * @private
-	 * @param {*} value The value to process.
-	 * @returns {Object} Returns the object.
-	 */
-	function toObject(value) {
-	  return isObject(value) ? value : Object(value);
-	}
-
-	module.exports = toObject;
-
-
-/***/ },
-/* 37 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var isArguments = __webpack_require__(40),
-	    isArray = __webpack_require__(6),
-	    isIndex = __webpack_require__(38),
-	    isLength = __webpack_require__(10),
-	    keysIn = __webpack_require__(41),
-	    support = __webpack_require__(42);
+	var isArguments = __webpack_require__(39),
+	    isArray = __webpack_require__(8),
+	    isIndex = __webpack_require__(35),
+	    isLength = __webpack_require__(16),
+	    keysIn = __webpack_require__(40),
+	    support = __webpack_require__(41);
 
 	/** Used for native method references. */
 	var objectProto = Object.prototype;
@@ -2724,7 +2670,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 38 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -2751,44 +2697,76 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 39 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var toObject = __webpack_require__(36);
-
 	/**
-	 * Creates a base function for `_.forIn` or `_.forInRight`.
+	 * Converts `value` to a string if it is not one. An empty string is returned
+	 * for `null` or `undefined` values.
 	 *
 	 * @private
-	 * @param {boolean} [fromRight] Specify iterating from right to left.
-	 * @returns {Function} Returns the new base function.
+	 * @param {*} value The value to process.
+	 * @returns {string} Returns the string.
 	 */
-	function createBaseFor(fromRight) {
-	  return function(object, iteratee, keysFunc) {
-	    var iterable = toObject(object),
-	        props = keysFunc(object),
-	        length = props.length,
-	        index = fromRight ? length : -1;
-
-	    while ((fromRight ? index-- : ++index < length)) {
-	      var key = props[index];
-	      if (iteratee(iterable[key], key, iterable) === false) {
-	        break;
-	      }
-	    }
-	    return object;
-	  };
+	function baseToString(value) {
+	  if (typeof value == 'string') {
+	    return value;
+	  }
+	  return value == null ? '' : (value + '');
 	}
 
-	module.exports = createBaseFor;
+	module.exports = baseToString;
 
 
 /***/ },
-/* 40 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isLength = __webpack_require__(10),
-	    isObjectLike = __webpack_require__(12);
+	var createBaseFor = __webpack_require__(42);
+
+	/**
+	 * The base implementation of `baseForIn` and `baseForOwn` which iterates
+	 * over `object` properties returned by `keysFunc` invoking `iteratee` for
+	 * each property. Iterator functions may exit iteration early by explicitly
+	 * returning `false`.
+	 *
+	 * @private
+	 * @param {Object} object The object to iterate over.
+	 * @param {Function} iteratee The function invoked per iteration.
+	 * @param {Function} keysFunc The function to get the keys of `object`.
+	 * @returns {Object} Returns `object`.
+	 */
+	var baseFor = createBaseFor();
+
+	module.exports = baseFor;
+
+
+/***/ },
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var isObject = __webpack_require__(9);
+
+	/**
+	 * Converts `value` to an object if it is not one.
+	 *
+	 * @private
+	 * @param {*} value The value to process.
+	 * @returns {Object} Returns the object.
+	 */
+	function toObject(value) {
+	  return isObject(value) ? value : Object(value);
+	}
+
+	module.exports = toObject;
+
+
+/***/ },
+/* 39 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var isLength = __webpack_require__(16),
+	    isObjectLike = __webpack_require__(18);
 
 	/** `Object#toString` result references. */
 	var argsTag = '[object Arguments]';
@@ -2827,15 +2805,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 41 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isArguments = __webpack_require__(40),
-	    isArray = __webpack_require__(6),
-	    isIndex = __webpack_require__(38),
-	    isLength = __webpack_require__(10),
-	    isObject = __webpack_require__(24),
-	    support = __webpack_require__(42);
+	var isArguments = __webpack_require__(39),
+	    isArray = __webpack_require__(8),
+	    isIndex = __webpack_require__(35),
+	    isLength = __webpack_require__(16),
+	    isObject = __webpack_require__(9),
+	    support = __webpack_require__(41);
 
 	/** Used for native method references. */
 	var objectProto = Object.prototype;
@@ -2898,7 +2876,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 42 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/** Used for native method references. */
@@ -2973,6 +2951,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = support;
 
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 42 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var toObject = __webpack_require__(38);
+
+	/**
+	 * Creates a base function for `_.forIn` or `_.forInRight`.
+	 *
+	 * @private
+	 * @param {boolean} [fromRight] Specify iterating from right to left.
+	 * @returns {Function} Returns the new base function.
+	 */
+	function createBaseFor(fromRight) {
+	  return function(object, iteratee, keysFunc) {
+	    var iterable = toObject(object),
+	        props = keysFunc(object),
+	        length = props.length,
+	        index = fromRight ? length : -1;
+
+	    while ((fromRight ? index-- : ++index < length)) {
+	      var key = props[index];
+	      if (iteratee(iterable[key], key, iterable) === false) {
+	        break;
+	      }
+	    }
+	    return object;
+	  };
+	}
+
+	module.exports = createBaseFor;
+
 
 /***/ }
 /******/ ])

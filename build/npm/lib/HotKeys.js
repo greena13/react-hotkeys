@@ -28,6 +28,10 @@ var _isArray = require('lodash/lang/isArray');
 
 var _isArray2 = _interopRequireWildcard(_isArray);
 
+var _isObject = require('lodash/lang/isObject');
+
+var _isObject2 = _interopRequireWildcard(_isObject);
+
 var _forEach = require('lodash/collection/forEach');
 
 var _forEach2 = _interopRequireWildcard(_forEach);
@@ -110,7 +114,7 @@ var HotKeys = _React2['default'].createClass({
     var handlers = _props$handlers === undefined ? {} : _props$handlers;
 
     var hotKeyMap = this.getMap();
-    var sequenceHandlers = {};
+    var sequenceHandlers = [];
     var mousetrap = this.__mousetrap__;
 
     // Group all our handlers by sequence
@@ -120,7 +124,9 @@ var HotKeys = _React2['default'].createClass({
       // Could be optimized as every handler will get called across every bound
       // component - imagine making a node a focus point and then having hundreds!
       _forEach2['default'](handlerSequences, function (sequence) {
-        sequenceHandlers[sequence] = function (event, sequence) {
+        var action = undefined;
+
+        var callback = function callback(event, sequence) {
           // Check we are actually in focus and that a child hasn't already handled this sequence
           if (_this.__isFocused__ && sequence !== _this.__lastChildSequence__) {
             if (_this.context.hotKeyParent) {
@@ -130,13 +136,20 @@ var HotKeys = _React2['default'].createClass({
             return handler(event, sequence);
           }
         };
+
+        if (_isObject2['default'](sequence)) {
+          action = sequence.action;
+          sequence = sequence.sequence;
+        }
+
+        sequenceHandlers.push({ callback: callback, action: action, sequence: sequence });
       });
     });
 
     // Hard reset our handlers (probably could be more efficient)
     mousetrap.reset();
-    _forEach2['default'](sequenceHandlers, function (handler, sequence) {
-      return mousetrap.bind(sequence, handler);
+    _forEach2['default'](sequenceHandlers, function (handler) {
+      return mousetrap.bind(handler.sequence, handler.callback, handler.action);
     });
   },
 
