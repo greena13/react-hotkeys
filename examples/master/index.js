@@ -7,7 +7,7 @@ const SIZE_INCREMENT = 5;
 const POS_INCREMENT = 5;
 
 const keyMap = {
-  'delete': ['del', 'backspace'],
+  'delete': ['del', {sequence: 'backspace', action: 'keyup'}],
   'expand': 'alt+up',
   'contract': 'alt+down',
   'konami': 'up up down down left right left right b a enter'
