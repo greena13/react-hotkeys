@@ -1,19 +1,19 @@
 'use strict';
 
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj['default'] : obj; };
-
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _default = require('./HotKeys');
+function _interopRequire(obj) { return obj && obj.__esModule ? obj['default'] : obj; }
 
-exports.HotKeys = _interopRequire(_default);
+var _HotKeys = require('./HotKeys');
 
-var _default2 = require('./FocusTrap');
+exports.HotKeys = _interopRequire(_HotKeys);
 
-exports.FocusTrap = _interopRequire(_default2);
+var _FocusTrap = require('./FocusTrap');
 
-var _default3 = require('./HotKeyMapMixin');
+exports.FocusTrap = _interopRequire(_FocusTrap);
 
-exports.HotKeyMapMixin = _interopRequire(_default3);
+var _HotKeyMapMixin = require('./HotKeyMapMixin');
+
+exports.HotKeyMapMixin = _interopRequire(_HotKeyMapMixin);
