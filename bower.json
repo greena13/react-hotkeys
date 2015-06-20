@@ -1,0 +1,28 @@
+{
+  "name": "react-hotkeys",
+  "version": "0.3.1",
+  "homepage": "https://github.com/Chrisui/react-hotkeys",
+  "authors": [
+    "Chris Pearce <hello@chrispearce.me>"
+  ],
+  "description": "Declarative hotkey management for React applications",
+  "main": "build/global/react-hotkeys.js",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "react",
+    "hotkeys",
+    "focus"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
