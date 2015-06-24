@@ -32,6 +32,10 @@ var _forEach = require('lodash/collection/forEach');
 
 var _forEach2 = _interopRequireWildcard(_forEach);
 
+var _isEqual = require('lodash/lang/isEqual');
+
+var _isEqual2 = _interopRequireWildcard(_isEqual);
+
 function getSequencesFromMap(hotKeyMap, hotKeyName) {
   var sequences = hotKeyMap[hotKeyName];
 
@@ -86,8 +90,8 @@ var HotKeys = _React2['default'].createClass({
     this.updateHotKeys(true);
   },
 
-  componentDidUpdate: function componentDidUpdate() {
-    this.updateHotKeys();
+  componentDidUpdate: function componentDidUpdate(prevProps) {
+    this.updateHotKeys(false, prevProps);
   },
 
   componentWillUnmount: function componentWillUnmount() {
@@ -102,15 +106,17 @@ var HotKeys = _React2['default'].createClass({
     var _this = this;
 
     var force = arguments[0] === undefined ? false : arguments[0];
+    var prevProps = arguments[1] === undefined ? {} : arguments[1];
+    var _props$handlers = this.props.handlers;
+    var handlers = _props$handlers === undefined ? {} : _props$handlers;
+    var _prevProps$handlers = prevProps.handlers;
+    var prevHandlers = _prevProps$handlers === undefined ? handlers : _prevProps$handlers;
 
     // Ensure map is up-to-date to begin with
     // We will only bother continuing if the map was actually updated
-    if (!this.updateMap() && !force) {
+    if (!force && _isEqual2['default'](handlers, prevHandlers) && !this.updateMap()) {
       return;
     }
-
-    var _props$handlers = this.props.handlers;
-    var handlers = _props$handlers === undefined ? {} : _props$handlers;
 
     var hotKeyMap = this.getMap();
     var sequenceHandlers = [];

@@ -87,6 +87,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var forEach = _interopRequire(__webpack_require__(8));
 
+	var isEqual = _interopRequire(__webpack_require__(7));
+
 	function getSequencesFromMap(hotKeyMap, hotKeyName) {
 	  var sequences = hotKeyMap[hotKeyName];
 
@@ -141,8 +143,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.updateHotKeys(true);
 	  },
 
-	  componentDidUpdate: function componentDidUpdate() {
-	    this.updateHotKeys();
+	  componentDidUpdate: function componentDidUpdate(prevProps) {
+	    this.updateHotKeys(false, prevProps);
 	  },
 
 	  componentWillUnmount: function componentWillUnmount() {
@@ -157,15 +159,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var _this = this;
 
 	    var force = arguments[0] === undefined ? false : arguments[0];
+	    var prevProps = arguments[1] === undefined ? {} : arguments[1];
+	    var _props$handlers = this.props.handlers;
+	    var handlers = _props$handlers === undefined ? {} : _props$handlers;
+	    var _prevProps$handlers = prevProps.handlers;
+	    var prevHandlers = _prevProps$handlers === undefined ? handlers : _prevProps$handlers;
 
 	    // Ensure map is up-to-date to begin with
 	    // We will only bother continuing if the map was actually updated
-	    if (!this.updateMap() && !force) {
+	    if (!force && isEqual(handlers, prevHandlers) && !this.updateMap()) {
 	      return;
 	    }
-
-	    var _props$handlers = this.props.handlers;
-	    var handlers = _props$handlers === undefined ? {} : _props$handlers;
 
 	    var hotKeyMap = this.getMap();
 	    var sequenceHandlers = [];
