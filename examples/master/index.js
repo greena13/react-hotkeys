@@ -49,7 +49,7 @@ const App = React.createClass({
             <li>Want to get started? <a href="https://github.com/Chrisui/react-hotkeys/blob/master/docs/getting-started.md">Read the guide.</a></li>
           </ul>
         </div>
-        <HotKeys handlers={handlers} className={'viewport ' + (this.state && this.state.konamiTime ? 'konamiTime' : '')}>
+        <HotKeys focused={true} handlers={handlers} className={'viewport ' + (this.state && this.state.konamiTime ? 'konamiTime' : '')}>
           {Array.apply(null, new Array(10)).map((e, i) => <Node key={i} />)}
         </HotKeys>
       </div>
