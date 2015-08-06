@@ -81,13 +81,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var HotKeyMapMixin = _interopRequire(__webpack_require__(3));
 
-	var isArray = _interopRequire(__webpack_require__(5));
+	var isBool = _interopRequire(__webpack_require__(5));
 
-	var isObject = _interopRequire(__webpack_require__(6));
+	var isArray = _interopRequire(__webpack_require__(6));
 
-	var forEach = _interopRequire(__webpack_require__(8));
+	var isObject = _interopRequire(__webpack_require__(7));
 
-	var isEqual = _interopRequire(__webpack_require__(7));
+	var forEach = _interopRequire(__webpack_require__(9));
+
+	var isEqual = _interopRequire(__webpack_require__(8));
 
 	function getSequencesFromMap(hotKeyMap, hotKeyName) {
 	  var sequences = hotKeyMap[hotKeyName];
@@ -113,9 +115,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  propTypes: {
 	    onFocus: React.PropTypes.func,
 	    onBlur: React.PropTypes.func,
-	    focusName: React.PropTypes.string, // Currently unused
 	    keyMap: React.PropTypes.object,
-	    handlers: React.PropTypes.object
+	    handlers: React.PropTypes.object,
+	    focused: React.PropTypes.bool, // externally controlled focus
+	    attach: React.PropTypes.any // dom element to listen for key events
 	  },
 
 	  contextTypes: {
@@ -135,10 +138,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  componentDidMount: function componentDidMount() {
 	    // import is here to support React's server rendering as Mousetrap immediately
 	    // calls itself with window and it fails in Node environment
-	    var Mousetrap = __webpack_require__(10);
+	    var Mousetrap = __webpack_require__(11);
 	    // Not optimal - imagine hundreds of this component. We need a top level
 	    // delegation point for mousetrap
-	    this.__mousetrap__ = new Mousetrap(React.findDOMNode(this.refs.focusTrap));
+	    this.__mousetrap__ = new Mousetrap(this.props.attach || React.findDOMNode(this));
 
 	    this.updateHotKeys(true);
 	  },
@@ -186,7 +189,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        var callback = function (event, sequence) {
 	          // Check we are actually in focus and that a child hasn't already handled this sequence
-	          if (_this.__isFocused__ && sequence !== _this.__lastChildSequence__) {
+	          var isFocused = isBool(_this.props.focused) ? _this.props.focused : _this.__isFocused__;
+
+	          if (isFocused && sequence !== _this.__lastChildSequence__) {
 	            if (_this.context.hotKeyParent) {
 	              _this.context.hotKeyParent.childHandledSequence(sequence);
 	            }
@@ -245,7 +250,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  render: function render() {
 	    return React.createElement(
 	      FocusTrap,
-	      _extends({ ref: "focusTrap" }, this.props, { onFocus: this.onFocus, onBlur: this.onBlur }),
+	      _extends({}, this.props, { onFocus: this.onFocus, onBlur: this.onBlur }),
 	      this.props.children
 	    );
 	  }
@@ -299,9 +304,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var React = _interopRequire(__webpack_require__(4));
 
-	var assign = _interopRequire(__webpack_require__(9));
+	var assign = _interopRequire(__webpack_require__(10));
 
-	var isEqual = _interopRequire(__webpack_require__(7));
+	var isEqual = _interopRequire(__webpack_require__(8));
 
 	function HotKeyMapMixin() {
 	  var hotKeyMap = arguments[0] === undefined ? {} : arguments[0];
@@ -361,9 +366,50 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isLength = __webpack_require__(11),
-	    isNative = __webpack_require__(12),
-	    isObjectLike = __webpack_require__(13);
+	var isObjectLike = __webpack_require__(12);
+
+	/** `Object#toString` result references. */
+	var boolTag = '[object Boolean]';
+
+	/** Used for native method references. */
+	var objectProto = Object.prototype;
+
+	/**
+	 * Used to resolve the [`toStringTag`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var objToString = objectProto.toString;
+
+	/**
+	 * Checks if `value` is classified as a boolean primitive or object.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
+	 * @example
+	 *
+	 * _.isBoolean(false);
+	 * // => true
+	 *
+	 * _.isBoolean(null);
+	 * // => false
+	 */
+	function isBoolean(value) {
+	  return value === true || value === false || (isObjectLike(value) && objToString.call(value) == boolTag);
+	}
+
+	module.exports = isBoolean;
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var isLength = __webpack_require__(13),
+	    isNative = __webpack_require__(14),
+	    isObjectLike = __webpack_require__(12);
 
 	/** `Object#toString` result references. */
 	var arrayTag = '[object Array]';
@@ -404,7 +450,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -438,12 +484,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseIsEqual = __webpack_require__(14),
-	    bindCallback = __webpack_require__(15),
-	    isStrictComparable = __webpack_require__(16);
+	var baseIsEqual = __webpack_require__(15),
+	    bindCallback = __webpack_require__(16),
+	    isStrictComparable = __webpack_require__(17);
 
 	/**
 	 * Performs a deep comparison between two values to determine if they are
@@ -501,12 +547,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrayEach = __webpack_require__(17),
-	    baseEach = __webpack_require__(18),
-	    createForEach = __webpack_require__(19);
+	var arrayEach = __webpack_require__(18),
+	    baseEach = __webpack_require__(19),
+	    createForEach = __webpack_require__(20);
 
 	/**
 	 * Iterates over elements of `collection` invoking `iteratee` for each element.
@@ -544,11 +590,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseAssign = __webpack_require__(20),
-	    createAssigner = __webpack_require__(21);
+	var baseAssign = __webpack_require__(21),
+	    createAssigner = __webpack_require__(22);
 
 	/**
 	 * Assigns own enumerable properties of source object(s) to the destination
@@ -585,7 +631,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*global define:false */
@@ -1612,7 +1658,25 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Checks if `value` is object-like.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+	 */
+	function isObjectLike(value) {
+	  return !!value && typeof value == 'object';
+	}
+
+	module.exports = isObjectLike;
+
+
+/***/ },
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -1638,11 +1702,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var escapeRegExp = __webpack_require__(22),
-	    isObjectLike = __webpack_require__(13);
+	var escapeRegExp = __webpack_require__(23),
+	    isObjectLike = __webpack_require__(12);
 
 	/** `Object#toString` result references. */
 	var funcTag = '[object Function]';
@@ -1698,28 +1762,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * Checks if `value` is object-like.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
-	 */
-	function isObjectLike(value) {
-	  return !!value && typeof value == 'object';
-	}
-
-	module.exports = isObjectLike;
-
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var baseIsEqualDeep = __webpack_require__(23);
+	var baseIsEqualDeep = __webpack_require__(24);
 
 	/**
 	 * The base implementation of `_.isEqual` without support for `this` binding
@@ -1756,10 +1802,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var identity = __webpack_require__(24);
+	var identity = __webpack_require__(25);
 
 	/**
 	 * A specialized version of `baseCallback` which only supports `this` binding
@@ -1801,10 +1847,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(6);
+	var isObject = __webpack_require__(7);
 
 	/**
 	 * Checks if `value` is suitable for strict equality comparisons, i.e. `===`.
@@ -1822,7 +1868,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -1850,11 +1896,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseForOwn = __webpack_require__(25),
-	    createBaseEach = __webpack_require__(26);
+	var baseForOwn = __webpack_require__(26),
+	    createBaseEach = __webpack_require__(27);
 
 	/**
 	 * The base implementation of `_.forEach` without support for callback
@@ -1871,11 +1917,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var bindCallback = __webpack_require__(15),
-	    isArray = __webpack_require__(5);
+	var bindCallback = __webpack_require__(16),
+	    isArray = __webpack_require__(6);
 
 	/**
 	 * Creates a function for `_.forEach` or `_.forEachRight`.
@@ -1897,11 +1943,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseCopy = __webpack_require__(27),
-	    keys = __webpack_require__(28);
+	var baseCopy = __webpack_require__(28),
+	    keys = __webpack_require__(29);
 
 	/**
 	 * The base implementation of `_.assign` without support for argument juggling,
@@ -1938,11 +1984,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var bindCallback = __webpack_require__(15),
-	    isIterateeCall = __webpack_require__(29);
+	var bindCallback = __webpack_require__(16),
+	    isIterateeCall = __webpack_require__(30);
 
 	/**
 	 * Creates a function that assigns properties of source object(s) to a given
@@ -1993,10 +2039,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseToString = __webpack_require__(30);
+	var baseToString = __webpack_require__(31);
 
 	/**
 	 * Used to match `RegExp` [special characters](http://www.regular-expressions.info/characters.html#special).
@@ -2031,14 +2077,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 23 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var equalArrays = __webpack_require__(31),
-	    equalByTag = __webpack_require__(32),
-	    equalObjects = __webpack_require__(33),
-	    isArray = __webpack_require__(5),
-	    isTypedArray = __webpack_require__(34);
+	var equalArrays = __webpack_require__(32),
+	    equalByTag = __webpack_require__(33),
+	    equalObjects = __webpack_require__(34),
+	    isArray = __webpack_require__(6),
+	    isTypedArray = __webpack_require__(35);
 
 	/** `Object#toString` result references. */
 	var argsTag = '[object Arguments]',
@@ -2144,7 +2190,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 24 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -2170,11 +2216,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 25 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseFor = __webpack_require__(35),
-	    keys = __webpack_require__(28);
+	var baseFor = __webpack_require__(36),
+	    keys = __webpack_require__(29);
 
 	/**
 	 * The base implementation of `_.forOwn` without support for callback
@@ -2193,11 +2239,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isLength = __webpack_require__(11),
-	    toObject = __webpack_require__(36);
+	var isLength = __webpack_require__(13),
+	    toObject = __webpack_require__(37);
 
 	/**
 	 * Creates a `baseEach` or `baseEachRight` function.
@@ -2229,7 +2275,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -2260,13 +2306,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 28 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isLength = __webpack_require__(11),
-	    isNative = __webpack_require__(12),
-	    isObject = __webpack_require__(6),
-	    shimKeys = __webpack_require__(37);
+	var isLength = __webpack_require__(13),
+	    isNative = __webpack_require__(14),
+	    isObject = __webpack_require__(7),
+	    shimKeys = __webpack_require__(38);
 
 	/* Native method references for those with the same name as other `lodash` methods. */
 	var nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys;
@@ -2314,12 +2360,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isIndex = __webpack_require__(38),
-	    isLength = __webpack_require__(11),
-	    isObject = __webpack_require__(6);
+	var isIndex = __webpack_require__(39),
+	    isLength = __webpack_require__(13),
+	    isObject = __webpack_require__(7);
 
 	/**
 	 * Checks if the provided arguments are from an iteratee call.
@@ -2352,7 +2398,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -2374,7 +2420,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -2434,7 +2480,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** `Object#toString` result references. */
@@ -2489,10 +2535,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var keys = __webpack_require__(28);
+	var keys = __webpack_require__(29);
 
 	/** Used for native method references. */
 	var objectProto = Object.prototype;
@@ -2569,11 +2615,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isLength = __webpack_require__(11),
-	    isObjectLike = __webpack_require__(13);
+	var isLength = __webpack_require__(13),
+	    isObjectLike = __webpack_require__(12);
 
 	/** `Object#toString` result references. */
 	var argsTag = '[object Arguments]',
@@ -2649,10 +2695,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var createBaseFor = __webpack_require__(39);
+	var createBaseFor = __webpack_require__(40);
 
 	/**
 	 * The base implementation of `baseForIn` and `baseForOwn` which iterates
@@ -2672,10 +2718,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(6);
+	var isObject = __webpack_require__(7);
 
 	/**
 	 * Converts `value` to an object if it is not one.
@@ -2692,15 +2738,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isArguments = __webpack_require__(40),
-	    isArray = __webpack_require__(5),
-	    isIndex = __webpack_require__(38),
-	    isLength = __webpack_require__(11),
-	    keysIn = __webpack_require__(41),
-	    support = __webpack_require__(42);
+	var isArguments = __webpack_require__(41),
+	    isArray = __webpack_require__(6),
+	    isIndex = __webpack_require__(39),
+	    isLength = __webpack_require__(13),
+	    keysIn = __webpack_require__(42),
+	    support = __webpack_require__(43);
 
 	/** Used for native method references. */
 	var objectProto = Object.prototype;
@@ -2740,7 +2786,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -2767,10 +2813,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var toObject = __webpack_require__(36);
+	var toObject = __webpack_require__(37);
 
 	/**
 	 * Creates a base function for `_.forIn` or `_.forInRight`.
@@ -2800,11 +2846,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isLength = __webpack_require__(11),
-	    isObjectLike = __webpack_require__(13);
+	var isLength = __webpack_require__(13),
+	    isObjectLike = __webpack_require__(12);
 
 	/** `Object#toString` result references. */
 	var argsTag = '[object Arguments]';
@@ -2843,15 +2889,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isArguments = __webpack_require__(40),
-	    isArray = __webpack_require__(5),
-	    isIndex = __webpack_require__(38),
-	    isLength = __webpack_require__(11),
-	    isObject = __webpack_require__(6),
-	    support = __webpack_require__(42);
+	var isArguments = __webpack_require__(41),
+	    isArray = __webpack_require__(6),
+	    isIndex = __webpack_require__(39),
+	    isLength = __webpack_require__(13),
+	    isObject = __webpack_require__(7),
+	    support = __webpack_require__(43);
 
 	/** Used for native method references. */
 	var objectProto = Object.prototype;
@@ -2914,7 +2960,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/** Used for native method references. */

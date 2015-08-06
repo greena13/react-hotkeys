@@ -20,6 +20,10 @@ var _HotKeyMapMixin = require('./HotKeyMapMixin');
 
 var _HotKeyMapMixin2 = _interopRequireWildcard(_HotKeyMapMixin);
 
+var _isBool = require('lodash/lang/isBoolean');
+
+var _isBool2 = _interopRequireWildcard(_isBool);
+
 var _isArray = require('lodash/lang/isArray');
 
 var _isArray2 = _interopRequireWildcard(_isArray);
@@ -60,9 +64,10 @@ var HotKeys = _React2['default'].createClass({
   propTypes: {
     onFocus: _React2['default'].PropTypes.func,
     onBlur: _React2['default'].PropTypes.func,
-    focusName: _React2['default'].PropTypes.string, // Currently unused
     keyMap: _React2['default'].PropTypes.object,
-    handlers: _React2['default'].PropTypes.object
+    handlers: _React2['default'].PropTypes.object,
+    focused: _React2['default'].PropTypes.bool, // externally controlled focus
+    attach: _React2['default'].PropTypes.any // dom element to listen for key events
   },
 
   contextTypes: {
@@ -85,7 +90,7 @@ var HotKeys = _React2['default'].createClass({
     var Mousetrap = require('mousetrap');
     // Not optimal - imagine hundreds of this component. We need a top level
     // delegation point for mousetrap
-    this.__mousetrap__ = new Mousetrap(_React2['default'].findDOMNode(this.refs.focusTrap));
+    this.__mousetrap__ = new Mousetrap(this.props.attach || _React2['default'].findDOMNode(this));
 
     this.updateHotKeys(true);
   },
@@ -133,7 +138,9 @@ var HotKeys = _React2['default'].createClass({
 
         var callback = function callback(event, sequence) {
           // Check we are actually in focus and that a child hasn't already handled this sequence
-          if (_this.__isFocused__ && sequence !== _this.__lastChildSequence__) {
+          var isFocused = _isBool2['default'](_this.props.focused) ? _this.props.focused : _this.__isFocused__;
+
+          if (isFocused && sequence !== _this.__lastChildSequence__) {
             if (_this.context.hotKeyParent) {
               _this.context.hotKeyParent.childHandledSequence(sequence);
             }
@@ -192,7 +199,7 @@ var HotKeys = _React2['default'].createClass({
   render: function render() {
     return _React2['default'].createElement(
       _FocusTrap2['default'],
-      _extends({ ref: 'focusTrap' }, this.props, { onFocus: this.onFocus, onBlur: this.onBlur }),
+      _extends({}, this.props, { onFocus: this.onFocus, onBlur: this.onBlur }),
       this.props.children
     );
   }
