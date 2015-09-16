@@ -277,12 +277,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	  propTypes: {
 	    onFocus: React.PropTypes.func,
 	    onBlur: React.PropTypes.func,
-	    focusName: React.PropTypes.string // Currently unused
+	    focusName: React.PropTypes.string, // Currently unused
+	    component: React.PropTypes.any
+	  },
+
+	  getDefaultProps: function getDefaultProps() {
+	    return {
+	      component: "div"
+	    };
 	  },
 
 	  render: function render() {
+	    var Component = this.props.component;
+
 	    return React.createElement(
-	      "div",
+	      Component,
 	      _extends({ tabIndex: "-1" }, this.props),
 	      this.props.children
 	    );
