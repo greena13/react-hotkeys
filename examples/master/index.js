@@ -1,5 +1,6 @@
-import {FocusTrap, HotKeys, HotKeyMapMixin} from 'react-hotkeys';
+import {HotKeys, HotKeyMapMixin} from 'react-hotkeys';
 import React from 'react';
+import ReactDOM from 'react-dom';
 import rand from 'lodash/number/random';
 
 const DEFAULT_NODE_SIZE = 100;
@@ -118,9 +119,9 @@ const Node = React.createClass({
 });
 
 export function render(renderTo) {
-  React.render(<App />, renderTo);
+  ReactDOM.render(<App />, renderTo);
 }
 
 export function cleanup(cleanFrom) {
-  React.unmountComponentAtNode(cleanFrom);
+  ReactDOM.unmountComponentAtNode(cleanFrom);
 }
