@@ -16,15 +16,17 @@
     "jsdom": "^3.1.2",
     "mocha-jsdom": "^0.3.0",
     "prompt": "^0.2.14",
+    "react-addons-test-utils": "^0.14.0",
     "style-loader": "^0.9.0",
     "webpack": "^1.7.3"
   },
   "dependencies": {
-    "mousetrap": "^1.5.2",
-    "lodash": "^3.1.0"
+    "lodash": "^3.1.0",
+    "mousetrap": "^1.5.2"
   },
   "peerDependencies": {
-    "react": ">=0.12.2"
+    "react": "^0.14.0",
+    "react-dom": "^0.14.0"
   },
   "scripts": {
     "test": "scripts/test",
