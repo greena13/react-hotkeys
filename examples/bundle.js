@@ -22798,8 +22798,8 @@
 	// Hot Module Replacement
 	if(false) {
 		// When the styles change, update the <style> tags
-		module.hot.accept("!!/Users/cpsubrian/projects/js/react-hotkeys/node_modules/css-loader/index.js!/Users/cpsubrian/projects/js/react-hotkeys/node_modules/autoprefixer-loader/index.js!/Users/cpsubrian/projects/js/react-hotkeys/examples/style.css", function() {
-			var newContent = require("!!/Users/cpsubrian/projects/js/react-hotkeys/node_modules/css-loader/index.js!/Users/cpsubrian/projects/js/react-hotkeys/node_modules/autoprefixer-loader/index.js!/Users/cpsubrian/projects/js/react-hotkeys/examples/style.css");
+		module.hot.accept("!!/Users/chris/Projects/react-hotkeys/node_modules/css-loader/index.js!/Users/chris/Projects/react-hotkeys/node_modules/autoprefixer-loader/index.js!/Users/chris/Projects/react-hotkeys/examples/style.css", function() {
+			var newContent = require("!!/Users/chris/Projects/react-hotkeys/node_modules/css-loader/index.js!/Users/chris/Projects/react-hotkeys/node_modules/autoprefixer-loader/index.js!/Users/chris/Projects/react-hotkeys/examples/style.css");
 			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 			update(newContent);
 		});
