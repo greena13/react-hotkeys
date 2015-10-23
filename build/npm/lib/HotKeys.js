@@ -1,44 +1,48 @@
 'use strict';
 
-var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _React = require('react');
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React2 = _interopRequireWildcard(_React);
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactDom = require('react-dom');
+
+var _reactDom2 = _interopRequireDefault(_reactDom);
 
 var _FocusTrap = require('./FocusTrap');
 
-var _FocusTrap2 = _interopRequireWildcard(_FocusTrap);
+var _FocusTrap2 = _interopRequireDefault(_FocusTrap);
 
 var _HotKeyMapMixin = require('./HotKeyMapMixin');
 
-var _HotKeyMapMixin2 = _interopRequireWildcard(_HotKeyMapMixin);
+var _HotKeyMapMixin2 = _interopRequireDefault(_HotKeyMapMixin);
 
-var _isBool = require('lodash/lang/isBoolean');
+var _lodashLangIsBoolean = require('lodash/lang/isBoolean');
 
-var _isBool2 = _interopRequireWildcard(_isBool);
+var _lodashLangIsBoolean2 = _interopRequireDefault(_lodashLangIsBoolean);
 
-var _isArray = require('lodash/lang/isArray');
+var _lodashLangIsArray = require('lodash/lang/isArray');
 
-var _isArray2 = _interopRequireWildcard(_isArray);
+var _lodashLangIsArray2 = _interopRequireDefault(_lodashLangIsArray);
 
-var _isObject = require('lodash/lang/isObject');
+var _lodashLangIsObject = require('lodash/lang/isObject');
 
-var _isObject2 = _interopRequireWildcard(_isObject);
+var _lodashLangIsObject2 = _interopRequireDefault(_lodashLangIsObject);
 
-var _forEach = require('lodash/collection/forEach');
+var _lodashCollectionForEach = require('lodash/collection/forEach');
 
-var _forEach2 = _interopRequireWildcard(_forEach);
+var _lodashCollectionForEach2 = _interopRequireDefault(_lodashCollectionForEach);
 
-var _isEqual = require('lodash/lang/isEqual');
+var _lodashLangIsEqual = require('lodash/lang/isEqual');
 
-var _isEqual2 = _interopRequireWildcard(_isEqual);
+var _lodashLangIsEqual2 = _interopRequireDefault(_lodashLangIsEqual);
 
 function getSequencesFromMap(hotKeyMap, hotKeyName) {
   var sequences = hotKeyMap[hotKeyName];
@@ -49,33 +53,33 @@ function getSequencesFromMap(hotKeyMap, hotKeyName) {
     return [hotKeyName];
   }
 
-  if (_isArray2['default'](sequences)) {
+  if ((0, _lodashLangIsArray2['default'])(sequences)) {
     return sequences;
   }
 
   return [sequences];
 }
 
-var HotKeys = _React2['default'].createClass({
+var HotKeys = _react2['default'].createClass({
   displayName: 'HotKeys',
 
-  mixins: [_HotKeyMapMixin2['default']()],
+  mixins: [(0, _HotKeyMapMixin2['default'])()],
 
   propTypes: {
-    onFocus: _React2['default'].PropTypes.func,
-    onBlur: _React2['default'].PropTypes.func,
-    keyMap: _React2['default'].PropTypes.object,
-    handlers: _React2['default'].PropTypes.object,
-    focused: _React2['default'].PropTypes.bool, // externally controlled focus
-    attach: _React2['default'].PropTypes.any // dom element to listen for key events
+    onFocus: _react2['default'].PropTypes.func,
+    onBlur: _react2['default'].PropTypes.func,
+    keyMap: _react2['default'].PropTypes.object,
+    handlers: _react2['default'].PropTypes.object,
+    focused: _react2['default'].PropTypes.bool, // externally controlled focus
+    attach: _react2['default'].PropTypes.any // dom element to listen for key events
   },
 
   contextTypes: {
-    hotKeyParent: _React2['default'].PropTypes.any
+    hotKeyParent: _react2['default'].PropTypes.any
   },
 
   childContextTypes: {
-    hotKeyParent: _React2['default'].PropTypes.any
+    hotKeyParent: _react2['default'].PropTypes.any
   },
 
   getChildContext: function getChildContext() {
@@ -90,7 +94,7 @@ var HotKeys = _React2['default'].createClass({
     var Mousetrap = require('mousetrap');
     // Not optimal - imagine hundreds of this component. We need a top level
     // delegation point for mousetrap
-    this.__mousetrap__ = new Mousetrap(this.props.attach || _React2['default'].findDOMNode(this));
+    this.__mousetrap__ = new Mousetrap(this.props.attach || _reactDom2['default'].findDOMNode(this));
 
     this.updateHotKeys(true);
   },
@@ -110,8 +114,8 @@ var HotKeys = _React2['default'].createClass({
   updateHotKeys: function updateHotKeys() {
     var _this = this;
 
-    var force = arguments[0] === undefined ? false : arguments[0];
-    var prevProps = arguments[1] === undefined ? {} : arguments[1];
+    var force = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
+    var prevProps = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
     var _props$handlers = this.props.handlers;
     var handlers = _props$handlers === undefined ? {} : _props$handlers;
     var _prevProps$handlers = prevProps.handlers;
@@ -119,7 +123,7 @@ var HotKeys = _React2['default'].createClass({
 
     // Ensure map is up-to-date to begin with
     // We will only bother continuing if the map was actually updated
-    if (!force && _isEqual2['default'](handlers, prevHandlers) && !this.updateMap()) {
+    if (!force && (0, _lodashLangIsEqual2['default'])(handlers, prevHandlers) && !this.updateMap()) {
       return;
     }
 
@@ -128,17 +132,17 @@ var HotKeys = _React2['default'].createClass({
     var mousetrap = this.__mousetrap__;
 
     // Group all our handlers by sequence
-    _forEach2['default'](handlers, function (handler, hotKey) {
+    (0, _lodashCollectionForEach2['default'])(handlers, function (handler, hotKey) {
       var handlerSequences = getSequencesFromMap(hotKeyMap, hotKey);
 
       // Could be optimized as every handler will get called across every bound
       // component - imagine making a node a focus point and then having hundreds!
-      _forEach2['default'](handlerSequences, function (sequence) {
+      (0, _lodashCollectionForEach2['default'])(handlerSequences, function (sequence) {
         var action = undefined;
 
         var callback = function callback(event, sequence) {
           // Check we are actually in focus and that a child hasn't already handled this sequence
-          var isFocused = _isBool2['default'](_this.props.focused) ? _this.props.focused : _this.__isFocused__;
+          var isFocused = (0, _lodashLangIsBoolean2['default'])(_this.props.focused) ? _this.props.focused : _this.__isFocused__;
 
           if (isFocused && sequence !== _this.__lastChildSequence__) {
             if (_this.context.hotKeyParent) {
@@ -149,7 +153,7 @@ var HotKeys = _React2['default'].createClass({
           }
         };
 
-        if (_isObject2['default'](sequence)) {
+        if ((0, _lodashLangIsObject2['default'])(sequence)) {
           action = sequence.action;
           sequence = sequence.sequence;
         }
@@ -160,13 +164,13 @@ var HotKeys = _React2['default'].createClass({
 
     // Hard reset our handlers (probably could be more efficient)
     mousetrap.reset();
-    _forEach2['default'](sequenceHandlers, function (handler) {
+    (0, _lodashCollectionForEach2['default'])(sequenceHandlers, function (handler) {
       return mousetrap.bind(handler.sequence, handler.callback, handler.action);
     });
   },
 
   childHandledSequence: function childHandledSequence() {
-    var sequence = arguments[0] === undefined ? null : arguments[0];
+    var sequence = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
 
     this.__lastChildSequence__ = sequence;
 
@@ -197,7 +201,7 @@ var HotKeys = _React2['default'].createClass({
   },
 
   render: function render() {
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       _FocusTrap2['default'],
       _extends({}, this.props, { onFocus: this.onFocus, onBlur: this.onBlur }),
       this.props.children

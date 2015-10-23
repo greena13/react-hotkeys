@@ -1,17 +1,18 @@
 {
   "name": "react-hotkeys",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "A declarative library for handling hotkeys and focus within a React application",
   "main": "lib",
   "directories": {
     "doc": "docs"
   },
   "dependencies": {
-    "mousetrap": "^1.5.2",
-    "lodash": "^3.1.0"
+    "lodash": "^3.1.0",
+    "mousetrap": "^1.5.2"
   },
   "peerDependencies": {
-    "react": ">=0.12.2"
+    "react": "^0.14.0",
+    "react-dom": "^0.14.0"
   },
   "author": "Chris Pearce <hello@chrispearce.me> (chrispearce.co)",
   "license": "MIT",
