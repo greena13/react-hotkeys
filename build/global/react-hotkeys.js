@@ -165,7 +165,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.context.hotKeyParent.childHandledSequence(null);
 	    }
 
-	    this.__mousetrap__.reset();
+	    if (this.__mousetrap__) {
+	      this.__mousetrap__.reset();
+	    }
 	  },
 
 	  updateHotKeys: function updateHotKeys() {

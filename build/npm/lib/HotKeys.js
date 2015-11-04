@@ -108,7 +108,9 @@ var HotKeys = _react2['default'].createClass({
       this.context.hotKeyParent.childHandledSequence(null);
     }
 
-    this.__mousetrap__.reset();
+    if (this.__mousetrap__) {
+      this.__mousetrap__.reset();
+    }
   },
 
   updateHotKeys: function updateHotKeys() {
