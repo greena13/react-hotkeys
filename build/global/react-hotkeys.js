@@ -257,6 +257,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      (_props = this.props).onBlur.apply(_props, arguments);
 	    }
+	    if (this.context.hotKeyParent) {
+	      this.context.hotKeyParent.childHandledSequence(null);
+	    }
 	  },
 
 	  render: function render() {

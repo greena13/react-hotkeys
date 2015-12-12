@@ -200,6 +200,9 @@ var HotKeys = _react2['default'].createClass({
 
       (_props2 = this.props).onBlur.apply(_props2, arguments);
     }
+    if (this.context.hotKeyParent) {
+      this.context.hotKeyParent.childHandledSequence(null);
+    }
   },
 
   render: function render() {
