@@ -1,4 +1,6 @@
 # Common directories where we don't care about linting
+build/
+examples/bundle.js
 cordova/*
 grunt/*
 hooks/*

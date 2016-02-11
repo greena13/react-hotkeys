@@ -10,6 +10,6 @@ config.plugins.push(
     /^react-hotkeys$/,
     '../../lib/index'
   )
-)
+);
 
 module.exports = config;
