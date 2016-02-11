@@ -69,7 +69,7 @@ const Node = React.createClass({
       ],
       size: DEFAULT_NODE_SIZE,
       deleted: false
-    }
+    };
   },
 
   move(x = 0, y = 0) {
