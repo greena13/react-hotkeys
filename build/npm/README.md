@@ -6,7 +6,7 @@ A declarative library for handling hotkeys and focus areas in React applications
 
 See [Exploring HotKeys and focus in React](http://chrispearce.co/exploring-hotkeys-and-focus-in-react/) for an introductory look into the problems we're trying to solve or if you're eager to get going check out the [Getting Started ](docs/getting-started.md) guide!
 
-##### NOTE: This project is still in it's development stages. While I'm pretty confident on the API you should expect breaking changes on minor version upgrades until `1.0.0`!
+##### NOTE: The "road to v1" is set to be worked on *soon*. You can see the roadmap [here](https://github.com/Chrisui/react-hotkeys/issues/24). The current api is very solid and being used in production across a whole variety of different applications (most notably Lystable and Whatsapp). v1 will be mostly around modernising api's, improving performance and providing *additional* functionality rather than having any breaking changes.
 
 Quick Example
 -------------
