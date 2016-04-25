@@ -51,5 +51,6 @@
   },
   "homepage": "https://github.com/chrisui/react-hotkeys",
   "bugs": "https://github.com/chrisui/react-hotkeys/issues",
-  "globalExport": "ReactHotkeys"
+  "globalExport": "ReactHotkeys",
+  "typings": "./index.d.ts"
 }
