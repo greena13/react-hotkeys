@@ -41,6 +41,14 @@ exports = module.exports = {
   plugins: plugins,
   externals: [
     {
+      'react-dom': {
+        root: 'ReactDOM',
+        commonjs2: 'ReactDOM',
+        commonjs: 'ReactDOM',
+        amd: 'ReactDOM'
+      }
+    },
+    {
       'react': {
         root: 'React',
         commonjs2: 'react',
