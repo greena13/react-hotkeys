@@ -16,6 +16,7 @@
     "css-loader": "^0.9.1",
     "eslint": "^1.10.3",
     "eslint-plugin-react": "^3.16.1",
+    "estraverse": "^4.2.0",
     "mocha": "^2.4.5",
     "prompt": "^0.2.14",
     "react": "^15.0.1",
@@ -34,7 +35,7 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "test": "mocha --compilers js:babel/register lib/**/__tests__/*.js",
+    "test": "mocha --compilers js:babel-register lib/**/__tests__/*.js",
     "build-global": "bash ./scripts/build-global",
     "build-npm": "bash ./scripts/build-npm"
   },
