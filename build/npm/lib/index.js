@@ -1,19 +1,34 @@
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-function _interopRequire(obj) { return obj && obj.__esModule ? obj['default'] : obj; }
-
 var _HotKeys = require('./HotKeys');
 
-exports.HotKeys = _interopRequire(_HotKeys);
+Object.defineProperty(exports, 'HotKeys', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_HotKeys).default;
+  }
+});
 
 var _FocusTrap = require('./FocusTrap');
 
-exports.FocusTrap = _interopRequire(_FocusTrap);
+Object.defineProperty(exports, 'FocusTrap', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_FocusTrap).default;
+  }
+});
 
 var _HotKeyMapMixin = require('./HotKeyMapMixin');
 
-exports.HotKeyMapMixin = _interopRequire(_HotKeyMapMixin);
+Object.defineProperty(exports, 'HotKeyMapMixin', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_HotKeyMapMixin).default;
+  }
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }

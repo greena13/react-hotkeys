@@ -1,35 +1,36 @@
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports['default'] = HotKeyMapMixin;
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+exports.default = HotKeyMapMixin;
 
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _lodashObjectAssign = require('lodash/object/assign');
+var _assign = require('lodash/assign');
 
-var _lodashObjectAssign2 = _interopRequireDefault(_lodashObjectAssign);
+var _assign2 = _interopRequireDefault(_assign);
 
-var _lodashLangIsEqual = require('lodash/lang/isEqual');
+var _isEqual = require('lodash/isEqual');
 
-var _lodashLangIsEqual2 = _interopRequireDefault(_lodashLangIsEqual);
+var _isEqual2 = _interopRequireDefault(_isEqual);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function HotKeyMapMixin() {
   var hotKeyMap = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
+
   return {
 
     contextTypes: {
-      hotKeyMap: _react2['default'].PropTypes.object
+      hotKeyMap: _react2.default.PropTypes.object
     },
 
     childContextTypes: {
-      hotKeyMap: _react2['default'].PropTypes.object
+      hotKeyMap: _react2.default.PropTypes.object
     },
 
     getChildContext: function getChildContext() {
@@ -37,35 +38,27 @@ function HotKeyMapMixin() {
         hotKeyMap: this.__hotKeyMap__
       };
     },
-
     componentWillMount: function componentWillMount() {
       this.updateMap();
     },
-
     updateMap: function updateMap() {
       var newMap = this.buildMap();
 
-      if (!(0, _lodashLangIsEqual2['default'])(newMap, this.__hotKeyMap__)) {
+      if (!(0, _isEqual2.default)(newMap, this.__hotKeyMap__)) {
         this.__hotKeyMap__ = newMap;
         return true;
       }
 
       return false;
     },
-
     buildMap: function buildMap() {
       var parentMap = this.context.hotKeyMap || {};
       var thisMap = this.props.keyMap || {};
 
-      return (0, _lodashObjectAssign2['default'])({}, parentMap, hotKeyMap, thisMap);
+      return (0, _assign2.default)({}, parentMap, hotKeyMap, thisMap);
     },
-
     getMap: function getMap() {
       return this.__hotKeyMap__;
     }
-
   };
-}
-
-;
-module.exports = exports['default'];
+};
