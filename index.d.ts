@@ -3,8 +3,8 @@ import { Component, Props } from 'react';
 interface HotKeysProps extends Props<HotKeys> {
   onFocus?: Function;
   onBlur?: Function;
-  keyMap?: Object;
-  handlers?: Object;
+  keyMap?: {[event: string]: string};
+  handlers?: {[event: string]: Function};
   focused?: boolean;
   attach?: any;
 }
