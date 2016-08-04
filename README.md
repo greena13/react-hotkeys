@@ -42,7 +42,7 @@ const Node = React.createClass({
     };
 
     return (
-      <HotKeys handlers={handlers}>
+      <HotKeys component="div" handlers={handlers}>
         Node contents
       </HotKeys>
     );
