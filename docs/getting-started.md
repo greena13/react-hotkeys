@@ -12,7 +12,7 @@ or use the old-skool [UMD](http://bob.yexley.net/umd-javascript-that-runs-anywhe
 ## Defining HotKey Maps
 The most future-proof and flexible way of defining hotkeys is to create a 'generic hotkey name' to 'key sequence' mapping.
 
-> Using genric names allows for the flexibility of easy customization of hotkeys later. You only need to change the map rather than all the use-cases.
+> Using generic names allow more flexibility and customization of hotkeys later. You only need to change the map rather than all the use-cases.
 
 This hotkey map is a simple js object.
 
