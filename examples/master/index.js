@@ -1,7 +1,7 @@
 import {HotKeys, HotKeyMapMixin} from 'react-hotkeys';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import rand from 'lodash/number/random';
+import rand from 'lodash/random';
 
 const DEFAULT_NODE_SIZE = 100;
 const SIZE_INCREMENT = 5;
@@ -51,7 +51,9 @@ const App = React.createClass({
           </ul>
         </div>
         <HotKeys handlers={handlers} className={'viewport ' + (this.state && this.state.konamiTime ? 'konamiTime' : '')}>
-          {Array.apply(null, new Array(10)).map((e, i) => <Node key={i} />)}
+          <div>
+            {Array.apply(null, new Array(10)).map((e, i) => <Node key={i} />)}
+          </div>
         </HotKeys>
       </div>
     );
@@ -110,7 +112,7 @@ const Node = React.createClass({
     // - by default we would set it to -1 so it can only be directly clicked (& tapped?)
     //   or focused programattically
     return (
-      <HotKeys tabIndex="0" handlers={handlers} className="node" style={style}>
+      <HotKeys tabIndex="0" component="div" handlers={handlers} className="node" style={style}>
         Node
       </HotKeys>
     );
