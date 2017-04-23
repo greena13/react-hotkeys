@@ -5,6 +5,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = HotKeyMapMixin;
 
+var _propTypes = require('prop-types');
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
@@ -20,17 +24,17 @@ var _isEqual2 = _interopRequireDefault(_isEqual);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function HotKeyMapMixin() {
-  var hotKeyMap = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+  var hotKeyMap = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
 
   return {
 
     contextTypes: {
-      hotKeyMap: _react2.default.PropTypes.object
+      hotKeyMap: _propTypes2.default.object
     },
 
     childContextTypes: {
-      hotKeyMap: _react2.default.PropTypes.object
+      hotKeyMap: _propTypes2.default.object
     },
 
     getChildContext: function getChildContext() {
@@ -61,4 +65,4 @@ function HotKeyMapMixin() {
       return this.__hotKeyMap__;
     }
   };
-};
+}
