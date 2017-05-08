@@ -6,9 +6,17 @@ Object.defineProperty(exports, "__esModule", {
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+var _propTypes = require('prop-types');
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
+
+var _createReactClass = require('create-react-class');
+
+var _createReactClass2 = _interopRequireDefault(_createReactClass);
 
 var _reactDom = require('react-dom');
 
@@ -62,28 +70,26 @@ function getSequencesFromMap(hotKeyMap, hotKeyName) {
   return [sequences];
 }
 
-var HotKeys = _react2.default.createClass({
+var HotKeys = (0, _createReactClass2.default)({
   displayName: 'HotKeys',
-
-
   mixins: [(0, _HotKeyMapMixin2.default)()],
 
   propTypes: {
-    children: _react2.default.PropTypes.node,
-    onFocus: _react2.default.PropTypes.func,
-    onBlur: _react2.default.PropTypes.func,
-    keyMap: _react2.default.PropTypes.object,
-    handlers: _react2.default.PropTypes.object,
-    focused: _react2.default.PropTypes.bool, // externally controlled focus
-    attach: _react2.default.PropTypes.any // dom element to listen for key events
+    children: _propTypes2.default.node,
+    onFocus: _propTypes2.default.func,
+    onBlur: _propTypes2.default.func,
+    keyMap: _propTypes2.default.object,
+    handlers: _propTypes2.default.object,
+    focused: _propTypes2.default.bool, // externally controlled focus
+    attach: _propTypes2.default.any // dom element to listen for key events
   },
 
   contextTypes: {
-    hotKeyParent: _react2.default.PropTypes.any
+    hotKeyParent: _propTypes2.default.any
   },
 
   childContextTypes: {
-    hotKeyParent: _react2.default.PropTypes.any
+    hotKeyParent: _propTypes2.default.any
   },
 
   getChildContext: function getChildContext() {
@@ -116,17 +122,17 @@ var HotKeys = _react2.default.createClass({
   updateHotKeys: function updateHotKeys() {
     var _this = this;
 
-    var force = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
-    var prevProps = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-    var _props$handlers = this.props.handlers;
-    var handlers = _props$handlers === undefined ? {} : _props$handlers;
-    var _prevProps$handlers = prevProps.handlers;
-    var prevHandlers = _prevProps$handlers === undefined ? handlers : _prevProps$handlers;
+    var force = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+    var prevProps = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var _props$handlers = this.props.handlers,
+        handlers = _props$handlers === undefined ? {} : _props$handlers;
+    var _prevProps$handlers = prevProps.handlers,
+        prevHandlers = _prevProps$handlers === undefined ? handlers : _prevProps$handlers;
 
     // Ensure map is up-to-date to begin with
     // We will only bother continuing if the map was actually updated
 
-    if (!force && (0, _isEqual2.default)(handlers, prevHandlers) && !this.updateMap()) {
+    if (!force && !this.updateMap() && (0, _isEqual2.default)(handlers, prevHandlers)) {
       return;
     }
 
@@ -172,7 +178,7 @@ var HotKeys = _react2.default.createClass({
     });
   },
   childHandledSequence: function childHandledSequence() {
-    var sequence = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+    var sequence = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
     this.__lastChildSequence__ = sequence;
 
@@ -203,14 +209,13 @@ var HotKeys = _react2.default.createClass({
     }
   },
   render: function render() {
-    var _props3 = this.props;
-    var children = _props3.children;
-    var keyMap = _props3.keyMap;
-    var handlers = _props3.handlers;
-    var focused = _props3.focused;
-    var attach = _props3.attach;
-
-    var props = _objectWithoutProperties(_props3, ['children', 'keyMap', 'handlers', 'focused', 'attach']);
+    var _props3 = this.props,
+        children = _props3.children,
+        keyMap = _props3.keyMap,
+        handlers = _props3.handlers,
+        focused = _props3.focused,
+        attach = _props3.attach,
+        props = _objectWithoutProperties(_props3, ['children', 'keyMap', 'handlers', 'focused', 'attach']);
 
     return _react2.default.createElement(
       _FocusTrap2.default,
