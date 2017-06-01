@@ -5,6 +5,7 @@ interface HotKeysProps extends HTMLProps<HotKeys> {
   handlers?: Object;
   focused?: boolean;
   attach?: any;
+  component?: any;
 }
 
 export class HotKeys extends Component<HotKeysProps, {}> { }
