@@ -16,12 +16,6 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactDom = require('react-dom');
-
-var _reactDom2 = _interopRequireDefault(_reactDom);
-
-var _focusListeners = require('./focusListeners');
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
@@ -35,82 +29,25 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var FocusTrap = function (_React$Component) {
   _inherits(FocusTrap, _React$Component);
 
-  function FocusTrap(props) {
+  function FocusTrap() {
     _classCallCheck(this, FocusTrap);
 
-    var _this = _possibleConstructorReturn(this, (FocusTrap.__proto__ || Object.getPrototypeOf(FocusTrap)).call(this, props));
-
-    _this.focusListener;
-    _this.blurListener;
-    _this.willWrap = !_this.props.noWrapper;
-    _this.setupNativeListeners = _this.setupNativeListeners.bind(_this);
-    _this.removeNativeListeners = _this.removeNativeListeners.bind(_this);
-    return _this;
+    return _possibleConstructorReturn(this, (FocusTrap.__proto__ || Object.getPrototypeOf(FocusTrap)).apply(this, arguments));
   }
 
   _createClass(FocusTrap, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      if (!this.willWrap) {
-        this.setupNativeListeners();
-      }
-    }
-  }, {
-    key: 'componentWillUnmount',
-    value: function componentWillUnmount() {
-      this.removeNativeListeners();
-    }
-  }, {
-    key: 'setupNativeListeners',
-    value: function setupNativeListeners() {
-      if (!this.focusListener) {
-        var _props = this.props,
-            onFocus = _props.onFocus,
-            onBlur = _props.onBlur;
-
-
-        var elem = _reactDom2.default.findDOMNode(this);
-
-        if (elem && !this.focusListener) {
-          if (!elem.getAttribute('tabindex')) {
-            elem.setAttribute('tabindex', '-1');
-          }
-          this.focusListener = (0, _focusListeners.addFocusListener)(elem, onFocus);
-          this.blurListener = (0, _focusListeners.addBlurListener)(elem, onBlur);
-        } else {
-          this.willWrap = true;
-        }
-      }
-    }
-  }, {
-    key: 'removeNativeListeners',
-    value: function removeNativeListeners() {
-      if (this.focusListener) {
-        this.focusListener.remove();
-        this.focusListener = null;
-      }
-      if (this.blurListener) {
-        this.blurListener.remove();
-        this.blurListener = null;
-      }
-    }
-  }, {
     key: 'render',
     value: function render() {
-      var _props2 = this.props,
-          Component = _props2.component,
-          children = _props2.children,
-          props = _objectWithoutProperties(_props2, ['component', 'children']);
+      var _props = this.props,
+          Component = _props.component,
+          children = _props.children,
+          props = _objectWithoutProperties(_props, ['component', 'children']);
 
-      if (this.willWrap) {
-        return _react2.default.createElement(
-          Component,
-          _extends({ tabIndex: '-1' }, props),
-          children
-        );
-      }
-
-      return children;
+      return _react2.default.createElement(
+        Component,
+        _extends({ tabIndex: '-1' }, props),
+        children
+      );
     }
   }]);
 
@@ -121,7 +58,6 @@ FocusTrap.propTypes = {
   onFocus: _propTypes2.default.func,
   onBlur: _propTypes2.default.func,
   component: _propTypes2.default.any,
-  noWrapper: _propTypes2.default.bool,
   children: _propTypes2.default.node
 };
 FocusTrap.defaultProps = {
