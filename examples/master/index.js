@@ -1,7 +1,7 @@
 import {HotKeys, HotKeyMapMixin} from 'react-hotkeys';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import rand from 'lodash/number/random';
+import rand from 'lodash/random';
 
 const DEFAULT_NODE_SIZE = 100;
 const SIZE_INCREMENT = 5;
