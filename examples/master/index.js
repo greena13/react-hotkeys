@@ -1,7 +1,9 @@
-import {HotKeys, HotKeyMapMixin} from 'react-hotkeys';
+import {HotKeys} from 'react-hotkeys';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import rand from 'lodash/number/random';
+import rand from 'lodash/random';
+
+/* eslint-disable react/no-multi-comp */
 
 const DEFAULT_NODE_SIZE = 100;
 const SIZE_INCREMENT = 5;
@@ -16,27 +18,25 @@ const keyMap = {
   'commandUp': {sequence: 'command', action: 'keyup'}
 };
 
-const App = React.createClass({
-
-  mixins: [HotKeyMapMixin(keyMap)],
+class App extends React.Component {
 
   onKonami() {
     this.setState({konamiTime: true});
-  },
+  }
 
   commandDown() {
     console.log('comm down');
-  },
+  }
 
   commandUp() {
     console.log('comm up');
-  },
+  }
 
   render() {
     const handlers = {
-      'konami': this.onKonami,
-      'commandDown': this.commandDown,
-      'commandUp': this.commandUp
+      'konami': this.onKonami.bind(this),
+      'commandDown': this.commandDown.bind(this),
+      'commandUp': this.commandUp.bind(this)
     };
 
     return (
@@ -50,19 +50,20 @@ const App = React.createClass({
             <li>Want to get started? <a href="https://github.com/Chrisui/react-hotkeys/blob/master/docs/getting-started.md">Read the guide.</a></li>
           </ul>
         </div>
-        <HotKeys handlers={handlers} className={'viewport ' + (this.state && this.state.konamiTime ? 'konamiTime' : '')}>
+        <HotKeys keyMap={keyMap} handlers={handlers} className={'viewport ' + (this.state && this.state.konamiTime ? 'konamiTime' : '')}>
           {Array.apply(null, new Array(10)).map((e, i) => <Node key={i} />)}
         </HotKeys>
       </div>
     );
   }
 
-});
+}
 
-const Node = React.createClass({
+class Node extends React.Component {
 
-  getInitialState() {
-    return {
+  constructor() {
+    super();
+    this.state = {
       pos: [
         rand(0, window.innerWidth - DEFAULT_NODE_SIZE),
         rand(0, window.innerHeight - DEFAULT_NODE_SIZE)
@@ -70,19 +71,19 @@ const Node = React.createClass({
       size: DEFAULT_NODE_SIZE,
       deleted: false
     };
-  },
+  }
 
   move(x = 0, y = 0) {
     this.setState(({pos}) => ({pos: [pos[0] + (x * POS_INCREMENT), pos[1] + (y * POS_INCREMENT)]}));
-  },
+  }
 
   resize(expansion = 0) {
     this.setState((state) => ({size: state.size + (expansion * SIZE_INCREMENT)}));
-  },
+  }
 
   requestDelete() {
     this.setState({deleted: true});
-  },
+  }
 
   render() {
     const handlers = {
@@ -90,7 +91,7 @@ const Node = React.createClass({
       'down': this.move.bind(this, 0, 1),
       'left': this.move.bind(this, -1, 0),
       'right': this.move.bind(this, 1, 0),
-      'delete': this.requestDelete,
+      'delete': this.requestDelete.bind(this),
       'expand': this.resize.bind(this, 1),
       'contract': this.resize.bind(this, -1)
     };
@@ -116,7 +117,7 @@ const Node = React.createClass({
     );
   }
 
-});
+}
 
 export function render(renderTo) {
   ReactDOM.render(<App />, renderTo);
