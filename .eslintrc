@@ -19,7 +19,6 @@
     "comma-style": [0, "first"],
     "consistent-this": [0, "self"],
     "key-spacing": [2, {"beforeColon": false, "afterColon": true}],
-    "max-nested-callbacks": [2, 3],
     "no-lonely-if": 2,
     "quotes": [2, "single", "avoid-escape"],
     "semi": [2, "always"],
