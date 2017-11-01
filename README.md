@@ -1,10 +1,10 @@
 React HotKeys
 -------------
 
-[![Build Status](https://travis-ci.org/Chrisui/react-hotkeys.svg)](https://travis-ci.org/Chrisui/react-hotkeys)
+[![Build Status](https://travis-ci.org/chrisui/react-hotkeys.svg)](https://travis-ci.org/chrisui/react-hotkeys)
 
 > ☢️ ☢️ ☢️
-> 
+>
 > If you're interested in taking over ownership/maintainence of this project please [get in touch!](https://github.com/chrisui/react-hotkeys/issues/72)
 
 A declarative library for handling hotkeys and focus areas in React applications.
