@@ -1,7 +1,7 @@
 import {HotKeys} from 'react-hotkeys';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import rand from 'lodash/random';
+import rand from 'lodash.random';
 
 /* eslint-disable react/no-multi-comp */
 

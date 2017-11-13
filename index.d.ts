@@ -1,12 +1,11 @@
-import { Component, Props } from 'react';
+import { Component, HTMLProps } from 'react';
 
-interface HotKeysProps extends Props<HotKeys> {
-  onFocus?: Function;
-  onBlur?: Function;
+interface HotKeysProps extends HTMLProps<HotKeys> {
   keyMap?: Object;
   handlers?: Object;
   focused?: boolean;
   attach?: any;
+  component?: any;
 }
 
 export class HotKeys extends Component<HotKeysProps, {}> { }

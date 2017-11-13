@@ -26,7 +26,7 @@ const keyMap = {
 You can map to multiple sequences using an array as the value.
 
 ```javascript
-const keyMap: {
+const keyMap = {
   'deleteNode': ['del', 'backspace'],
   'moveUp': ['up', 'w']
 };
