@@ -10,7 +10,7 @@
 
 // React testing framework for traversing React components' output
 import Enzyme from 'enzyme';
-import Adaptor from 'enzyme-adapter-react-14';
+import Adaptor from 'enzyme-adapter-react-16';
 
 // Assertion library for more expressive syntax
 import chai from 'chai';
