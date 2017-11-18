@@ -223,16 +223,26 @@ const handlers = {
 
 Key handlers are only called under the following conditions (all must be true):
 
-* One of the descendents of a `<HotKeys />` component that defines `handlers` is currently in focus
+* One of the descendents of a `<HotKeys />` component that defines `handlers` is currently in focus (or the [focused prop](#Simulating-an-element's-focus) is true)
 * Either that `<HotKeys />` component, or one of its ancestors that is a `<HotKeys />` component, defines a `keyMap` that has a sequence that matches the keys being pressed
 * The `<HotKeys />` component that defines `handlers` has a handler that matches the action being triggered
 * A more deeply nested `<HotKeys />` component's handler has **not** already been called
 
-A more exhaustive enumration of `react-hotkeys` behaviour can be found by reviewing the [test suite](/tests).                              
+A more exhaustive enumration of `react-hotkeys` behaviour can be found by reviewing the [test suite](/tests).
 
 ### Elements must be in focus
 
 In order for a hot key to be triggered, an element that is a descendent of the `<HotKey />` component that defines `handlers` must be in focus. It is not enough to have a descendent element of a `<HotKey />` that defines a `keyMap` in focus - it must be one that defines `handlers`. See [Managing focus in the browser](#Managing-focus-in-the-browser) for more details.
+
+### Simulating an element's focus
+
+You can cause a `<HotKey />` with a `handlers` prop to behave as if one of its descendents is currently focused (and call any matching handlers) using the `focused` prop:
+
+```javasript
+<HotKeys keyMap={this.keyMap} handlers={this.handlers} focused>
+  <input />
+</HotKeys>
+```
 
 ### Hot Key Action Propagation
 
@@ -257,7 +267,7 @@ HTML5 allows any element with a `tabindex` attribute to receive focus.
 
 ### Tab order
 
-If no elements have a `tabindex` in a HTML document, the browser will tab between [focusable elements](#focusable-elements) in the order that they appear in the DOM.
+If no elements have a `tabindex` in a HTML document, the browser will tab between [focusable elements](#Focusable-elements) in the order that they appear in the DOM.
 
 If there are elements with `tabindex` values greater than zero, they are iterated over first, according their `tabindex` value (from smallest to largest). Then the browser tabs over the focusable elements with a `0` or unspecified `tabindex` in the order that they appear in the DOM.
 
@@ -265,9 +275,9 @@ If any element is given a negative `tabindex`, it will be skipped when a user ta
 
 ### Programmatically manage focus
 
-To programmatically focus an DOM element, it must meet two requirements:
+To programmatically focus a DOM element, it must meet two requirements:
 
-* It must be a [focusable elements](#focusable-element)
+* It must be a [focusable elements](#Focusable-element)
 * You must have a reference to it
 
 You can get a reference to an element using React's `ref` property:
