@@ -1,5 +1,7 @@
-React HotKeys
--------------
+<p align="center">
+  <img src="http://svgshare.com/i/3tk.svg"><br/>
+  <h2 align="center">React HotKeys</h2>
+</p>
 
 [![Build Status](https://travis-ci.org/chrisui/react-hotkeys.svg)](https://travis-ci.org/chrisui/react-hotkeys)
 [![GitHub license](https://img.shields.io/github/license/chrisui/react-hotkeys.svg)](https://github.com/chrisui/react-hotkeys/blob/master/LICENSE)
