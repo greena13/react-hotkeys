@@ -4,4 +4,4 @@
 # Builds example project to examples/bundle.js using config examples/webpack.config.js
 # ====================================================================================
 
-SOURCEMAPS=1 webpack examples/index.js examples/bundle.js --config examples/webpack.config.js
+SOURCEMAPS=1 ./node_modules/.bin/webpack examples/index.js examples/bundle.js --config examples/webpack.config.js
