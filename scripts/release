@@ -1,15 +1,25 @@
 #!/bin/bash -e
 
+# ====================================================================================
+# Builds CommonJS and UMD versions of the module, creates a new version commit and tag
+# and moves the latest tag to point to the new version. Pushes to github and publishes
+# on npm.
+# ====================================================================================
+
+# Function to change the version of a JSON config file
 update_version() {
   echo "$(node -p "p=require('./${1}');p.version='${2}';JSON.stringify(p,null,2)")" > $1
   echo "Updated ${1} version to ${2}"
 }
 
+# Version currently listed in package.json
 current_version=$(node -p "require('./package').version")
 
+# Request the next version of the package from the user
 printf "Next version (current is $current_version)? "
 read next_version
 
+# Check provided version is valid
 if ! [[ $next_version =~ ^[0-9]\.[0-9]+\.[0-9](-.+)? ]]; then
   echo "Version must be a valid semver string, e.g. 1.0.2 or 2.3.0-beta.1"
   exit 1
@@ -17,26 +27,33 @@ fi
 
 next_ref="v$next_version"
 
+# Run the tests
 npm test
 
+# Update versions of package.json and bower.json
 update_version 'package.json' $next_version
 #update_version 'bower.json' $next_version
 
-#node_modules/.bin/changelog -t $next_ref
-
+# Build the react-hotkeys UMD module and stage it
 npm run build-global
 git add -A build/global
 
+# Build the react-hotkeys CommonJS module and stage it
 npm run build-npm
 git add -A build/npm
 
+# Create a new version commit
 git commit -am "Version $next_version"
 
+# Tag new commit with the new version
 git tag $next_ref
+# Move the latest tag to the new version
 git tag latest -f
 
+# Push everything to git
 git push origin master
 git push origin $next_ref
 git push origin latest -f
 
+# Publish the CommonJS module to npm
 npm publish build/npm

@@ -1,8 +1,18 @@
 #!/bin/bash -e
 
+# ====================================================================================
+# Replaces previous CommonJS build with code transpiled (using Babel) from the source
+# files in /lib, that is ready for consumption with npm. It also copies over
+# package.json (with necessary modifications for an npm release), TypeScript definitions
+# and Readme.
+# ====================================================================================
+
+# Remove old build
 rm -rf build/npm
+# Transpile source code using babel and save in build/npm/lib
 ./node_modules/.bin/babel -d build/npm/lib ./lib
+# Copy Readme and TypeScript definitions across to build directory
 cp README.md build/npm/
 cp index.d.ts build/npm/
-find -X build/npm/lib -type d -name __tests__ | xargs rm -rf
+# Read in package.json, set it's "main" attribute; clear "scripts" and "devDependencies" and save it in build/npm/package.json
 node -p "p=require(\"./package.json\");p.main=\"lib\";p.scripts=p.devDependencies=undefined;JSON.stringify(p,null,2)" > build/npm/package.json
