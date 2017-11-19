@@ -6,7 +6,7 @@
 [![npm](https://img.shields.io/npm/dm/react-hotkeys.svg)]()
 [![Build Status](https://travis-ci.org/chrisui/react-hotkeys.svg)](https://travis-ci.org/chrisui/react-hotkeys)
 [![GitHub license](https://img.shields.io/github/license/chrisui/react-hotkeys.svg)](https://github.com/chrisui/react-hotkeys/blob/master/LICENSE)
-[![Gitter](https://img.shields.io/gitter/room/chrisui/react-hotkeys.js.svg)]()
+[![Gitter](https://img.shields.io/gitter/room/chrisui/react-hotkeys.svg)]()
 
 A declarative library for handling hotkeys and focus areas in React applications.
 
