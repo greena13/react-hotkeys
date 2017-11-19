@@ -317,6 +317,24 @@ You can retrieve the element that is currently focused using the following:
 document.activeElement
 ```
 
+## Troubleshooting & Gotchas
+
+### Not compatible with lodash-webpack-plugin
+
+There is [some suggestion](https://github.com/chrisui/react-hotkeys/issues/46) that `react-hotkeys` is not compatible with `lodash-webpack-plugin`. If you are experiencing issues where none of your handlers are being called and are using this webpack plugin, please try disabling it.
+
+### Blue border appears around children of HotKeys
+
+`react-hotkeys` adds a `<div />` around its children with a `tabindex="-1"` to allow them to be programmatically focused. This can result in browsers rendering a blue outline around them to visually indicate that they are the elements in the document that is currently in focus.
+
+This can be disabled using CSS similar to the following:
+
+```css
+div[tabindex="-1"]:focus {
+    outline: 0;
+}
+```
+
 ## Support
 
 Please use [Gitter](https://gitter.im/Chrisui/react-hotkeys) to ask any questions you may have regarding how to use `react-hotkeys`.
