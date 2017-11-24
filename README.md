@@ -232,7 +232,7 @@ Key handlers are only called under the following conditions (all must be true):
 * The `<HotKeys />` component that defines `handlers` has a handler that matches the action being triggered
 * A more deeply nested `<HotKeys />` component's handler has **not** already been called
 
-A more exhaustive enumration of `react-hotkeys` behaviour can be found by reviewing the [test suite](/tests).
+A more exhaustive enumration of `react-hotkeys` behaviour can be found by reviewing the [test suite](/test).
 
 ### Elements must be in focus
 
