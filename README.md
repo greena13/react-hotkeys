@@ -5,7 +5,7 @@
 
 [![npm](https://img.shields.io/npm/dm/react-hotkeys.svg)]()
 [![Build Status](https://travis-ci.org/chrisui/react-hotkeys.svg)](https://travis-ci.org/chrisui/react-hotkeys)
-[![GitHub license](https://img.shields.io/github/license/chrisui/react-hotkeys.svg)](https://github.com/chrisui/react-hotkeys/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/greena13/react-hotkeys.svg)](https://github.com/greena13/react-hotkeys/blob/master/LICENSE)
 [![Gitter](https://img.shields.io/gitter/room/chrisui/react-hotkeys.svg)](https://gitter.im/chrisui/react-hotkeys)
 
 A declarative library for handling hotkeys and focus areas in React applications.
@@ -321,7 +321,7 @@ document.activeElement
 
 ### Not compatible with lodash-webpack-plugin
 
-There is [some suggestion](https://github.com/chrisui/react-hotkeys/issues/46) that `react-hotkeys` is not compatible with `lodash-webpack-plugin`. If you are experiencing issues where none of your handlers are being called and are using this webpack plugin, please try disabling it.
+There is [some suggestion](https://github.com/greena13/react-hotkeys/issues/46) that `react-hotkeys` is not compatible with `lodash-webpack-plugin`. If you are experiencing issues where none of your handlers are being called and are using this webpack plugin, please try disabling it.
 
 ### Blue border appears around children of HotKeys
 
@@ -339,7 +339,7 @@ div[tabindex="-1"]:focus {
 
 Please use [Gitter](https://gitter.im/Chrisui/react-hotkeys) to ask any questions you may have regarding how to use `react-hotkeys`.
 
-If you believe you have found a bug or have a feature request, please [open an issue](https://github.com/chrisui/react-hotkeys/issues).
+If you believe you have found a bug or have a feature request, please [open an issue](https://github.com/greena13/react-hotkeys/issues).
 
 ## Stability & Maintenance
 
@@ -351,7 +351,7 @@ In November 2017, responsibility for maintaining `react-hotkeys` has changed han
 
 ## Contribute, please!
 
-If you're interested in helping out with the maintenance of `react-hotkeys`, make yourself known on [Gitter](https://gitter.im/Chrisui/react-hotkeys), [open an issue](https://github.com/chrisui/react-hotkeys/issues) or create a pull request.
+If you're interested in helping out with the maintenance of `react-hotkeys`, make yourself known on [Gitter](https://gitter.im/Chrisui/react-hotkeys), [open an issue](https://github.com/greena13/react-hotkeys/issues) or create a pull request.
 
 All contributions are welcome and greatly appreciated - from contributors of all levels of experience.
 
@@ -359,7 +359,7 @@ Collaboration is loosely being coordinated across [Gitter](https://gitter.im/Chr
 
 ### Roadmap
 
-The product roadmap is being currently being tracked in [Projects](https://github.com/chrisui/react-hotkeys/projects), but is largely focused on improving performance, code quality and adding extra features to meet common requirements.
+The product roadmap is being currently being tracked in [Projects](https://github.com/greena13/react-hotkeys/projects), but is largely focused on improving performance, code quality and adding extra features to meet common requirements.
 
 ### Using GitHub Issues
 

@@ -66,10 +66,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/chrisui/react-hotkeys.git"
+    "url": "https://github.com/greena13/react-hotkeys.git"
   },
-  "homepage": "https://github.com/chrisui/react-hotkeys",
-  "bugs": "https://github.com/chrisui/react-hotkeys/issues",
+  "homepage": "https://github.com/greena13/react-hotkeys",
+  "bugs": "https://github.com/greena13/react-hotkeys/issues",
   "globalExport": "ReactHotkeys",
   "typings": "./index.d.ts"
 }
