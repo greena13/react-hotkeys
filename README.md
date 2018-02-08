@@ -4,7 +4,7 @@
 </p>
 
 [![npm](https://img.shields.io/npm/dm/react-hotkeys.svg)]()
-[![Build Status](https://travis-ci.org/chrisui/react-hotkeys.svg)](https://travis-ci.org/chrisui/react-hotkeys)
+[![Build Status](https://travis-ci.org/greena13/react-hotkeys.svg)](https://travis-ci.org/greena13/react-hotkeys)
 [![GitHub license](https://img.shields.io/github/license/greena13/react-hotkeys.svg)](https://github.com/greena13/react-hotkeys/blob/master/LICENSE)
 [![Gitter](https://img.shields.io/gitter/room/chrisui/react-hotkeys.svg)](https://gitter.im/chrisui/react-hotkeys)
 
@@ -345,7 +345,7 @@ If you believe you have found a bug or have a feature request, please [open an i
 
 `react-hotkeys` is considered stable and already being widely used (most notably Lystable and Whatsapp).
 
-It has a non-comprehensive test suite. [![Build Status](https://travis-ci.org/chrisui/react-hotkeys.svg)](https://travis-ci.org/chrisui/react-hotkeys)
+It has a non-comprehensive test suite. [![Build Status](https://travis-ci.org/greena13/react-hotkeys.svg)](https://travis-ci.org/greena13/react-hotkeys)
 
 In November 2017, responsibility for maintaining `react-hotkeys` has changed hands. The new group of contributors will be working towards improving performance and providing *additional* functionality rather than having any breaking changes.
 
@@ -355,7 +355,7 @@ If you're interested in helping out with the maintenance of `react-hotkeys`, mak
 
 All contributions are welcome and greatly appreciated - from contributors of all levels of experience.
 
-Collaboration is loosely being coordinated across [Gitter](https://gitter.im/Chrisui/react-hotkeys) and [Projects](https://github.com/chrisui/react-hotkeys/projects).
+Collaboration is loosely being coordinated across [Gitter](https://gitter.im/Chrisui/react-hotkeys) and [Projects](https://github.com/greena13/react-hotkeys/projects).
 
 ### Roadmap
 
