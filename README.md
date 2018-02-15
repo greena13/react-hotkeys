@@ -227,7 +227,7 @@ const handlers = {
 
 Key handlers are only called under the following conditions (all must be true):
 
-* One of the descendents of a `<HotKeys />` component that defines `handlers` is currently in focus (or the [focused prop](#Simulating-an-element's-focus) is true)
+* One of the descendents of a `<HotKeys />` component that defines `handlers` is currently in focus (or the [focused prop](#simulating-an-elements-focus) is true)
 * Either that `<HotKeys />` component, or one of its ancestors that is a `<HotKeys />` component, defines a `keyMap` that has a sequence that matches the keys being pressed
 * The `<HotKeys />` component that defines `handlers` has a handler that matches the action being triggered
 * A more deeply nested `<HotKeys />` component's handler has **not** already been called
