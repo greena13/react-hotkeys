@@ -35,3 +35,7 @@ node_modules
 /cjs
 /umd
 /es
+
+build/global/
+
+build/npm/

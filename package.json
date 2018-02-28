@@ -5,7 +5,9 @@
   "main": "index",
   "module": "index.es",
   "directories": {
-    "doc": "docs"
+    "example": "examples",
+    "lib": "lib",
+    "test": "test"
   },
   "devDependencies": {
     "@types/react": "^16.0.41",
@@ -53,6 +55,7 @@
     "webpack": "^1.7.3"
   },
   "dependencies": {
+    "create-react-class": "^15.6.2",
     "lodash.isboolean": "^3.0.3",
     "lodash.isequal": "^4.5.0",
     "lodash.isobject": "^3.0.2",
@@ -102,10 +105,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/greena13/react-hotkeys.git"
+    "url": "git+https://github.com/greena13/react-hotkeys.git"
   },
   "homepage": "https://github.com/greena13/react-hotkeys",
-  "bugs": "https://github.com/greena13/react-hotkeys/issues",
+  "bugs": {
+    "url": "https://github.com/greena13/react-hotkeys/issues"
+  },
   "globalExport": "ReactHotkeys",
   "typings": "./index.d.ts"
 }
