@@ -54,7 +54,9 @@
     "lint": "eslint .",
     "test": "mocha",
     "build-global": "bash ./scripts/build-global",
-    "build-npm": "bash ./scripts/build-npm"
+    "build-npm": "bash ./scripts/build-npm",
+    "build": "rm -fr build && mkdir -p build && npm run build-global && npm run build-npm",
+    "prepublish": "npm run build"
   },
   "author": "Chris Pearce <hello@chrispearce.me> (chrispearce.co)",
   "license": "MIT",
