@@ -89,14 +89,6 @@ npm install react-hotkeys --save
 yarn add react-hotkeys
 ```
 
-### Bower
-
-```
-bower install react-hotkeys
-```
-
-or use the old-skool [UMD](http://bob.yexley.net/umd-javascript-that-runs-anywhere/) packaged library found in [/build/global](build/global).
-
 ## Defining Hot Keys
 
 `react-hotkeys` uses key maps to separate defining keyboard shortcuts from the actions that they trigger. This allows adding or changing hot keys in the future, without having to also update the actions in many places across your application.

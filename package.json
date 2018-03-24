@@ -2,7 +2,8 @@
   "name": "react-hotkeys",
   "version": "1.0.0",
   "description": "A declarative library for handling hotkeys and focus within a React application",
-  "main": "lib",
+  "main": "index",
+  "module": "index.es",
   "directories": {
     "doc": "docs"
   },
@@ -12,6 +13,8 @@
     "babel-core": "^6.11.4",
     "babel-eslint": "^6.1.2",
     "babel-loader": "^6.2.4",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-remove-comments": "^2.0.0",
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-react": "^6.11.1",
     "babel-preset-stage-2": "^6.11.0",
@@ -32,6 +35,11 @@
     "prompt": "^0.2.14",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
+    "rollup": "^0.57.1",
+    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-license": "^0.6.0",
+    "rollup-plugin-replace": "^2.0.0",
+    "rollup-plugin-uglify": "^3.0.0",
     "simulant": "^0.2.2",
     "sinon": "^4.0.0",
     "sinon-chai": "^2.14.0",
@@ -46,6 +54,15 @@
     "mousetrap": "^1.5.2",
     "prop-types": "^15.6.0"
   },
+  "files": [
+    "lib",
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "index.js",
+    "index.es.js",
+    "index.d.ts"
+  ],
   "peerDependencies": {
     "react": ">= 0.14.0",
     "react-dom": ">= 0.14.0"
@@ -53,10 +70,16 @@
   "scripts": {
     "lint": "eslint .",
     "test": "mocha",
-    "build-global": "bash ./scripts/build-global",
-    "build-npm": "bash ./scripts/build-npm",
-    "build": "rm -fr build && mkdir -p build && npm run build-global && npm run build-npm",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build-cjs && npm run build-es && npm run build-umd",
+    "build-cjs": "rm -rf cjs && npm run build-development && npm run build-production",
+    "build-es": "rm -rf es && npm run build-es-development && npm run build-es-production",
+    "build-umd": "rm -rf umd && npm run build-umd-development && npm run build-umd-production",
+    "build-development": "BABEL_ENV=development NODE_ENV=development babel lib -d cjs",
+    "build-es-development": "BABEL_ENV=es-development NODE_ENV=development babel lib -d es",
+    "build-umd-development": "BABEL_ENV=umd-development NODE_ENV=development rollup --format umd --name ReactHotkeys -c --file umd/react-hotkeys.js",
+    "build-production": "BABEL_ENV=production NODE_ENV=production rollup --format cjs -c --file cjs/react-hotkeys.production.min.js",
+    "build-es-production": "BABEL_ENV=production NODE_ENV=production rollup --format es -c --file es/react-hotkeys.production.min.js",
+    "build-umd-production": "BABEL_ENV=production NODE_ENV=production rollup --format umd --name ReactHotkeys -c --file umd/react-hotkeys.min.js"
   },
   "author": "Chris Pearce <hello@chrispearce.me> (chrispearce.co)",
   "license": "MIT",
