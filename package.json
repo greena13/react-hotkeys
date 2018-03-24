@@ -81,7 +81,10 @@
     "build-es-production": "BABEL_ENV=production NODE_ENV=production rollup --format es -c --file es/react-hotkeys.production.min.js",
     "build-umd-production": "BABEL_ENV=production NODE_ENV=production rollup --format umd --name ReactHotkeys -c --file umd/react-hotkeys.min.js"
   },
-  "author": "Chris Pearce <hello@chrispearce.me> (chrispearce.co)",
+  "author": "Aleck Greenham",
+  "contributors": [
+    "Chris Pearce <hello@chrispearce.me> (chrispearce.co)"
+  ],
   "license": "MIT",
   "keywords": [
     "react-component",

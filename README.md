@@ -341,6 +341,7 @@ It has a non-comprehensive test suite. [![Build Status](https://travis-ci.org/gr
 
 In November 2017, responsibility for maintaining `react-hotkeys` has changed hands. The new group of contributors will be working towards improving performance and providing *additional* functionality rather than having any breaking changes.
 
+
 ## Contribute, please!
 
 If you're interested in helping out with the maintenance of `react-hotkeys`, make yourself known on [Gitter](https://gitter.im/Chrisui/react-hotkeys), [open an issue](https://github.com/greena13/react-hotkeys/issues) or create a pull request.
@@ -366,10 +367,12 @@ The product roadmap is being currently being tracked in [Projects](https://githu
 - Lint your code with eslint (config provided)
 - Include relevant test updates/additions
 
+## Authorship
+
+All credit, and many thanks, goes to [Chris Pearce](https://github.com/Chrisui) for the inception of `react-hotkeys` and all versions before `1.0.0`.
+
+As of version `1.0.0`, [Aleck Greenham](https://github.com/greena13) is actively maintaining `react-hotkeys`. Please be patient while he gets up to speed.
+
 ## Thanks
 
 Thanks to @ccampbell for [Mousetrap](https://github.com/ccampbell/mousetrap)
-
-## License
-
-MIT
