@@ -77,18 +77,59 @@ const MyNode = React.createClass({
 
 ## Install
 
-### npm
+### CommonJS & ES6 Modules
+
+`react-hotkeys` is available as a CommonJS or a ES6 Modules through npm or yarn. It uses `NODE_ENV` to determine whether to export the development or production build in your library or application.
+
+It is expected you will use a bundling tool like Webpack or Uglify to remove the version of the bundle you are not using with each version of your application's code, to keep the library size to a minimum.
+
+#### npm
 
 ```
 npm install react-hotkeys --save
 ```
 
-### yarn
+#### yarn
 
 ```
 yarn add react-hotkeys
 ```
 
+### UMD
+
+`react-hotkeys` as a UMD module is available on your CDN of choice.
+
+Change `1.0.1` for the version that you would like to use.
+
+#### Development build
+
+```
+<script crossorigin src="https://cdn.jsdelivr.net/npm/react-hotkeys@1.0.1/umd/react-hotkeys.js"></script>
+```
+
+```
+<script crossorigin src="https://unpkg.com/react-hotkeys@1.0.1/umd/react-hotkeys.js"></script>
+```
+
+#### Minified production build
+
+```
+<script crossorigin src="https://cdn.jsdelivr.net/npm/react-hotkeys@1.0.1/umd/react-hotkeys.min.js"></script>
+```
+
+```
+<script crossorigin src="https://unpkg.com/react-hotkeys@1.0.1/umd/react-hotkeys.min.js"></script>
+```
+
+### Bower
+
+Bower support was removed in `v1.0.0`, but those who already rely on earlier versions of `react-hotkeys` through Bower can continue to do so using the following command:
+
+```
+bower install react-hotkeys@0.10.0
+```
+
+The Bower version of the package will **not** be supported going forward (including fixing any outstanding issues).
 ## Defining Hot Keys
 
 `react-hotkeys` uses key maps to separate defining keyboard shortcuts from the actions that they trigger. This allows adding or changing hot keys in the future, without having to also update the actions in many places across your application.
