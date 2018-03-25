@@ -1,0 +1,9 @@
+{
+  "rules": {
+    "no-unused-expressions": 0
+  },
+  "globals": {
+    "context": true,
+    "before": true
+  }
+}

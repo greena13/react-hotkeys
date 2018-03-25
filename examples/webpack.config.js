@@ -4,7 +4,9 @@ var config = require('../webpack.config.js');
 config.output = {
   publicPath: '/'
 };
+
 config.externals = undefined;
+
 config.plugins.push(
   new webpack.NormalModuleReplacementPlugin(
     /^react-hotkeys$/,
