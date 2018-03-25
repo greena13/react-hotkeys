@@ -16,7 +16,6 @@ describe('Activating hotkeys by focusing in the DOM:', () => {
   });
 
   context('when a keyMap and a handler are provided to the same component', () => {
-
     beforeEach(function () {
       this.handler = sinon.spy();
 
