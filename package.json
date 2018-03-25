@@ -37,6 +37,7 @@
     "jsdom-global": "^3.0.2",
     "lodash.random": "^3.2.0",
     "mocha": "^2.4.5",
+    "nodemon": "^1.17.2",
     "prompt": "^0.2.14",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
@@ -77,6 +78,7 @@
   "scripts": {
     "lint": "eslint .",
     "test": "mocha",
+    "watch-tests": "nodemon --exec 'npm run test || true'",
     "prepublish": "npm run build-cjs && npm run build-es && npm run build-umd",
     "build-cjs": "rm -rf cjs && npm run build-development && npm run build-production",
     "build-es": "rm -rf es && npm run build-es-development && npm run build-es-production",
