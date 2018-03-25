@@ -8,6 +8,7 @@
     "doc": "docs"
   },
   "devDependencies": {
+    "@types/react": "^16.0.41",
     "autoprefixer-loader": "^1.2.0",
     "babel-cli": "^6.11.4",
     "babel-core": "^6.11.4",
