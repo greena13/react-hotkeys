@@ -13,7 +13,6 @@ export default {
   external: [
     'prop-types',
     'react',
-    'create-react-class',
     'react-dom',
     'lodash.isequal',
     'lodash.isboolean',
