@@ -55,7 +55,6 @@
     "webpack": "^1.7.3"
   },
   "dependencies": {
-    "create-react-class": "^15.6.2",
     "lodash.isboolean": "^3.0.3",
     "lodash.isequal": "^4.5.0",
     "lodash.isobject": "^3.0.2",
