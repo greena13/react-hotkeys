@@ -37,8 +37,6 @@ describe('withHotKeys-wrapped Component', () => {
 
     expect(hotKeysWrapper).to.have.length(1);
     expect(hotKeysWrapper.find({keyMap: ACTION_KEY_MAP})).to.have.length(1);
-    console.log(mountedRootComponent.debug());
-    console.log(hotKeysWrapper.props());
     expect(hotKeysWrapper.find({handlers: {}})).to.have.length(1);
 
     const keyMapKeys = Object.keys(hotKeysWrapper.props().keyMap);
