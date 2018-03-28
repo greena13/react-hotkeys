@@ -40,9 +40,14 @@ interface HotKeysProps extends FocusTrapProps<HotKeys> {
   attach?: React.Component | Element | Window;
 
   /**
-   * TODO: Try and remove for inherited value from React.HTMLProps
+   * Function to call when this component gains focus in the browser
    */
-  className?: string;
+  onFocus?: () => void;
+
+  /**
+   * Function to call when this component loses focus in the browser
+   */
+  onBlur?: () => void;
 }
 
 /**
