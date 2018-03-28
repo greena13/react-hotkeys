@@ -1,4 +1,5 @@
 import * as React from 'react';
+import FocusTrap from './lib/FocusTrap';
 
 type MouseTrapKeySequence = string | Array<string>;
 
@@ -17,7 +18,7 @@ interface FocusTrapProps extends React.HTMLProps<FocusTrap> {
   component?: React.Component | string;
 }
 
-interface HotKeysProps extends FocusTrapProps<HotKeys> {
+interface HotKeysProps extends React.Props<HotKeys>, FocusTrapProps {
   /**
    * A mapping of action names to key combinations
    */
