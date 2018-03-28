@@ -38,16 +38,6 @@ interface HotKeysProps extends FocusTrapProps<HotKeys> {
    * The object that the internal key listeners should be bound to
    */
   attach?: React.Component | Element | Window;
-
-  /**
-   * Function to call when this component gains focus in the browser
-   */
-  onFocus?: () => void;
-
-  /**
-   * Function to call when this component loses focus in the browser
-   */
-  onBlur?: () => void;
 }
 
 /**
