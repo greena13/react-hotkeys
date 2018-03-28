@@ -32,7 +32,7 @@ interface HotKeysProps extends FocusTrapProps<HotKeys> {
    * Whether the component should behave as if it current has browser focus
    * event when it doesn't
    */
-  focused?: boolean = false;
+  focused?: boolean;
 
   /**
    * The object that the internal key listeners should be bound to
