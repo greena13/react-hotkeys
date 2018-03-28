@@ -1,4 +1,4 @@
-import * as React from '@types/react';
+import * as React from 'react';
 
 type MouseTrapKeySequence = string | Array<string>;
 
@@ -21,12 +21,12 @@ interface HotKeysProps extends FocusTrapProps<HotKeys> {
   /**
    * A mapping of action names to key combinations
    */
-  keyMap: { [key: string]: MouseTrapKeySequence | KeyMapOptions | Array<MouseTrapKeySequence> };
+  keyMap?: { [key: string]: MouseTrapKeySequence | KeyMapOptions | Array<MouseTrapKeySequence> };
 
   /**
    * A mapping of action names to handler functions
    */
-  handlers: { [key: string]: (keyEvent: KeyboardEvent) => void };
+  handlers?: { [key: string]: (keyEvent: KeyboardEvent) => void };
 
   /**
    * Whether the component should behave as if it current has browser focus
@@ -38,6 +38,11 @@ interface HotKeysProps extends FocusTrapProps<HotKeys> {
    * The object that the internal key listeners should be bound to
    */
   attach?: React.Component | Element | Window;
+
+  /**
+   * TODO: Try and remove for inherited value from React.HTMLProps
+   */
+  className?: string;
 }
 
 /**
