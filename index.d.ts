@@ -6,7 +6,7 @@ type KeyEventName = 'keyup' | 'keydown' | 'keypress';
 
 interface KeyMapOptions {
   sequence: MouseTrapKeySequence;
-  action: KeyEventName = 'keypress';
+  action: KeyEventName;
 }
 
 interface FocusTrapProps extends React.HTMLProps<FocusTrap> {
