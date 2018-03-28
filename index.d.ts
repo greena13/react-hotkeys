@@ -26,7 +26,7 @@ interface HotKeysProps extends FocusTrapProps<HotKeys> {
   /**
    * A mapping of action names to handler functions
    */
-  handlers?: { [key: string]: (keyEvent: KeyboardEvent) => void };
+  handlers?: { [key: string]: (keyEvent?: KeyboardEvent) => void };
 
   /**
    * Whether the component should behave as if it current has browser focus
