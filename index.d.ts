@@ -37,7 +37,7 @@ interface HotKeysProps extends FocusTrapProps<HotKeys> {
   /**
    * The object that the internal key listeners should be bound to
    */
-  attach?: React.Component | Element ;
+  attach?: React.Component | Element | Window;
 }
 
 /**
