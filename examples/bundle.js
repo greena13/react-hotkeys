@@ -22183,30 +22183,28 @@
 	 * @param {Object} keyMap an action-to-keyboard-key mapping
 	 * @summary An HOC that provides the wrappedComponent with the ability to implement keyboard actions
 	 */
-	var withHotKeys = function withHotKeys(keyMap, handlers) {
+	var withHotKeys = function withHotKeys(keyMap) {
 	  return function (Component) {
-	    var _class, _temp2;
+	    return function (_PureComponent) {
+	      _inherits(HotKeysWrapper, _PureComponent);
 	
-	    return _temp2 = _class = function (_PureComponent) {
-	      _inherits(withHotKeysWrapper, _PureComponent);
-	
-	      function withHotKeysWrapper() {
+	      function HotKeysWrapper() {
 	        var _ref;
 	
 	        var _temp, _this, _ret;
 	
-	        _classCallCheck(this, withHotKeysWrapper);
+	        _classCallCheck(this, HotKeysWrapper);
 	
 	        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
 	          args[_key] = arguments[_key];
 	        }
 	
-	        return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = withHotKeysWrapper.__proto__ || Object.getPrototypeOf(withHotKeysWrapper)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
+	        return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = HotKeysWrapper.__proto__ || Object.getPrototypeOf(HotKeysWrapper)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
 	          handlers: {}
 	        }, _temp), _possibleConstructorReturn(_this, _ret);
 	      }
 	
-	      _createClass(withHotKeysWrapper, [{
+	      _createClass(HotKeysWrapper, [{
 	        key: 'componentDidMount',
 	        value: function componentDidMount() {
 	          this.setState({ handlers: this._ref.hotKeyHandlers });
@@ -22221,11 +22219,12 @@
 	        value: function render() {
 	          var handlers = this.state.handlers;
 	
-	          // Setting component as documentFragment to avoid unexpected stylistic changes to the wrapped component
+	          var DocumentFragment = document.createDocumentFragment();
 	
+	          // Setting component as documentfragment to avoid unexpected stylistic changes to the wrapped component
 	          return _react2.default.createElement(
 	            _HotKeys2.default,
-	            { component: 'documentFragment', keyMap: keyMap, handlers: handlers },
+	            { component: 'document-fragment', keyMap: keyMap, handlers: handlers },
 	            _react2.default.createElement(Component, _extends({
 	              ref: this._setRef.bind(this)
 	            }, this.props))
@@ -22233,8 +22232,8 @@
 	        }
 	      }]);
 	
-	      return withHotKeysWrapper;
-	    }(_react.PureComponent), _class.propTypes = Component.propTypes, _temp2;
+	      return HotKeysWrapper;
+	    }(_react.PureComponent);
 	  };
 	};
 	

@@ -23,10 +23,10 @@ class ChildComponent extends PureComponent {
 describe('withHotKeys-wrapped Component', () => {
   const WrappedComponent = withHotKeys(ACTION_KEY_MAP)(ChildComponent);
 
-  it('includes withHotKeysWrapper/HotKeys/FocusTrap', () => {
+  it('includes HotKeysWrapper/HotKeys/FocusTrap', () => {
     const mountedRootComponent = mount(<WrappedComponent />);
 
-    expect(mountedRootComponent.find('withHotKeysWrapper')).to.have.length(1);
+    expect(mountedRootComponent.find('HotKeysWrapper')).to.have.length(1);
     expect(mountedRootComponent.find('HotKeys')).to.have.length(1);
     expect(mountedRootComponent.find('FocusTrap')).to.have.length(1);
   });
