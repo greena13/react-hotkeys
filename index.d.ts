@@ -10,7 +10,7 @@ interface KeyMapOptions {
   action: KeyEventName;
 }
 
-interface FocusTrapProps extends React.HTMLProps<FocusTrap> {
+interface FocusTrapProps {
   /**
    * The React component that should be used in the DOM to wrap the FocusTrap's
    * children and have the internal key listeners bound to
