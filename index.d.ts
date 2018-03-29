@@ -18,7 +18,7 @@ interface FocusTrapProps extends React.HTMLProps<FocusTrap> {
   component?: React.Component | string;
 }
 
-interface HotKeysProps extends React.Props<HotKeys>, FocusTrapProps {
+interface HotKeysProps extends React.HTMLAttributes<HotKeys>, FocusTrapProps {
   /**
    * A mapping of action names to key combinations
    */
@@ -39,6 +39,16 @@ interface HotKeysProps extends React.Props<HotKeys>, FocusTrapProps {
    * The object that the internal key listeners should be bound to
    */
   attach?: React.Component | Element | Window;
+
+  /**
+   * Function to call when this component gains focus in the browser
+   */
+  onFocus?: () => void;
+
+  /**
+   * Function to call when this component loses focus in the browser
+   */
+  onBlur?: () => void;
 }
 
 /**
