@@ -1,9 +1,13 @@
 import * as React from 'react';
-import FocusTrap from './lib/FocusTrap';
+import FocusTrap from './cjs/FocusTrap';
 
 type MouseTrapKeySequence = string | Array<string>;
 
 type KeyEventName = 'keyup' | 'keydown' | 'keypress';
+
+type KeySequence = MouseTrapKeySequence | KeyMapOptions | Array<MouseTrapKeySequence>;
+
+type KeyMap = { [key: string]: KeySequence };
 
 interface KeyMapOptions {
   sequence: MouseTrapKeySequence;
@@ -22,7 +26,7 @@ interface HotKeysProps extends React.HTMLAttributes<HotKeys>, FocusTrapProps {
   /**
    * A mapping of action names to key combinations
    */
-  keyMap?: { [key: string]: MouseTrapKeySequence | KeyMapOptions | Array<MouseTrapKeySequence> };
+  keyMap?: KeyMap;
 
   /**
    * A mapping of action names to handler functions
