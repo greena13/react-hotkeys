@@ -46,3 +46,9 @@ interface HotKeysProps extends FocusTrapProps<HotKeys> {
  * based on which key (or key combination) is activated.
  */
 export class HotKeys extends React.Component<HotKeysProps, {}> { }
+
+/**
+ * HOC (function) that renders its children within a "HotKeys" component
+ * given a keyMap
+ */
+export const withHotKeys = (keyMap: { [key: string]: MouseTrapKeySequence | KeyMapOptions | Array<MouseTrapKeySequence> }) => HotKeys;
