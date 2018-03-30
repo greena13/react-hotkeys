@@ -1,4 +1,5 @@
 import * as React from 'react';
+import FocusTrap from './lib/FocusTrap';
 
 type MouseTrapKeySequence = string | Array<string>;
 
@@ -6,10 +7,10 @@ type KeyEventName = 'keyup' | 'keydown' | 'keypress';
 
 interface KeyMapOptions {
   sequence: MouseTrapKeySequence;
-  action: KeyEventName = 'keypress';
+  action: KeyEventName;
 }
 
-interface FocusTrapProps extends React.HTMLProps<FocusTrap> {
+interface FocusTrapProps {
   /**
    * The React component that should be used in the DOM to wrap the FocusTrap's
    * children and have the internal key listeners bound to
@@ -17,7 +18,7 @@ interface FocusTrapProps extends React.HTMLProps<FocusTrap> {
   component?: React.Component | string;
 }
 
-interface HotKeysProps extends FocusTrapProps<HotKeys> {
+interface HotKeysProps extends React.HTMLAttributes<HotKeys>, FocusTrapProps {
   /**
    * A mapping of action names to key combinations
    */
@@ -26,13 +27,13 @@ interface HotKeysProps extends FocusTrapProps<HotKeys> {
   /**
    * A mapping of action names to handler functions
    */
-  handlers?: { [key: string]: (keyEvent: KeyboardEvent) => void };
+  handlers?: { [key: string]: (keyEvent?: KeyboardEvent) => void };
 
   /**
    * Whether the component should behave as if it current has browser focus
    * event when it doesn't
    */
-  focused?: boolean = false;
+  focused?: boolean;
 
   /**
    * The object that the internal key listeners should be bound to
@@ -40,9 +41,14 @@ interface HotKeysProps extends FocusTrapProps<HotKeys> {
   attach?: React.Component | Element | Window;
 
   /**
-   * TODO: Try and remove for inherited value from React.HTMLProps
+   * Function to call when this component gains focus in the browser
    */
-  className?: string;
+  onFocus?: () => void;
+
+  /**
+   * Function to call when this component loses focus in the browser
+   */
+  onBlur?: () => void;
 }
 
 /**
