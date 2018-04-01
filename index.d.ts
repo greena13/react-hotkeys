@@ -1,5 +1,4 @@
 import * as React from 'react';
-import FocusTrap from './cjs/FocusTrap';
 
 type MouseTrapKeySequence = string | Array<string>;
 
@@ -61,3 +60,10 @@ interface HotKeysProps extends React.HTMLAttributes<HotKeys>, FocusTrapProps {
  * based on which key (or key combination) is activated.
  */
 export class HotKeys extends React.Component<HotKeysProps, {}> { }
+
+/**
+ * Component that renders a "focus trap" with a tabIndex property allowing
+ * it to be programmatically focused, but skip the user focusing it in the
+ * browser
+ */
+export class FocusTrap extends React.Component<FocusTrapProps, {}> { }
