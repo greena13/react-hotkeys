@@ -5,7 +5,9 @@
   "main": "index",
   "module": "index.es",
   "directories": {
-    "doc": "docs"
+    "example": "examples",
+    "lib": "lib",
+    "test": "test"
   },
   "devDependencies": {
     "autoprefixer-loader": "^1.2.0",
@@ -101,10 +103,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/greena13/react-hotkeys.git"
+    "url": "git+https://github.com/greena13/react-hotkeys.git"
   },
   "homepage": "https://github.com/greena13/react-hotkeys",
-  "bugs": "https://github.com/greena13/react-hotkeys/issues",
+  "bugs": {
+    "url": "https://github.com/greena13/react-hotkeys/issues"
+  },
   "globalExport": "ReactHotkeys",
   "typings": "./index.d.ts"
 }
