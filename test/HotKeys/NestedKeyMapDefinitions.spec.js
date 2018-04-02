@@ -42,10 +42,10 @@ describe('Nested key map definitions:', () => {
 
         this.wrapper = mount(
           <HotKeys keyMap={this.outerKeyMap} handlers={handlers}>
-            <input className="outerChildElement" />
+            <div className="outerChildElement" />
 
             <HotKeys keyMap={this.innerKeyMap}>
-              <input className="innerChildElement" />
+              <div className="innerChildElement" />
             </HotKeys>
           </HotKeys>
         );
@@ -54,12 +54,12 @@ describe('Nested key map definitions:', () => {
 
       context('and a child of the outer component is in focus', () => {
         beforeEach(function () {
-          this.input = new FocusableElement(this.wrapper, '.outerChildElement');
-          this.input.focus();
+          this.targetElement = new FocusableElement(this.wrapper, '.outerChildElement');
+          this.targetElement.focus();
         });
 
         it('then calls the handler for the action defined in the outer component when keys that match hotkeys defined only in the outer component are pressed', function() {
-          this.input.keyPress(KeyCode.TAB);
+          this.targetElement.keyPress(KeyCode.TAB);
 
           expect(this.tabHandler).to.have.been.called;
 
@@ -69,7 +69,7 @@ describe('Nested key map definitions:', () => {
         });
 
         it('then does not trigger any action when keys that match hotkeys defined only in the inner component are pressed', function() {
-          this.input.keyPress(KeyCode.ALT);
+          this.targetElement.keyPress(KeyCode.ALT);
 
           expect(this.tabHandler).to.not.have.been.called;
           expect(this.enterOuterHandler).to.not.have.been.called;
@@ -78,7 +78,7 @@ describe('Nested key map definitions:', () => {
         });
 
         it('then calls the handler for the action defined in the outer component when keys that match hotkeys defined in both components are pressed', function() {
-          this.input.keyPress(KeyCode.ENTER);
+          this.targetElement.keyPress(KeyCode.ENTER);
 
           expect(this.enterOuterHandler).to.have.been.called;
 
@@ -91,12 +91,12 @@ describe('Nested key map definitions:', () => {
 
       context('and a child of the inner component is in focus', () => {
         beforeEach(function () {
-          this.input = new FocusableElement(this.wrapper, '.innerChildElement');
-          this.input.focus();
+          this.targetElement = new FocusableElement(this.wrapper, '.innerChildElement');
+          this.targetElement.focus();
         });
 
         it('then calls the handler for the action defined in the outer component when keys that match hotkeys defined only in the outer component are pressed', function() {
-          this.input.keyPress(KeyCode.TAB);
+          this.targetElement.keyPress(KeyCode.TAB);
 
           expect(this.tabHandler).to.have.been.called;
 
@@ -106,7 +106,7 @@ describe('Nested key map definitions:', () => {
         });
 
         it('then calls the handler defined in the outer component when keys that match an action defined only in the inner component are pressed', function() {
-          this.input.keyPress(KeyCode.ALT);
+          this.targetElement.keyPress(KeyCode.ALT);
 
           expect(this.altHandler).to.have.been.called;
 
@@ -116,7 +116,7 @@ describe('Nested key map definitions:', () => {
         });
 
         it('then calls the handler defined in the outer component for the action defined in the inner component when keys that match hotkeys defined in both components are pressed', function() {
-          this.input.keyPress(KeyCode.ENTER);
+          this.targetElement.keyPress(KeyCode.ENTER);
 
           expect(this.enterInnerHandler).to.have.been.called;
           expect(this.enterOuterHandler).to.not.have.been.called;
@@ -145,10 +145,10 @@ describe('Nested key map definitions:', () => {
 
         this.wrapper = mount(
           <HotKeys keyMap={this.outerKeyMap} >
-            <input className="outerChildElement" />
+            <div className="outerChildElement" />
 
             <HotKeys keyMap={this.innerKeyMap} handlers={handlers}>
-              <input className="innerChildElement" />
+              <div className="innerChildElement" />
             </HotKeys>
           </HotKeys>
         );
@@ -157,12 +157,12 @@ describe('Nested key map definitions:', () => {
 
       context('and a child of the outer component is in focus', () => {
         beforeEach(function () {
-          this.input = new FocusableElement(this.wrapper, '.outerChildElement');
-          this.input.focus();
+          this.targetElement = new FocusableElement(this.wrapper, '.outerChildElement');
+          this.targetElement.focus();
         });
 
         it('then does not trigger any action when keys that match hotkeys defined only in the outer component are pressed', function() {
-          this.input.keyPress(KeyCode.TAB);
+          this.targetElement.keyPress(KeyCode.TAB);
 
           expect(this.tabHandler).to.not.have.been.called;
           expect(this.enterOuterHandler).to.not.have.been.called;
@@ -171,7 +171,7 @@ describe('Nested key map definitions:', () => {
         });
 
         it('then does not trigger any action when keys that match hotkeys defined only in the inner component are pressed', function() {
-          this.input.keyPress(KeyCode.ALT);
+          this.targetElement.keyPress(KeyCode.ALT);
 
           expect(this.tabHandler).to.not.have.been.called;
           expect(this.enterOuterHandler).to.not.have.been.called;
@@ -180,7 +180,7 @@ describe('Nested key map definitions:', () => {
         });
 
         it('then does not trigger any action when keys that match hotkeys defined in both components are pressed', function() {
-          this.input.keyPress(KeyCode.ENTER);
+          this.targetElement.keyPress(KeyCode.ENTER);
 
           expect(this.enterOuterHandler).to.not.have.been.called;
           expect(this.tabHandler).to.not.have.been.called;
@@ -192,12 +192,12 @@ describe('Nested key map definitions:', () => {
 
       context('and a child of the inner component is in focus', () => {
         beforeEach(function () {
-          this.input = new FocusableElement(this.wrapper, '.innerChildElement');
-          this.input.focus();
+          this.targetElement = new FocusableElement(this.wrapper, '.innerChildElement');
+          this.targetElement.focus();
         });
 
         it('then calls the handler for the action defined in the outer component when keys that match hotkeys defined only in the outer component are pressed', function() {
-          this.input.keyPress(KeyCode.TAB);
+          this.targetElement.keyPress(KeyCode.TAB);
 
           expect(this.tabHandler).to.have.been.called;
 
@@ -207,7 +207,7 @@ describe('Nested key map definitions:', () => {
         });
 
         xit('then calls the handler for the action defined in the inner component when keys that match hotkeys defined only in the inner component are pressed', function() {
-          this.input.keyPress(KeyCode.ALT);
+          this.targetElement.keyPress(KeyCode.ALT);
 
           expect(this.altHandler).to.have.been.called;
 
@@ -217,7 +217,7 @@ describe('Nested key map definitions:', () => {
         });
 
         it('then calls the handler for the action defined in the inner component when keys that match hotkeys defined in both components are pressed', function() {
-          this.input.keyPress(KeyCode.ENTER);
+          this.targetElement.keyPress(KeyCode.ENTER);
 
           expect(this.enterInnerHandler).to.have.been.called;
 
@@ -257,10 +257,10 @@ describe('Nested key map definitions:', () => {
 
         this.wrapper = mount(
           <HotKeys keyMap={this.outerKeyMap} handlers={outerHandlers}>
-            <input className="outerChildElement" />
+            <div className="outerChildElement" />
 
             <HotKeys keyMap={this.innerKeyMap} handlers={innerHandlers}>
-              <input className="innerChildElement" />
+              <div className="innerChildElement" />
             </HotKeys>
           </HotKeys>
         );
@@ -269,12 +269,12 @@ describe('Nested key map definitions:', () => {
 
       context('and a child of the outer component is in focus', () => {
         beforeEach(function () {
-          this.input = new FocusableElement(this.wrapper, '.outerChildElement');
-          this.input.focus();
+          this.targetElement = new FocusableElement(this.wrapper, '.outerChildElement');
+          this.targetElement.focus();
         });
 
         it('then calls the handler defined in the outer component for the the action defined in the outer component when keys that match hotkeys defined only in the outer component are pressed', function() {
-          this.input.keyPress(KeyCode.TAB);
+          this.targetElement.keyPress(KeyCode.TAB);
 
           expect(this.enterOuterActionOuterHandler).to.have.not.been.called;
           expect(this.tabOuterHandler).to.have.been.called;
@@ -288,7 +288,7 @@ describe('Nested key map definitions:', () => {
         });
 
         it('then does not trigger any action when keys that match hotkeys defined only in the inner component are pressed', function() {
-          this.input.keyPress(KeyCode.ALT);
+          this.targetElement.keyPress(KeyCode.ALT);
 
           expect(this.altOuterHandler).to.have.been.called;
           expect(this.enterOuterActionOuterHandler).to.have.not.been.called;
@@ -302,7 +302,7 @@ describe('Nested key map definitions:', () => {
         });
 
         it('then calls the handler defined in the outer component for the action defined in the outer component when keys that match hotkeys defined in both components are pressed', function() {
-          this.input.keyPress(KeyCode.ENTER);
+          this.targetElement.keyPress(KeyCode.ENTER);
 
           expect(this.enterOuterActionOuterHandler).to.have.been.called;
           expect(this.tabOuterHandler).to.have.not.been.called;
@@ -319,12 +319,12 @@ describe('Nested key map definitions:', () => {
 
       context('and a child of the inner component is in focus', () => {
         beforeEach(function () {
-          this.input = new FocusableElement(this.wrapper, '.innerChildElement');
-          this.input.focus();
+          this.targetElement = new FocusableElement(this.wrapper, '.innerChildElement');
+          this.targetElement.focus();
         });
 
         it('then calls the handler defined in the inner component for the action defined in the outer component when keys that match hotkeys defined only in the outer component are pressed', function() {
-          this.input.keyPress(KeyCode.TAB);
+          this.targetElement.keyPress(KeyCode.TAB);
 
           expect(this.enterOuterActionOuterHandler).to.have.not.been.called;
           expect(this.tabOuterHandler).to.have.not.been.called;
@@ -338,7 +338,7 @@ describe('Nested key map definitions:', () => {
         });
 
         xit('then calls the handler defined in the inner component for the action defined in the inner component when keys that match hotkeys defined only in the inner component are pressed', function() {
-          this.input.keyPress(KeyCode.ALT);
+          this.targetElement.keyPress(KeyCode.ALT);
 
           expect(this.enterOuterActionOuterHandler).to.have.not.been.called;
           expect(this.tabOuterHandler).to.have.not.been.called;
@@ -352,7 +352,7 @@ describe('Nested key map definitions:', () => {
         });
 
         it('then calls the handler defined in the inner component for the action defined in the inner component when keys that match hotkeys defined in both components are pressed', function() {
-          this.input.keyPress(KeyCode.ENTER);
+          this.targetElement.keyPress(KeyCode.ENTER);
 
           expect(this.enterOuterActionOuterHandler).to.have.not.been.called;
           expect(this.tabOuterHandler).to.have.not.been.called;

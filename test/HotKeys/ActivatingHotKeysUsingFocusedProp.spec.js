@@ -29,15 +29,15 @@ xdescribe('Activating hotkeys using focused prop:', () => {
       beforeEach(function () {
         this.wrapper = mount(
           <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
-            <input className="childElement" />
+            <div className="childElement" />
           </HotKeys>
         );
 
-        this.input = new FocusableElement(this.wrapper, '.childElement');
+        this.targetElement = new FocusableElement(this.wrapper, '.childElement');
       });
 
       it('then DOES NOT call the handler when a key is pressed that matches the keyMap', function() {
-        this.input.keyPress(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.ENTER);
 
         expect(this.handler).to.not.have.been.called;
       });
@@ -47,15 +47,15 @@ xdescribe('Activating hotkeys using focused prop:', () => {
       beforeEach(function () {
         this.wrapper = mount(
           <HotKeys keyMap={this.keyMap} handlers={this.handlers} focused>
-            <input className="childElement" />
+            <div className="childElement" />
           </HotKeys>
         );
 
-        this.input = new FocusableElement(this.wrapper, '.childElement');
+        this.targetElement = new FocusableElement(this.wrapper, '.childElement');
       });
 
       it('then calls the correct handler when a key is pressed that matches the keyMap', function() {
-        this.input.keyPress(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.ENTER);
 
         expect(this.handler).to.have.been.called;
       });
@@ -78,17 +78,17 @@ xdescribe('Activating hotkeys using focused prop:', () => {
           <HotKeys keyMap={this.keyMap}>
             <div >
               <HotKeys handlers={this.handlers}>
-                <input className={'handlerChildElement'}/>
+                <div className={'handlerChildElement'}/>
               </HotKeys>
             </div>
           </HotKeys>
         );
 
-        this.input = new FocusableElement(this.wrapper, '.handlerChildElement');
+        this.targetElement = new FocusableElement(this.wrapper, '.handlerChildElement');
       });
 
       it('then DOES NOT call the handler when a key is pressed that matches the keyMap', function() {
-        this.input.keyPress(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.ENTER);
 
         expect(this.handler).to.not.have.been.called;
       });
@@ -100,17 +100,17 @@ xdescribe('Activating hotkeys using focused prop:', () => {
           <HotKeys keyMap={this.keyMap} focused>
             <div >
               <HotKeys handlers={this.handlers}>
-                <input className={'handlerChildElement'}/>
+                <div className={'handlerChildElement'}/>
               </HotKeys>
             </div>
           </HotKeys>
         );
 
-        this.input = new FocusableElement(this.wrapper, '.handlerChildElement');
+        this.targetElement = new FocusableElement(this.wrapper, '.handlerChildElement');
       });
 
       it('then DOES NOT call the handler when a key is pressed that matches the keyMap', function() {
-        this.input.keyPress(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.ENTER);
 
         expect(this.handler).to.not.have.been.called;
       });
@@ -122,17 +122,17 @@ xdescribe('Activating hotkeys using focused prop:', () => {
           <HotKeys keyMap={this.keyMap}>
             <div >
               <HotKeys handlers={this.handlers} focused>
-                <input className={'handlerChildElement'}/>
+                <div className={'handlerChildElement'}/>
               </HotKeys>
             </div>
           </HotKeys>
         );
 
-        this.input = new FocusableElement(this.wrapper, '.handlerChildElement');
+        this.targetElement = new FocusableElement(this.wrapper, '.handlerChildElement');
       });
 
       it('then calls the handler when a key is pressed that matches the keyMap', function() {
-        this.input.keyPress(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.ENTER);
 
         expect(this.handler).to.have.been.called;
       });
@@ -162,34 +162,34 @@ xdescribe('Activating hotkeys using focused prop:', () => {
           <HotKeys keyMap={this.keyMap}>
             <div >
               <HotKeys handlers={this.outerHandlers}>
-                <input className={'outerElement'}/>
+                <div className={'outerElement'}/>
 
                 <HotKeys handlers={this.innerHandlers} focused>
-                  <input className={'innerElement'}/>
+                  <div className={'innerElement'}/>
                 </HotKeys>
               </HotKeys>
             </div>
           </HotKeys>
         );
 
-        this.input = new FocusableElement(this.wrapper, '.innerElement');
+        this.targetElement = new FocusableElement(this.wrapper, '.innerElement');
       });
 
       it('then only calls the handler defined in the inner component when a key is pressed for which handlers are defined in both components', function() {
-        this.input.keyPress(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.ENTER);
 
         expect(this.innerEnterHandler).to.have.been.called;
         expect(this.outerEnterHandler).to.not.have.been.called;
       });
 
       it('then does NOT call the handler defined in the outer component when a key is pressed that only the outer component has a handler for', function() {
-        this.input.keyPress(KeyCode.TAB);
+        this.targetElement.keyPress(KeyCode.TAB);
 
         expect(this.outerTabHandler).to.not.have.been.called;
       });
 
       it('then does not call any handlers when a key that doesn\'t match any handlers is pressed', function() {
-        this.input.keyPress(KeyCode.ALT);
+        this.targetElement.keyPress(KeyCode.ALT);
 
         expect(this.innerEnterHandler).to.not.have.been.called;
         expect(this.outerTabHandler).to.not.have.been.called;
@@ -203,34 +203,34 @@ xdescribe('Activating hotkeys using focused prop:', () => {
           <HotKeys keyMap={this.keyMap}>
             <div >
               <HotKeys handlers={this.outerHandlers} focused>
-                <input className={'outerElement'}/>
+                <div className={'outerElement'}/>
 
                 <HotKeys handlers={this.innerHandlers} >
-                  <input className={'innerElement'}/>
+                  <div className={'innerElement'}/>
                 </HotKeys>
               </HotKeys>
             </div>
           </HotKeys>
         );
 
-        this.input = new FocusableElement(this.wrapper, '.innerElement');
+        this.targetElement = new FocusableElement(this.wrapper, '.innerElement');
       });
 
       it('then only calls the handler defined in the outer component when a key is pressed for which handlers are defined in both components', function() {
-        this.input.keyPress(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.ENTER);
 
         expect(this.innerEnterHandler).to.not.have.been.called;
         expect(this.outerEnterHandler).to.have.been.called;
       });
 
       it('then calls the handler defined in the outer component when a key is pressed that only the outer component has a handler for', function() {
-        this.input.keyPress(KeyCode.TAB);
+        this.targetElement.keyPress(KeyCode.TAB);
 
         expect(this.outerTabHandler).to.have.been.called;
       });
 
       it('then does not call any handlers when a key that doesn\'t match any handlers is pressed', function() {
-        this.input.keyPress(KeyCode.ALT);
+        this.targetElement.keyPress(KeyCode.ALT);
 
         expect(this.innerEnterHandler).to.not.have.been.called;
         expect(this.outerTabHandler).to.not.have.been.called;
@@ -244,34 +244,34 @@ xdescribe('Activating hotkeys using focused prop:', () => {
           <HotKeys keyMap={this.keyMap}>
             <div >
               <HotKeys handlers={this.outerHandlers} focused>
-                <input className={'outerElement'}/>
+                <div className={'outerElement'}/>
 
                 <HotKeys handlers={this.innerHandlers} focused>
-                  <input className={'innerElement'}/>
+                  <div className={'innerElement'}/>
                 </HotKeys>
               </HotKeys>
             </div>
           </HotKeys>
         );
 
-        this.input = new FocusableElement(this.wrapper, '.innerElement');
+        this.targetElement = new FocusableElement(this.wrapper, '.innerElement');
       });
 
       it('then only calls the handler defined in the inner component when a key is pressed for which handlers are defined in both components', function() {
-        this.input.keyPress(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.ENTER);
 
         expect(this.innerEnterHandler).to.have.been.called;
         expect(this.outerEnterHandler).to.not.have.been.called;
       });
 
       it('then calls the handler defined in the outer component when a key is pressed that only the outer component has a handler for', function() {
-        this.input.keyPress(KeyCode.TAB);
+        this.targetElement.keyPress(KeyCode.TAB);
 
         expect(this.outerTabHandler).to.have.been.called;
       });
 
       it('then does not call any handlers when a key that doesn\'t match any handlers is pressed', function() {
-        this.input.keyPress(KeyCode.ALT);
+        this.targetElement.keyPress(KeyCode.ALT);
 
         expect(this.innerEnterHandler).to.not.have.been.called;
         expect(this.outerTabHandler).to.not.have.been.called;
@@ -300,35 +300,35 @@ xdescribe('Activating hotkeys using focused prop:', () => {
           <HotKeys keyMap={this.keyMap}>
             <div >
               <HotKeys handlers={this.firstHandlers} focused>
-                <input className={'firstElement'}/>
+                <div className={'firstElement'}/>
               </HotKeys>
 
               <HotKeys handlers={this.secondHandlers} focused>
-                <input className={'secondElement'}/>
+                <div className={'secondElement'}/>
               </HotKeys>
             </div>
           </HotKeys>
         );
 
-        this.input = new FocusableElement(this.wrapper, '.firstElement');
+        this.targetElement = new FocusableElement(this.wrapper, '.firstElement');
       });
 
       context('and the focus is on a child of the first component', () => {
         it('then only calls the handlers on the first component when a key is pressed for which handlers are defined in both components', function() {
-          this.input.keyPress(KeyCode.ENTER);
+          this.targetElement.keyPress(KeyCode.ENTER);
 
           expect(this.firstEnterHandler).to.have.been.called;
           expect(this.secondEnterHandler).to.not.have.been.called;
         });
 
         it('then calls the handler defined in the first component when a key is pressed that only the first component has a handler for', function() {
-          this.input.keyPress(KeyCode.TAB);
+          this.targetElement.keyPress(KeyCode.TAB);
 
           expect(this.firstTabHandler).to.have.been.called;
         });
 
         it('then does not call any handlers when a key that doesn\'t match any handlers is pressed', function() {
-          this.input.keyPress(KeyCode.ALT);
+          this.targetElement.keyPress(KeyCode.ALT);
 
           expect(this.secondEnterHandler).to.not.have.been.called;
           expect(this.firstTabHandler).to.not.have.been.called;

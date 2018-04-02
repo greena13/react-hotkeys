@@ -26,16 +26,16 @@ describe('Specifying key map using objects:', () => {
 
       this.wrapper = mount(
         <HotKeys keyMap={this.keyMap} handlers={this.handlers} focused>
-          <input className="childElement" />
+          <div className="childElement" />
         </HotKeys>
       );
 
-      this.input = new FocusableElement(this.wrapper, '.childElement');
-      this.input.focus();
+      this.targetElement = new FocusableElement(this.wrapper, '.childElement');
+      this.targetElement.focus();
     });
 
     it('then calls the correct handler when a key is pressed that matches the keyMap', function() {
-      this.input.keyDown(KeyCode.ENTER);
+      this.targetElement.keyDown(KeyCode.ENTER);
 
       expect(this.handler).to.have.been.called;
     });
@@ -58,16 +58,16 @@ describe('Specifying key map using objects:', () => {
 
       this.wrapper = mount(
         <HotKeys keyMap={this.keyMap} handlers={this.handlers} focused>
-          <input className="childElement" />
+          <div className="childElement" />
         </HotKeys>
       );
 
-      this.input = new FocusableElement(this.wrapper, '.childElement');
-      this.input.focus();
+      this.targetElement = new FocusableElement(this.wrapper, '.childElement');
+      this.targetElement.focus();
     });
 
     it('then calls the correct handler when a key is pressed that matches the keyMap', function() {
-      this.input.keyUp(KeyCode.ENTER);
+      this.targetElement.keyUp(KeyCode.ENTER);
 
       expect(this.handler).to.have.been.called;
     });
@@ -90,16 +90,16 @@ describe('Specifying key map using objects:', () => {
 
       this.wrapper = mount(
         <HotKeys keyMap={this.keyMap} handlers={this.handlers} focused>
-          <input className="childElement" />
+          <div className="childElement" />
         </HotKeys>
       );
 
-      this.input = new FocusableElement(this.wrapper, '.childElement');
-      this.input.focus();
+      this.targetElement = new FocusableElement(this.wrapper, '.childElement');
+      this.targetElement.focus();
     });
 
     it('then calls the correct handler when a key is pressed that matches the keyMap', function() {
-      this.input.keyPress(KeyCode.A);
+      this.targetElement.keyPress(KeyCode.A);
 
       expect(this.handler).to.have.been.called;
     });

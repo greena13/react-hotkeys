@@ -26,7 +26,7 @@ describe('Component lifecycle:', () => {
 
       this.wrapper = mount(
         <HotKeys keyMap={this.keyMap} handlers={handlers}>
-          <input className="childElement" />
+          <div className="childElement" />
         </HotKeys>
       );
 
@@ -38,8 +38,8 @@ describe('Component lifecycle:', () => {
 
     context('and focused', () => {
       beforeEach(function () {
-        this.input = new FocusableElement(this.wrapper, '.childElement');
-        this.input.focus();
+        this.targetElement = new FocusableElement(this.wrapper, '.childElement');
+        this.targetElement.focus();
       });
 
       it('then none of the handlers are called', function() {
@@ -48,7 +48,7 @@ describe('Component lifecycle:', () => {
 
       context('and a key matching a hot key is pressed', () => {
         it('then calls the correct handler', function() {
-          this.input.keyPress(KeyCode.ENTER);
+          this.targetElement.keyPress(KeyCode.ENTER);
 
           expect(this.handler).to.have.been.called;
         });
@@ -68,21 +68,21 @@ describe('Component lifecycle:', () => {
       this.wrapper = mount(
         <div >
           <HotKeys keyMap={this.keyMap} handlers={handlers}>
-            <input className="childElement" />
+            <div className="childElement" />
           </HotKeys>
 
-          <input className="siblingElement" />
+          <div className="siblingElement" />
         </div>
       );
 
-      this.input = new FocusableElement(this.wrapper, '.childElement');
-      this.input.focus();
+      this.targetElement = new FocusableElement(this.wrapper, '.childElement');
+      this.targetElement.focus();
 
       this.wrapper.unmount();
     });
 
     it('then does not call the handler when a key matching a hot key is pressed', function() {
-      this.input.keyPress(KeyCode.ENTER);
+      this.targetElement.keyPress(KeyCode.ENTER);
 
       expect(this.handler).to.not.have.been.called;
     });

@@ -24,7 +24,7 @@ describe('Rendering children', () => {
 
       this.wrapper = mount(
         <HotKeys keyMap={this.keyMap} handlers={handlers}>
-          <input className="childElement" />
+          <div className="childElement" />
         </HotKeys>
       );
 
@@ -32,11 +32,11 @@ describe('Rendering children', () => {
 
     it('then renders its children wrapped in a div', function() {
       let div = this.wrapper.find('div');
-      expect(div).to.containMatchingElement(<input className="childElement" />);
+      expect(div).to.containMatchingElement(<div className="childElement" />);
     });
 
     it('then sets a tabIndex of -1', function() {
-      let div = this.wrapper.find('div');
+      let div = this.wrapper.find('div').not('.childElement');
       expect(div).to.have.attr('tabindex', '-1');
     });
 
@@ -53,7 +53,7 @@ describe('Rendering children', () => {
 
       this.wrapper = mount(
         <HotKeys keyMap={this.keyMap} handlers={handlers} component={'span'}>
-          <input className="childElement" />
+          <div className="childElement" />
         </HotKeys>
       );
 
@@ -61,7 +61,7 @@ describe('Rendering children', () => {
 
     it('then renders its children wrapped in a component matching the string', function() {
       let div = this.wrapper.find('span');
-      expect(div).to.containMatchingElement(<input className="childElement" />);
+      expect(div).to.containMatchingElement(<div className="childElement" />);
     });
 
     it('then sets a tabIndex of -1', function() {
