@@ -1,6 +1,6 @@
 {
   "name": "react-hotkeys",
-  "version": "1.0.3",
+  "version": "1.0.6",
   "description": "A declarative library for handling hotkeys and focus within a React application",
   "main": "index",
   "module": "index.es",
@@ -10,7 +10,6 @@
     "test": "test"
   },
   "devDependencies": {
-    "@types/react": "^16.0.41",
     "autoprefixer-loader": "^1.2.0",
     "babel-cli": "^6.11.4",
     "babel-core": "^6.11.4",

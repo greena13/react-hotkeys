@@ -1,15 +1,19 @@
-import * as React from '@types/react';
+import * as React from 'react';
 
 type MouseTrapKeySequence = string | Array<string>;
 
 type KeyEventName = 'keyup' | 'keydown' | 'keypress';
 
+type KeySequence = MouseTrapKeySequence | KeyMapOptions | Array<MouseTrapKeySequence>;
+
+type KeyMap = { [key: string]: KeySequence };
+
 interface KeyMapOptions {
   sequence: MouseTrapKeySequence;
-  action: KeyEventName = 'keypress';
+  action: KeyEventName;
 }
 
-interface FocusTrapProps extends React.HTMLProps<FocusTrap> {
+interface FocusTrapProps {
   /**
    * The React component that should be used in the DOM to wrap the FocusTrap's
    * children and have the internal key listeners bound to
@@ -17,27 +21,37 @@ interface FocusTrapProps extends React.HTMLProps<FocusTrap> {
   component?: React.Component | string;
 }
 
-interface HotKeysProps extends FocusTrapProps<HotKeys> {
+interface HotKeysProps extends React.HTMLAttributes<HotKeys>, FocusTrapProps {
   /**
    * A mapping of action names to key combinations
    */
-  keyMap: { [key: string]: MouseTrapKeySequence | KeyMapOptions | Array<MouseTrapKeySequence> };
+  keyMap?: KeyMap;
 
   /**
    * A mapping of action names to handler functions
    */
-  handlers: { [key: string]: (keyEvent: KeyboardEvent) => void };
+  handlers?: { [key: string]: (keyEvent?: KeyboardEvent) => void };
 
   /**
    * Whether the component should behave as if it current has browser focus
    * event when it doesn't
    */
-  focused?: boolean = false;
+  focused?: boolean;
 
   /**
    * The object that the internal key listeners should be bound to
    */
-  attach?: React.Component | Element ;
+  attach?: React.Component | Element | Window;
+
+  /**
+   * Function to call when this component gains focus in the browser
+   */
+  onFocus?: () => void;
+
+  /**
+   * Function to call when this component loses focus in the browser
+   */
+  onBlur?: () => void;
 }
 
 /**
@@ -47,8 +61,12 @@ interface HotKeysProps extends FocusTrapProps<HotKeys> {
  */
 export class HotKeys extends React.Component<HotKeysProps, {}> { }
 
+export const withHotKeys = (keyMap: { [key: string]: KeySequence }) => HotKeys;
+
 /**
- * HOC (function) that renders its children within a "HotKeys" component
- * given a keyMap
+ * Component that renders a "focus trap" with a tabIndex property allowing
+ * it to be programmatically focused, but skip the user focusing it in the
+ * browser
  */
-export const withHotKeys = (keyMap: { [key: string]: MouseTrapKeySequence | KeyMapOptions | Array<MouseTrapKeySequence> }) => HotKeys;
+export class FocusTrap extends React.Component<FocusTrapProps, {}> { }
+
