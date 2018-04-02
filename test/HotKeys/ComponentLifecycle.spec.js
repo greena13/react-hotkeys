@@ -4,7 +4,7 @@ import {expect} from 'chai';
 import sinon from 'sinon';
 
 import HotKeys from '../../lib/HotKeys';
-import KeyCode from '../support/KeyCode';
+import KeyCode from '../support/Key';
 import FocusableElement from '../support/FocusableElement';
 
 describe('Component lifecycle:', () => {
@@ -48,7 +48,7 @@ describe('Component lifecycle:', () => {
 
       context('and a key matching a hot key is pressed', () => {
         it('then calls the correct handler', function() {
-          this.input.keyDown(KeyCode.ENTER);
+          this.input.keyPress(KeyCode.ENTER);
 
           expect(this.handler).to.have.been.called;
         });
@@ -82,7 +82,7 @@ describe('Component lifecycle:', () => {
     });
 
     it('then does not call the handler when a key matching a hot key is pressed', function() {
-      this.input.keyDown(KeyCode.ENTER);
+      this.input.keyPress(KeyCode.ENTER);
 
       expect(this.handler).to.not.have.been.called;
     });

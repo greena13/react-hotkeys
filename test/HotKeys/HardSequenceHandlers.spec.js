@@ -5,7 +5,7 @@ import sinon from 'sinon';
 
 import HotKeys from '../../lib/HotKeys';
 
-import KeyCode from '../support/KeyCode';
+import KeyCode from '../support/Key';
 import FocusableElement from '../support/FocusableElement';
 
 describe('Hard sequence handlers:', () => {
@@ -34,7 +34,7 @@ describe('Hard sequence handlers:', () => {
     });
 
     it('then calls the hard sequence handler when key sequence is pressed', function() {
-      this.input.keyDown(KeyCode.ENTER);
+      this.input.keyPress(KeyCode.ENTER);
 
       expect(this.hardSequenceHandler).to.have.been.called;
     });
@@ -57,7 +57,7 @@ describe('Hard sequence handlers:', () => {
     });
 
     it('then calls the hard sequence handler when key sequence is pressed', function() {
-      this.input.keyDown(KeyCode.ENTER);
+      this.input.keyPress(KeyCode.ENTER);
 
       expect(this.hardSequenceHandler).to.have.been.called;
     });
@@ -83,7 +83,7 @@ describe('Hard sequence handlers:', () => {
     });
 
     it('then calls the hard sequence handler when key sequence is pressed', function() {
-      this.input.keyDown(KeyCode.ENTER);
+      this.input.keyPress(KeyCode.ENTER);
 
       expect(this.hardSequenceHandler).to.have.been.called;
     });
@@ -108,7 +108,7 @@ describe('Hard sequence handlers:', () => {
     });
 
     it('then calls the hard sequence handler when key sequence is pressed', function() {
-      this.input.keyDown(KeyCode.ENTER);
+      this.input.keyPress(KeyCode.ENTER);
 
       expect(this.hardSequenceHandler).to.have.been.called;
       expect(this.otherHandler).to.not.have.been.called;
@@ -136,7 +136,7 @@ describe('Hard sequence handlers:', () => {
     });
 
     it('then calls the hard sequence handler when key sequence is pressed', function() {
-      this.input.keyDown(KeyCode.ENTER);
+      this.input.keyPress(KeyCode.ENTER);
 
       expect(this.hardSequenceHandler).to.have.been.called;
       expect(this.otherHandler).to.not.have.been.called;
@@ -164,7 +164,7 @@ describe('Hard sequence handlers:', () => {
     });
 
     it('then calls the hard sequence handler in the child component', function() {
-      this.input.keyDown(KeyCode.ENTER);
+      this.input.keyPress(KeyCode.ENTER);
 
       expect(this.hardSequenceHandler).to.have.been.called;
       expect(this.outerHardSequenceHandler).to.not.have.been.called;

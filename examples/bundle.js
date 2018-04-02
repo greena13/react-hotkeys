@@ -277,19 +277,19 @@
 	  onFocus: function onFocus() {
 	    this.__isFocused__ = true;
 
-	    if (this.props.onFocus) {
+	    if (this.props._handleFocus) {
 	      var _props;
 
-	      (_props = this.props).onFocus.apply(_props, arguments);
+	      (_props = this.props)._handleFocus.apply(_props, arguments);
 	    }
 	  },
 	  onBlur: function onBlur() {
 	    this.__isFocused__ = false;
 
-	    if (this.props.onBlur) {
+	    if (this.props._handleBlur) {
 	      var _props2;
 
-	      (_props2 = this.props).onBlur.apply(_props2, arguments);
+	      (_props2 = this.props)._handleBlur.apply(_props2, arguments);
 	    }
 	    if (this.context.hotKeyParent) {
 	      this.context.hotKeyParent.childHandledSequence(null);
@@ -3893,8 +3893,8 @@
 	{start:g,end:k}}else b=null}b=b||{start:0,end:0}}else b=null;Hg={focusedElem:a,selectionRange:b};pd(!1)},resetAfterCommit:function(){var a=Hg,b=da(),c=a.focusedElem,d=a.selectionRange;if(b!==c&&ha(document.documentElement,c)){if(Fd(c))if(b=d.start,a=d.end,void 0===a&&(a=b),"selectionStart"in c)c.selectionStart=b,c.selectionEnd=Math.min(a,c.value.length);else if(window.getSelection){b=window.getSelection();var e=c[Db()].length;a=Math.min(d.start,e);d=void 0===d.end?a:Math.min(d.end,e);!b.extend&&a>
 	d&&(e=d,d=a,a=e);e=Ed(c,a);var f=Ed(c,d);if(e&&f&&(1!==b.rangeCount||b.anchorNode!==e.node||b.anchorOffset!==e.offset||b.focusNode!==f.node||b.focusOffset!==f.offset)){var g=document.createRange();g.setStart(e.node,e.offset);b.removeAllRanges();a>d?(b.addRange(g),b.extend(f.node,f.offset)):(g.setEnd(f.node,f.offset),b.addRange(g))}}b=[];for(a=c;a=a.parentNode;)1===a.nodeType&&b.push({element:a,left:a.scrollLeft,top:a.scrollTop});ia(c);for(c=0;c<b.length;c++)a=b[c],a.element.scrollLeft=a.left,a.element.scrollTop=
 	a.top}Hg=null;pd(Gg);Gg=null},createInstance:function(a,b,c,d,e){a=jg(a,b,c,d);a[O]=e;a[ob]=b;return a},appendInitialChild:function(a,b){a.appendChild(b)},finalizeInitialChildren:function(a,b,c,d){og(a,b,c,d);a:{switch(b){case "button":case "input":case "select":case "textarea":a=!!c.autoFocus;break a}a=!1}return a},prepareUpdate:function(a,b,c,d,e){return pg(a,b,c,d,e)},shouldSetTextContent:function(a,b){return"textarea"===a||"string"===typeof b.children||"number"===typeof b.children||"object"===
-	typeof b.dangerouslySetInnerHTML&&null!==b.dangerouslySetInnerHTML&&"string"===typeof b.dangerouslySetInnerHTML.__html},shouldDeprioritizeSubtree:function(a,b){return!!b.hidden},createTextInstance:function(a,b,c,d){a=kg(a,b);a[O]=d;return a},now:of,mutation:{commitMount:function(a){a.focus()},commitUpdate:function(a,b,c,d,e){a[ob]=e;qg(a,b,c,d,e)},resetTextContent:function(a){a.textContent=""},commitTextUpdate:function(a,b,c){a.nodeValue=c},appendChild:function(a,b){a.appendChild(b)},appendChildToContainer:function(a,
-	b){8===a.nodeType?a.parentNode.insertBefore(b,a):a.appendChild(b)},insertBefore:function(a,b,c){a.insertBefore(b,c)},insertInContainerBefore:function(a,b,c){8===a.nodeType?a.parentNode.insertBefore(b,c):a.insertBefore(b,c)},removeChild:function(a,b){a.removeChild(b)},removeChildFromContainer:function(a,b){8===a.nodeType?a.parentNode.removeChild(b):a.removeChild(b)}},hydration:{canHydrateInstance:function(a,b){return 1===a.nodeType&&b.toLowerCase()===a.nodeName.toLowerCase()},canHydrateTextInstance:function(a,
+	typeof b.dangerouslySetInnerHTML&&null!==b.dangerouslySetInnerHTML&&"string"===typeof b.dangerouslySetInnerHTML.__html},shouldDeprioritizeSubtree:function(a,b){return!!b.hidden},createTextInstance:function(a,b,c,d){a=kg(a,b);a[O]=d;return a},now:of,mutation:{commitMount:function(a){a.handleFocus()},commitUpdate:function(a, b, c, d, e){a[ob]=e;qg(a,b,c,d,e)},resetTextContent:function(a){a.textContent=""},commitTextUpdate:function(a, b, c){a.nodeValue=c},appendChild:function(a, b){a.appendChild(b)},appendChildToContainer:function(a,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        b){8===a.nodeType?a.parentNode.insertBefore(b,a):a.appendChild(b)},insertBefore:function(a,b,c){a.insertBefore(b,c)},insertInContainerBefore:function(a,b,c){8===a.nodeType?a.parentNode.insertBefore(b,c):a.insertBefore(b,c)},removeChild:function(a,b){a.removeChild(b)},removeChildFromContainer:function(a,b){8===a.nodeType?a.parentNode.removeChild(b):a.removeChild(b)}},hydration:{canHydrateInstance:function(a,b){return 1===a.nodeType&&b.toLowerCase()===a.nodeName.toLowerCase()},canHydrateTextInstance:function(a,
 	b){return""===b?!1:3===a.nodeType},getNextHydratableSibling:function(a){for(a=a.nextSibling;a&&1!==a.nodeType&&3!==a.nodeType;)a=a.nextSibling;return a},getFirstHydratableChild:function(a){for(a=a.firstChild;a&&1!==a.nodeType&&3!==a.nodeType;)a=a.nextSibling;return a},hydrateInstance:function(a,b,c,d,e,f){a[O]=f;a[ob]=c;return rg(a,b,c,e,d)},hydrateTextInstance:function(a,b,c){a[O]=c;return sg(a,b)},didNotMatchHydratedContainerTextInstance:function(){},didNotMatchHydratedTextInstance:function(){},
 	didNotHydrateContainerInstance:function(){},didNotHydrateInstance:function(){},didNotFindHydratableContainerInstance:function(){},didNotFindHydratableContainerTextInstance:function(){},didNotFindHydratableInstance:function(){},didNotFindHydratableTextInstance:function(){}},scheduleDeferredCallback:pf,useSyncScheduling:!0});qc=Z.batchedUpdates;
 	function Kg(a,b,c,d,e){Ig(c)?void 0:D("200");var f=c._reactRootContainer;if(f)Z.updateContainer(b,f,a,e);else{d=d||Jg(c);if(!d)for(f=void 0;f=c.lastChild;)c.removeChild(f);var g=Z.createContainer(c,d);f=c._reactRootContainer=g;Z.unbatchedUpdates(function(){Z.updateContainer(b,g,a,e)})}return Z.getPublicRootInstance(f)}function Lg(a,b){var c=2<arguments.length&&void 0!==arguments[2]?arguments[2]:null;Ig(b)?void 0:D("200");return Oe(a,b,null,c)}
@@ -19254,7 +19254,7 @@
 
 	  mutation: {
 	    commitMount: function (domElement, type, newProps, internalInstanceHandle) {
-	      domElement.focus();
+	      domElement.handleFocus();
 	    },
 	    commitUpdate: function (domElement, updatePayload, type, oldProps, newProps, internalInstanceHandle) {
 	      // Update the props handle so that we know which props are the ones with

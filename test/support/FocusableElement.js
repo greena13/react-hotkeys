@@ -1,5 +1,4 @@
 import ReactDOM from 'react-dom';
-import simulant from 'simulant';
 
 export default class FocusableElement {
   constructor(wrapper, selector) {
@@ -10,16 +9,16 @@ export default class FocusableElement {
     this.element.simulate('focus');
   }
 
-  keyDown(keyCode) {
-    simulant.fire(this.getInstance(), 'keydown', {keyCode});
+  keyDown(key) {
+    this.element.simulate('keyDown', {key});
   }
 
-  keyPress(keyCode) {
-    simulant.fire(this.getInstance(), 'keypress', {keyCode});
+  keyPress(key) {
+    this.element.simulate('keyPress', {key});
   }
 
-  keyUp(keyCode) {
-    simulant.fire(this.getInstance(), 'keyup', {keyCode});
+  keyUp(key) {
+    this.element.simulate('keyUp', {key});
   }
 
   getInstance() {
