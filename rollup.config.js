@@ -14,9 +14,7 @@ export default {
     'prop-types',
     'react',
     'react-dom',
-    'lodash.isequal',
-    'lodash.isboolean',
-    'lodash.isobject'
+    'lodash.orderby',
   ],
   plugins: [
     babel({
