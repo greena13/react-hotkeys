@@ -18,8 +18,6 @@ A declarative library for handling hotkeys and focus areas in React applications
 - Tree based priority - the deepest focused handler wins
 - Easy-to-use [HOC](https://github.com/greena13/react-hotkeys/blob/master/lib/withHotKeys.js) available.
 
-See [Exploring HotKeys and focus in React](http://chrispearce.co/exploring-hotkeys-and-focus-in-react/) for an introductory look into the problems we're trying to solve.
-
 ## Usage
 
 #### Key map
