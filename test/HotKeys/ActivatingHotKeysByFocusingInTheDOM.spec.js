@@ -6,9 +6,10 @@ import sinon from 'sinon';
 import HotKeys from '../../lib/HotKeys';
 import KeyCode from '../support/Key';
 import FocusableElement from '../support/FocusableElement';
+import KeyEventManager from '../../lib/lib/KeyEventManager';
 
 beforeEach(function() {
-  delete HotKeys.__keyEventManager;
+  KeyEventManager.clear();
 });
 
 describe('Activating hotkeys by focusing in the DOM:', () => {
