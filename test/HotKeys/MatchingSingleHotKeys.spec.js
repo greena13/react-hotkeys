@@ -38,7 +38,7 @@ describe('Matching single hotkeys:', function () {
       this.targetElement.focus();
     });
 
-    describe('When NO key events have occurred', function () {
+    describe('when NO key events have occurred', function () {
       it('then no handlers are called', function() {
         expect(this.enterHandler).to.not.have.been.called;
       });
@@ -254,7 +254,7 @@ describe('Matching single hotkeys:', function () {
       this.targetElement.focus();
     });
 
-    describe('When NO key events have occurred', function () {
+    describe('when NO key events have occurred', function () {
       it('then no handlers are called', function() {
         expect(this.enterHandler).to.not.have.been.called;
       });
@@ -473,7 +473,7 @@ describe('Matching single hotkeys:', function () {
       this.targetElement.focus();
     });
 
-    describe('When NO key events have occurred', function () {
+    describe('when NO key events have occurred', function () {
       it('then no handlers are called', function() {
         expect(this.enterHandler).to.not.have.been.called;
       });
