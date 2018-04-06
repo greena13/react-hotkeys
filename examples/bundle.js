@@ -45,7 +45,7 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 	__webpack_require__(1);
-	module.exports = __webpack_require__(40);
+	module.exports = __webpack_require__(41);
 
 
 /***/ }),
@@ -67,7 +67,7 @@
 	  }
 	});
 	
-	var _withHotKeys = __webpack_require__(38);
+	var _withHotKeys = __webpack_require__(39);
 	
 	Object.defineProperty(exports, 'withHotKeys', {
 	  enumerable: true,
@@ -85,7 +85,7 @@
 	  }
 	});
 	
-	var _HotKeyMapMixin = __webpack_require__(39);
+	var _HotKeyMapMixin = __webpack_require__(40);
 	
 	Object.defineProperty(exports, 'HotKeyMapMixin', {
 	  enumerable: true,
@@ -142,6 +142,10 @@
 	
 	var _sequencesFromKeyMap2 = _interopRequireDefault(_sequencesFromKeyMap);
 	
+	var _hasChanged = __webpack_require__(37);
+	
+	var _hasChanged2 = _interopRequireDefault(_hasChanged);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
@@ -152,11 +156,55 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
+	/**
+	 * A string or list of strings, that represent a sequence of one or more keys
+	 * @typedef {String | Array.<String>} MouseTrapKeySequence
+	 * @see {@link https://craig.is/killing/mice} for support key sequences
+	 */
+	
+	/**
+	 * Name of a key event
+	 * @typedef {'keyup'|'keydown'|'keypress'} KeyEventName
+	 */
+	
+	/**
+	 * Options for the mapping of a key sequence and event
+	 * @typedef {Object} KeyEventOptions
+	 * @property {MouseTrapKeySequence} The key sequence required to satisfy a KeyEventMatcher
+	 * @property {KeyEventName} action The keyboard state required to satisfy a KeyEventMatcher
+	 */
+	
+	/**
+	 * A matcher used on keyboard sequences and events to trigger handler functions
+	 * when matching sequences occur
+	 * @typedef {MouseTrapKeySequence | KeyMapOptions | Array<MouseTrapKeySequence>} KeyEventMatcher
+	 */
+	
+	/**
+	 * A unique key to associate with KeyEventMatchers that allows associating handler
+	 * functions at a later stage
+	 * @typedef {String} ActionName
+	 */
+	
+	/**
+	 * A mapping from ActionNames to KeyEventMatchers
+	 * @typedef {Object.<String, KeyEventMatcher>} KeySequence
+	 */
+	
+	/**
+	 * Component that wraps it children in a "focus trap" and allows key events to
+	 * trigger function handlers when its children are in focus
+	 */
 	var HotKeys = function (_Component) {
 	  _inherits(HotKeys, _Component);
 	
 	  function HotKeys(props, context) {
 	    _classCallCheck(this, HotKeys);
+	
+	    /**
+	     * The focus and blur handlers need access to the current component as 'this'
+	     * so they need to be bound to it when the component is instantiated
+	     */
 	
 	    var _this = _possibleConstructorReturn(this, (HotKeys.__proto__ || Object.getPrototypeOf(HotKeys)).call(this, props, context));
 	
@@ -164,6 +212,14 @@
 	    _this.onBlur = _this.onBlur.bind(_this);
 	    return _this;
 	  }
+	
+	  /**
+	   * Constructs the context object that contains references to this component
+	   * and its KeyMap so that they may be accessed by any descendant HotKeys
+	   * components
+	   * @returns {{hotKeyParent: HotKeys, hotKeyMap: KeySequence}} Child context object
+	   */
+	
 	
 	  _createClass(HotKeys, [{
 	    key: 'getChildContext',
@@ -173,11 +229,25 @@
 	        hotKeyMap: this.__hotKeyMap__
 	      };
 	    }
+	
+	    /**
+	     * Sets this components KeyMap from its keyMap prop and the KeyMap of its
+	     * ancestor KeyMap component (if one exists)
+	     */
+	
 	  }, {
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
 	      this.updateMap();
 	    }
+	
+	    /**
+	     * Updates this component's KeyMap if either its own keyMap prop has changed
+	     * or its ancestor's KeyMap has been update
+	     *
+	     * @returns {boolean} Whether the KeyMap was updated
+	     */
+	
 	  }, {
 	    key: 'updateMap',
 	    value: function updateMap() {
@@ -185,36 +255,70 @@
 	
 	      if (!(0, _lodash6.default)(newMap, this.__hotKeyMap__)) {
 	        this.__hotKeyMap__ = newMap;
+	
 	        return true;
 	      }
 	
 	      return false;
 	    }
+	
+	    /**
+	     * This component's KeyMap merged with that of its most direct ancestor that is a
+	     * HotKeys component. This component's mappings take precedence over those defined
+	     * in its ancestor.
+	     * @returns {KeySequence} This component's KeyMap merged with its HotKeys ancestor's
+	     */
+	
 	  }, {
 	    key: 'buildMap',
 	    value: function buildMap() {
 	      var parentMap = this.context.hotKeyMap || {};
 	      var thisMap = this.props.keyMap || {};
 	
+	      /**
+	       * TODO: This appears to only merge in the key maps of its most direct
+	       * ancestor - what about grandparent components' KeyMap's?
+	       */
 	      return _extends({}, parentMap, thisMap);
 	    }
+	
+	    /**
+	     * This component's KeyMap
+	     * @returns {KeySequence} This component's KeyMap
+	     */
+	
 	  }, {
 	    key: 'getMap',
 	    value: function getMap() {
 	      return this.__hotKeyMap__;
 	    }
+	
+	    /**
+	     * Imports mousetrap and stores a reference to it on the this component
+	     */
+	
 	  }, {
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
 	      // import is here to support React's server rendering as Mousetrap immediately
 	      // calls itself with window and it fails in Node environment
-	      var Mousetrap = __webpack_require__(37);
-	      // Not optimal - imagine hundreds of this component. We need a top level
-	      // delegation point for mousetrap
+	      var Mousetrap = __webpack_require__(38);
+	
+	      /**
+	       * TODO: Not optimal - imagine hundreds of this component. We need a top level
+	       * delegation point for mousetrap
+	       */
 	      this.__mousetrap__ = new Mousetrap(this.props.attach || _reactDom2.default.findDOMNode(this));
 	
 	      this.updateHotKeys(true);
 	    }
+	
+	    /**
+	     * Updates this component's KeyMap and synchronises the handlers across to
+	     * Mousetrap after the component has been updated (passed new prop values)
+	     * @param {Object} prevProps The props used on the component's last render
+	     */
+	
 	  }, {
 	    key: 'componentDidUpdate',
 	    value: function componentDidUpdate(prevProps) {
@@ -231,11 +335,19 @@
 	        this.__mousetrap__.reset();
 	      }
 	    }
+	
+	    /**
+	     * Updates this component's KeyMap and synchronises the changes across
+	     * to Mouestrap
+	     * @param {Boolean} force Whether to force an update of the KeyMap and sync
+	     *        to Mousetrap, even if no relevant values appear to have changed
+	     *        since the last time
+	     * @param {Object} prevProps The props used on the component's last render
+	     */
+	
 	  }, {
 	    key: 'updateHotKeys',
 	    value: function updateHotKeys() {
-	      var _this2 = this;
-	
 	      var force = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 	      var prevProps = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	      var _props$handlers = this.props.handlers,
@@ -243,12 +355,27 @@
 	      var _prevProps$handlers = prevProps.handlers,
 	          prevHandlers = _prevProps$handlers === undefined ? handlers : _prevProps$handlers;
 	
-	      // Ensure map is up-to-date to begin with
-	      // We will only bother continuing if the map was actually updated
 	
-	      if (!force && !this.updateMap() && (0, _lodash6.default)(handlers, prevHandlers)) {
-	        return;
+	      var keyMapHasChanged = this.updateMap();
+	
+	      if (force || keyMapHasChanged || (0, _hasChanged2.default)(handlers, prevHandlers)) {
+	        this.syncHandlersToMousetrap();
 	      }
+	    }
+	
+	    /**
+	     * Synchronises the KeyMap and handlers applied to this component over to
+	     * Mousetrap
+	     */
+	
+	  }, {
+	    key: 'syncHandlersToMousetrap',
+	    value: function syncHandlersToMousetrap() {
+	      var _this2 = this;
+	
+	      var _props$handlers2 = this.props.handlers,
+	          handlers = _props$handlers2 === undefined ? {} : _props$handlers2;
+	
 	
 	      var hotKeyMap = this.getMap();
 	      var sequenceHandlers = [];
@@ -258,15 +385,20 @@
 	      Object.keys(handlers).forEach(function (hotKey) {
 	        var handler = handlers[hotKey];
 	
-	        var handlerSequences = (0, _sequencesFromKeyMap2.default)(hotKeyMap, hotKey);
+	        var sequencesAsArray = (0, _sequencesFromKeyMap2.default)(hotKeyMap, hotKey);
 	
-	        // Could be optimized as every handler will get called across every bound
-	        // component - imagine making a node a focus point and then having hundreds!
-	        handlerSequences.forEach(function (sequence) {
+	        /**
+	         * TODO: Could be optimized as every handler will get called across every bound
+	         * component - imagine making a node a focus point and then having hundreds!
+	         */
+	        sequencesAsArray.forEach(function (sequence) {
 	          var action = void 0;
 	
 	          var callback = function callback(event, sequence) {
-	            // Check we are actually in focus and that a child hasn't already handled this sequence
+	            /**
+	             * Check we are actually in focus and that a child hasn't already
+	             * handled this sequence
+	             */
 	            var isFocused = (0, _lodash2.default)(_this2.props.focused) ? _this2.props.focused : _this2.__isFocused__;
 	
 	            if (isFocused && sequence !== _this2.__lastChildSequence__) {
@@ -287,12 +419,32 @@
 	        });
 	      });
 	
-	      // Hard reset our handlers (probably could be more efficient)
+	      /**
+	       * TODO: Hard reset our handlers (probably could be more efficient)
+	       */
 	      mousetrap.reset();
-	      sequenceHandlers.forEach(function (handler) {
-	        return mousetrap.bind(handler.sequence, handler.callback, handler.action);
+	
+	      sequenceHandlers.forEach(function (_ref) {
+	        var sequence = _ref.sequence,
+	            callback = _ref.callback,
+	            action = _ref.action;
+	        return mousetrap.bind(sequence, callback, action);
 	      });
 	    }
+	
+	    /**
+	     * Stores a reference to the last key sequence handled by the most direct
+	     * descendant HotKeys component, and passes that sequence to its own most
+	     * direct HotKeys ancestor for it to do the same.
+	     *
+	     * This reference is stored so that parent HotKeys components do not try
+	     * to handle a sequence that has already been handled by one of its
+	     * descendants.
+	     *
+	     * @param {KeyEventMatcher} sequence The sequence handled most recently by
+	     * a child HotKeys component
+	     */
+	
 	  }, {
 	    key: 'childHandledSequence',
 	    value: function childHandledSequence() {
@@ -300,46 +452,32 @@
 	
 	      this.__lastChildSequence__ = sequence;
 	
-	      // Traverse up any hot key parents so everyone is aware a child has handled a certain sequence
+	      /**
+	       * Traverse up any hot key parents so everyone is aware a child has
+	       * handled a certain sequence
+	       */
 	      if (this.context.hotKeyParent) {
 	        this.context.hotKeyParent.childHandledSequence(sequence);
 	      }
 	    }
-	  }, {
-	    key: 'onFocus',
-	    value: function onFocus() {
-	      this.__isFocused__ = true;
 	
-	      if (this.props.onFocus) {
-	        var _props;
+	    /**
+	     * Renders the component's children wrapped in a FocusTrap with the necessary
+	     * props to capture keyboard events
+	     *
+	     * @returns {FocusTrap} FocusTrap with necessary props to capture keyboard events
+	     */
 	
-	        (_props = this.props).onFocus.apply(_props, arguments);
-	      }
-	    }
-	  }, {
-	    key: 'onBlur',
-	    value: function onBlur() {
-	      this.__isFocused__ = false;
-	
-	      if (this.props.onBlur) {
-	        var _props2;
-	
-	        (_props2 = this.props).onBlur.apply(_props2, arguments);
-	      }
-	      if (this.context.hotKeyParent) {
-	        this.context.hotKeyParent.childHandledSequence(null);
-	      }
-	    }
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var _props3 = this.props,
-	          children = _props3.children,
-	          keyMap = _props3.keyMap,
-	          handlers = _props3.handlers,
-	          focused = _props3.focused,
-	          attach = _props3.attach,
-	          props = _objectWithoutProperties(_props3, ['children', 'keyMap', 'handlers', 'focused', 'attach']);
+	      var _props = this.props,
+	          keyMap = _props.keyMap,
+	          handlers = _props.handlers,
+	          focused = _props.focused,
+	          attach = _props.attach,
+	          children = _props.children,
+	          props = _objectWithoutProperties(_props, ['keyMap', 'handlers', 'focused', 'attach', 'children']);
 	
 	      return _react2.default.createElement(
 	        _FocusTrap2.default,
@@ -347,31 +485,115 @@
 	        children
 	      );
 	    }
+	
+	    /**
+	     * Updates the internal focused state and calls the onFocus prop if it is
+	     * defined
+	     */
+	
+	  }, {
+	    key: 'onFocus',
+	    value: function onFocus() {
+	      this.__isFocused__ = true;
+	
+	      if (this.props.onFocus) {
+	        var _props2;
+	
+	        (_props2 = this.props).onFocus.apply(_props2, arguments);
+	      }
+	    }
+	
+	    /**
+	     * Updates the internal focused state and calls the onBlur prop if it is
+	     * defined.
+	     *
+	     * Also registers a null sequence as being handled by this component with
+	     * its ancestor HotKeys.
+	     */
+	
+	  }, {
+	    key: 'onBlur',
+	    value: function onBlur() {
+	      this.__isFocused__ = false;
+	
+	      if (this.props.onBlur) {
+	        var _props3;
+	
+	        (_props3 = this.props).onBlur.apply(_props3, arguments);
+	      }
+	
+	      if (this.context.hotKeyParent) {
+	        this.context.hotKeyParent.childHandledSequence(null);
+	      }
+	    }
 	  }]);
 	
 	  return HotKeys;
 	}(_react.Component);
 	
 	HotKeys.propTypes = {
-	  children: _propTypes2.default.node,
-	  onFocus: _propTypes2.default.func,
-	  onBlur: _propTypes2.default.func,
+	  /**
+	   * A map from action names to Mousetrap key sequences
+	   */
 	  keyMap: _propTypes2.default.object,
+	
+	  /**
+	   * A map from action names to event handler functions
+	   */
 	  handlers: _propTypes2.default.object,
-	  focused: _propTypes2.default.bool, // externally controlled focus
-	  attach: _propTypes2.default.any // dom element to listen for key events
-	};
 	
-	HotKeys.contextTypes = {
-	  hotKeyParent: _propTypes2.default.any,
-	  hotKeyMap: _propTypes2.default.object
-	};
+	  /**
+	   * Whether HotKeys should behave as if it has focus in the browser,
+	   * whether it does or not - a way to force focus behaviour
+	   */
+	  focused: _propTypes2.default.bool,
 	
+	  /**
+	   * The DOM element the keyboard listeners should be attached to
+	   */
+	  attach: _propTypes2.default.any,
+	
+	  /**
+	   * Children to wrap within a focus trap
+	   */
+	  children: _propTypes2.default.node,
+	
+	  /**
+	   * Function to call when this component gains focus in the browser
+	   */
+	  onFocus: _propTypes2.default.func,
+	
+	  /**
+	   * Function to call when this component loses focus in the browser
+	   */
+	  onBlur: _propTypes2.default.func
+	};
 	HotKeys.childContextTypes = {
+	  /**
+	   * Reference to this instance of HotKeys so that any descendents are aware
+	   * that they are being rendered within another HotKeys component
+	   */
 	  hotKeyParent: _propTypes2.default.any,
+	
+	  /**
+	   * Reference to this instance's KeyMap so that any descendents may merge it
+	   * into its own
+	   */
 	  hotKeyMap: _propTypes2.default.object
 	};
+	HotKeys.contextTypes = {
+	  /**
+	   * Reference to the most direct ancestor that is a HotKeys component (if one
+	   * exists) so that messages may be passed to it when necessary
+	   */
+	  hotKeyParent: _propTypes2.default.any,
 	
+	  /**
+	   * Reference to the KeyMap of its most direct HotKeys ancestor, so that it may
+	   * be merged into this components
+	   */
+	  hotKeyMap: _propTypes2.default.object
+	};
 	exports.default = HotKeys;
 
 /***/ }),
@@ -19006,8 +19228,12 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var FocusTrap = function (_React$Component) {
-	  _inherits(FocusTrap, _React$Component);
+	/**
+	 * Component to wrap its children in a parent that has a tabIndex of -1,
+	 * making it programmatically focusable and with focus and blur handlers
+	 */
+	var FocusTrap = function (_Component) {
+	  _inherits(FocusTrap, _Component);
 	
 	  function FocusTrap() {
 	    _classCallCheck(this, FocusTrap);
@@ -19032,12 +19258,28 @@
 	  }]);
 	
 	  return FocusTrap;
-	}(_react2.default.Component);
+	}(_react.Component);
 	
 	FocusTrap.propTypes = {
+	  /**
+	   * Function to call when this component gains focus in the browser
+	   */
 	  onFocus: _propTypes2.default.func,
+	
+	  /**
+	   * Function to call when this component loses focus in the browser
+	   */
 	  onBlur: _propTypes2.default.func,
-	  component: _propTypes2.default.any,
+	
+	  /**
+	   * Component (or component type as a string) to use as a wrapper or
+	   * parent of this component's children
+	   */
+	  component: _propTypes2.default.oneOfType([_propTypes2.default.func, _propTypes2.default.string]),
+	
+	  /**
+	   * Children to place in the wrapper or parent
+	   */
 	  children: _propTypes2.default.node
 	};
 	FocusTrap.defaultProps = {
@@ -21047,23 +21289,45 @@
 	function sequencesFromKeyMap(hotKeyMap, hotKeyName) {
 	  var sequences = hotKeyMap[hotKeyName];
 	
-	  // If no sequence is found with this name we assume
-	  // the user is passing a hard-coded sequence as a key
 	  if (!sequences) {
+	    /**
+	     * If no sequence is found with this name we assume the user is passing a
+	     * hard-coded sequence as a key
+	     */
 	    return [hotKeyName];
-	  }
-	
-	  if (Array.isArray(sequences)) {
+	  } else if (Array.isArray(sequences)) {
 	    return sequences;
+	  } else {
+	    return [sequences];
 	  }
-	
-	  return [sequences];
 	}
 	
 	exports.default = sequencesFromKeyMap;
 
 /***/ }),
 /* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _lodash = __webpack_require__(34);
+	
+	var _lodash2 = _interopRequireDefault(_lodash);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function hasChanged(newValue, previousValue) {
+	  return !(0, _lodash2.default)(newValue, previousValue);
+	}
+	
+	exports.default = hasChanged;
+
+/***/ }),
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*global define:false */
@@ -22113,7 +22377,7 @@
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22188,20 +22452,16 @@
 	    return function (_PureComponent) {
 	      _inherits(HotKeysWrapper, _PureComponent);
 	
-	      function HotKeysWrapper() {
-	        var _ref;
-	
-	        var _temp, _this, _ret;
-	
+	      function HotKeysWrapper(props) {
 	        _classCallCheck(this, HotKeysWrapper);
 	
-	        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-	          args[_key] = arguments[_key];
-	        }
+	        var _this = _possibleConstructorReturn(this, (HotKeysWrapper.__proto__ || Object.getPrototypeOf(HotKeysWrapper)).call(this, props));
 	
-	        return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = HotKeysWrapper.__proto__ || Object.getPrototypeOf(HotKeysWrapper)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
+	        _this._setRef = _this._setRef.bind(_this);
+	        _this.state = {
 	          handlers: {}
-	        }, _temp), _possibleConstructorReturn(_this, _ret);
+	        };
+	        return _this;
 	      }
 	
 	      _createClass(HotKeysWrapper, [{
@@ -22219,14 +22479,13 @@
 	        value: function render() {
 	          var handlers = this.state.handlers;
 	
-	          var DocumentFragment = document.createDocumentFragment();
-	
 	          // Setting component as documentfragment to avoid unexpected stylistic changes to the wrapped component
+	
 	          return _react2.default.createElement(
 	            _HotKeys2.default,
 	            { component: 'document-fragment', keyMap: keyMap, handlers: handlers },
 	            _react2.default.createElement(Component, _extends({
-	              ref: this._setRef.bind(this)
+	              ref: this._setRef
 	            }, this.props))
 	          );
 	        }
@@ -22240,7 +22499,7 @@
 	exports.default = withHotKeys;
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22308,12 +22567,12 @@
 	}
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _index = __webpack_require__(41);
+	var _index = __webpack_require__(42);
 	
 	var Master = _interopRequireWildcard(_index);
 	
@@ -22321,10 +22580,10 @@
 	
 	Master.render(document.getElementById('container'));
 	
-	__webpack_require__(45);
+	__webpack_require__(46);
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22348,11 +22607,11 @@
 	
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 	
-	var _Node = __webpack_require__(42);
+	var _Node = __webpack_require__(43);
 	
 	var _Node2 = _interopRequireDefault(_Node);
 	
-	var _HOCWrappedNode = __webpack_require__(44);
+	var _HOCWrappedNode = __webpack_require__(45);
 	
 	var _HOCWrappedNode2 = _interopRequireDefault(_HOCWrappedNode);
 	
@@ -22485,7 +22744,7 @@
 	}
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22504,7 +22763,7 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _lodash = __webpack_require__(43);
+	var _lodash = __webpack_require__(44);
 	
 	var _lodash2 = _interopRequireDefault(_lodash);
 	
@@ -22615,7 +22874,7 @@
 	exports.default = Node;
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports) {
 
 	/**
@@ -23077,7 +23336,7 @@
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23168,16 +23427,16 @@
 	exports.default = (0, _reactHotkeys.withHotKeys)(ACTION_KEY_MAP)(HOCWrappedNode);
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(46);
+	var content = __webpack_require__(47);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(48)(content, {});
+	var update = __webpack_require__(49)(content, {});
 	// Hot Module Replacement
 	if(false) {
 		// When the styles change, update the <style> tags
@@ -23191,14 +23450,14 @@
 	}
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(47)();
+	exports = module.exports = __webpack_require__(48)();
 	exports.push([module.id, "* {\n  box-sizing: border-box;\n}\n\nbody {\n  font-family: \"Helvetica Neue\", Arial;\n  margin: 0;\n}\n\n.app {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  display: flex;\n  flex-direction: column;\n}\n\n.tips {\n  background: #ccc;\n  padding: 15px;\n}\n\n.viewport {\n  position: relative;\n  overflow: hidden;\n  flex: 1;\n}\n\n@keyframes konamiTime {\n  0% {background-color: #45CEEF;}\n  25% {background-color: #FFF5A5;}\n  50% {background-color: #FFD4DA;}\n  75% {background-color: #99D2E4;}\n  100% {background-color: #D8CAB4;}\n}\n\n.viewport.konamiTime {\n  animation: konamiTime 2s infinite linear;\n}\n\n.node {\n  z-index: 5;\n  position: absolute;\n  background: black;\n  color: white;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.node:focus {\n  background: blue;\n}\n", ""]);
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports) {
 
 	module.exports = function() {
@@ -23219,7 +23478,7 @@
 	}
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/*
