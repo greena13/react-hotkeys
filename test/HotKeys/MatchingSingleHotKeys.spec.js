@@ -55,12 +55,13 @@ describe('Matching single hotkeys:', function () {
     });
 
     describe('when a hotkey keypress event occurs', function () {
+
       beforeEach(function () {
         this.targetElement.keyDown(KeyCode.ENTER);
         this.targetElement.keyPress(KeyCode.ENTER);
       });
 
-      it('then the matching handler is called once', function() {
+      it.only('then the matching handler is called once', function() {
         expect(this.enterHandler).to.have.been.calledOnce;
       });
     });

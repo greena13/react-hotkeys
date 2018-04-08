@@ -96,6 +96,7 @@ describe('Matching hotkey combinations:', function () {
 
         it('then calls the shorter key combination\'s handler', function() {
           expect(this.comboHandler).to.have.been.calledOnce;
+          expect(this.longerCombinationHandler).to.not.have.been.called;
         });
 
         describe('and the remaining keys to satisfy the longer combination are pressed', () => {
@@ -198,6 +199,7 @@ describe('Matching hotkey combinations:', function () {
 
           it('then calls the shorter key combination\'s handler', function() {
             expect(this.comboHandler).to.have.been.calledOnce;
+            expect(this.longerCombinationHandler).to.not.have.been.called;
           });
 
           describe('and the remaining keys to satisfy the longer combination are pressed', () => {
