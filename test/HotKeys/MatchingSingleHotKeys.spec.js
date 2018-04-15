@@ -61,7 +61,7 @@ describe('Matching single hotkeys:', function () {
         this.targetElement.keyPress(KeyCode.ENTER);
       });
 
-      it.only('then the matching handler is called once', function() {
+      it('then the matching handler is called once', function() {
         expect(this.enterHandler).to.have.been.calledOnce;
       });
     });

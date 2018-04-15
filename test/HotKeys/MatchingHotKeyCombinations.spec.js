@@ -233,13 +233,9 @@ describe('Matching hotkey combinations:', function () {
       };
 
       this.wrapper = mount(
-        <div >
-          <HotKeys keyMap={this.keyMap} handlers={handlers}>
-            <div className="childElement" />
-          </HotKeys>
-
-          <div className="siblingElement" />
-        </div>
+        <HotKeys keyMap={this.keyMap} handlers={handlers}>
+          <div className="childElement" />
+        </HotKeys>
       );
 
       this.targetElement = new FocusableElement(this.wrapper, '.childElement');
