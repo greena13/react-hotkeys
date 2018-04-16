@@ -104,4 +104,35 @@ describe('Specifying key map using objects:', () => {
       expect(this.handler).to.have.been.called;
     });
   });
+
+  context('when a keymap is specified as an object without the action', () => {
+    beforeEach(function () {
+      this.keyMap = {
+        'A': {
+          sequence: 'a',
+        },
+      };
+
+      this.handler = sinon.spy();
+
+      this.handlers = {
+        'A': this.handler,
+      };
+
+      this.wrapper = mount(
+        <HotKeys keyMap={this.keyMap} handlers={this.handlers} focused>
+          <div className="childElement" />
+        </HotKeys>
+      );
+
+      this.targetElement = new FocusableElement(this.wrapper, '.childElement');
+      this.targetElement.focus();
+    });
+
+    it('then calls the correct handler when a key is pressed that matches the keyMap', function() {
+      this.targetElement.keyPress(KeyCode.A);
+
+      expect(this.handler).to.have.been.called;
+    });
+  });
 });
