@@ -15,7 +15,7 @@ describe('KeyEventManager:', () => {
     };
   });
 
-  context('when setIgnoreEventsCondition() is not called', () => {
+  context('when setIgnoreEventsCondition() is NOT called', () => {
 
     [ 'input', 'select', 'textarea'].forEach((Tagname) => {
       it(`then events from <${Tagname} /> tags are ignored`, function() {
@@ -42,9 +42,9 @@ describe('KeyEventManager:', () => {
     })
   });
 
-  context('when setIgnoreEventsCondition() is not called with a function', () => {
+  context('when setIgnoreEventsCondition() is called with a function', () => {
 
-    it('then that function is then used to decide whether to ignore events', function() {
+    it('then that function is used to decide whether to ignore events', function() {
       KeyEventManager.setIgnoreEventsCondition(({ target }) => {
         return target.tagName.toLowerCase() === 'input' && target.className === 'ignore';
       });
