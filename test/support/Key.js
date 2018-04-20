@@ -3,6 +3,6 @@ export default {
   TAB: 'Tab',
   ALT: 'Alt',
 
-  A: 'A',
-  B: 'B',
+  A: 'a',
+  B: 'b',
 };

@@ -34,7 +34,7 @@ describe('KeyEventManager:', () => {
         this.targetElement = new FocusableElement(this.wrapper, Tagname);
         this.targetElement.focus();
 
-        this.targetElement.keyPress('enter');
+        this.targetElement.keyPress('Enter');
 
         expect(this.handler).to.not.have.been.called;
       });
@@ -65,14 +65,14 @@ describe('KeyEventManager:', () => {
       this.targetElement = new FocusableElement(this.wrapper, 'input.ignore');
       this.targetElement.focus();
 
-      this.targetElement.keyPress('enter');
+      this.targetElement.keyPress('Enter');
 
       expect(this.handler).to.not.have.been.called;
 
       this.targetElement = new FocusableElement(this.wrapper, 'input.other');
       this.targetElement.focus();
 
-      this.targetElement.keyPress('enter');
+      this.targetElement.keyPress('Enter');
 
       expect(this.handler).to.have.been.called;
     });
@@ -103,7 +103,7 @@ describe('KeyEventManager:', () => {
       this.targetElement = new FocusableElement(this.wrapper, 'input.other');
       this.targetElement.focus();
 
-      this.targetElement.keyPress('enter');
+      this.targetElement.keyPress('Enter');
 
       expect(this.handler).to.not.have.been.called;
     });
