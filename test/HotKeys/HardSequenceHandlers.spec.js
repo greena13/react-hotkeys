@@ -94,13 +94,9 @@ describe('Hard sequence handlers:', () => {
       this.otherHandler = sinon.spy();
 
       this.wrapper = mount(
-        <div >
-          <HotKeys actions={{ 'ENTER': 'enter' }} handlers={{ 'ENTER': this.otherHandler, ...this.handlers }}>
-            <div className="childElement" />
-          </HotKeys>
-
-          <div className="siblingElement" />
-        </div>
+        <HotKeys actions={{ 'ACTION': 'enter' }} handlers={{ 'ACTION': this.otherHandler, ...this.handlers }}>
+          <div className="childElement" />
+        </HotKeys>
       );
 
       this.targetElement = new FocusableElement(this.wrapper, '.childElement');

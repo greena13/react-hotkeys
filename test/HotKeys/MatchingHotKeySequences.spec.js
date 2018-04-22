@@ -496,7 +496,6 @@ describe('Matching hotkey sequences:', function () {
     });
   });
 
-
   describe('when there is a sequence with a combination at the start', function () {
     beforeEach(function () {
       this.keyMap = {
