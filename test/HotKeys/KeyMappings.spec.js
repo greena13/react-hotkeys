@@ -48,7 +48,6 @@ const keyMapping = {
   "+": ["plus", "+"],
   "Tab": ["tab", "Tab"],
   "Backspace": ["del", "backspace", "Delete", "Backspace"],
-  "Delete": ["del", "backspace", "Delete", "Backspace"],
   "CapsLock": ["capslock", "CapsLock"],
   "Enter": ["enter", "return", "Enter"],
   "Shift": ["shift", "Shift"],
