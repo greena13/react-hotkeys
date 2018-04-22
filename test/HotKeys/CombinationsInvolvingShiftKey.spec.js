@@ -6,114 +6,12 @@ import sinon from 'sinon';
 import FocusableElement from '../support/FocusableElement';
 
 import HotKeys from '../../lib/HotKeys';
-
-const shiftKeyMappings = {
-  'US': {
-    "`": "~",
-    "1": "!",
-    "2": "@",
-    "3": "#",
-    "4": "$",
-    "5": "%",
-    "6": "^",
-    "7": "&",
-    "8": "*",
-    "9": "(",
-    "0": ")",
-    "-": "_",
-    "=": "+",
-    "a": "A",
-    "b": "B",
-    "c": "C",
-    "d": "D",
-    "e": "E",
-    "f": "F",
-    "g": "G",
-    "h": "H",
-    "i": "I",
-    "j": "J",
-    "k": "K",
-    "l": "L",
-    "m": "M",
-    "n": "N",
-    "o": "O",
-    "p": "P",
-    "q": "Q",
-    "r": "R",
-    "s": "S",
-    "t": "T",
-    "u": "U",
-    "v": "V",
-    "w": "W",
-    "x": "X",
-    "y": "Y",
-    "z": "Z",
-    "[": "{",
-    "]": "}",
-    "\\": "|",
-    "'": '"',
-    ";": ":",
-    ",": "<",
-    ".": ">",
-    "/": "?",
-  },
-
-  'UK': {
-    "\\": "|",
-    "1": "!",
-    "2": '"',
-    "3": "£",
-    "4": "$",
-    "5": "%",
-    "6": "^",
-    "7": "&",
-    "8": "*",
-    "9": "9",
-    "0": "0",
-    "-": "_",
-    "=": "+",
-    "a": "A",
-    "b": "B",
-    "c": "C",
-    "d": "D",
-    "e": "E",
-    "f": "F",
-    "g": "G",
-    "h": "H",
-    "i": "I",
-    "j": "J",
-    "k": "K",
-    "l": "L",
-    "m": "M",
-    "n": "N",
-    "o": "O",
-    "p": "P",
-    "q": "Q",
-    "r": "R",
-    "s": "S",
-    "t": "T",
-    "u": "U",
-    "v": "V",
-    "w": "W",
-    "x": "X",
-    "y": "Y",
-    "z": "Z",
-    "[": "{",
-    "]": "}",
-    "#": "~",
-    ";": ":",
-    "'": "@",
-    ",": "<",
-    ".": ">",
-    "/": "?",
-  }
-
-};
+import ShiftKeyMappings from '../support/ShiftKeyMappings';
 
 describe('Combinations involving shift key:', function () {
-  Object.keys(shiftKeyMappings).forEach((keyboardLayout) => {
+  Object.keys(ShiftKeyMappings).forEach((keyboardLayout) => {
     context(`when a user is using a ${keyboardLayout} keyboard layout`, () => {
-      const keyboardLayoutShiftMappings = shiftKeyMappings[keyboardLayout];
+      const keyboardLayoutShiftMappings = ShiftKeyMappings[keyboardLayout];
 
       Object.keys(keyboardLayoutShiftMappings).forEach((nonShiftKeyCode) => {
         const shiftKeyCode = keyboardLayoutShiftMappings[nonShiftKeyCode];
