@@ -14,7 +14,6 @@ export default {
     'prop-types',
     'react',
     'react-dom',
-    'lodash.orderby',
   ],
   plugins: [
     babel({

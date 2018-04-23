@@ -51,7 +51,6 @@
     "webpack": "^1.7.3"
   },
   "dependencies": {
-    "lodash.orderby": "^4.6.0",
     "mousetrap": "^1.5.2",
     "prop-types": "^15.6.1"
   },
