@@ -48,7 +48,7 @@ describe('Component lifecycle:', () => {
 
       context('and a key matching a hot key is pressed', () => {
         it('then calls the correct handler', function() {
-          this.targetElement.keyPress(KeyCode.ENTER);
+          this.targetElement.keyDown(KeyCode.ENTER);
 
           expect(this.handler).to.have.been.called;
         });
@@ -82,7 +82,7 @@ describe('Component lifecycle:', () => {
     });
 
     it('then does not call the handler when a key matching a hot key is pressed', function() {
-      this.targetElement.keyPress(KeyCode.ENTER);
+      this.targetElement.keyDown(KeyCode.ENTER);
 
       expect(this.handler).to.not.have.been.called;
     });
