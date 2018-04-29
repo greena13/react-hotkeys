@@ -164,7 +164,7 @@ describe('Key mappings:', function () {
         });
 
         it(`then calls the handler when ${reactKeyCode} is pressed`, function() {
-          this.targetElement.keyDown(reactKeyCode);
+          this.targetElement.keyPress(reactKeyCode);
 
           expect(this.handler).to.have.been.called;
         });

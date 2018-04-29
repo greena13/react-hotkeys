@@ -12,8 +12,8 @@ describe('Matching single hotkeys:', function () {
   describe('when the actions are triggered by the keypress event', () => {
     beforeEach(function () {
       this.keyMap = {
-        'ENTER': { sequence: 'enter', action: 'keypress' },
-        'TAB': { sequence: 'tab', action: 'keypress' }
+        'ENTER': 'enter',
+        'TAB': 'tab',
       };
 
       this.enterHandler = sinon.spy();
