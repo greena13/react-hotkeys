@@ -5,7 +5,6 @@ import sinon from 'sinon';
 
 import HotKeys from '../../lib/HotKeys';
 import FocusableElement from '../support/FocusableElement';
-import KeyEventManager from '../../lib/lib/KeyEventManager';
 
 describe('KeyEventManager:', () => {
   before(function () {
@@ -45,7 +44,7 @@ describe('KeyEventManager:', () => {
   context('when setIgnoreEventsCondition() is called with a function', () => {
 
     it('then that function is used to decide whether to ignore events', function() {
-      KeyEventManager.setIgnoreEventsCondition(({ target }) => {
+      HotKeys.setIgnoreEventsCondition(({ target }) => {
         return target.tagName.toLowerCase() === 'input' && target.className === 'ignore';
       });
 
@@ -82,11 +81,11 @@ describe('KeyEventManager:', () => {
   context('when resetIgnoreEventsCondition() is called', () => {
 
     it('then restores the default function used for ignoreEventsCondition', function() {
-      KeyEventManager.setIgnoreEventsCondition(({ target }) => {
+      HotKeys.setIgnoreEventsCondition(({ target }) => {
         return target.tagName.toLowerCase() === 'input' && target.className === 'ignore';
       });
 
-      KeyEventManager.resetIgnoreEventsCondition();
+      HotKeys.resetIgnoreEventsCondition();
 
       this.handler = sinon.spy();
 
