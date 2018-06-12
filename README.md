@@ -268,7 +268,7 @@ A more exhaustive enumration of `react-hotkeys` behaviour can be found by review
 
 ### Elements must be in focus
 
-In order for a hot key to be triggered, an element that is a descendent of the `<HotKey />` component that defines `handlers` must be in focus. It is not enough to have a descendent element of a `<HotKey />` that defines a `keyMap` in focus - it must be one that defines `handlers`. See [Managing focus in the browser](#Managing-focus-in-the-browser) for more details.
+In order for a hot key to be triggered, an element that is a descendent of the `<HotKey />` component that defines `handlers` must be in focus. It is not enough to have a descendent element of a `<HotKey />` that defines a `keyMap` in focus - it must be one that defines `handlers`. See [Managing focus in the browser](#managing-focus-in-the-browser) for more details.
 
 ### Simulating an element's focus
 
