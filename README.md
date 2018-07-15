@@ -20,7 +20,7 @@ A declarative library for handling hotkeys and focus areas in React applications
 
 ## Live Example
 
-Play with a live example of [react-hotkeys](https://codesandbox.io/s/84p9kxv3k2)!
+Play with a live example of [react-hotkeys](https://codesandbox.io/s/x73mw4knlo)!
 
 ## Usage
 
