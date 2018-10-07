@@ -16,8 +16,11 @@ A declarative library for handling hotkeys and focus areas in React applications
 - Named hotkeys for easy customization
 - Intuitive key commands thanks to [Mousetrap](https://github.com/ccampbell/mousetrap)
 - Tree based priority - the deepest focused handler wins
+- Easy-to-use [HOC](https://github.com/greena13/react-hotkeys/blob/master/lib/withHotKeys.js) available.
 
-See [Exploring HotKeys and focus in React](http://chrispearce.co/exploring-hotkeys-and-focus-in-react/) for an introductory look into the problems we're trying to solve.
+## Live Example
+
+Play with a live example of [react-hotkeys](https://codesandbox.io/s/x73mw4knlo)!
 
 ## Usage
 
@@ -269,7 +272,7 @@ A more exhaustive enumration of `react-hotkeys` behaviour can be found by review
 
 ### Elements must be in focus
 
-In order for a hot key to be triggered, an element that is a descendent of the `<HotKey />` component that defines `handlers` must be in focus. It is not enough to have a descendent element of a `<HotKey />` that defines a `keyMap` in focus - it must be one that defines `handlers`. See [Managing focus in the browser](#Managing-focus-in-the-browser) for more details.
+In order for a hot key to be triggered, an element that is a descendent of the `<HotKey />` component that defines `handlers` must be in focus. It is not enough to have a descendent element of a `<HotKey />` that defines a `keyMap` in focus - it must be one that defines `handlers`. See [Managing focus in the browser](#managing-focus-in-the-browser) for more details.
 
 ### Simulating an element's focus
 

@@ -61,9 +61,12 @@ interface HotKeysProps extends React.HTMLAttributes<HotKeys>, FocusTrapProps {
  */
 export class HotKeys extends React.Component<HotKeysProps, {}> { }
 
+export declare function withHotKeys(keyMap: { [key: string]: KeySequence }): HotKeys;
+
 /**
  * Component that renders a "focus trap" with a tabIndex property allowing
  * it to be programmatically focused, but skip the user focusing it in the
  * browser
  */
 export class FocusTrap extends React.Component<FocusTrapProps, {}> { }
+

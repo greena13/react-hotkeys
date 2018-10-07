@@ -29,7 +29,14 @@ exports = module.exports = {
     libraryTarget: 'umd'
   },
   module: {
-    loaders: [{test: /\.(js|jsx)$/, exclude: /node_modules/, loaders: ['babel-loader']}]
+    loaders: [
+        {test: /\.(js|jsx)$/, exclude: /node_modules/, loaders: ['babel-loader']},
+        {
+          test: /\.css$/,
+          exclude: /node_modules/,
+          loaders: ['style-loader', 'css-loader'],
+        },
+    ]
   },
   resolveLoader: {
     modulesDirectories: ['node_modules']
