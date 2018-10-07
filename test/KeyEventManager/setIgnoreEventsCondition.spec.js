@@ -5,12 +5,13 @@ import sinon from 'sinon';
 
 import HotKeys from '../../lib/HotKeys';
 import FocusableElement from '../support/FocusableElement';
+import KeyCode from '../support/Key';
 
 describe('KeyEventManager:', () => {
   before(function () {
     this.keyMap = {
-      'ENTER': 'enter',
-      'TAB': 'tab',
+      'ACTION1': 'a',
+      'ACTION2': 'b',
     };
   });
 
@@ -21,7 +22,7 @@ describe('KeyEventManager:', () => {
         this.handler = sinon.spy();
 
         const handlers = {
-          'ENTER': this.handler,
+          'ACTION1': this.handler,
         };
 
         this.wrapper = mount(
@@ -33,7 +34,7 @@ describe('KeyEventManager:', () => {
         this.targetElement = new FocusableElement(this.wrapper, Tagname);
         this.targetElement.focus();
 
-        this.targetElement.keyPress('Enter');
+        this.targetElement.keyPress(KeyCode.A);
 
         expect(this.handler).to.not.have.been.called;
       });
@@ -51,7 +52,7 @@ describe('KeyEventManager:', () => {
       this.handler = sinon.spy();
 
       const handlers = {
-        'ENTER': this.handler,
+        'ACTION1': this.handler,
       };
 
       this.wrapper = mount(
@@ -64,14 +65,14 @@ describe('KeyEventManager:', () => {
       this.targetElement = new FocusableElement(this.wrapper, 'input.ignore');
       this.targetElement.focus();
 
-      this.targetElement.keyPress('Enter');
+      this.targetElement.keyPress(KeyCode.A);
 
       expect(this.handler).to.not.have.been.called;
 
       this.targetElement = new FocusableElement(this.wrapper, 'input.other');
       this.targetElement.focus();
 
-      this.targetElement.keyPress('Enter');
+      this.targetElement.keyPress(KeyCode.A);
 
       expect(this.handler).to.have.been.called;
     });
@@ -90,7 +91,7 @@ describe('KeyEventManager:', () => {
       this.handler = sinon.spy();
 
       const handlers = {
-        'ENTER': this.handler,
+        'ACTION1': this.handler,
       };
 
       this.wrapper = mount(
@@ -102,7 +103,7 @@ describe('KeyEventManager:', () => {
       this.targetElement = new FocusableElement(this.wrapper, 'input.other');
       this.targetElement.focus();
 
-      this.targetElement.keyPress('Enter');
+      this.targetElement.keyPress(KeyCode.A);
 
       expect(this.handler).to.not.have.been.called;
     });

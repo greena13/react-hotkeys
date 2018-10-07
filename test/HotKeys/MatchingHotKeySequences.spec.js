@@ -12,7 +12,7 @@ describe('Matching hotkey sequences:', function () {
   describe('when the actions are occur on the keydown event', function () {
     beforeEach(function () {
       this.keyMap = {
-        'SEQUENCE': { sequence: 'enter tab', action: 'keydown' },
+        'SEQUENCE': { sequence: 'a b', action: 'keydown' },
       };
 
       this.sequenceHandler = sinon.spy();
@@ -34,7 +34,7 @@ describe('Matching hotkey sequences:', function () {
 
     describe('after the keydown event for the first key in the sequence', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
       });
 
       it('then no handlers are called', function() {
@@ -44,11 +44,11 @@ describe('Matching hotkey sequences:', function () {
 
     describe('after the keydown event for the second key in the sequence', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-        this.targetElement.keyUp(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
 
-        this.targetElement.keyDown(KeyCode.TAB);
+        this.targetElement.keyDown(KeyCode.B);
       });
 
       it('then the sequence\'s handler is called', function() {
@@ -58,12 +58,12 @@ describe('Matching hotkey sequences:', function () {
 
     describe('after the keypress event for the second key in the sequence', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-        this.targetElement.keyUp(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
 
-        this.targetElement.keyDown(KeyCode.TAB);
-        this.targetElement.keyPress(KeyCode.TAB);
+        this.targetElement.keyDown(KeyCode.B);
+        this.targetElement.keyPress(KeyCode.B);
       });
 
       it('then the sequence\'s handler is NOT called again', function() {
@@ -74,13 +74,13 @@ describe('Matching hotkey sequences:', function () {
 
     describe('after the keyup event for the second key in the sequence', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-        this.targetElement.keyUp(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
 
-        this.targetElement.keyDown(KeyCode.TAB);
-        this.targetElement.keyPress(KeyCode.TAB);
-        this.targetElement.keyUp(KeyCode.TAB);
+        this.targetElement.keyDown(KeyCode.B);
+        this.targetElement.keyPress(KeyCode.B);
+        this.targetElement.keyUp(KeyCode.B);
       });
 
       it('then the sequence\'s handler is NOT called again', function() {
@@ -92,7 +92,7 @@ describe('Matching hotkey sequences:', function () {
   describe('when the actions are occur on the keypress event', function () {
     beforeEach(function () {
       this.keyMap = {
-        'SEQUENCE': { sequence: 'enter tab', action: 'keypress' },
+        'SEQUENCE': { sequence: 'a b', action: 'keypress' },
       };
 
       this.sequenceHandler = sinon.spy();
@@ -114,7 +114,7 @@ describe('Matching hotkey sequences:', function () {
 
     describe('after the keypress event for the first key in the sequence', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
       });
 
       it('then no handlers are called', function() {
@@ -124,11 +124,11 @@ describe('Matching hotkey sequences:', function () {
 
     describe('after the keydown event for the second key in the sequence', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-        this.targetElement.keyUp(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
 
-        this.targetElement.keyDown(KeyCode.TAB);
+        this.targetElement.keyDown(KeyCode.B);
       });
 
       it('then no handlers are called', function() {
@@ -139,12 +139,12 @@ describe('Matching hotkey sequences:', function () {
 
     describe('after the keypress event for the second key in the sequence', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-        this.targetElement.keyUp(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
 
-        this.targetElement.keyDown(KeyCode.TAB);
-        this.targetElement.keyPress(KeyCode.TAB);
+        this.targetElement.keyDown(KeyCode.B);
+        this.targetElement.keyPress(KeyCode.B);
       });
 
       it('then the sequence\'s handler is called', function() {
@@ -155,13 +155,13 @@ describe('Matching hotkey sequences:', function () {
 
     describe('after the keyup event for the second key in the sequence', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-        this.targetElement.keyUp(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
 
-        this.targetElement.keyDown(KeyCode.TAB);
-        this.targetElement.keyPress(KeyCode.TAB);
-        this.targetElement.keyUp(KeyCode.TAB);
+        this.targetElement.keyDown(KeyCode.B);
+        this.targetElement.keyPress(KeyCode.B);
+        this.targetElement.keyUp(KeyCode.B);
       });
 
       it('then the sequence\'s handler is NOT called again', function() {
@@ -173,7 +173,7 @@ describe('Matching hotkey sequences:', function () {
   describe('when the actions are occur on the keyup event', function () {
     beforeEach(function () {
       this.keyMap = {
-        'SEQUENCE': { sequence: 'enter tab', action: 'keyup' },
+        'SEQUENCE': { sequence: 'a b', action: 'keyup' },
       };
 
       this.sequenceHandler = sinon.spy();
@@ -195,7 +195,7 @@ describe('Matching hotkey sequences:', function () {
 
     describe('after the keypress event for the first key in the sequence', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
       });
 
       it('then no handlers are called', function() {
@@ -205,11 +205,11 @@ describe('Matching hotkey sequences:', function () {
 
     describe('after the keydown event for the second key in the sequence', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-        this.targetElement.keyUp(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
 
-        this.targetElement.keyDown(KeyCode.TAB);
+        this.targetElement.keyDown(KeyCode.B);
       });
 
       it('then no handlers are called', function() {
@@ -220,12 +220,12 @@ describe('Matching hotkey sequences:', function () {
 
     describe('after the keypress event for the second key in the sequence', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-        this.targetElement.keyUp(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
 
-        this.targetElement.keyDown(KeyCode.TAB);
-        this.targetElement.keyPress(KeyCode.TAB);
+        this.targetElement.keyDown(KeyCode.B);
+        this.targetElement.keyPress(KeyCode.B);
       });
 
       it('then no handlers are called', function() {
@@ -236,13 +236,13 @@ describe('Matching hotkey sequences:', function () {
 
     describe('after the keyup event for the second key in the sequence', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-        this.targetElement.keyUp(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
 
-        this.targetElement.keyDown(KeyCode.TAB);
-        this.targetElement.keyPress(KeyCode.TAB);
-        this.targetElement.keyUp(KeyCode.TAB);
+        this.targetElement.keyDown(KeyCode.B);
+        this.targetElement.keyPress(KeyCode.B);
+        this.targetElement.keyUp(KeyCode.B);
       });
 
       it('then the sequence\'s handler is called', function() {
@@ -254,8 +254,8 @@ describe('Matching hotkey sequences:', function () {
   describe('when there is a sequence that is a subset of a longer one (which includes more keys at the end)', function () {
     beforeEach(function () {
       this.keyMap = {
-        'SHORT_SEQUENCE': 'enter tab',
-        'LONG_SEQUENCE': 'enter tab b',
+        'SHORT_SEQUENCE': 'a b',
+        'LONG_SEQUENCE': 'a b c',
       };
 
       this.shortSequenceHandler = sinon.spy();
@@ -278,13 +278,13 @@ describe('Matching hotkey sequences:', function () {
 
     describe('and the keys for the shorter sequence are pressed', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-        this.targetElement.keyUp(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
 
-        this.targetElement.keyDown(KeyCode.TAB);
-        this.targetElement.keyPress(KeyCode.TAB);
-        this.targetElement.keyUp(KeyCode.TAB);
+        this.targetElement.keyDown(KeyCode.B);
+        this.targetElement.keyPress(KeyCode.B);
+        this.targetElement.keyUp(KeyCode.B);
       });
 
       it('then the handler for the shorter sequence is called', function() {
@@ -294,17 +294,17 @@ describe('Matching hotkey sequences:', function () {
 
     describe('and the keys for the shorter sequence are pressed followed by the remaining keys to match the longer sequence', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-        this.targetElement.keyUp(KeyCode.ENTER);
-
-        this.targetElement.keyDown(KeyCode.TAB);
-        this.targetElement.keyPress(KeyCode.TAB);
-        this.targetElement.keyUp(KeyCode.TAB);
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
 
         this.targetElement.keyDown(KeyCode.B);
         this.targetElement.keyPress(KeyCode.B);
         this.targetElement.keyUp(KeyCode.B);
+
+        this.targetElement.keyDown(KeyCode.C);
+        this.targetElement.keyPress(KeyCode.C);
+        this.targetElement.keyUp(KeyCode.C);
       });
 
       it('then the handler for the shorter sequence is called followed by the handler for the longer sequence', function() {
@@ -319,8 +319,8 @@ describe('Matching hotkey sequences:', function () {
   describe('when there is a sequence that is a subset of a longer one (which includes more keys at the start)', function () {
     beforeEach(function () {
       this.keyMap = {
-        'SHORT_SEQUENCE': 'enter tab',
-        'LONG_SEQUENCE': 'b enter tab',
+        'SHORT_SEQUENCE': 'a b',
+        'LONG_SEQUENCE': 'c a b',
       };
 
       this.shortSequenceHandler = sinon.spy();
@@ -343,13 +343,13 @@ describe('Matching hotkey sequences:', function () {
 
     describe('and the keys for the shorter sequence are pressed', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-        this.targetElement.keyUp(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
 
-        this.targetElement.keyDown(KeyCode.TAB);
-        this.targetElement.keyPress(KeyCode.TAB);
-        this.targetElement.keyUp(KeyCode.TAB);
+        this.targetElement.keyDown(KeyCode.B);
+        this.targetElement.keyPress(KeyCode.B);
+        this.targetElement.keyUp(KeyCode.B);
       });
 
       it('then the handler for the shorter sequence is called', function() {
@@ -359,17 +359,17 @@ describe('Matching hotkey sequences:', function () {
 
     describe('and the keys for the longer sequence are pressed', function () {
       beforeEach(function () {
+        this.targetElement.keyDown(KeyCode.C);
+        this.targetElement.keyPress(KeyCode.C);
+        this.targetElement.keyUp(KeyCode.C);
+
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
+
         this.targetElement.keyDown(KeyCode.B);
         this.targetElement.keyPress(KeyCode.B);
         this.targetElement.keyUp(KeyCode.B);
-
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-        this.targetElement.keyUp(KeyCode.ENTER);
-
-        this.targetElement.keyDown(KeyCode.TAB);
-        this.targetElement.keyPress(KeyCode.TAB);
-        this.targetElement.keyUp(KeyCode.TAB);
       });
 
       it('then the handler for the shorter sequence is called followed by the handler for the longer sequence', function() {
@@ -383,7 +383,7 @@ describe('Matching hotkey sequences:', function () {
   describe('when there is a sequence', function () {
     beforeEach(function () {
       this.keyMap = {
-        'SEQUENCE': 'enter tab',
+        'SEQUENCE': 'a b',
       };
 
       this.sequenceHandler = sinon.spy();
@@ -404,13 +404,13 @@ describe('Matching hotkey sequences:', function () {
 
     describe('and the keys that match it are pressed in the wrong order', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.TAB);
-        this.targetElement.keyPress(KeyCode.TAB);
-        this.targetElement.keyUp(KeyCode.TAB);
+        this.targetElement.keyDown(KeyCode.B);
+        this.targetElement.keyPress(KeyCode.B);
+        this.targetElement.keyUp(KeyCode.B);
 
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-        this.targetElement.keyUp(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
       });
 
       it('then the the sequence\'s handler is NOT called', function() {
@@ -420,17 +420,17 @@ describe('Matching hotkey sequences:', function () {
 
     describe('and the first key in the sequence is pressed twice before the remaining keys', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-        this.targetElement.keyUp(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
 
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-        this.targetElement.keyUp(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
 
-        this.targetElement.keyDown(KeyCode.TAB);
-        this.targetElement.keyPress(KeyCode.TAB);
-        this.targetElement.keyUp(KeyCode.TAB);
+        this.targetElement.keyDown(KeyCode.B);
+        this.targetElement.keyPress(KeyCode.B);
+        this.targetElement.keyUp(KeyCode.B);
       });
 
       it('then the the sequence\'s handler is called', function() {
@@ -440,17 +440,17 @@ describe('Matching hotkey sequences:', function () {
 
     describe('and the last key in the sequence is pressed twice at the end of sequence', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-        this.targetElement.keyUp(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
 
-        this.targetElement.keyDown(KeyCode.TAB);
-        this.targetElement.keyPress(KeyCode.TAB);
-        this.targetElement.keyUp(KeyCode.TAB);
+        this.targetElement.keyDown(KeyCode.B);
+        this.targetElement.keyPress(KeyCode.B);
+        this.targetElement.keyUp(KeyCode.B);
 
-        this.targetElement.keyDown(KeyCode.TAB);
-        this.targetElement.keyPress(KeyCode.TAB);
-        this.targetElement.keyUp(KeyCode.TAB);
+        this.targetElement.keyDown(KeyCode.B);
+        this.targetElement.keyPress(KeyCode.B);
+        this.targetElement.keyUp(KeyCode.B);
       });
 
       it('then the the sequence\'s handler is called once', function() {
@@ -460,17 +460,17 @@ describe('Matching hotkey sequences:', function () {
 
     describe('and key NOT in the sequence is pressed in the middle of pressing the keys that are', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-        this.targetElement.keyUp(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
+
+        this.targetElement.keyDown(KeyCode.C);
+        this.targetElement.keyPress(KeyCode.C);
+        this.targetElement.keyUp(KeyCode.C);
 
         this.targetElement.keyDown(KeyCode.B);
         this.targetElement.keyPress(KeyCode.B);
         this.targetElement.keyUp(KeyCode.B);
-
-        this.targetElement.keyDown(KeyCode.TAB);
-        this.targetElement.keyPress(KeyCode.TAB);
-        this.targetElement.keyUp(KeyCode.TAB);
       });
 
       it('then the the sequence\'s handler is NOT called', function() {
@@ -480,14 +480,14 @@ describe('Matching hotkey sequences:', function () {
 
     describe('and the keys in the sequence are pressed at the same time', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
 
-        this.targetElement.keyDown(KeyCode.TAB);
-        this.targetElement.keyPress(KeyCode.TAB);
+        this.targetElement.keyDown(KeyCode.B);
+        this.targetElement.keyPress(KeyCode.B);
 
-        this.targetElement.keyUp(KeyCode.ENTER);
-        this.targetElement.keyUp(KeyCode.TAB);
+        this.targetElement.keyUp(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.B);
       });
 
       it('then the the sequence\'s handler is NOT called', function() {
@@ -499,7 +499,7 @@ describe('Matching hotkey sequences:', function () {
   describe('when there is a sequence with a combination at the start', function () {
     beforeEach(function () {
       this.keyMap = {
-        'SEQUENCE': 'enter+tab b',
+        'SEQUENCE': 'a+b c',
       };
 
       this.sequenceHandler = sinon.spy();
@@ -520,18 +520,16 @@ describe('Matching hotkey sequences:', function () {
 
     describe('and the keys that match the combination are pressed, followed by the remaining keys in the sequence', function () {
       beforeEach(function () {
-        this.targetElement.keyDown(KeyCode.TAB);
-        this.targetElement.keyPress(KeyCode.TAB);
-
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-
-        this.targetElement.keyUp(KeyCode.TAB);
-        this.targetElement.keyUp(KeyCode.ENTER);
-
         this.targetElement.keyDown(KeyCode.B);
-        this.targetElement.keyPress(KeyCode.B);
+
+        this.targetElement.keyDown(KeyCode.A);
+
         this.targetElement.keyUp(KeyCode.B);
+        this.targetElement.keyUp(KeyCode.A);
+
+        this.targetElement.keyDown(KeyCode.C);
+        this.targetElement.keyPress(KeyCode.C);
+        this.targetElement.keyUp(KeyCode.C);
       });
 
       it('then the the sequence\'s handler is called', function() {
@@ -543,7 +541,7 @@ describe('Matching hotkey sequences:', function () {
   describe('when there is a sequence with a combination at the end', function () {
     beforeEach(function () {
       this.keyMap = {
-        'SEQUENCE': 'b enter+tab',
+        'SEQUENCE': 'c a+b',
       };
 
       this.sequenceHandler = sinon.spy();
@@ -564,18 +562,18 @@ describe('Matching hotkey sequences:', function () {
 
     describe('and the keys are pressed in the correct order to match combination and the sequence it is in', function () {
       beforeEach(function () {
+        this.targetElement.keyDown(KeyCode.C);
+        this.targetElement.keyPress(KeyCode.C);
+        this.targetElement.keyUp(KeyCode.C);
+
         this.targetElement.keyDown(KeyCode.B);
         this.targetElement.keyPress(KeyCode.B);
+
+        this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+
         this.targetElement.keyUp(KeyCode.B);
-
-        this.targetElement.keyDown(KeyCode.TAB);
-        this.targetElement.keyPress(KeyCode.TAB);
-
-        this.targetElement.keyDown(KeyCode.ENTER);
-        this.targetElement.keyPress(KeyCode.ENTER);
-
-        this.targetElement.keyUp(KeyCode.TAB);
-        this.targetElement.keyUp(KeyCode.ENTER);
+        this.targetElement.keyUp(KeyCode.A);
       });
 
       it('then the the sequence\'s handler is called', function() {

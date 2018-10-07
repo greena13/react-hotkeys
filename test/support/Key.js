@@ -5,4 +5,5 @@ export default {
 
   A: 'a',
   B: 'b',
+  C: 'c'
 };

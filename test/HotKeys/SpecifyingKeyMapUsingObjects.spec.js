@@ -9,10 +9,9 @@ import FocusableElement from '../support/FocusableElement';
 
 describe('Specifying key map using objects:', () => {
   context('when a keydown keymap is specified as an object', () => {
-
     beforeEach(function () {
       this.keyMap = {
-        'ENTER': {
+        'ACTION1': {
           sequence: 'enter',
           action: 'keydown',
         },
@@ -21,7 +20,7 @@ describe('Specifying key map using objects:', () => {
       this.handler = sinon.spy();
 
       this.handlers = {
-        'ENTER': this.handler,
+        'ACTION1': this.handler,
       };
 
       this.wrapper = mount(
@@ -37,14 +36,14 @@ describe('Specifying key map using objects:', () => {
     it('then calls the correct handler when a key is pressed that matches the keyMap', function() {
       this.targetElement.keyDown(KeyCode.ENTER);
 
-      expect(this.handler).to.have.been.called;
+      expect(this.handler).to.have.been.calledOnce;
     });
   });
 
   context('when a keyup keymap is specified as an object', () => {
     beforeEach(function () {
       this.keyMap = {
-        'ENTER': {
+        'ACTION1': {
           sequence: 'enter',
           action: 'keyup',
         },
@@ -53,7 +52,7 @@ describe('Specifying key map using objects:', () => {
       this.handler = sinon.spy();
 
       this.handlers = {
-        'ENTER': this.handler,
+        'ACTION1': this.handler,
       };
 
       this.wrapper = mount(
@@ -76,7 +75,7 @@ describe('Specifying key map using objects:', () => {
   context('when a keypress keymap is specified as an object', () => {
     beforeEach(function () {
       this.keyMap = {
-        'A': {
+        'ACTION1': {
           sequence: 'a',
           action: 'keypress',
         },
@@ -85,7 +84,7 @@ describe('Specifying key map using objects:', () => {
       this.handler = sinon.spy();
 
       this.handlers = {
-        'A': this.handler,
+        'ACTION1': this.handler,
       };
 
       this.wrapper = mount(
@@ -108,7 +107,7 @@ describe('Specifying key map using objects:', () => {
   context('when a keymap is specified as an object without the action', () => {
     beforeEach(function () {
       this.keyMap = {
-        'A': {
+        'ACTION': {
           sequence: 'a',
         },
       };
@@ -116,7 +115,7 @@ describe('Specifying key map using objects:', () => {
       this.handler = sinon.spy();
 
       this.handlers = {
-        'A': this.handler,
+        'ACTION': this.handler,
       };
 
       this.wrapper = mount(

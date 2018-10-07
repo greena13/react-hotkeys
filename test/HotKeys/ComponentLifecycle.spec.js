@@ -10,8 +10,8 @@ import FocusableElement from '../support/FocusableElement';
 describe('Component lifecycle:', () => {
   before(function () {
     this.keyMap = {
-      'ENTER': 'enter',
-      'TAB': 'tab',
+      'ACTION1': 'a',
+      'ACTION2': 'b',
     };
   });
 
@@ -21,7 +21,7 @@ describe('Component lifecycle:', () => {
       this.handler = sinon.spy();
 
       const handlers = {
-        'ENTER': this.handler,
+        'ACTION1': this.handler,
       };
 
       this.wrapper = mount(
@@ -48,7 +48,7 @@ describe('Component lifecycle:', () => {
 
       context('and a key matching a hot key is pressed', () => {
         it('then calls the correct handler', function() {
-          this.targetElement.keyPress(KeyCode.ENTER);
+          this.targetElement.keyPress(KeyCode.A);
 
           expect(this.handler).to.have.been.called;
         });
@@ -62,7 +62,7 @@ describe('Component lifecycle:', () => {
       this.handler = sinon.spy();
 
       const handlers = {
-        'ENTER': this.handler,
+        'ACTION1': this.handler,
       };
 
       this.wrapper = mount(
@@ -82,7 +82,7 @@ describe('Component lifecycle:', () => {
     });
 
     it('then does not call the handler when a key matching a hot key is pressed', function() {
-      this.targetElement.keyPress(KeyCode.ENTER);
+      this.targetElement.keyPress(KeyCode.A);
 
       expect(this.handler).to.not.have.been.called;
     });

@@ -32,7 +32,6 @@ describe('Sequences involving key aliases:', () => {
                 keySequence: `shift+${keyUsedInCombination} a`,
                 keyEvents: [
                   [ 'keyDown', 'Shift' ],
-                  [ 'keyPress', 'Shift' ],
 
                   [ 'keyDown', shiftedKey ],
                   [ 'keyPress', shiftedKey ],
@@ -53,7 +52,6 @@ describe('Sequences involving key aliases:', () => {
                   [ 'keyUp', 'a' ],
 
                   [ 'keyDown', 'Shift' ],
-                  [ 'keyPress', 'Shift' ],
 
                   [ 'keyDown', shiftedKey ],
                   [ 'keyPress', shiftedKey ],
@@ -75,7 +73,6 @@ describe('Sequences involving key aliases:', () => {
                   [ 'keyUp', 'a' ],
 
                   [ 'keyDown', 'Shift' ],
-                  [ 'keyPress', 'Shift' ],
 
                   [ 'keyDown', shiftedKey ],
                   [ 'keyPress', shiftedKey ],

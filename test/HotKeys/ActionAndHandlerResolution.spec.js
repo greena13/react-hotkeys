@@ -13,7 +13,7 @@ describe('Action and handler resolution:', function () {
     describe('in the same component as its handlers', function () {
       beforeEach(function () {
         this.keyMap = {
-          'ACTION': 'enter',
+          'ACTION': 'a',
         };
 
         this.handler = sinon.spy();
@@ -34,9 +34,9 @@ describe('Action and handler resolution:', function () {
 
       describe('when the matching key is pressed', function () {
         it('then that action\'s handler is called', function() {
-          this.targetElement.keyDown(KeyCode.ENTER);
-          this.targetElement.keyPress(KeyCode.ENTER);
-          this.targetElement.keyUp(KeyCode.ENTER);
+          this.targetElement.keyDown(KeyCode.A);
+          this.targetElement.keyPress(KeyCode.A);
+          this.targetElement.keyUp(KeyCode.A);
 
           expect(this.handler).to.have.been.calledOnce;
         });
@@ -46,7 +46,7 @@ describe('Action and handler resolution:', function () {
     describe('in a parent component to the one that defines the handlers', function () {
       beforeEach(function () {
         this.keyMap = {
-          'ACTION': 'enter',
+          'ACTION': 'a',
         };
 
         this.handler = sinon.spy();
@@ -69,9 +69,9 @@ describe('Action and handler resolution:', function () {
 
       describe('when the matching key is pressed', function () {
         it('then that action\'s handler is called', function() {
-          this.targetElement.keyDown(KeyCode.ENTER);
-          this.targetElement.keyPress(KeyCode.ENTER);
-          this.targetElement.keyUp(KeyCode.ENTER);
+          this.targetElement.keyDown(KeyCode.A);
+          this.targetElement.keyPress(KeyCode.A);
+          this.targetElement.keyUp(KeyCode.A);
 
           expect(this.handler).to.have.been.calledOnce;
         });
@@ -81,7 +81,7 @@ describe('Action and handler resolution:', function () {
     describe('in a grand parent component to the one that defines the handlers', function () {
       beforeEach(function () {
         this.keyMap = {
-          'ACTION': 'enter',
+          'ACTION': 'a',
           ACTION2: 'b',
         };
 
@@ -109,9 +109,9 @@ describe('Action and handler resolution:', function () {
 
       describe('when the matching key is pressed', function () {
         it('then that action\'s handler is called', function() {
-          this.targetElement.keyDown(KeyCode.ENTER);
-          this.targetElement.keyPress(KeyCode.ENTER);
-          this.targetElement.keyUp(KeyCode.ENTER);
+          this.targetElement.keyDown(KeyCode.A);
+          this.targetElement.keyPress(KeyCode.A);
+          this.targetElement.keyUp(KeyCode.A);
 
           expect(this.handler).to.have.been.calledOnce;
         });

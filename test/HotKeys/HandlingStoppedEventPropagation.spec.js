@@ -11,7 +11,7 @@ import HotKeys from '../../lib/HotKeys';
 describe('Handling stopped event propagation:', function () {
   beforeEach(function () {
     this.keyMap = {
-      'ACTION': 'enter',
+      'ACTION': 'a',
     };
 
     this.handler = sinon.spy();
@@ -34,7 +34,7 @@ describe('Handling stopped event propagation:', function () {
     });
 
     it('then does not trigger an associated handler', function() {
-      this.targetElement.keyPress(KeyCode.ENTER);
+      this.targetElement.keyPress(KeyCode.A);
 
       expect(this.handler).to.not.have.been.called;
     });
@@ -58,7 +58,7 @@ describe('Handling stopped event propagation:', function () {
       });
 
       it('then does not trigger an associated handler', function() {
-        this.targetElement.keyPress(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.A);
 
         expect(this.handler).to.not.have.been.called;
       });
@@ -81,7 +81,7 @@ describe('Handling stopped event propagation:', function () {
       });
 
       it('then calls the handler', function() {
-        this.targetElement.keyPress(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.A);
 
         expect(this.handler).to.have.been.called;
       });
@@ -104,7 +104,7 @@ describe('Handling stopped event propagation:', function () {
       });
 
       it('then calls the associated action\'s handler', function() {
-        this.targetElement.keyPress(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.A);
 
         expect(this.handler).to.have.been.calledOnce;
       });

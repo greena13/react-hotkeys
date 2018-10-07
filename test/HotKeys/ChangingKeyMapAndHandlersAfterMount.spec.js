@@ -11,7 +11,7 @@ import HotKeys from '../../lib/HotKeys';
 describe('Changing keyMap and handlers after mount:', function () {
   beforeEach(function () {
     this.keyMap = {
-      'ACTION': 'enter',
+      'ACTION': 'a',
     };
 
     this.handler = sinon.spy();
@@ -35,27 +35,27 @@ describe('Changing keyMap and handlers after mount:', function () {
 
   describe('when a keyMap action\'s key sequence is changed', () => {
     beforeEach(function () {
-      this.wrapper.setProps({ keyMap: { 'ACTION': 'tab' }, handlers: this.handlers })
+      this.wrapper.setProps({ keyMap: { 'ACTION': 'b' }, handlers: this.handlers })
     });
 
     it('then the new sequence is used', function() {
       expect(this.handler).to.not.have.been.called;
 
-      this.targetElement.keyPress(KeyCode.TAB);
+      this.targetElement.keyPress(KeyCode.B);
       expect(this.handler).to.have.been.calledOnce;
     });
   });
 
   describe('when the action associated with a key sequence is changed', () => {
     beforeEach(function () {
-      this.wrapper.setProps({ keyMap: { 'ACTION2': 'enter' }, handlers: this.handlers })
+      this.wrapper.setProps({ keyMap: { 'ACTION2': 'a' }, handlers: this.handlers })
     });
 
     it('then the new sequence is used', function() {
       expect(this.handler).to.not.have.been.called;
       expect(this.handler2).to.not.have.been.called;
 
-      this.targetElement.keyPress(KeyCode.ENTER);
+      this.targetElement.keyPress(KeyCode.A);
 
       expect(this.handler).to.not.have.been.called;
       expect(this.handler2).to.have.been.calledOnce;
@@ -64,14 +64,14 @@ describe('Changing keyMap and handlers after mount:', function () {
 
   describe('when the a new action is added to the keymap', () => {
     beforeEach(function () {
-      this.wrapper.setProps({ keyMap: { ...this.keyMap, 'ACTION2': 'tab' }, handlers: this.handlers })
+      this.wrapper.setProps({ keyMap: { ...this.keyMap, 'ACTION2': 'b' }, handlers: this.handlers })
     });
 
     it('then the new sequence is used', function() {
       expect(this.handler).to.not.have.been.called;
       expect(this.handler2).to.not.have.been.called;
 
-      this.targetElement.keyPress(KeyCode.TAB);
+      this.targetElement.keyPress(KeyCode.B);
 
       expect(this.handler).to.not.have.been.called;
       expect(this.handler2).to.have.been.calledOnce;
@@ -84,7 +84,7 @@ describe('Changing keyMap and handlers after mount:', function () {
     });
 
     it('then the new sequence is used', function() {
-      this.targetElement.keyPress(KeyCode.ENTER);
+      this.targetElement.keyPress(KeyCode.A);
 
       expect(this.handler).to.not.have.been.called;
     });
@@ -97,7 +97,7 @@ describe('Changing keyMap and handlers after mount:', function () {
 
     it('then the new sequence is used', function() {
 
-      this.targetElement.keyPress(KeyCode.ENTER);
+      this.targetElement.keyPress(KeyCode.A);
 
       expect(this.handler).to.not.have.been.called;
       expect(this.handler2).to.have.been.calledOnce;
@@ -108,7 +108,7 @@ describe('Changing keyMap and handlers after mount:', function () {
     beforeEach(function () {
       this.handler3 = sinon.spy();
 
-      this.wrapper.setProps({ keyMap: { ...this.keyMap, 'ACTION3': 'tab' }, handlers: { ...this.handlers, 'ACTION3': this.handler3 } })
+      this.wrapper.setProps({ keyMap: { ...this.keyMap, 'ACTION3': 'b' }, handlers: { ...this.handlers, 'ACTION3': this.handler3 } })
     });
 
     it('then the new sequence is used', function() {
@@ -116,7 +116,7 @@ describe('Changing keyMap and handlers after mount:', function () {
       expect(this.handler2).to.not.have.been.called;
       expect(this.handler3).to.not.have.been.called;
 
-      this.targetElement.keyPress(KeyCode.TAB);
+      this.targetElement.keyPress(KeyCode.B);
 
       expect(this.handler).to.not.have.been.called;
       expect(this.handler2).to.not.have.been.called;
@@ -132,7 +132,7 @@ describe('Changing keyMap and handlers after mount:', function () {
     });
 
     it('then the new sequence is used', function() {
-      this.targetElement.keyPress(KeyCode.ENTER);
+      this.targetElement.keyPress(KeyCode.A);
 
       expect(this.handler).to.not.have.been.called;
     });

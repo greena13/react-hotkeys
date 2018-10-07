@@ -6,6 +6,7 @@ import sinon from 'sinon';
 import FocusableElement from '../support/FocusableElement';
 
 import HotKeys from '../../lib/HotKeys';
+import hasKeyPressEvent from '../../lib/lib/hasKeyPressEvent';
 
 const keyMapping = {
   "Escape": [ "escape", "esc" , "Escape"],
@@ -164,7 +165,11 @@ describe('Key mappings:', function () {
         });
 
         it(`then calls the handler when ${reactKeyCode} is pressed`, function() {
-          this.targetElement.keyPress(reactKeyCode);
+          this.targetElement.keyDown(reactKeyCode);
+
+          if (hasKeyPressEvent(reactKeyCode)) {
+            this.targetElement.keyPress(reactKeyCode);
+          }
 
           expect(this.handler).to.have.been.called;
         });

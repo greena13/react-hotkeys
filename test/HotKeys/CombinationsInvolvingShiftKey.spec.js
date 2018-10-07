@@ -41,10 +41,12 @@ describe('Combinations involving shift key:', function () {
 
             it(`then calls the handler when shift and ${nonShiftKeyCode} are pressed at the same time`, function() {
               this.targetElement.keyDown('Shift');
-              this.targetElement.keyPress('Shift');
 
               this.targetElement.keyDown(shiftKeyCode);
               this.targetElement.keyPress(shiftKeyCode);
+              this.targetElement.keyUp(shiftKeyCode);
+
+              this.targetElement.keyUp('Shift');
 
               expect(this.handler).to.have.been.called;
             });

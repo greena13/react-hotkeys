@@ -35,7 +35,6 @@ describe('Specifying actions with multiple key sequences:', function () {
       it('then that action\'s handler is called', function() {
         [ KeyCode.ENTER, KeyCode.TAB ].forEach((key) => {
           this.targetElement.keyDown(key);
-          this.targetElement.keyPress(key);
           this.targetElement.keyUp(key);
         });
 
@@ -77,7 +76,6 @@ describe('Specifying actions with multiple key sequences:', function () {
       it('then that action\'s handler is called', function() {
         [ KeyCode.ENTER, KeyCode.TAB ].forEach((key) => {
           this.targetElement.keyDown(key);
-          this.targetElement.keyPress(key);
           this.targetElement.keyUp(key);
         });
 

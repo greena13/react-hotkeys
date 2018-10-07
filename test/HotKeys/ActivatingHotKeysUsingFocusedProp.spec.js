@@ -10,8 +10,8 @@ import FocusableElement from '../support/FocusableElement';
 xdescribe('Activating hotkeys using focused prop:', () => {
   before(function () {
     this.keyMap = {
-      'ENTER': 'enter',
-      'TAB': 'tab',
+      'ACTION1': 'a',
+      'ACTION2': 'b',
     };
   });
 
@@ -21,7 +21,7 @@ xdescribe('Activating hotkeys using focused prop:', () => {
       this.handler = sinon.spy();
 
       this.handlers = {
-        'ENTER': this.handler,
+        'ACTION1': this.handler,
       };
     });
 
@@ -37,7 +37,7 @@ xdescribe('Activating hotkeys using focused prop:', () => {
       });
 
       it('then DOES NOT call the handler when a key is pressed that matches the keyMap', function() {
-        this.targetElement.keyPress(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.A);
 
         expect(this.handler).to.not.have.been.called;
       });
@@ -55,7 +55,7 @@ xdescribe('Activating hotkeys using focused prop:', () => {
       });
 
       it('then calls the correct handler when a key is pressed that matches the keyMap', function() {
-        this.targetElement.keyPress(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.A);
 
         expect(this.handler).to.have.been.called;
       });
@@ -68,7 +68,7 @@ xdescribe('Activating hotkeys using focused prop:', () => {
       this.handler = sinon.spy();
 
       this.handlers = {
-        'ENTER': this.handler,
+        'ACTION1': this.handler,
       };
     });
 
@@ -88,7 +88,7 @@ xdescribe('Activating hotkeys using focused prop:', () => {
       });
 
       it('then DOES NOT call the handler when a key is pressed that matches the keyMap', function() {
-        this.targetElement.keyPress(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.A);
 
         expect(this.handler).to.not.have.been.called;
       });
@@ -110,7 +110,7 @@ xdescribe('Activating hotkeys using focused prop:', () => {
       });
 
       it('then DOES NOT call the handler when a key is pressed that matches the keyMap', function() {
-        this.targetElement.keyPress(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.A);
 
         expect(this.handler).to.not.have.been.called;
       });
@@ -132,7 +132,7 @@ xdescribe('Activating hotkeys using focused prop:', () => {
       });
 
       it('then calls the handler when a key is pressed that matches the keyMap', function() {
-        this.targetElement.keyPress(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.A);
 
         expect(this.handler).to.have.been.called;
       });
@@ -142,17 +142,17 @@ xdescribe('Activating hotkeys using focused prop:', () => {
   context('when HotKey components defining handlers are nested inside each other', () => {
 
     beforeEach(function () {
-      this.outerEnterHandler = sinon.spy();
-      this.outerTabHandler = sinon.spy();
-      this.innerEnterHandler = sinon.spy();
+      this.outerAction1Handler = sinon.spy();
+      this.outerAction2Handler = sinon.spy();
+      this.innerAction1Handler = sinon.spy();
 
       this.outerHandlers = {
-        'ENTER': this.outerEnterHandler,
-        'TAB': this.outerTabHandler,
+        'ACTION1': this.outerAction1Handler,
+        'ACTION2': this.outerAction2Handler,
       };
 
       this.innerHandlers = {
-        'ENTER': this.innerEnterHandler,
+        'ACTION1': this.innerAction1Handler,
       };
     });
 
@@ -176,24 +176,24 @@ xdescribe('Activating hotkeys using focused prop:', () => {
       });
 
       it('then only calls the handler defined in the inner component when a key is pressed for which handlers are defined in both components', function() {
-        this.targetElement.keyPress(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.A);
 
-        expect(this.innerEnterHandler).to.have.been.called;
-        expect(this.outerEnterHandler).to.not.have.been.called;
+        expect(this.innerAction1Handler).to.have.been.called;
+        expect(this.outerAction1Handler).to.not.have.been.called;
       });
 
       it('then does NOT call the handler defined in the outer component when a key is pressed that only the outer component has a handler for', function() {
-        this.targetElement.keyPress(KeyCode.TAB);
+        this.targetElement.keyPress(KeyCode.B);
 
-        expect(this.outerTabHandler).to.not.have.been.called;
+        expect(this.outerAction2Handler).to.not.have.been.called;
       });
 
       it('then does not call any handlers when a key that doesn\'t match any handlers is pressed', function() {
-        this.targetElement.keyPress(KeyCode.ALT);
+        this.targetElement.keyPress(KeyCode.C);
 
-        expect(this.innerEnterHandler).to.not.have.been.called;
-        expect(this.outerTabHandler).to.not.have.been.called;
-        expect(this.outerEnterHandler).to.not.have.been.called;
+        expect(this.innerAction1Handler).to.not.have.been.called;
+        expect(this.outerAction2Handler).to.not.have.been.called;
+        expect(this.outerAction1Handler).to.not.have.been.called;
       });
     });
 
@@ -217,24 +217,24 @@ xdescribe('Activating hotkeys using focused prop:', () => {
       });
 
       it('then only calls the handler defined in the outer component when a key is pressed for which handlers are defined in both components', function() {
-        this.targetElement.keyPress(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.A);
 
-        expect(this.innerEnterHandler).to.not.have.been.called;
-        expect(this.outerEnterHandler).to.have.been.called;
+        expect(this.innerAction1Handler).to.not.have.been.called;
+        expect(this.outerAction1Handler).to.have.been.called;
       });
 
       it('then calls the handler defined in the outer component when a key is pressed that only the outer component has a handler for', function() {
-        this.targetElement.keyPress(KeyCode.TAB);
+        this.targetElement.keyPress(KeyCode.B);
 
-        expect(this.outerTabHandler).to.have.been.called;
+        expect(this.outerAction2Handler).to.have.been.called;
       });
 
       it('then does not call any handlers when a key that doesn\'t match any handlers is pressed', function() {
-        this.targetElement.keyPress(KeyCode.ALT);
+        this.targetElement.keyPress(KeyCode.C);
 
-        expect(this.innerEnterHandler).to.not.have.been.called;
-        expect(this.outerTabHandler).to.not.have.been.called;
-        expect(this.outerEnterHandler).to.not.have.been.called;
+        expect(this.innerAction1Handler).to.not.have.been.called;
+        expect(this.outerAction2Handler).to.not.have.been.called;
+        expect(this.outerAction1Handler).to.not.have.been.called;
       });
     });
 
@@ -258,24 +258,24 @@ xdescribe('Activating hotkeys using focused prop:', () => {
       });
 
       it('then only calls the handler defined in the inner component when a key is pressed for which handlers are defined in both components', function() {
-        this.targetElement.keyPress(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.A);
 
-        expect(this.innerEnterHandler).to.have.been.called;
-        expect(this.outerEnterHandler).to.not.have.been.called;
+        expect(this.innerAction1Handler).to.have.been.called;
+        expect(this.outerAction1Handler).to.not.have.been.called;
       });
 
       it('then calls the handler defined in the outer component when a key is pressed that only the outer component has a handler for', function() {
-        this.targetElement.keyPress(KeyCode.TAB);
+        this.targetElement.keyPress(KeyCode.B);
 
-        expect(this.outerTabHandler).to.have.been.called;
+        expect(this.outerAction2Handler).to.have.been.called;
       });
 
       it('then does not call any handlers when a key that doesn\'t match any handlers is pressed', function() {
-        this.targetElement.keyPress(KeyCode.ALT);
+        this.targetElement.keyPress(KeyCode.C);
 
-        expect(this.innerEnterHandler).to.not.have.been.called;
-        expect(this.outerTabHandler).to.not.have.been.called;
-        expect(this.outerEnterHandler).to.not.have.been.called;
+        expect(this.innerAction1Handler).to.not.have.been.called;
+        expect(this.outerAction2Handler).to.not.have.been.called;
+        expect(this.outerAction1Handler).to.not.have.been.called;
       });
     });
   });
@@ -283,17 +283,17 @@ xdescribe('Activating hotkeys using focused prop:', () => {
   context('when HotKeys components are siblings', () => {
     context('and both components have a focused prop of true', () => {
       beforeEach(function () {
-        this.firstEnterHandler = sinon.spy();
-        this.firstTabHandler = sinon.spy();
-        this.secondEnterHandler = sinon.spy();
+        this.firstAction1Handler = sinon.spy();
+        this.firstAction2Handler = sinon.spy();
+        this.secondAction1Handler = sinon.spy();
 
         this.firstHandlers = {
-          'ENTER': this.firstEnterHandler,
-          'TAB': this.firstTabHandler,
+          'ACTION1': this.firstAction1Handler,
+          'ACTION2': this.firstAction2Handler,
         };
 
         this.secondHandlers = {
-          'ENTER': this.secondEnterHandler,
+          'ACTION1': this.secondAction1Handler,
         };
 
         this.wrapper = mount(
@@ -315,24 +315,24 @@ xdescribe('Activating hotkeys using focused prop:', () => {
 
       context('and the focus is on a child of the first component', () => {
         it('then only calls the handlers on the first component when a key is pressed for which handlers are defined in both components', function() {
-          this.targetElement.keyPress(KeyCode.ENTER);
+          this.targetElement.keyPress(KeyCode.A);
 
-          expect(this.firstEnterHandler).to.have.been.called;
-          expect(this.secondEnterHandler).to.not.have.been.called;
+          expect(this.firstAction1Handler).to.have.been.called;
+          expect(this.secondAction1Handler).to.not.have.been.called;
         });
 
         it('then calls the handler defined in the first component when a key is pressed that only the first component has a handler for', function() {
-          this.targetElement.keyPress(KeyCode.TAB);
+          this.targetElement.keyPress(KeyCode.B);
 
-          expect(this.firstTabHandler).to.have.been.called;
+          expect(this.firstAction2Handler).to.have.been.called;
         });
 
         it('then does not call any handlers when a key that doesn\'t match any handlers is pressed', function() {
-          this.targetElement.keyPress(KeyCode.ALT);
+          this.targetElement.keyPress(KeyCode.C);
 
-          expect(this.secondEnterHandler).to.not.have.been.called;
-          expect(this.firstTabHandler).to.not.have.been.called;
-          expect(this.firstEnterHandler).to.not.have.been.called;
+          expect(this.secondAction1Handler).to.not.have.been.called;
+          expect(this.firstAction2Handler).to.not.have.been.called;
+          expect(this.firstAction1Handler).to.not.have.been.called;
         });
       });
     });
