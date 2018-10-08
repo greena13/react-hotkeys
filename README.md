@@ -32,9 +32,8 @@ const map = {
   'deleteNode': ['del', 'backspace']
 };
 
-// Component with a key map
-
-const App = React.createClass({
+// ...later in possibly separate component code...
+class HotkeyedBase extends React.Component {
   render() {
     return (
       <HotKeys keyMap={map}>
@@ -45,7 +44,8 @@ const App = React.createClass({
       </HotKeys>
     );
   }
-});
+}
+
 ```
 
 #### Handlers
@@ -59,7 +59,7 @@ import {HotKeys} from 'react-hotkeys';
  * being called
  */
 
-const MyNode = React.createClass({
+class HotkeyedSubComponent extends React.Component{
   render() {
     const handlers = {
       'deleteNode': this.deleteNode
