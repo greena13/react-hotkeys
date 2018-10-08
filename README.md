@@ -1,12 +1,8 @@
 <p align="center">
   <img src="http://svgshare.com/i/3tk.svg"><br/>
-  <h2 align="center">React HotKeys</h2>
+  <h2 align="center">Stripes React HotKeys<br/><span>(FOLIO fork of react-hotkeys)</span></h2>
+  
 </p>
-
-[![npm](https://img.shields.io/npm/dm/react-hotkeys.svg)]()
-[![Build Status](https://travis-ci.org/greena13/react-hotkeys.svg)](https://travis-ci.org/greena13/react-hotkeys)
-[![GitHub license](https://img.shields.io/github/license/greena13/react-hotkeys.svg)](https://github.com/greena13/react-hotkeys/blob/master/LICENSE)
-[![Gitter](https://img.shields.io/gitter/room/chrisui/react-hotkeys.svg)](https://gitter.im/chrisui/react-hotkeys)
 
 A declarative library for handling hotkeys and focus areas in React applications.
 
@@ -77,6 +73,18 @@ const MyNode = React.createClass({
   }
 });
 ```
+#### Focus detection
+
+By default, `<HotKeys>` uses an extra `<div>` to catch focus on its wrapped elements. This can cause unwanted interference with styles. To avoid this, you can apply a `noWrapper` prop like so:
+
+```javascript
+  <HotKeys handlers={handlers} noWrapper>
+    <ChildComponent />
+  </HotKeys>
+```
+
+##### NoWrapper caveats
+Since `<HotKeys>` applies listeners to an outer DOM element when `NoWrapper` is used, The child component should render a `<div>` as its outermost element or be wrapped in a `<div>` that's styled to the needs of the application.
 
 ## Install
 
