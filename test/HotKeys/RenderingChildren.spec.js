@@ -70,4 +70,28 @@ describe('Rendering children', () => {
     });
 
   });
+
+  context('when the useFocusTrap prop is false', () => {
+
+    beforeEach(function () {
+      this.handler = sinon.spy();
+
+      const handlers = {
+        'ENTER': this.handler,
+      };
+
+      this.wrapper = mount(
+        <HotKeys useFocusTrap={false} keyMap={this.keyMap} handlers={handlers} component={'span'}>
+          <input className="childElement" />
+        </HotKeys>
+      );
+
+    });
+
+    it('then renders children without a wrapping element', function() {
+      let html = this.wrapper.html();
+      console.log(html)
+      expect(html).to.equal('<input class="childElement">');
+    });
+  });
 });
