@@ -1,10 +1,11 @@
-import ReactDOM from 'react-dom';
+import simulant from 'simulant';
 
 let focused = null;
 
 export default class FocusableElement {
-  constructor(wrapper, selector) {
+  constructor(wrapper, selector, options = {}) {
     this.element = wrapper.find(selector);
+    this.isNativeElement = options.nativeElement || false;
   }
 
   focus() {
@@ -14,11 +15,19 @@ export default class FocusableElement {
 
     this.element.simulate('focus');
 
+    if (this.isNativeElement) {
+      simulant.fire(this.getInstance(), 'focus');
+    }
+
     focused = this;
   }
 
   blur() {
     this.element.simulate('blur');
+
+    if (this.isNativeElement) {
+      simulant.fire(this.getInstance(), 'blur');
+    }
 
     if (focused === this) {
       focused = null;
@@ -27,14 +36,26 @@ export default class FocusableElement {
 
   keyDown(key) {
     this.element.simulate('keyDown', {key});
+
+    if (this.isNativeElement) {
+      simulant.fire(this.getInstance(), 'keydown', {key});
+    }
   }
 
   keyPress(key) {
     this.element.simulate('keyPress', {key});
+
+    if (this.isNativeElement) {
+      simulant.fire(this.getInstance(), 'keypress', {key});
+    }
   }
 
   keyUp(key) {
     this.element.simulate('keyUp', {key});
+
+    if (this.isNativeElement) {
+      simulant.fire(this.getInstance(), 'keyup', {key});
+    }
   }
 
   isFocused() {
@@ -43,7 +64,7 @@ export default class FocusableElement {
 
   getInstance() {
     if (!this.instance) {
-      this.instance = ReactDOM.findDOMNode(this.element.instance());
+      this.instance = this.element.getDOMNode();
     }
 
     return this.instance;
