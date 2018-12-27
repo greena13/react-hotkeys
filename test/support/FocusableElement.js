@@ -13,20 +13,20 @@ export default class FocusableElement {
       focused.blur();
     }
 
-    this.element.simulate('focus');
-
     if (this.isNativeElement) {
       simulant.fire(this.getInstance(), 'focus');
+    } else {
+      this.element.simulate('focus');
     }
 
     focused = this;
   }
 
   blur() {
-    this.element.simulate('blur');
-
     if (this.isNativeElement) {
       simulant.fire(this.getInstance(), 'blur');
+    } else {
+      this.element.simulate('blur');
     }
 
     if (focused === this) {
