@@ -3,10 +3,10 @@ import {mount} from 'enzyme';
 import {expect} from 'chai';
 import sinon from 'sinon';
 
-import HotKeys from '../../lib/HotKeys';
-import KeyCode from '../support/Key';
-import FocusableElement from '../support/FocusableElement';
-import KeyEventManager from '../../lib/lib/KeyEventManager';
+import HotKeys from '../../../lib/HotKeys';
+import KeyCode from '../../support/Key';
+import FocusableElement from '../../support/FocusableElement';
+import KeyEventManager from '../../../lib/lib/KeyEventManager';
 
 beforeEach(function() {
   KeyEventManager.clear();

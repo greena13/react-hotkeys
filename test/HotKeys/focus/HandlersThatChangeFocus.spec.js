@@ -3,10 +3,10 @@ import {mount} from 'enzyme';
 import {expect} from 'chai';
 import sinon from 'sinon';
 
-import FocusableElement from '../support/FocusableElement';
-import KeyCode from '../support/Key';
+import FocusableElement from '../../support/FocusableElement';
+import KeyCode from '../../support/Key';
 
-import HotKeys from '../../lib/HotKeys';
+import HotKeys from '../../../lib/HotKeys';
 
 describe('Handlers that change focus:', function () {
   describe('when there are handlers that change focus', function () {
