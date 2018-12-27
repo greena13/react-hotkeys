@@ -54,7 +54,6 @@
     "webpack": "^1.7.3"
   },
   "dependencies": {
-    "mousetrap": "^1.5.2",
     "prop-types": "^15.6.1"
   },
   "files": [
