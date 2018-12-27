@@ -24,7 +24,7 @@ describe('Specifying key map using objects:', () => {
       };
 
       this.wrapper = mount(
-        <HotKeys keyMap={this.keyMap} handlers={this.handlers} focused>
+        <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
           <div className="childElement" />
         </HotKeys>
       );
@@ -56,7 +56,7 @@ describe('Specifying key map using objects:', () => {
       };
 
       this.wrapper = mount(
-        <HotKeys keyMap={this.keyMap} handlers={this.handlers} focused>
+        <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
           <div className="childElement" />
         </HotKeys>
       );
@@ -88,7 +88,7 @@ describe('Specifying key map using objects:', () => {
       };
 
       this.wrapper = mount(
-        <HotKeys keyMap={this.keyMap} handlers={this.handlers} focused>
+        <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
           <div className="childElement" />
         </HotKeys>
       );
@@ -119,7 +119,7 @@ describe('Specifying key map using objects:', () => {
       };
 
       this.wrapper = mount(
-        <HotKeys keyMap={this.keyMap} handlers={this.handlers} focused>
+        <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
           <div className="childElement" />
         </HotKeys>
       );

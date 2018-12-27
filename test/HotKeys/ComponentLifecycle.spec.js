@@ -35,26 +35,6 @@ describe('Component lifecycle:', () => {
     it('then none of the handlers are called', function() {
       expect(this.handler).to.not.have.been.called;
     });
-
-    context('and focused', () => {
-      beforeEach(function () {
-        this.targetElement = new FocusableElement(this.wrapper, '.childElement');
-        this.targetElement.focus();
-      });
-
-      it('then none of the handlers are called', function() {
-        expect(this.handler).to.not.have.been.called;
-      });
-
-      context('and a key matching a hot key is pressed', () => {
-        it('then calls the correct handler', function() {
-          this.targetElement.keyPress(KeyCode.A);
-
-          expect(this.handler).to.have.been.called;
-        });
-      });
-    });
-
   });
 
   context('when the component has been unmounted', () => {
