@@ -34,8 +34,8 @@ describe('Handlers that change focus:', function () {
 
       this.wrapper = mount(
         <HotKeys keyMap={this.keyMap} handlers={handlers}>
-          <div className="firstChildElement" />
-          <div className="secondChildElement" />
+          <div className='firstChildElement' />
+          <div className='secondChildElement' />
         </HotKeys>
       );
 
@@ -47,10 +47,8 @@ describe('Handlers that change focus:', function () {
       expect(this.firstElement.isFocused()).to.equal(true);
     });
 
-
     describe('and the key to change focus is pressed', function () {
-
-      xit('then focus is correctly managed', function() {
+      it('then focus is correctly managed', function() {
         this.firstElement.keyDown(KeyCode.A);
         this.firstElement.keyPress(KeyCode.A);
 

@@ -22,7 +22,6 @@ describe('Nested key map definitions:', () => {
   });
 
   context('when components are nested with overlapping key maps', () => {
-
     context('and only the outer component has handlers defined', () => {
       beforeEach(function () {
         this.action1OuterHandler = sinon.spy();
