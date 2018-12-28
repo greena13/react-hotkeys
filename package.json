@@ -50,8 +50,7 @@
     "simulant": "^0.2.2",
     "sinon": "^4.5.0",
     "sinon-chai": "^3.0.0",
-    "style-loader": "^0.9.0",
-    "webpack": "^1.7.3"
+    "style-loader": "^0.9.0"
   },
   "dependencies": {
     "prop-types": "^15.6.1"
