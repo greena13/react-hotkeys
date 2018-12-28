@@ -4,16 +4,20 @@ import React from 'react';
 const COLORS = ['green', 'purple', 'orange', 'grey', 'pink'];
 
 const ACTION_KEY_MAP = {
-  'changeColor': 'alt+c',
+  CHANGE_COLOR: 'alt+c',
 };
 
 class HOCWrappedNode extends React.Component {
-  state = {
-    colorNumber: 0,
-  };
+  constructor(props, context) {
+    super(props, context);
 
-  hotKeyHandlers = {
-    'changeColor': this.changeColor.bind(this),
+    this.hotKeyHandlers = {
+      CHANGE_COLOR: this.changeColor.bind(this),
+    };
+
+    this.state = {
+      colorNumber: 0,
+    };
   }
 
   changeColor() {
@@ -35,9 +39,9 @@ class HOCWrappedNode extends React.Component {
     // - by default we would set it to -1 so it can only be directly clicked (& tapped?)
     //   or focused programattically
     return (
-        <div tabIndex="0" className="node" style={style}>
-            [Alt+C] Change Color
-        </div>
+      <div tabIndex="0" className="node" style={style}>
+        [Alt+C] Change Color
+      </div>
     );
   }
 }

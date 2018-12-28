@@ -1,4 +1,4 @@
-import {HotKeys} from 'react-hotkeys';
+import { HotKeys } from 'react-hotkeys';
 import React from 'react';
 import rand from 'lodash.random';
 
@@ -9,9 +9,9 @@ const SIZE_INCREMENT = 5;
 const POS_INCREMENT = 5;
 
 class Node extends React.Component {
-
   constructor() {
     super();
+
     this.state = {
       pos: [
         rand(0, window.innerWidth - DEFAULT_NODE_SIZE),
@@ -36,13 +36,13 @@ class Node extends React.Component {
 
   render() {
     const handlers = {
-      'up': this.move.bind(this, 0, -1),
-      'down': this.move.bind(this, 0, 1),
-      'left': this.move.bind(this, -1, 0),
-      'right': this.move.bind(this, 1, 0),
-      'delete': this.requestDelete.bind(this),
-      'expand': this.resize.bind(this, 1),
-      'contract': this.resize.bind(this, -1),
+      MOVE_UP: this.move.bind(this, 0, -1),
+      MOVED_OWN: this.move.bind(this, 0, 1),
+      MOVE_LEFT: this.move.bind(this, -1, 0),
+      MOVE_RIGHT: this.move.bind(this, 1, 0),
+      DELETE: this.requestDelete.bind(this),
+      EXPAND: this.resize.bind(this, 1),
+      CONTRACT: this.resize.bind(this, -1),
     };
 
     const {size, pos, deleted} = this.state;
@@ -58,19 +58,18 @@ class Node extends React.Component {
 
     // tabIndex is explicitly set here so we can use the tab key to move between nodes
     // - by default we would set it to -1 so it can only be directly clicked (& tapped?)
-    //   or focused programattically
+    //   or focused programmatically
     return (
-        <HotKeys
-            tabIndex="0"
-            handlers={handlers}
-            className="node"
-            style={style}
-        >
-           Node
-        </HotKeys>
+      <HotKeys
+        tabIndex="0"
+        handlers={handlers}
+        className="node"
+        style={style}
+      >
+       Node
+      </HotKeys>
     );
   }
-
 }
 
 export default Node;
