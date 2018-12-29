@@ -8,13 +8,20 @@ export default {
   input: 'lib/index.js',
 
   output: {
-    exports: 'named'
+    exports: 'named',
+
+    globals: {
+      'prop-types': 'PropTypes',
+      react: 'React'
+    },
   },
+
   external: [
     'prop-types',
     'react',
     'react-dom',
   ],
+
   plugins: [
     babel({
       exclude: 'node_modules/**'
