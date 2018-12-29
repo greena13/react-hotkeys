@@ -37,7 +37,7 @@ class Node extends React.Component {
   render() {
     const handlers = {
       MOVE_UP: this.move.bind(this, 0, -1),
-      MOVED_OWN: this.move.bind(this, 0, 1),
+      MOVE_DOWN: this.move.bind(this, 0, 1),
       MOVE_LEFT: this.move.bind(this, -1, 0),
       MOVE_RIGHT: this.move.bind(this, 1, 0),
       DELETE: this.requestDelete.bind(this),
