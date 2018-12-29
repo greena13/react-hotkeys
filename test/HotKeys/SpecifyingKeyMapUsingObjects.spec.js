@@ -104,6 +104,48 @@ describe('Specifying key map using objects:', () => {
     });
   });
 
+  context('when several key events are for the same key are specified as an object', () => {
+    beforeEach(function () {
+      this.keyMap = {
+        'KEY_DOWN': {
+          sequence: 'command',
+          action: 'keydown',
+        },
+        'KEY_UP': {
+          sequence: 'command',
+          action: 'keyup',
+        }
+      };
+
+      this.keyDownHandler = sinon.spy();
+      this.keyUpHandler = sinon.spy();
+
+      this.handlers = {
+        'KEY_DOWN': this.keyDownHandler,
+        'KEY_UP': this.keyUpHandler,
+      };
+
+      this.wrapper = mount(
+        <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
+          <div className="childElement" />
+        </HotKeys>
+      );
+
+      this.targetElement = new FocusableElement(this.wrapper, '.childElement');
+      this.targetElement.focus();
+    });
+
+    it('then calls the correct handler for each event', function() {
+      this.targetElement.keyDown(KeyCode.COMMAND);
+
+      expect(this.keyDownHandler).to.have.been.called;
+
+      this.targetElement.keyUp(KeyCode.COMMAND);
+
+      expect(this.keyUpHandler).to.have.been.called;
+    });
+  });
+
   context('when a keymap is specified as an object without the action', () => {
     beforeEach(function () {
       this.keyMap = {

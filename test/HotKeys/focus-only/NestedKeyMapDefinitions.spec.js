@@ -205,7 +205,9 @@ describe('Nested key map definitions:', () => {
 
       context('and a child of the inner component is in focus', () => {
         beforeEach(function () {
-          this.targetElement = new FocusableElement(this.wrapper, '.innerChildElement');
+          this.targetElement =
+            new FocusableElement(this.wrapper, '.innerChildElement');
+
           this.targetElement.focus();
         });
 
