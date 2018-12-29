@@ -10,6 +10,10 @@
 
 A declarative library for handling hotkeys and focus areas in React applications.
 
+## Maintenance
+
+react-hotkeys is [currently seeking new maintainers](https://github.com/greena13/react-hotkeys/issues/130).
+
 ## Feature Overview
 
 - Minimal and declarative API
@@ -415,7 +419,9 @@ The product roadmap is being currently being tracked in [Projects](https://githu
 
 All credit, and many thanks, goes to [Chris Pearce](https://github.com/Chrisui) for the inception of `react-hotkeys` and all versions before `1.0.0`.
 
-As of version `1.0.0`, [Aleck Greenham](https://github.com/greena13) is actively maintaining `react-hotkeys`. Please be patient while he gets up to speed.
+As of version `1.0.0`, [Aleck Greenham](https://github.com/greena13) maintained `react-hotkeys`. 
+
+react-hotkeys is [currently seeking new maintainers](https://github.com/greena13/react-hotkeys/issues/130).
 
 ## Thanks
 
