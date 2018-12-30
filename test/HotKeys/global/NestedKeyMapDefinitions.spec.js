@@ -64,10 +64,6 @@ describe('Nested global HotKeys components:', () => {
           this.targetElement.keyPress(KeyCode.B);
 
           expect(this.action2Handler).to.have.been.called;
-
-          expect(this.action1OuterHandler).to.not.have.been.called;
-          expect(this.action1InnerHandler).to.not.have.been.called;
-          expect(this.action3Handler).to.not.have.been.called;
         });
       });
 
@@ -75,9 +71,6 @@ describe('Nested global HotKeys components:', () => {
         it('then does NOT call any handlers', function() {
           this.targetElement.keyPress(KeyCode.C);
 
-          expect(this.action2Handler).to.not.have.been.called;
-          expect(this.action1OuterHandler).to.not.have.been.called;
-          expect(this.action1InnerHandler).to.not.have.been.called;
           expect(this.action3Handler).to.not.have.been.called;
         });
       });
@@ -87,13 +80,9 @@ describe('Nested global HotKeys components:', () => {
           this.targetElement.keyPress(KeyCode.A);
 
           expect(this.action1OuterHandler).to.have.been.called;
-
-          expect(this.action2Handler).to.not.have.been.called;
           expect(this.action1InnerHandler).to.not.have.been.called;
-          expect(this.action3Handler).to.not.have.been.called;
         });
       });
-
     });
 
     context('and only the inner component has handlers defined', () => {
@@ -126,35 +115,27 @@ describe('Nested global HotKeys components:', () => {
       });
 
       context('when keys that match an action defined only in the outer component are pressed', () => {
-        it('then does NOT call any handlers', function() {
+        it('then calls the handlers defined in the inner component', function() {
           this.targetElement.keyPress(KeyCode.B);
 
-          expect(this.action2Handler).to.not.have.been.called;
-          expect(this.action1OuterHandler).to.not.have.been.called;
-          expect(this.action1InnerHandler).to.not.have.been.called;
-          expect(this.action3Handler).to.not.have.been.called;
+          expect(this.action2Handler).to.have.been.called;
         });
       });
 
       context('when keys that match an action defined only in the inner component are pressed', () => {
-        it('then does NOT call any handlers', function() {
+        it('then calls the inner component\'s handler', function() {
           this.targetElement.keyPress(KeyCode.C);
 
-          expect(this.action2Handler).to.not.have.been.called;
-          expect(this.action1OuterHandler).to.not.have.been.called;
-          expect(this.action1InnerHandler).to.not.have.been.called;
-          expect(this.action3Handler).to.not.have.been.called;
+          expect(this.action3Handler).to.have.been.called;
         });
       });
 
       context('when keys that match an action defined in both components are pressed', () => {
-        it('then does NOT call any handlers', function() {
+        it('then calls on the inner component\'s handler', function() {
           this.targetElement.keyPress(KeyCode.A);
 
           expect(this.action1OuterHandler).to.not.have.been.called;
-          expect(this.action2Handler).to.not.have.been.called;
-          expect(this.action1InnerHandler).to.not.have.been.called;
-          expect(this.action3Handler).to.not.have.been.called;
+          expect(this.action1InnerHandler).to.have.been.called;
         });
       });
     });
@@ -201,18 +182,11 @@ describe('Nested global HotKeys components:', () => {
       });
 
       context('when keys that an action defined only in the outer component are pressed', () => {
-        it('then calls the handler defined in the outer component', function() {
+        it('then calls the handler defined in the inner component', function() {
           this.targetElement.keyPress(KeyCode.B);
 
-          expect(this.action1OuterActionOuterHandler).to.have.not.been.called;
-          expect(this.action2OuterHandler).to.have.been.called;
-          expect(this.action1InnerActionOuterHandler).to.have.not.been.called;
-          expect(this.action3OuterHandler).to.have.not.been.called;
-
-          expect(this.action1OuterActionInnerHandler).to.have.not.been.called;
-          expect(this.action2InnerHandler).to.have.not.been.called;
-          expect(this.action1InnerActionInnerHandler).to.have.not.been.called;
-          expect(this.action3InnerHandler).to.have.not.been.called;
+          expect(this.action2InnerHandler).to.have.been.called;
+          expect(this.action2OuterHandler).to.not.have.been.called;
         });
       });
 
@@ -220,16 +194,8 @@ describe('Nested global HotKeys components:', () => {
         it('then does NOT call any handlers', function() {
           this.targetElement.keyPress(KeyCode.C);
 
-          expect(this.action1OuterActionOuterHandler).to.have.not.been.called;
-          expect(this.action2OuterHandler).to.have.not.been.called;
-          expect(this.action1InnerActionOuterHandler).to.have.not.been.called;
-
-          expect(this.action3OuterHandler).to.have.not.been.called;
-
-          expect(this.action1OuterActionInnerHandler).to.have.not.been.called;
-          expect(this.action2InnerHandler).to.have.not.been.called;
-          expect(this.action1InnerActionInnerHandler).to.have.not.been.called;
-          expect(this.action3InnerHandler).to.have.not.been.called;
+          expect(this.action3InnerHandler).to.have.been.called;
+          expect(this.action3OuterHandler).to.not.have.been.called;
         });
       });
 
@@ -237,15 +203,8 @@ describe('Nested global HotKeys components:', () => {
         it('then calls the handler defined in the outer component', function() {
           this.targetElement.keyPress(KeyCode.A);
 
-          expect(this.action1OuterActionOuterHandler).to.have.been.called;
-          expect(this.action2OuterHandler).to.have.not.been.called;
-          expect(this.action1InnerActionOuterHandler).to.have.not.been.called;
-          expect(this.action3OuterHandler).to.have.not.been.called;
-
-          expect(this.action1OuterActionInnerHandler).to.have.not.been.called;
-          expect(this.action2InnerHandler).to.have.not.been.called;
-          expect(this.action1InnerActionInnerHandler).to.have.not.been.called;
-          expect(this.action3InnerHandler).to.have.not.been.called;
+          expect(this.action1InnerActionInnerHandler).to.have.been.called;
+          expect(this.action1OuterActionOuterHandler).to.not.have.been.called;
         });
       });
     });

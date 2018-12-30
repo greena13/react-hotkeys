@@ -3,12 +3,12 @@ import {mount} from 'enzyme';
 import {expect} from 'chai';
 import sinon from 'sinon';
 
-import FocusableElement from '../support/FocusableElement';
+import FocusableElement from '../../support/FocusableElement';
 
-import KeyCode from '../support/Key';
-import HotKeys from '../../lib/HotKeys';
+import KeyCode from '../../support/Key';
+import HotKeys from '../../../lib/HotKeys';
 
-describe('Action and handler resolution:', function () {
+describe('Action and handler resolution for global HotKeys component:', function () {
   describe('when an action is defined', function () {
     describe('in the same component as its handlers', function () {
       beforeEach(function () {
@@ -22,14 +22,22 @@ describe('Action and handler resolution:', function () {
           'ACTION': this.handler,
         };
 
+        this.reactDiv = document.createElement('div');
+        document.body.appendChild(this.reactDiv);
+
         this.wrapper = mount(
-          <HotKeys keyMap={ this.keyMap } handlers={ handlers }>
+          <HotKeys keyMap={ this.keyMap } handlers={ handlers } global>
             <div className="childElement" />
-          </HotKeys>
+          </HotKeys>,
+          { attachTo: this.reactDiv }
         );
 
-        this.targetElement = new FocusableElement(this.wrapper, '.childElement');
-        this.targetElement.focus();
+        this.targetElement =
+          new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
+      });
+
+      afterEach(function() {
+        document.body.removeChild(this.reactDiv);
       });
 
       describe('when the matching key is pressed', function () {
@@ -55,16 +63,24 @@ describe('Action and handler resolution:', function () {
           'ACTION': this.handler,
         };
 
+        this.reactDiv = document.createElement('div');
+        document.body.appendChild(this.reactDiv);
+
         this.wrapper = mount(
-          <HotKeys keyMap={ this.keyMap } >
-            <HotKeys handlers={ handlers }>
+          <HotKeys keyMap={ this.keyMap } global>
+            <HotKeys handlers={ handlers } global>
               <div className="childElement" />
             </HotKeys>
-          </HotKeys>
+          </HotKeys>,
+          { attachTo: this.reactDiv }
         );
 
-        this.targetElement = new FocusableElement(this.wrapper, '.childElement');
-        this.targetElement.focus();
+        this.targetElement =
+          new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
+      });
+
+      afterEach(function() {
+        document.body.removeChild(this.reactDiv);
       });
 
       describe('when the matching key is pressed', function () {
@@ -91,20 +107,28 @@ describe('Action and handler resolution:', function () {
           'ACTION': this.handler,
         };
 
+        this.reactDiv = document.createElement('div');
+        document.body.appendChild(this.reactDiv);
+
         this.wrapper = mount(
-          <HotKeys keyMap={ this.keyMap } >
-            <HotKeys keyMap={ { ACTION2: 'tab' } } >
+          <HotKeys keyMap={ this.keyMap }  global>
+            <HotKeys keyMap={ { ACTION2: 'tab' } }  global>
               <div >
-                <HotKeys handlers={ handlers }>
+                <HotKeys handlers={ handlers } global>
                   <div className="childElement" />
                 </HotKeys>
               </div>
             </HotKeys>
-          </HotKeys>
+          </HotKeys>,
+          { attachTo: this.reactDiv }
         );
 
-        this.targetElement = new FocusableElement(this.wrapper, '.childElement');
-        this.targetElement.focus();
+        this.targetElement =
+          new FocusableElement(this.wrapper, '.childElement', { nativeElement: true});
+      });
+
+      afterEach(function() {
+        document.body.removeChild(this.reactDiv);
       });
 
       describe('when the matching key is pressed', function () {
@@ -117,7 +141,5 @@ describe('Action and handler resolution:', function () {
         });
       });
     });
-
   });
-
 });
