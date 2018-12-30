@@ -7,6 +7,7 @@
   "directories": {
     "example": "examples",
     "lib": "lib",
+    "lib/vendor": "lib/vendor",
     "test": "test"
   },
   "devDependencies": {

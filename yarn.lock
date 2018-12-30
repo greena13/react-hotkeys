@@ -4225,6 +4225,7 @@ signal-exit@^3.0.0, signal-exit@^3.0.2:
 simulant@^0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/simulant/-/simulant-0.2.2.tgz#f1bce52712b6a7a0da38ddfdda7e83b20b1da01e"
+  integrity sha1-8bzlJxK2p6DaON392n6DsgsdoB4=
 
 sinon-chai@^3.0.0:
   version "3.0.0"
