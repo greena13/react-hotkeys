@@ -34,24 +34,30 @@ export default class FocusableElement {
     }
   }
 
-  keyDown(key) {
-    this.element.simulate('keyDown', {key});
+  keyDown(key, options = {}) {
+    if (!this.isNativeElement || options.forceEnzymeEvent) {
+      this.element.simulate('keyDown', {key});
+    }
 
     if (this.isNativeElement) {
       simulant.fire(this.getInstance(), 'keydown', {key});
     }
   }
 
-  keyPress(key) {
-    this.element.simulate('keyPress', {key});
+  keyPress(key, options = {}) {
+    if (!this.isNativeElement || options.forceEnzymeEvent) {
+      this.element.simulate('keyPress', {key});
+    }
 
     if (this.isNativeElement) {
       simulant.fire(this.getInstance(), 'keypress', {key});
     }
   }
 
-  keyUp(key) {
-    this.element.simulate('keyUp', {key});
+  keyUp(key, options = {}) {
+    if (!this.isNativeElement || options.forceEnzymeEvent) {
+      this.element.simulate('keyUp', {key});
+    }
 
     if (this.isNativeElement) {
       simulant.fire(this.getInstance(), 'keyup', {key});
