@@ -3,9 +3,9 @@ import {mount} from 'enzyme';
 import {expect} from 'chai';
 import sinon from 'sinon';
 
-import HotKeys from '../../lib/HotKeys';
-import FocusableElement from '../support/FocusableElement';
-import ShiftKeyMappings from '../support/ShiftKeyMappings';
+import HotKeys from '../../../lib/HotKeys';
+import FocusableElement from '../../support/FocusableElement';
+import ShiftKeyMappings from '../../support/ShiftKeyMappings';
 
 describe('Sequences involving key aliases:', () => {
   Object.keys(ShiftKeyMappings).forEach((keyboardLayout) => {
@@ -114,7 +114,6 @@ describe('Sequences involving key aliases:', () => {
 
                     expect(this.handler).to.have.been.called;
                   });
-
                 });
               })
             })

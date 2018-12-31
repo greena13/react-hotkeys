@@ -31,8 +31,21 @@ Enzyme.configure({adapter: new Adaptor()});
 
 const {window} = new JSDOM('<html><body></body></html>');
 
-global.document = window.document;
+function copyProps(src, target) {
+  Object.defineProperties(target, {
+    ...Object.getOwnPropertyDescriptors(src),
+    ...Object.getOwnPropertyDescriptors(target),
+  });
+}
 global.window = window;
-global.Image = window.Image;
-global.navigator = window.navigator;
-global.CustomEvent = window.CustomEvent;
+global.document = window.document;
+global.navigator = {
+  userAgent: 'node.js',
+};
+global.requestAnimationFrame = function (callback) {
+  return setTimeout(callback, 0);
+};
+global.cancelAnimationFrame = function (id) {
+  clearTimeout(id);
+};
+copyProps(window, global);
