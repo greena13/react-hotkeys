@@ -2,8 +2,7 @@ import React from 'react';
 import {mount} from 'enzyme';
 import {expect} from 'chai';
 import sinon from 'sinon';
-
-import FocusableElement from '../../support/FocusableElement';
+import simulant from 'simulant';
 
 import KeyCode from '../../support/Key';
 import HotKeys from '../../../lib/HotKeys';
@@ -31,9 +30,6 @@ describe('Changing keyMap and handlers after mount for a global HotKeys componen
       </HotKeys>,
       { attachTo: this.reactDiv }
     );
-
-    this.targetElement =
-      new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
   });
 
   afterEach(function() {
@@ -48,7 +44,8 @@ describe('Changing keyMap and handlers after mount for a global HotKeys componen
     it('then the new sequence is used', function() {
       expect(this.handler).to.not.have.been.called;
 
-      this.targetElement.keyPress(KeyCode.B);
+      simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.B });
+
       expect(this.handler).to.have.been.calledOnce;
     });
   });
@@ -62,7 +59,7 @@ describe('Changing keyMap and handlers after mount for a global HotKeys componen
       expect(this.handler).to.not.have.been.called;
       expect(this.handler2).to.not.have.been.called;
 
-      this.targetElement.keyPress(KeyCode.A);
+      simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.A });
 
       expect(this.handler).to.not.have.been.called;
       expect(this.handler2).to.have.been.calledOnce;
@@ -78,7 +75,7 @@ describe('Changing keyMap and handlers after mount for a global HotKeys componen
       expect(this.handler).to.not.have.been.called;
       expect(this.handler2).to.not.have.been.called;
 
-      this.targetElement.keyPress(KeyCode.B);
+      simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.B });
 
       expect(this.handler).to.not.have.been.called;
       expect(this.handler2).to.have.been.calledOnce;
@@ -91,7 +88,7 @@ describe('Changing keyMap and handlers after mount for a global HotKeys componen
     });
 
     it('then the new sequence is used', function() {
-      this.targetElement.keyPress(KeyCode.A);
+      simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.A });
 
       expect(this.handler).to.not.have.been.called;
     });
@@ -104,7 +101,7 @@ describe('Changing keyMap and handlers after mount for a global HotKeys componen
 
     it('then the new sequence is used', function() {
 
-      this.targetElement.keyPress(KeyCode.A);
+      simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.A });
 
       expect(this.handler).to.not.have.been.called;
       expect(this.handler2).to.have.been.calledOnce;
@@ -123,7 +120,7 @@ describe('Changing keyMap and handlers after mount for a global HotKeys componen
       expect(this.handler2).to.not.have.been.called;
       expect(this.handler3).to.not.have.been.called;
 
-      this.targetElement.keyPress(KeyCode.B);
+      simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.B });
 
       expect(this.handler).to.not.have.been.called;
       expect(this.handler2).to.not.have.been.called;
@@ -139,7 +136,7 @@ describe('Changing keyMap and handlers after mount for a global HotKeys componen
     });
 
     it('then the new sequence is used', function() {
-      this.targetElement.keyPress(KeyCode.A);
+      simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.A });
 
       expect(this.handler).to.not.have.been.called;
     });

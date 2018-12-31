@@ -2,8 +2,7 @@ import React from 'react';
 import {mount} from 'enzyme';
 import {expect} from 'chai';
 import sinon from 'sinon';
-
-import FocusableElement from '../../support/FocusableElement';
+import simulant from 'simulant';
 
 import KeyCode from '../../support/Key';
 import HotKeys from '../../../lib/HotKeys';
@@ -31,9 +30,6 @@ describe('Action and handler resolution for global HotKeys component:', function
           </HotKeys>,
           { attachTo: this.reactDiv }
         );
-
-        this.targetElement =
-          new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
       });
 
       afterEach(function() {
@@ -42,9 +38,9 @@ describe('Action and handler resolution for global HotKeys component:', function
 
       describe('when the matching key is pressed', function () {
         it('then that action\'s handler is called', function() {
-          this.targetElement.keyDown(KeyCode.A);
-          this.targetElement.keyPress(KeyCode.A);
-          this.targetElement.keyUp(KeyCode.A);
+          simulant.fire(this.reactDiv, 'keydown', { key: KeyCode.A });
+          simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.A });
+          simulant.fire(this.reactDiv, 'keyup', { key: KeyCode.A });
 
           expect(this.handler).to.have.been.calledOnce;
         });
@@ -74,9 +70,6 @@ describe('Action and handler resolution for global HotKeys component:', function
           </HotKeys>,
           { attachTo: this.reactDiv }
         );
-
-        this.targetElement =
-          new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
       });
 
       afterEach(function() {
@@ -85,9 +78,9 @@ describe('Action and handler resolution for global HotKeys component:', function
 
       describe('when the matching key is pressed', function () {
         it('then that action\'s handler is called', function() {
-          this.targetElement.keyDown(KeyCode.A);
-          this.targetElement.keyPress(KeyCode.A);
-          this.targetElement.keyUp(KeyCode.A);
+          simulant.fire(this.reactDiv, 'keydown', { key: KeyCode.A });
+          simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.A });
+          simulant.fire(this.reactDiv, 'keyup', { key: KeyCode.A });
 
           expect(this.handler).to.have.been.calledOnce;
         });
@@ -122,9 +115,6 @@ describe('Action and handler resolution for global HotKeys component:', function
           </HotKeys>,
           { attachTo: this.reactDiv }
         );
-
-        this.targetElement =
-          new FocusableElement(this.wrapper, '.childElement', { nativeElement: true});
       });
 
       afterEach(function() {
@@ -133,9 +123,9 @@ describe('Action and handler resolution for global HotKeys component:', function
 
       describe('when the matching key is pressed', function () {
         it('then that action\'s handler is called', function() {
-          this.targetElement.keyDown(KeyCode.A);
-          this.targetElement.keyPress(KeyCode.A);
-          this.targetElement.keyUp(KeyCode.A);
+          simulant.fire(this.reactDiv, 'keydown', { key: KeyCode.A });
+          simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.A });
+          simulant.fire(this.reactDiv, 'keyup', { key: KeyCode.A });
 
           expect(this.handler).to.have.been.calledOnce;
         });
