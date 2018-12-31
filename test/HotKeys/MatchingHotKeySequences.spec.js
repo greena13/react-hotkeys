@@ -9,7 +9,7 @@ import KeyCode from '../support/Key';
 import HotKeys from '../../lib/HotKeys';
 
 describe('Matching hotkey sequences:', function () {
-  describe('when the actions are occur on the keydown event', function () {
+  describe('when the actions occur on the keydown event', function () {
     beforeEach(function () {
       this.keyMap = {
         'SEQUENCE': { sequence: 'a b', action: 'keydown' },
