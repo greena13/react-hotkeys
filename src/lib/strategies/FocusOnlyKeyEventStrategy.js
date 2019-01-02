@@ -42,7 +42,10 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     /**
      * Record of the event currently bubbling up through the React application (and
-     * beyond).
+     * beyond). This state is *not* cleared when the event propagation is finished
+     * or when the component focus tree changes. It persists until it is overridden
+     * by a new event, so that the global strategy is able to inspect the last
+     * event seen by the React application, even after focus is lost.
      */
     this.currentEvent = {
       /**
@@ -95,7 +98,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     this.eventPropagationState = {
       /**
        * Index of the component last seen to be handling a key event
-       * @type {ComponentID}
+       * @type {ComponentId}
        */
       previousComponentIndex: 0,
 
@@ -120,12 +123,13 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
   /**
    * Registers the actions and handlers of a HotKeys component that has gained focus
-   * @param {KeyMap} actionNameToKeyMap Map of actions to key expressions
-   * @param {HandlersMap} actionNameToHandlersMap Map of actions to handler functions
+   * @param {KeyMap} actionNameToKeyMap - Map of actions to key expressions
+   * @param {HandlersMap} actionNameToHandlersMap - Map of actions to handler functions
    * @param {Object} options Hash of options that configure how the actions
    *        and handlers are associated and called.
-   * @returns {ComponentID} Unique component index to assign to the focused HotKeys
-   *         component and passed back when handling a key event
+   * @returns {[FocusTreeId, ComponentId]} The current focus tree's ID and a unique
+   *         component ID to assign to the focused HotKeys component and passed back
+   *         when handling a key event
    */
   addHotKeys(actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
     if (this.resetOnNextFocus) {
@@ -159,7 +163,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * either the keyMap or handlers prop value
    * @param {FocusTreeId} focusTreeId - The ID of the focus tree the component is part of.
    *        Used to identify (and ignore) stale updates.
-   * @param {ComponentID} componentId - The component index of the component to
+   * @param {ComponentId} componentId - The component index of the component to
    *        update
    * @param {KeyMap} actionNameToKeyMap - Map of key sequences to action names
    * @param {HandlersMap} actionNameToHandlersMap - Map of action names to handler
@@ -192,9 +196,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   /**
    * Handles when a component loses focus by resetting the internal state, ready to
    * receive the next tree of focused HotKeys components
-   * @param {FocusTreeId} focusTreeId Id of focus tree component thinks it's
+   * @param {FocusTreeId} focusTreeId - Id of focus tree component thinks it's
    *        apart of
-   * @param {ComponentID} componentId Index of component that is blurring
+   * @param {ComponentId} componentId - Index of component that is blurring
    * @returns {Boolean} Whether the component still has event propagation yet to handle
    */
   removeHotKeys(focusTreeId, componentId){
@@ -227,7 +231,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * at each component level, to ensure the proper handler declaration scoping.
    * @param {KeyboardEvent} event - Event containing the key name and state
    * @param {FocusTreeId} focusTreeId - Id of focus tree component thinks it's apart of
-   * @param {ComponentID} componentId - The id of the component that is currently handling
+   * @param {ComponentId} componentId - The id of the component that is currently handling
    *        the keyboard event as it bubbles towards the document root.
    * @param {Object} options - Hash of options that configure how the event is handled.
    * @returns Whether the event was discarded because it was part of an old focus tree
@@ -341,7 +345,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * at each component level, to ensure the proper handler declaration scoping.
    * @param {KeyboardEvent} event - Event containing the key name and state
    * @param {FocusTreeId} focusTreeId Id - of focus tree component thinks it's apart of
-   * @param {ComponentID} componentId - The index of the component that is currently handling
+   * @param {ComponentId} componentId - The index of the component that is currently handling
    *        the keyboard event as it bubbles towards the document root.
    * @param {Object} options - Hash of options that configure how the event
    *        is handled.
@@ -426,12 +430,10 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * at each component level, to ensure the proper handler declaration scoping.
    * @param {KeyboardEvent} event Event containing the key name and state
    * @param {FocusTreeId} focusTreeId Id of focus tree component thinks it's apart of
-   * @param {ComponentID} componentId The index of the component that is currently handling
+   * @param {ComponentId} componentId The index of the component that is currently handling
    *        the keyboard event as it bubbles towards the document root.
    * @param {Object} options Hash of options that configure how the event
    *        is handled.
-   * @return {Number} Length of component list so calling HotKeys component can establish
-   *        if it's the last one in the list, or not
    */
   handleKeyup(event, focusTreeId, componentId, options) {
     const _key = normalizeKeyName(event.key);
@@ -515,7 +517,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   /**
    * Returns whether this is a previously seen event bubbling up to render tree towards
    * the document root, or whether it is a new event that has not previously been seen.
-   * @param {ComponentID} componentId Index of the component currently handling
+   * @param {ComponentId} componentId Index of the component currently handling
    *        the keyboard event
    * @return {Boolean} If the event has been seen before
    * @private
@@ -572,7 +574,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {NormalizedKeyName} keyName Normalized key name
    * @param {KeyEventBitmapIndex} eventBitmapIndex The bitmap index of the current key event type
    * @param {FocusTreeId} focusTreeId Id of focus tree component thinks it's apart of
-   * @param {ComponentID} componentId Index of the component that is currently handling
+   * @param {ComponentId} componentId Index of the component that is currently handling
    *        the keyboard event
    * @private
    */
@@ -619,7 +621,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const eventIcons = Logger.eventIcons;
     const componentIcons = Logger.componentIcons;
 
-    return `HotKeys (FT${focusTreeId}${logIcons[focusTreeId % logIcons.length]}-E${KeyEventCounter.getId()}${eventIcons[KeyEventCounter.getId() % eventIcons.length]}-C${componentId}${componentIcons[componentId % componentIcons.length]}):`
+    return `HotKeys (FT${focusTreeId}${logIcons[focusTreeId % logIcons.length]}-`
+      + `E${KeyEventCounter.getId()}${eventIcons[KeyEventCounter.getId() % eventIcons.length]}-`
+      + `C${componentId}${componentIcons[componentId % componentIcons.length]}):`
   }
 
 }

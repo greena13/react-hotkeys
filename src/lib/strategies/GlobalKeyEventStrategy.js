@@ -13,18 +13,18 @@ import isUndefined from '../../utils/isUndefined';
 import getEventKey from '../../vendor/react-dom/getEventKey';
 import printComponent from '../../helpers/logging/printComponent';
 
+/**
+ * Defines behaviour for dealing with key maps defined in global HotKey components
+ * @class
+ */
 class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   /********************************************************************************
    * Init & Reset
    ********************************************************************************/
 
-  /**
-   * Creates a new KeyEventManager instance. It is expected that only a single instance
-   * will be used with a render tree.
-   */
   constructor(configuration = {}, keyEventManager) {
     /**
-     * Set state that does get cleared every time a component gets mounted or unmounted
+     * Set state that gets cleared every time a component gets mounted or unmounted
      */
     super(configuration);
 
@@ -34,8 +34,20 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * @type {number}
      */
 
+    /**
+     * Counter to keep track of what component ID should be allocated next
+     * @type {ComponentId}
+     */
     this.componentId = -1;
+
+    /**
+     * Reference to key event manager, so that information may pass between the
+     * global strategy and the focus-only strategy
+     * @type {KeyEventManager}
+     */
     this.keyEventManager = keyEventManager;
+
+
     this.eventOptions = {};
   }
 
@@ -43,14 +55,10 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     super._reset();
 
     /**
-     * State that is specific to global key event strategy
+     * Set of ComponentOptions indexed by ComponentId to allow efficient retrieval
+     * when components need to be updated or unmounted by their ComponentId
+     * @type {Object<ComponentId, ComponentOptions>}
      */
-    this.handlerCounts = {
-      [KeyEventBitmapIndex.keydown]: 0,
-      [KeyEventBitmapIndex.keypress]: 0,
-      [KeyEventBitmapIndex.keyup]: 0
-    };
-
     this.componentIdDict = {};
   }
 
@@ -58,6 +66,16 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * Registering key maps and handlers
    ********************************************************************************/
 
+  /**
+   * Registers the actions and handlers of a HotKeys component that has mounted
+   * @param {KeyMap} actionNameToKeyMap - Map of actions to key expressions
+   * @param {HandlersMap} actionNameToHandlersMap - Map of actions to handler functions
+   * @param {Object} options Hash of options that configure how the actions
+   *        and handlers are associated and called.
+   * @param {Object} eventOptions - Options for how the event should be handled
+   * @returns {ComponentId} A unique component ID to assign to the focused HotKeys
+   *        component and passed back when handling a key event
+   */
   addHotKeys(actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
     this.eventOptions = eventOptions;
 
@@ -86,21 +104,17 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     return this.componentId;
   }
 
-  _addComponentToList(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
-    super._addComponentToList(
-      componentId,
-      actionNameToKeyMap,
-      actionNameToHandlersMap,
-      options
-    );
-
-    this._setComponentPosition(componentId, this.componentList.length - 1);
-  }
-
-  _setComponentPosition(componentId, position) {
-    this.componentIdDict[componentId] = position;
-  }
-
+  /**
+   * Handles when a mounted global HotKeys component updates its props and changes
+   * either the keyMap or handlers prop value
+   * @param {ComponentId} componentId - The component index of the component to
+   *        update
+   * @param {KeyMap} actionNameToKeyMap - Map of actions to key expressions
+   * @param {HandlersMap} actionNameToHandlersMap - Map of actions to handler functions
+   * @param {Object} options Hash of options that configure how the actions
+   *        and handlers are associated and called.
+   * @param {Object} eventOptions - Options for how the event should be handled
+   */
   updateHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
     this.eventOptions = eventOptions;
 
@@ -143,6 +157,10 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     );
   }
 
+  /**
+   * Handles when a component is unmounted
+   * @param {ComponentId} componentId - Index of component that is being unmounted
+   */
   removeHotKeys(componentId) {
     const [{ keyMapEventBitmap }, componentPosition ] =
       this._getComponentAndPosition(componentId);
@@ -174,6 +192,21 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this._logPrefix(this.componentId, {eventId: false}),
       `Unmounted global component ${componentId}`
     );
+  }
+
+  _addComponentToList(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
+    super._addComponentToList(
+      componentId,
+      actionNameToKeyMap,
+      actionNameToHandlersMap,
+      options
+    );
+
+    this._setComponentPosition(componentId, this.componentList.length - 1);
+  }
+
+  _setComponentPosition(componentId, position) {
+    this.componentIdDict[componentId] = position;
   }
 
   _updateLongestKeySequenceIfNecessary(componentId) {
@@ -230,6 +263,15 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * Recording key events
    ********************************************************************************/
 
+  /**
+   * Records a keydown keyboard event and matches it against the list of pre-registered
+   * event handlers, calling the first matching handler with the highest priority if
+   * one exists.
+   *
+   * This method is called once when a keyboard event bubbles up to document, and checks
+   * the keymaps for all of the mounted global HotKey components.
+   * @param {KeyboardEvent} event - Event containing the key name and state
+   */
   handleKeydown(event) {
     const _key = normalizeKeyName(getEventKey(event));
 
@@ -241,7 +283,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         `${this._logPrefix()} Ignored '${_key}' keydown event because React app has already handled it.`
       );
 
-      return false;
     } else {
       if (reactAppHistoryWithEvent === 'seen') {
         this.logger.debug(
@@ -261,7 +302,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
           `${this._logPrefix()} Ignored '${_key}' keydown event because ignoreEventsFilter rejected it.`
         );
 
-        return false;
+        return;
       }
 
       const keyInCurrentCombination = !!this._getCurrentKeyCombination().keys[_key];
@@ -293,11 +334,18 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
          */
         this.handleKeypress(event);
       }
-
-      return false;
     }
   }
 
+  /**
+   * Records a keypress keyboard event and matches it against the list of pre-registered
+   * event handlers, calling the first matching handler with the highest priority if
+   * one exists.
+   *
+   * This method is called once when a keyboard event bubbles up to document, and checks
+   * the keymaps for all of the mounted global HotKey components.
+   * @param {KeyboardEvent} event - Event containing the key name and state
+   */
   handleKeypress(event) {
     const _key = normalizeKeyName(getEventKey(event));
 
@@ -355,6 +403,15 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     }
   }
 
+  /**
+   * Records a keyup keyboard event and matches it against the list of pre-registered
+   * event handlers, calling the first matching handler with the highest priority if
+   * one exists.
+   *
+   * This method is called once when a keyboard event bubbles up to document, and checks
+   * the keymaps for all of the mounted global HotKey components.
+   * @param {KeyboardEvent} event - Event containing the key name and state
+   */
   handleKeyup(event) {
     const _key = normalizeKeyName(getEventKey(event));
 

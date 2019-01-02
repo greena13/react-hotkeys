@@ -35,7 +35,7 @@ class AbstractKeyEventStrategy {
   constructor(options = {}) {
     this.logger = options.logger || new Logger('warn');
     /**
-     * @typedef {Number} ComponentID Unique index associated with every HotKeys component
+     * @typedef {Number} ComponentId Unique index associated with every HotKeys component
      * as it becomes active.
      *
      * For focus-only components, this happens when the component is focused. The HotKeys
@@ -52,7 +52,7 @@ class AbstractKeyEventStrategy {
 
     /**
      * Counter to maintain what the next component index should be
-     * @type {ComponentID}
+     * @type {ComponentId}
      */
     this.componentId = 0;
 
@@ -84,7 +84,7 @@ class AbstractKeyEventStrategy {
      *          has defined in its keymap
      * @property {HandlersMap} handlers - Dictionary of handler functions the
      *          component has defined
-     * @property {ComponentID} componentId - Index of the component the options
+     * @property {ComponentId} componentId - Index of the component the options
      *          correspond with
      */
 
@@ -107,7 +107,7 @@ class AbstractKeyEventStrategy {
      * The component index of the component that defines the longest key sequence, so
      * we can quickly determine if the longest sequence needs to be re-calculated when
      * that component is updated or removed.
-     * @type {ComponentID}
+     * @type {ComponentId}
      */
     this.longestSequenceComponentIndex = null;
 
@@ -151,7 +151,7 @@ class AbstractKeyEventStrategy {
      * A dictionary of handlers to the components that register them. This is populated
      * as this.searchIndex increases, moving from the end of this.componentList to the
      * front, populating this.keyMaps as needed
-     * @type {Object<ActionName, ComponentID>}
+     * @type {Object<ActionName, ComponentId>}
      */
     this.handlersDictionary = {};
 
@@ -206,7 +206,7 @@ class AbstractKeyEventStrategy {
 
   /**
    * Registers the hotkeys defined by a HotKeys component
-   * @param {ComponentID} componentId - Index of the component
+   * @param {ComponentId} componentId - Index of the component
    * @param {KeyMap} actionNameToKeyMap - Definition of actions and key maps defined
    *        in the HotKeys component
    * @param {HandlersMap} actionNameToHandlersMap - Map of ActionNames to handlers
@@ -228,7 +228,7 @@ class AbstractKeyEventStrategy {
   /**
    * Builds the internal representation that described the options passed to a HotKeys
    * component
-   * @param {ComponentID} componentId - Index of the component
+   * @param {ComponentId} componentId - Index of the component
    * @param {KeyMap} actionNameToKeyMap - Definition of actions and key maps defined
    *        in the HotKeys component
    * @param {HandlersMap} actionNameToHandlersMap - Map of ActionNames to handlers
@@ -312,7 +312,7 @@ class AbstractKeyEventStrategy {
    * @param {Object} options - Hash of options that configure how the key map is built.
    * @param {String} options.defaultKeyEvent - The default key event to use for any
    *        action that does not explicitly define one.
-   * @param {ComponentID} componentId Index of the component the matcher belongs to
+   * @param {ComponentId} componentId Index of the component the matcher belongs to
    * @return {ActionDictionary} Map from ActionNames to FullKeyEventOptions
    * @private
    */

@@ -56,7 +56,7 @@ class KeySequenceParser {
    *          to compared against key events
    * @property {KeySequenceString} id Id describing key sequence used for matching against
    *            key events
-   * @property {ComponentID} componentId Id associated with the HotKeys component
+   * @property {ComponentId} componentId Id associated with the HotKeys component
    *          that registered the key sequence
    * @property {BasicKeyCombination[]} sequence A list of key combinations involved in
    *            the sequence
