@@ -101,11 +101,6 @@ class HotKeys extends Component {
     global: PropTypes.bool,
 
     /**
-     * The DOM element the keyboard listeners should be attached to
-     */
-    attach: PropTypes.any,
-
-    /**
      * Children to wrap within a focus trap
      */
     children: PropTypes.node,
@@ -161,7 +156,7 @@ class HotKeys extends Component {
        * Props used by HotKeys that should not be passed down to its focus trap
        * component
        */
-      keyMap, handlers, global, attach,
+      keyMap, handlers, global,
 
       children,
       ...props

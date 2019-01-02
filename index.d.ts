@@ -39,11 +39,6 @@ interface HotKeysProps extends React.HTMLAttributes<HotKeys>, FocusTrapProps {
   focused?: boolean;
 
   /**
-   * The object that the internal key listeners should be bound to
-   */
-  attach?: React.Component | Element | Window;
-
-  /**
    * Function to call when this component gains focus in the browser
    */
   onFocus?: () => void;
