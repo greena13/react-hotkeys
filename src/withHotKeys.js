@@ -68,7 +68,6 @@ const withHotKeys = (keyMap, componentProps) => ((Component) =>
         const props = {
           keyMap,
           handlers,
-          component: "document-fragment",
           ...componentProps
         };
 
