@@ -4,7 +4,9 @@ import KeyAliasesDictionary from '../const/KeyAliasesDictionary';
 import KeySequenceParser from './KeySequenceParser';
 
 /**
- * Serializes instances of KeyCombinationRecord to KeyCombinationString
+ * Serializes instances of KeyCombinationRecord to KeyCombinationString.
+ *
+ * Used primarily to serialize string representations of key events as they happen.
  * @class
  */
 class KeyCombinationSerializer {

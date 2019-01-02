@@ -53,7 +53,7 @@ class KeyEventManager {
    * Registers the actions and handlers of a HotKeys component that has gained focus
    * @param {ActionKeyMap} actionNameToKeyMap Map of actions to key expressions
    * @param {EventHandlerMap} actionNameToHandlersMap Map of actions to handler functions
-   * @param {Object<String, any>} options Hash of options that configure how the actions
+   * @param {Object} options Hash of options that configure how the actions
    *        and handlers are associated and called.
    * @returns {ComponentIndex} Unique component index to assign to the focused HotKeys
    *         component and passed back when handling a key event

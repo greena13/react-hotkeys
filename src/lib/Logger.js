@@ -1,6 +1,10 @@
-
-
 class Logger {
+  static logIcons = ['📕', '📗', '📘', '📙'];
+
+  static componentIcons = ['🔺', '⭐️', '🔷', '🔶', '⬛️'];
+
+  static eventIcons = ['❤️', '💚', '💙', '💛', '💜', '🧡'];
+
   static levels = {
     none: 0,
     error: 1,

@@ -5,12 +5,18 @@ import AbstractKeyEventStrategy from './AbstractKeyEventStrategy';
 import capitalize from '../../utils/string/capitalize';
 import normalizeKeyName from '../../helpers/resolving-handlers/normalizeKeyName';
 import hasKeyPressEvent from '../../helpers/resolving-handlers/hasKeyPressEvent';
+import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 import KeyEventCounter from '../KeyEventCounter';
+import Logger from '../Logger';
 import removeAtIndex from '../../utils/array/removeAtIndex';
 import isUndefined from '../../utils/isUndefined';
 import getEventKey from '../../vendor/react-dom/getEventKey';
 
 class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
+  /********************************************************************************
+   * Init & Reset
+   ********************************************************************************/
+
   /**
    * Creates a new KeyEventManager instance. It is expected that only a single instance
    * will be used with a render tree.
@@ -47,19 +53,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this.componentIndexDict = {};
   }
 
-  _getComponentPosition(componentIndex){
-    return this.componentIndexDict[componentIndex];
-  }
-
-  _getComponent(componentIndex){
-    const componentPosition = this._getComponentPosition(componentIndex);
-    return this.componentList[componentPosition];
-  }
-
-  _getComponentAndPosition(componentIndex){
-    const componentPosition = this._getComponentPosition(componentIndex);
-    return [ this.componentList[componentPosition], componentPosition ];
-  }
+  /********************************************************************************
+   * Registering key maps and handlers
+   ********************************************************************************/
 
   addHotKeys(actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
     this.eventOptions = eventOptions;
@@ -202,7 +198,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   _updateDocumentHandlers(){
     if (this.keyMapEventBitmap.some((eventType) => eventType)) {
       for(let bitmapIndex = 0; bitmapIndex < this.keyMapEventBitmap.length; bitmapIndex++) {
-        const eventName = this.constructor._describeKeyEvent(bitmapIndex);
+        const eventName = describeKeyEvent(bitmapIndex);
 
         document[`on${eventName}`] = (keyEvent) => {
           this.keyEventManager[`handleGlobal${capitalize(eventName)}`](keyEvent);
@@ -217,7 +213,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     } else {
 
       for(let bitmapIndex = 0; bitmapIndex < this.keyMapEventBitmap.length; bitmapIndex++) {
-        const eventName = this.constructor._describeKeyEvent(bitmapIndex);
+        const eventName = describeKeyEvent(bitmapIndex);
 
         delete document[`on${eventName}`];
 
@@ -228,6 +224,10 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       }
     }
   }
+
+  /********************************************************************************
+   * Recording key events
+   ********************************************************************************/
 
   handleKeydown(event) {
     const _key = normalizeKeyName(getEventKey(event));
@@ -412,8 +412,26 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     }
   }
 
+  _getComponentPosition(componentIndex){
+    return this.componentIndexDict[componentIndex];
+  }
+
+  _getComponent(componentIndex){
+    const componentPosition = this._getComponentPosition(componentIndex);
+    return this.componentList[componentPosition];
+  }
+
+  _getComponentAndPosition(componentIndex){
+    const componentPosition = this._getComponentPosition(componentIndex);
+    return [ this.componentList[componentPosition], componentPosition ];
+  }
+
+  /********************************************************************************
+   * Matching and calling handlers
+   ********************************************************************************/
+
   _callHandlerIfExists(event, keyName, eventBitmapIndex) {
-    const eventName = this.constructor._describeKeyEvent(eventBitmapIndex);
+    const eventName = describeKeyEvent(eventBitmapIndex);
     const combinationName = this._describeCurrentKeyCombination();
 
     if (this.keyMapEventBitmap[eventBitmapIndex]) {
@@ -462,9 +480,13 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     }
   }
 
+  /********************************************************************************
+   * Logging
+   ********************************************************************************/
+
   _logPrefix(componentIndex, options = {}) {
-    const eventIcons = this.constructor.eventIcons;
-    const componentIcons = this.constructor.componentIcons;
+    const eventIcons = Logger.eventIcons;
+    const componentIcons = Logger.componentIcons;
 
     let base = `HotKeys (GLOBAL`;
 

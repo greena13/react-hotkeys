@@ -15,18 +15,21 @@ function normalizedCombinationId(keys) {
 
 /**
  * Parses KeySequenceStrings and returns KeySequenceOptions
+ *
+ * Used primarily to parse strings describing hot key sequences and combinations
+ * so that they may be matched with key events when they occur.
  * @class
  */
 class KeySequenceParser {
   /**
    * @typedef {Object} BasicKeyCombination Object containing the basic information that
    *          describes a key combination
-   * @property {KeyCombinationString} id String description of keys involved in the key
+   * @property {KeyCombinationString} id - String description of keys involved in the key
    *          combination
-   * @property {Number} size Number of keys involved in the combination
-   * @property {Object.<KeyName, Boolean>} keyDictionary Dictionary of key names involved
+   * @property {Number} size - Number of keys involved in the combination
+   * @property {Object.<KeyName, Boolean>} keyDictionary - Dictionary of key names involved
    *           in the key combination
-   * @property {EventBitmapIndex} eventBitmapIndex bitmap index for key event that
+   * @property {EventBitmapIndex} eventBitmapIndex - Bitmap index for key event that
    *          the matcher should match on
    */
 
@@ -44,8 +47,8 @@ class KeySequenceParser {
   /**
    * @typedef {Object} BasicKeySequence Object containing the basic information that
    *          describes a key sequence
-   * @property {NormalizedKeySequenceId} prefix Normalized key sequence id
-   * @property {Number} size Number of combinations involved in the sequence
+   * @property {NormalizedKeySequenceId} prefix - Normalized key sequence id
+   * @property {Number} size - Number of combinations involved in the sequence
    */
 
   /**

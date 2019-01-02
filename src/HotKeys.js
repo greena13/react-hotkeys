@@ -10,55 +10,22 @@ import Configuration from './lib/Configuration';
 import hasChanged from './utils/object/hasChanged';
 
 /**
- * A string or list of strings, that represent a sequence of one or more keys
- * @typedef {String | Array.<String>} MouseTrapKeySequence
- * @see {@link https://craig.is/killing/mice} for support key sequences
- */
-
-/**
- * Name of a key event
- * @typedef {'keyup'|'keydown'|'keypress'} KeyEventName
- */
-
-/**
- * Options for the mapping of a key sequence and event
- * @typedef {Object} KeyEventOptions
- * @property {MouseTrapKeySequence} The key sequence required to satisfy a KeyEventMatcher
- * @property {KeyEventName} action The keyboard state required to satisfy a KeyEventMatcher
- */
-
-/**
- * A matcher used on keyboard sequences and events to trigger handler functions
- * when matching sequences occur
- * @typedef {MouseTrapKeySequence | KeyMapOptions | Array<MouseTrapKeySequence>} KeyEventMatcher
- */
-
-/**
- * A unique key to associate with KeyEventMatchers that allows associating handler
- * functions at a later stage
- * @typedef {String} ActionName
- */
-
-/**
- * A mapping from ActionNames to KeyEventMatchers
- * @typedef {Object.<String, KeyEventMatcher>} KeySequence
- */
-
-/**
  * Component that wraps it children in a "focus trap" and allows key events to
  * trigger function handlers when its children are in focus
+ * @class
  */
 class HotKeys extends Component {
   /**
-   * @callback ignoreEventsConditionCallback
-   * @param {KeyboardEvent) event Keyboard event
+   * @callback IgnoreEventsConditionCallback
+   * @param {KeyboardEvent} event Keyboard event
    * @return {Boolean} Whether to ignore the event
    */
+
   /**
    * Sets the function used to determine whether a keyboard event should be ignored.
    *
    * The function passed as an argument accepts the KeyboardEvent as its only argument.
-   * @param {ignoreEventsConditionCallback} func Function to use to decide whether to
+   * @param {IgnoreEventsConditionCallback} func Function to use to decide whether to
    *        ignore keyboard events
    */
   static setIgnoreEventsCondition(func) {
@@ -66,7 +33,7 @@ class HotKeys extends Component {
   }
 
   /**
-   * Sets the ignoreEventsCondition function back to its original value
+   * Sets the ignoreEventsCondition function back to its default value
    */
   static resetIgnoreEventsCondition(){
     Configuration.set('ignoreEventsCondition', ignoreEventsCondition);
@@ -75,8 +42,7 @@ class HotKeys extends Component {
   /**
    * Configure the behaviour of HotKeys
    * @param {Object} configuration Configuration object
-   * @param {Function} configuration.ignoreEventsFilter Filter function used to determine
-   *        whether a particular keyboard event should be ignored.
+   * @see Configuration.init
    */
   static configure(configuration = {}) {
     Configuration.init(configuration);
@@ -84,12 +50,55 @@ class HotKeys extends Component {
 
   static propTypes = {
     /**
+     * A unique key to associate with KeyEventMatchers that allows associating handler
+     * functions at a later stage
+     * @typedef {String} ActionName
+     */
+
+    /**
+     * Name of a key event
+     * @typedef {'keyup'|'keydown'|'keypress'} KeyEventName
+     */
+
+    /**
+     * A string or list of strings, that represent a sequence of one or more keys
+     * @typedef {String | Array.<String>} MouseTrapKeySequence
+     * @see {@link https://craig.is/killing/mice} for support key sequences
+     */
+
+    /**
+     * Options for the mapping of a key sequence and event
+     * @typedef {Object} KeyEventOptions
+     * @property {MouseTrapKeySequence} sequence - The key sequence required to satisfy a
+     *           KeyEventDescription
+     * @property {KeyEventName} action - The keyboard state required to satisfy a
+     *           KeyEventDescription
+     */
+
+    /**
+     * A description of key sequence of one or more key combinations
+     * @typedef {MouseTrapKeySequence|KeyMapOptions|Array<MouseTrapKeySequence>} KeyEventDescription
+     */
+
+    /**
+     * A mapping from ActionName to KeyEventDescription
+     * @typedef {Object.<ActionName, KeyEventDescription>} KeyMap
+     */
+
+    /**
      * A map from action names to Mousetrap key sequences
+     * @type {KeyMap}
      */
     keyMap: PropTypes.object,
 
     /**
      * A map from action names to event handler functions
+     * @typedef {Object<ActionName, Function>} HandlersMap
+     */
+
+    /**
+     * A map from action names to event handler functions
+     * @type {HandlersMap}
      */
     handlers: PropTypes.object,
 
@@ -97,6 +106,7 @@ class HotKeys extends Component {
      * Whether the hotkeys should be applied globally (the current
      * component or indeed the React app need not be in focus for
      * the keys be matched)
+     * @type {Boolean}
      */
     global: PropTypes.bool,
 
@@ -107,11 +117,13 @@ class HotKeys extends Component {
 
     /**
      * Function to call when this component gains focus in the browser
+     * @type {Function}
      */
     onFocus: PropTypes.func,
 
     /**
      * Function to call when this component loses focus in the browser
+     * @type {Function}
      */
     onBlur: PropTypes.func,
   };
@@ -151,14 +163,12 @@ class HotKeys extends Component {
    * @returns {FocusTrap} FocusTrap with necessary props to capture keyboard events
    */
   render() {
+    /**
+     * Props used by HotKeys that should not be passed down to its focus trap
+     * component
+     */
     const {
-      /**
-       * Props used by HotKeys that should not be passed down to its focus trap
-       * component
-       */
-      keyMap, handlers, global,
-
-      children,
+      keyMap, handlers, global, children,
       ...props
     } = this.props;
 

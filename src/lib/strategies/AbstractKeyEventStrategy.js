@@ -7,6 +7,7 @@ import indexFromEnd from '../../utils/array/indexFromEnd';
 import isObject from '../../utils/object/isObject';
 import isUndefined from '../../utils/isUndefined';
 import isEmpty from '../../utils/collection/isEmpty';
+import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 import resolveAltShiftedAlias from '../../helpers/resolving-handlers/resolveAltShiftedAlias';
 import resolveShiftedAlias from '../../helpers/resolving-handlers/resolveShiftedAlias';
 import resolveAltedAlias from '../../helpers/resolving-handlers/resolveAltedAlias';
@@ -15,84 +16,73 @@ import KeyEventSequenceIndex from '../../const/KeyEventSequenceIndex';
 import KeySequenceParser from '../KeySequenceParser';
 
 /**
- * @typedef {String} KeyName Name of the keyboard key
+ * Defines common behaviour for key event strategies
+ * @abstract
+ * @class
  */
-
-/**
- * @typedef {Number} ComponentIndex Unique index associated with every HotKeys component
- * as it becomes active.
- *
- * For focus-only components, this happens when the component is focused. The HotKeys
- * component closest to the DOM element in focus gets the smallest number (0) and
- * those further up the render tree get larger (incrementing) numbers. When a different
- * element is focused (triggering the creation of a new focus tree) all component indexes
- * are reset (de-allocated) and re-assigned to the new tree of HotKeys components that
- * are now in focus.
- *
- * For global components, component indexes are assigned when a HotKeys component is
- * mounted, and de-allocated when it unmounts. The component index counter is never reset
- * back to 0 and just keeps incrementing as new components are mounted.
- */
-
-/**
- * @typedef {Object} KeyCombinationObject Object containing description of a key
- *          combination to compared against key events
- * @extends BasicKeyCombination
- * @property {ComponentIndex} componentIndex Id associated with the HotKeys component
- *          that registered the key sequence
- * @property {Number} size Number of key combinations in the key sequence
- * @property {KeyEventBitmapIndex} eventBitmapIndex Index that matches key event type
- * @property {ActionName} actionName Name of the action that should be triggered if a
- *           keyboard event matching the combination and event type occur
- */
-
-/**
- * @typedef {Object} KeyEventMatcher Object containing key sequence and combination
- *          descriptions for a particular HotKeys component
- * @property {KeySequenceObject} sequences Map of key sequences
- * @property {KeyCombinationObject} combinations Map of key combinations
- * @property {KeyCombinationString[]} combinationsOrder Order of combinations from highest
- *            priority to lowest
- */
-
 class AbstractKeyEventStrategy {
-  static _describeKeyEvent(eventBitmapIndex) {
-    switch(parseInt(eventBitmapIndex, 10)) {
-      case 0: return 'keydown';
-      case 1: return 'keypress';
-      default: return 'keyup';
-    }
-  }
+  /********************************************************************************
+   * Init & Reset
+   ********************************************************************************/
 
-  static logIcons = ['📕', '📗', '📘', '📙'];
-  static componentIcons = ['🔺', '⭐️', '🔷', '🔶', '⬛️'];
-  static eventIcons = ['❤️', '💚', '💙', '💛', '💜', '🧡'];
+  /**
+   * Creates a new instance of a event strategy (this class is an abstract one and
+   * not intended to be instantiated directly)
+   * @param {Object} options Options for how event strategy should behave
+   * @param {Logger} options.logger The Logger to use to report event strategy actions
+   */
+  constructor(options = {}) {
+    this.logger = options.logger || new Logger('warn');
+    /**
+     * @typedef {Number} ComponentIndex Unique index associated with every HotKeys component
+     * as it becomes active.
+     *
+     * For focus-only components, this happens when the component is focused. The HotKeys
+     * component closest to the DOM element in focus gets the smallest number (0) and
+     * those further up the render tree get larger (incrementing) numbers. When a different
+     * element is focused (triggering the creation of a new focus tree) all component indexes
+     * are reset (de-allocated) and re-assigned to the new tree of HotKeys components that
+     * are now in focus.
+     *
+     * For global components, component indexes are assigned when a HotKeys component is
+     * mounted, and de-allocated when it unmounts. The component index counter is never reset
+     * back to 0 and just keeps incrementing as new components are mounted.
+     */
 
-  constructor(configuration = {}) {
-    this.logger = configuration.logger || new Logger('warn');
-
+    /**
+     * Counter to maintain what the next component index should be
+     * @type {ComponentIndex}
+     */
     this.componentIndex = 0;
 
     this._reset();
   }
 
+  /**
+   * Resets all strategy state to the values it had when it was first created
+   * @private
+   */
   _reset() {
     this._resetRegisteredKeyMapsState();
     this._resetHandlerResolutionState();
     this._resetKeyCombinationState();
   }
 
+  /**
+   * Resets all state used to record information about the keymaps that HotKey
+   * components have registered.
+   *
+   * After initialization, this state is generally maintained manually by
+   * the _buildKeyMatcherMap() method and this method should not be called.
+   */
   _resetRegisteredKeyMapsState() {
-    /**
-     * This state is maintained by the _buildKeyMatcherMap() method
-     */
-
     /**
      * @typedef {Object} ComponentOptions Object containing a description of the key map
      *          and handlers from a particular HotKeys component
-     * @property {KeyEventMatcher} keyMatchersMap Map of ActionNames to
-     *           KeySequenceDSLStatement
-     * @property {EventHandlerMap} handlers Map of ActionNames to EventHandlers
+     * @property {KeyEventDescription} actions -
+     * @property {EventHandlerMap} handlers - Map of ActionNames to EventHandlers
+     * @property {ComponentIndex} componentIndex - Index of the component that defined
+     *            the key maps
      */
 
     /**
@@ -167,21 +157,6 @@ class AbstractKeyEventStrategy {
 
     this.keypressEventsToSimulate = [];
 
-    /**
-     * @typedef {Object.<String, KeyEventBitmap[]>} KeyCombinationRecord A dictionary of keys that
-     * have been pressed down at once. The keys of the map are the lowercase names of the
-     * keyboard keys. May contain 1 or more keyboard keys.
-     *
-     * @example: A key combination for when shift and A have been pressed, but not released:
-     *
-     * {
-     *   shift: [ [true,false,false], [true,true,false] ],
-     *   A: [ [true,true,false], [true,true,false] ]
-     * }
-     *
-     * List of most recent key combinations seen by the KeyEventManager
-     * @type {KeyCombinationRecord[]}
-     */
     if (!this.keyCombinationHistory || this.keyCombinationHistory.length < 1) {
       this.keyCombinationHistory = [];
     } else {
@@ -207,6 +182,20 @@ class AbstractKeyEventStrategy {
     }
   }
 
+  /********************************************************************************
+   * Registering key maps and handlers
+   ********************************************************************************/
+
+  /**
+   * Registers the hotkeys defined by a HotKeys component
+   * @param {ComponentIndex} componentIndex - Index of the component
+   * @param {KeyMap} actionNameToKeyMap - Definition of actions and key maps defined
+   *        in the HotKeys component
+   * @param {HandlersMap} actionNameToHandlersMap - Map of ActionNames to handlers
+   *        defined in the HotKeys component
+   * @param {Object} options - Hash of options that configure how the key map is built.
+   * @private
+   */
   _addComponentToList(componentIndex, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
     const componentOptions = this._buildComponentOptions(
       componentIndex,
@@ -217,6 +206,174 @@ class AbstractKeyEventStrategy {
 
     this.componentList.push(componentOptions);
   }
+
+  /**
+   * Object containing a component's defined key maps and handlers
+   * @typedef {Object} ComponentOptions
+   * @property {ActionDictionary} actions - Dictionary of actions the component
+   *          has defined in its keymap
+   * @property {HandlersMap} handlers - Dictionary of handler functions the
+   *          component has defined
+   * @property {ComponentIndex} componentIndex - Index of the component
+   */
+
+  /**
+   * Builds the internal representation that described the options passed to a HotKeys
+   * component
+   * @param {ComponentIndex} componentIndex - Index of the component
+   * @param {KeyMap} actionNameToKeyMap - Definition of actions and key maps defined
+   *        in the HotKeys component
+   * @param {HandlersMap} actionNameToHandlersMap - Map of ActionNames to handlers
+   *        defined in the HotKeys component
+   * @param {Object} options - Hash of options that configure how the key map is built.
+   * @param {String} options.defaultKeyEvent - The default key event to use for any
+   *        action that does not explicitly define one.
+   * @returns {ComponentOptions} Options for the specified component
+   * @private
+   */
+  _buildComponentOptions(componentIndex, actionNameToKeyMap, actionNameToHandlersMap, options) {
+    const { keyMap: hardSequenceKeyMap, handlers: includingHardSequenceHandlers } =
+      this._applyHardSequences(actionNameToKeyMap, actionNameToHandlersMap);
+
+    return {
+      actions: this._buildActionDictionary(
+        {
+          ...actionNameToKeyMap,
+          ...hardSequenceKeyMap
+        },
+        options,
+        componentIndex
+      ),
+      handlers: includingHardSequenceHandlers,
+      componentIndex,
+      options
+    };
+  }
+
+  /**
+   * Applies hard sequences (handlers attached to actions with names that are valid
+   * KeySequenceStrings) that implicitly define a corresponding action name.
+   * @param {KeyMap} actionNameToKeyMap - KeyMap specified by HotKeys component
+   * @param {HandlersMap} actionNameToHandlersMap - HandlersMap specified by HotKeys
+   *        component
+   * @returns {{keyMap: {}, handlers: {}}} Object containing keymap and handlers map
+   *        with the hard sequence actions applied
+   * @private
+   */
+  _applyHardSequences(actionNameToKeyMap, actionNameToHandlersMap) {
+    return Object.keys(actionNameToHandlersMap).reduce((memo, actionNameOrKeyExpression) => {
+      const actionNameIsInKeyMap = !!actionNameToKeyMap[actionNameOrKeyExpression];
+
+      const handler = actionNameToHandlersMap[actionNameOrKeyExpression];
+
+      if (!actionNameIsInKeyMap && KeyCombinationSerializer.isValidKeySerialization(actionNameOrKeyExpression)) {
+        memo.keyMap[actionNameOrKeyExpression] = actionNameOrKeyExpression;
+      }
+
+      memo.handlers[actionNameOrKeyExpression] = handler;
+
+      return memo;
+    }, { keyMap: {}, handlers: {}});
+  }
+
+  /**
+   * Object containing all the information required to match a key event to an action
+   * @typedef {Object} ActionConfiguration
+   * @property {KeyCombinationString} id - String description of keys involved in the
+   *          final key combination in the sequence
+   * @property {ActionName} actionName - Name of the action associated with the key map
+   * @property {NormalizedKeySequenceId} prefix - String describing sequence of key
+   *          combinations involved key map, before the final key combination
+   * @property {Number} sequenceLength - Number of combinations involved in the
+   *           sequence
+   * @property {Number} size - Number of keys involved in the combination
+   * @property {Object.<KeyName, Boolean>} keyDictionary - Dictionary of key names involved
+   *           in the key combination
+   * @property {EventBitmapIndex} eventBitmapIndex - Bitmap index for key event that
+   *          the matcher should match on
+   */
+
+  /**
+   * A mapping between ActionNames and FullKeyEventOptions
+   * @typedef {Object<ActionName,ActionConfiguration>} ActionDictionary
+   */
+
+  /**
+   * Returns a mapping between ActionNames and FullKeyEventOptions
+   * @param {ActionKeyMap} actionNameToKeyMap - Mapping of ActionNames to key sequences.
+   * @param {Object} options - Hash of options that configure how the key map is built.
+   * @param {String} options.defaultKeyEvent - The default key event to use for any
+   *        action that does not explicitly define one.
+   * @param {ComponentIndex} componentIndex Index of the component the matcher belongs to
+   * @return {ActionDictionary} Map from ActionNames to FullKeyEventOptions
+   * @private
+   */
+  _buildActionDictionary(actionNameToKeyMap, options, componentIndex) {
+    return Object.keys(actionNameToKeyMap).reduce((keyMapMemo, actionName) => {
+      const keyMapOptions = arrayFrom(actionNameToKeyMap[actionName]);
+
+      keyMapOptions.forEach((keyMapOption) => {
+        const { keySequence, eventBitmapIndex } = function(){
+          if (isObject(keyMapOption)) {
+            const { sequence, action } = keyMapOption;
+
+            return {
+              keySequence: sequence,
+              eventBitmapIndex: isUndefined(action) ? KeyEventBitmapIndex[options.defaultKeyEvent] : KeyEventBitmapIndex[action]
+            };
+          } else {
+            return {
+              keySequence: keyMapOption,
+              eventBitmapIndex: KeyEventBitmapIndex[options.defaultKeyEvent]
+            }
+          }
+        }();
+
+        const { sequence, combination } = KeySequenceParser.parse(keySequence, { eventBitmapIndex });
+
+        if (sequence.size > this.longestSequence) {
+          this.longestSequence = sequence.size;
+          this.longestSequenceComponentIndex = componentIndex;
+        }
+
+        /**
+         * Record that there is at least one key sequence in the focus tree bound to
+         * the keyboard event
+         */
+        KeyEventBitmapManager.setBit(this.keyMapEventBitmap, eventBitmapIndex);
+
+        if (!keyMapMemo[actionName]) {
+          keyMapMemo[actionName] = [];
+        }
+
+        keyMapMemo[actionName].push({
+          prefix: sequence.prefix,
+          actionName,
+          sequenceLength: sequence.size,
+          ...combination,
+        });
+      });
+
+      return keyMapMemo;
+    }, {});
+  }
+
+  /********************************************************************************
+   * Recording key events
+   ********************************************************************************/
+
+  /**
+   * @typedef {Object.<String, KeyEventBitmap[]>} KeyCombinationRecord A dictionary of keys that
+   * have been pressed down at once. The keys of the map are the lowercase names of the
+   * keyboard keys. May contain 1 or more keyboard keys.
+   *
+   * @example: A key combination for when shift and A have been pressed, but not released:
+   *
+   * {
+   *   shift: [ [true,false,false], [true,true,false] ],
+   *   A: [ [true,true,false], [true,true,false] ]
+   * }
+   */
 
   /**
    * Returns the current key combination, i.e. the key combination that represents
@@ -322,6 +479,30 @@ class AbstractKeyEventStrategy {
     }, {});
   }
 
+  /********************************************************************************
+   * Matching and calling handlers
+   ********************************************************************************/
+
+  /**
+   * @typedef {Object} KeyCombinationObject Object containing description of a key
+   *          combination to compared against key events
+   * @extends BasicKeyCombination
+   * @property {ComponentIndex} componentIndex Id associated with the HotKeys component
+   *          that registered the key sequence
+   * @property {Number} size Number of key combinations in the key sequence
+   * @property {KeyEventBitmapIndex} eventBitmapIndex Index that matches key event type
+   * @property {ActionName} actionName Name of the action that should be triggered if a
+   *           keyboard event matching the combination and event type occur
+   */
+
+  /**
+   * @typedef {Object} KeyEventDescription Object containing key sequence and combination
+   *          descriptions for a particular HotKeys component
+   * @property {KeySequenceObject} sequences Map of key sequences
+   * @property {KeyCombinationObject} combinations Map of key combinations
+   * @property {KeyCombinationString[]} combinationsOrder Order of combinations from highest
+   *            priority to lowest
+   */
   _callMatchingHandlerClosestToEventTarget(event, keyName, eventBitmapIndex, componentIndex) {
     if (!this.keyMaps || !this.unmatchedHandlerStatus) {
       /**
@@ -526,7 +707,7 @@ class AbstractKeyEventStrategy {
        * Component doesn't define any matchers for the current key event
        */
 
-      this.logger.debug(`${this._logPrefix(componentIndex)} Doesn't define a handler for '${this._describeCurrentKeyCombination()}' ${this.constructor._describeKeyEvent(eventBitmapIndex)}.`);
+      this.logger.debug(`${this._logPrefix(componentIndex)} Doesn't define a handler for '${this._describeCurrentKeyCombination()}' ${describeKeyEvent(eventBitmapIndex)}.`);
 
       return;
     }
@@ -589,7 +770,7 @@ class AbstractKeyEventStrategy {
       sequenceLengthCounter--;
     }
 
-    const eventName = this.constructor._describeKeyEvent(eventBitmapIndex);
+    const eventName = describeKeyEvent(eventBitmapIndex);
     this.logger.debug(`${this._logPrefix(componentIndex)} No matching actions found for '${this._describeCurrentKeyCombination()}' ${eventName}.`);
   }
 
@@ -674,14 +855,6 @@ class AbstractKeyEventStrategy {
     return combinationMatchesKeysPressed && keyCompletesCombination;
   }
 
-  _keyIsCurrentlyTriggeringEvent(keyState, eventBitmapIndex) {
-    return keyState[KeyEventSequenceIndex.current][eventBitmapIndex];
-  }
-
-  _keyAlreadyTriggeredEvent(keyState, eventBitmapIndex) {
-    return keyState[KeyEventSequenceIndex.previous][eventBitmapIndex];
-  }
-
   _keyNameAsItAppearsInKeyboardState(keyName) {
     const keyboardState = this._getCurrentKeyCombination();
 
@@ -690,6 +863,15 @@ class AbstractKeyEventStrategy {
     } else {
       return this._tryMatchWithKeyAliases(keyboardState, keyName);
     }
+  }
+
+
+  _keyIsCurrentlyTriggeringEvent(keyState, eventBitmapIndex) {
+    return keyState[KeyEventSequenceIndex.current][eventBitmapIndex];
+  }
+
+  _keyAlreadyTriggeredEvent(keyState, eventBitmapIndex) {
+    return keyState[KeyEventSequenceIndex.previous][eventBitmapIndex];
   }
 
   _tryMatchWithKeyAliases(keyState, candidateKeyName) {
@@ -715,108 +897,9 @@ class AbstractKeyEventStrategy {
     return candidateKeyNames.find((keyName) => keyState.keys[keyName]);
   }
 
-  _buildComponentOptions(componentIndex, actionNameToKeyMap, actionNameToHandlersMap, options) {
-    const { keyMap: hardSequenceKeyMap, handlers } =
-      this._applyHardSequences(actionNameToKeyMap, actionNameToHandlersMap);
-
-    return {
-      actions: this._buildKeyMatcherMap(
-        {
-          ...actionNameToKeyMap,
-          ...hardSequenceKeyMap
-        },
-        options,
-        componentIndex
-      ),
-      handlers,
-      componentIndex,
-      options
-    };
-  }
-
-  _applyHardSequences(actionNameToKeyMap, actionNameToHandlersMap) {
-    return Object.keys(actionNameToHandlersMap).reduce((memo, actionNameOrKeyExpression) => {
-      const actionNameIsInKeyMap = !!actionNameToKeyMap[actionNameOrKeyExpression];
-
-      const handler = actionNameToHandlersMap[actionNameOrKeyExpression];
-
-      if (!actionNameIsInKeyMap && KeyCombinationSerializer.isValidKeySerialization(actionNameOrKeyExpression)) {
-        memo.keyMap[actionNameOrKeyExpression] = actionNameOrKeyExpression;
-      }
-
-      memo.handlers[actionNameOrKeyExpression] = handler;
-
-      return memo;
-    }, { keyMap: {}, handlers: {}});
-  }
-
-  /**
-   * @typedef {Object} KeyExpressionObject Object describing a key event
-   * @property {KeySequenceString|KeyCombinationString|KeySequenceString[]|KeyCombinationString[]} sequence
-   * @property {EventType} action
-   */
-
-  /**
-   * Converts a ActionKeyMap to a KeyExpressionObject and saves it so it can later be
-   * recalled and matched against key events
-   * @param {ActionKeyMap} actionNameToKeyMap Mapping of ActionNames to key sequences
-   * @param {Object<String, any>} options Hash of options that configure how the key
-   *        map is built.
-   * @param {String} options.defaultKeyEvent The default key event to use for any action
-   *        that does not explicitly define one.
-   * @param {ComponentIndex} componentIndex Index of the component the matcher belongs to
-   * @return {KeyEventMatcher}
-   * @private
-   */
-  _buildKeyMatcherMap(actionNameToKeyMap, options, componentIndex) {
-    return Object.keys(actionNameToKeyMap).reduce((keyMapMemo, actionName) => {
-      const keyMapOptions = arrayFrom(actionNameToKeyMap[actionName]);
-
-      keyMapOptions.forEach((keyMapOption) => {
-        const { keySequence, eventBitmapIndex } = function(){
-          if (isObject(keyMapOption)) {
-            const { sequence, action } = keyMapOption;
-
-            return {
-              keySequence: sequence,
-              eventBitmapIndex: isUndefined(action) ? KeyEventBitmapIndex[options.defaultKeyEvent] : KeyEventBitmapIndex[action]
-            };
-          } else {
-            return {
-              keySequence: keyMapOption,
-              eventBitmapIndex: KeyEventBitmapIndex[options.defaultKeyEvent]
-            }
-          }
-        }();
-
-        const { sequence, combination } = KeySequenceParser.parse(keySequence, { eventBitmapIndex });
-
-        if (sequence.size > this.longestSequence) {
-          this.longestSequence = sequence.size;
-          this.longestSequenceComponentIndex = componentIndex;
-        }
-
-        /**
-         * Record that there is at least one key sequence in the focus tree bound to
-         * the keyboard event
-         */
-        KeyEventBitmapManager.setBit(this.keyMapEventBitmap, eventBitmapIndex);
-
-        if (!keyMapMemo[actionName]) {
-          keyMapMemo[actionName] = [];
-        }
-
-        keyMapMemo[actionName].push({
-          prefix: sequence.prefix,
-          actionName,
-          sequenceLength: sequence.size,
-          ...combination,
-        });
-      });
-
-      return keyMapMemo;
-    }, {});
-  }
+  /********************************************************************************
+   * Logging
+   ********************************************************************************/
 
   _printComponent(component) {
     return JSON.stringify(
