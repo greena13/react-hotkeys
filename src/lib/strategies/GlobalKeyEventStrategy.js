@@ -11,6 +11,7 @@ import Logger from '../Logger';
 import removeAtIndex from '../../utils/array/removeAtIndex';
 import isUndefined from '../../utils/isUndefined';
 import getEventKey from '../../vendor/react-dom/getEventKey';
+import printComponent from '../../helpers/logging/printComponent';
 
 class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   /********************************************************************************
@@ -33,7 +34,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * @type {number}
      */
 
-    this.componentIndex = -1;
+    this.componentId = -1;
     this.keyEventManager = keyEventManager;
     this.eventOptions = {};
   }
@@ -50,7 +51,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       [KeyEventBitmapIndex.keyup]: 0
     };
 
-    this.componentIndexDict = {};
+    this.componentIdDict = {};
   }
 
   /********************************************************************************
@@ -60,10 +61,10 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   addHotKeys(actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
     this.eventOptions = eventOptions;
 
-    this.componentIndex += 1;
+    this.componentId += 1;
 
     this._addComponentToList(
-      this.componentIndex,
+      this.componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options
@@ -72,38 +73,38 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this._updateDocumentHandlers();
 
     this.logger.debug(
-      this._logPrefix(this.componentIndex, {eventId: false}),
+      this._logPrefix(this.componentId, {eventId: false}),
       `Mounted.`,
     );
 
     this.logger.verbose(
-      this._logPrefix(this.componentIndex, {eventId: false}),
+      this._logPrefix(this.componentId, {eventId: false}),
       'Component options: \n',
-      this._printComponent(this._getComponent(this.componentIndex))
+      printComponent(this._getComponent(this.componentId))
     );
 
-    return this.componentIndex;
+    return this.componentId;
   }
 
-  _addComponentToList(componentIndex, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
+  _addComponentToList(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
     super._addComponentToList(
-      componentIndex,
+      componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options
     );
 
-    this._setComponentPosition(componentIndex, this.componentList.length - 1);
+    this._setComponentPosition(componentId, this.componentList.length - 1);
   }
 
-  _setComponentPosition(componentIndex, position) {
-    this.componentIndexDict[componentIndex] = position;
+  _setComponentPosition(componentId, position) {
+    this.componentIdDict[componentId] = position;
   }
 
-  updateHotKeys(componentIndex, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
+  updateHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
     this.eventOptions = eventOptions;
 
-    const componentPosition = this._getComponentPosition(componentIndex);
+    const componentPosition = this._getComponentPosition(componentId);
 
     /**
      * Manually update the registered key map state, usually reset using
@@ -111,13 +112,13 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      */
 
     this.componentList[componentPosition] = this._buildComponentOptions(
-      componentIndex,
+      componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options
     );
 
-    this._updateLongestKeySequenceIfNecessary(componentIndex);
+    this._updateLongestKeySequenceIfNecessary(componentId);
 
     /**
      * Reset strategy state specific to the global strategy
@@ -131,20 +132,20 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this._resetHandlerResolutionState();
 
     this.logger.debug(
-      this._logPrefix(this.componentIndex, {eventId: false}),
-      `Global component ${componentIndex} updated.`,
+      this._logPrefix(this.componentId, {eventId: false}),
+      `Global component ${componentId} updated.`,
     );
 
     this.logger.verbose(
-      this._logPrefix(this.componentIndex, {eventId: false}),
+      this._logPrefix(this.componentId, {eventId: false}),
       'Component options: \n',
-      this._printComponent(this._getComponent(componentIndex))
+      printComponent(this._getComponent(componentId))
     );
   }
 
-  removeHotKeys(componentIndex) {
+  removeHotKeys(componentId) {
     const [{ keyMapEventBitmap }, componentPosition ] =
-      this._getComponentAndPosition(componentIndex);
+      this._getComponentAndPosition(componentId);
 
     /**
      * Manually update the registered key map state, usually reset using
@@ -152,7 +153,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      */
     this.componentList = removeAtIndex(this.componentList, componentPosition);
 
-    this._updateLongestKeySequenceIfNecessary(componentIndex);
+    this._updateLongestKeySequenceIfNecessary(componentId);
 
     /**
      * Reset strategy state specific to the global strategy
@@ -170,13 +171,13 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this._resetHandlerResolutionState();
 
     this.logger.debug(
-      this._logPrefix(this.componentIndex, {eventId: false}),
-      `Unmounted global component ${componentIndex}`
+      this._logPrefix(this.componentId, {eventId: false}),
+      `Unmounted global component ${componentId}`
     );
   }
 
-  _updateLongestKeySequenceIfNecessary(componentIndex) {
-    if (componentIndex === this.longestSequenceComponentIndex) {
+  _updateLongestKeySequenceIfNecessary(componentId) {
+    if (componentId === this.longestSequenceComponentIndex) {
       this.longestSequence = 1;
 
       this.componentList.forEach(({longestSequence}) => {
@@ -191,7 +192,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     let counter = options.startAt;
 
     while(counter < this.componentList.length) {
-      this._setComponentPosition(this.componentList[counter].componentIndex, counter);
+      this._setComponentPosition(this.componentList[counter].componentId, counter);
     }
   }
 
@@ -205,7 +206,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         };
 
         this.logger.debug(
-          this._logPrefix(this.componentIndex, {eventId: false}),
+          this._logPrefix(this.componentId, {eventId: false}),
           `Bound handler handleGlobal${capitalize(eventName)}() to document.on${eventName}()`
         );
       }
@@ -218,7 +219,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         delete document[`on${eventName}`];
 
         this.logger.debug(
-          this._logPrefix(this.componentIndex, {eventId: false}),
+          this._logPrefix(this.componentId, {eventId: false}),
           `Removed handler handleGlobal${capitalize(eventName)}() from document.on${eventName}()`
         );
       }
@@ -412,17 +413,17 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     }
   }
 
-  _getComponentPosition(componentIndex){
-    return this.componentIndexDict[componentIndex];
+  _getComponentPosition(componentId){
+    return this.componentIdDict[componentId];
   }
 
-  _getComponent(componentIndex){
-    const componentPosition = this._getComponentPosition(componentIndex);
+  _getComponent(componentId){
+    const componentPosition = this._getComponentPosition(componentId);
     return this.componentList[componentPosition];
   }
 
-  _getComponentAndPosition(componentIndex){
-    const componentPosition = this._getComponentPosition(componentIndex);
+  _getComponentAndPosition(componentId){
+    const componentPosition = this._getComponentPosition(componentId);
     return [ this.componentList[componentPosition], componentPosition ];
   }
 
@@ -462,12 +463,12 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _callMatchingHandlerClosestToEventTarget(event, keyName, eventBitmapIndex) {
-    for(let componentIndex = 0; componentIndex < this.componentList.length; componentIndex++) {
+    for(let componentId = 0; componentId < this.componentList.length; componentId++) {
       const matchFound = super._callMatchingHandlerClosestToEventTarget(
         event,
         keyName,
         eventBitmapIndex,
-        componentIndex
+        componentId
       );
 
       if (matchFound) {
@@ -484,7 +485,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * Logging
    ********************************************************************************/
 
-  _logPrefix(componentIndex, options = {}) {
+  _logPrefix(componentId, options = {}) {
     const eventIcons = Logger.eventIcons;
     const componentIcons = Logger.componentIcons;
 
@@ -494,10 +495,10 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       base = `${base}-E${KeyEventCounter.getId()}${eventIcons[KeyEventCounter.getId() % eventIcons.length]}`
     }
 
-    if (isUndefined(componentIndex)) {
+    if (isUndefined(componentId)) {
       return `${base}):`
     } else {
-      return `${base}-C${componentIndex}${componentIcons[componentIndex % componentIcons.length]}):`;
+      return `${base}-C${componentId}${componentIcons[componentId % componentIcons.length]}):`;
     }
   }
 }

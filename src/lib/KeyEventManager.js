@@ -51,11 +51,11 @@ class KeyEventManager {
 
   /**
    * Registers the actions and handlers of a HotKeys component that has gained focus
-   * @param {ActionKeyMap} actionNameToKeyMap Map of actions to key expressions
-   * @param {EventHandlerMap} actionNameToHandlersMap Map of actions to handler functions
+   * @param {KeyMap} actionNameToKeyMap Map of actions to key expressions
+   * @param {HandlersMap} actionNameToHandlersMap Map of actions to handler functions
    * @param {Object} options Hash of options that configure how the actions
    *        and handlers are associated and called.
-   * @returns {ComponentIndex} Unique component index to assign to the focused HotKeys
+   * @returns {ComponentID} Unique component index to assign to the focused HotKeys
    *         component and passed back when handling a key event
    */
   addHotKeys(actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
@@ -66,10 +66,10 @@ class KeyEventManager {
     );
   }
 
-  updateHotKeys(focusTreeId, componentIndex, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
+  updateHotKeys(focusTreeId, componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
     return this.focusOnlyEventStrategy.updateHotKeys(
       focusTreeId,
-      componentIndex,
+      componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options
@@ -79,35 +79,35 @@ class KeyEventManager {
   /**
    * Handles when a component loses focus by resetting the internal state, ready to
    * receive the next tree of focused HotKeys components
-   * @param {Number} focusTreeId Id of focus tree component thinks it's apart of
-   * @param {ComponentIndex} componentIndex Index of component that is blurring
+   * @param {FocusTreeId} focusTreeId Id of focus tree component thinks it's apart of
+   * @param {ComponentID} componentId Index of component that is blurring
    * @returns {Boolean} Whether the component still has event propagation yet to handle
    */
-  removeHotKeys(focusTreeId, componentIndex){
+  removeHotKeys(focusTreeId, componentId){
     return this.focusOnlyEventStrategy.removeHotKeys(
-      focusTreeId, componentIndex
+      focusTreeId, componentId
     )
   }
 
-  handleKeydown(event, focusTreeId, componentIndex, options) {
+  handleKeydown(event, focusTreeId, componentId, options) {
     if (isFromFocusOnlyComponent(focusTreeId)) {
-      return this.focusOnlyEventStrategy.handleKeydown(event, focusTreeId, componentIndex, options);
+      return this.focusOnlyEventStrategy.handleKeydown(event, focusTreeId, componentId, options);
     }
 
     this._recordLastSeenEvent(event);
   }
 
-  handleKeypress(event, focusTreeId, componentIndex, options) {
+  handleKeypress(event, focusTreeId, componentId, options) {
     if (isFromFocusOnlyComponent(focusTreeId)) {
-      return this.focusOnlyEventStrategy.handleKeypress(event, focusTreeId, componentIndex, options);
+      return this.focusOnlyEventStrategy.handleKeypress(event, focusTreeId, componentId, options);
     }
 
     this._recordLastSeenEvent(event);
   }
 
-  handleKeyup(event, focusTreeId, componentIndex, options) {
+  handleKeyup(event, focusTreeId, componentId, options) {
     if (isFromFocusOnlyComponent(focusTreeId)) {
-      return this.focusOnlyEventStrategy.handleKeyup(event, focusTreeId, componentIndex, options);
+      return this.focusOnlyEventStrategy.handleKeyup(event, focusTreeId, componentId, options);
     }
 
     this._recordLastSeenEvent(event);
@@ -132,9 +132,9 @@ class KeyEventManager {
     );
   }
 
-  updateGlobalHotKeys(componentIndex, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
+  updateGlobalHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
     return this.globalEventStrategy.updateHotKeys(
-      componentIndex,
+      componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options,
@@ -142,8 +142,8 @@ class KeyEventManager {
     );
   }
 
-  removeGlobalHotKeys(componentIndex) {
-    return this.globalEventStrategy.removeHotKeys(componentIndex);
+  removeGlobalHotKeys(componentId) {
+    return this.globalEventStrategy.removeHotKeys(componentId);
   }
 
   handleGlobalKeydown(event) {

@@ -1,6 +1,6 @@
 /**
  * Returns the name of the event at a specified event bitmap index
- * @param {EventBitmapIndex} eventBitmapIndex
+ * @param {KeyEventBitmapIndex} eventBitmapIndex
  * @returns {KeyEventName} Name of the key event
  */
 function describeKeyEvent(eventBitmapIndex) {

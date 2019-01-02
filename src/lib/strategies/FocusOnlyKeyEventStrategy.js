@@ -7,16 +7,17 @@ import hasKeyPressEvent from '../../helpers/resolving-handlers/hasKeyPressEvent'
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 import Configuration from '../Configuration';
 import Logger from '../Logger';
+import printComponent from '../../helpers/logging/printComponent';
 
+/**
+ * Defines behaviour for dealing with key maps defined in focus-only HotKey components
+ * @class
+ */
 class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   /********************************************************************************
    * Init & Reset
    ********************************************************************************/
 
-  /**
-   * Creates a new KeyEventManager instance. It is expected that only a single instance
-   * will be used with a render tree.
-   */
   constructor(configuration = {}) {
     /**
      * Set state that DOES get cleared on each new focus tree
@@ -26,11 +27,36 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     /**
      * State that doesn't get cleared on each new focus tree
      */
+
+    /**
+     * Unique identifier given to each focus tree - when the focus in the browser
+     * changes, and a different tree of elements are focused, a new id is allocated
+     * @typedef {Number} FocusTreeId
+     */
+
+    /**
+     * Counter to keep track of what focus tree ID should be allocated next
+     * @type {FocusTreeId}
+     */
     this.focusTreeId = 0;
 
+    /**
+     * Record of the event currently bubbling up through the React application (and
+     * beyond).
+     */
     this.currentEvent = {
+      /**
+       * The name of the key the event belongs to
+       * @type {ReactKeyName}
+       */
       key: null,
+
+      /**
+       * The event bitmap index of the type of key event
+       * @type {KeyEventBitmapIndex}
+       */
       type: null,
+
       handled: false
     };
   }
@@ -47,7 +73,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      * Increase the unique ID associated with each unique focus tree
      * @type {number}
      */
-    this.componentIndex = 0;
+    this.componentId = 0;
 
     this.focusTreeId += 1;
 
@@ -69,19 +95,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     this.eventPropagationState = {
       /**
        * Index of the component last seen to be handling a key event
-       * @type {ComponentIndex}
+       * @type {ComponentID}
        */
       previousComponentIndex: 0,
-
-      /**
-       * The name of the key the event belongs to
-       */
-      key: null,
-
-      /**
-       * The type of key event
-       */
-      type: null,
 
       /**
        * Whether the keyboard event currently being handled has already matched a
@@ -103,43 +119,12 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    ********************************************************************************/
 
   /**
-   * @typedef {String} ActionName Unique identifier of an action that is used to match
-   *          against handlers when a matching keyboard event occurs
-   */
-
-  /**
-   * @typedef {Object.<KeySequenceString, KeyEventDescription>} KeyMap A mapping from key
-   * sequence ids to key event matchers
-   */
-
-
-  /**
-   * @typedef {KeySequenceString|KeyCombinationString|KeySequenceString[]|KeyCombinationString[]} KeyEventExpression
-   *          expression describing a keyboard event
-   */
-
-  /**
-   * @typedef {Object.<ActionName, KeyEventExpression>} ActionKeyMap Mapping of ActionNames
-   *          to KeyEventExpressions
-   */
-
-  /**
-   * @typedef {Function(KeyboardEvent)} EventHandler Handler function that is called
-   *          with the matching keyboard event
-   */
-
-  /**
-   * @typedef {Object<ActionName, EventHandler>} EventHandlerMap Mapping of ActionNames
-   *          to EventHandlers
-   */
-
-  /**
    * Registers the actions and handlers of a HotKeys component that has gained focus
-   * @param {ActionKeyMap} actionNameToKeyMap Map of actions to key expressions
-   * @param {EventHandlerMap} actionNameToHandlersMap Map of actions to handler functions
+   * @param {KeyMap} actionNameToKeyMap Map of actions to key expressions
+   * @param {HandlersMap} actionNameToHandlersMap Map of actions to handler functions
    * @param {Object} options Hash of options that configure how the actions
    *        and handlers are associated and called.
-   * @returns {ComponentIndex} Unique component index to assign to the focused HotKeys
+   * @returns {ComponentID} Unique component index to assign to the focused HotKeys
    *         component and passed back when handling a key event
    */
   addHotKeys(actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
@@ -148,65 +133,79 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this.resetOnNextFocus = false;
     }
 
-    this.componentIndex = this.componentList.length;
+    this.componentId = this.componentList.length;
 
     this._addComponentToList(
-      this.componentIndex,
+      this.componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options
     );
 
     this.logger.debug(
-      `${this._logPrefix(this.componentIndex)} Focused. \n`
+      `${this._logPrefix(this.componentId)} Focused. \n`
     );
 
     this.logger.verbose(
-      `${this._logPrefix(this.componentIndex)} Component options:\n`,
-      this._printComponent(this.componentList[this.componentIndex])
+      `${this._logPrefix(this.componentId)} Component options:\n`,
+      printComponent(this.componentList[this.componentId])
     );
 
-    return [ this.focusTreeId, this.componentIndex ];
+    return [ this.focusTreeId, this.componentId ];
   }
 
-  updateHotKeys(focusTreeId, componentIndex, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
-    if (focusTreeId !== this.focusTreeId || !this.componentList[componentIndex]) {
+  /**
+   * Handles when a HotKeys component that is in focus updates its props and changes
+   * either the keyMap or handlers prop value
+   * @param {FocusTreeId} focusTreeId - The ID of the focus tree the component is part of.
+   *        Used to identify (and ignore) stale updates.
+   * @param {ComponentID} componentId - The component index of the component to
+   *        update
+   * @param {KeyMap} actionNameToKeyMap - Map of key sequences to action names
+   * @param {HandlersMap} actionNameToHandlersMap - Map of action names to handler
+   *        functions
+   * @param {Object} options Hash of options that configure how the actions
+   *        and handlers are associated and called.
+   */
+  updateHotKeys(focusTreeId, componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
+    if (focusTreeId !== this.focusTreeId || !this.componentList[componentId]) {
       return;
     }
 
-    this.componentList[componentIndex] = this._buildComponentOptions(
-      componentIndex,
+    this.componentList[componentId] = this._buildComponentOptions(
+      componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options
     );
 
     this.logger.debug(
-      `${this._logPrefix(componentIndex, focusTreeId)} Received new props.`,
+      `${this._logPrefix(componentId, focusTreeId)} Received new props.`,
     );
 
     this.logger.verbose(
-      `${this._logPrefix(componentIndex)} Component options:\n`,
-      this._printComponent(this.componentList[componentIndex])
+      `${this._logPrefix(componentId)} Component options:\n`,
+      printComponent(this.componentList[componentId])
     );
   }
 
   /**
    * Handles when a component loses focus by resetting the internal state, ready to
    * receive the next tree of focused HotKeys components
-   * @param {Number} focusTreeId Id of focus tree component thinks it's apart of
-   * @param {ComponentIndex} componentIndex Index of component that is blurring
+   * @param {FocusTreeId} focusTreeId Id of focus tree component thinks it's
+   *        apart of
+   * @param {ComponentID} componentId Index of component that is blurring
    * @returns {Boolean} Whether the component still has event propagation yet to handle
    */
-  removeHotKeys(focusTreeId, componentIndex){
+  removeHotKeys(focusTreeId, componentId){
     if (!this.resetOnNextFocus) {
       this.resetOnNextFocus = true;
     }
 
-    const outstandingEventPropagation = (this.eventPropagationState.previousComponentIndex + 1) < componentIndex;
+    const outstandingEventPropagation = (this.eventPropagationState.previousComponentIndex + 1) < componentId;
 
     this.logger.debug(
-      `${this._logPrefix(componentIndex)}`,
+      `${this._logPrefix(componentId)}`,
       `Lost focus${outstandingEventPropagation ? ' (Key event has yet to propagate through it)' : '' }.`
     );
 
@@ -226,36 +225,35 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * render tree. The event is only registered the first time it is seen and results
    * of some calculations are cached. The event is matched against the handlers registered
    * at each component level, to ensure the proper handler declaration scoping.
-   * @param {KeyboardEvent} event Event containing the key name and state
-   * @param {Number} focusTreeId Id of focus tree component thinks it's apart of
-   * @param {ComponentIndex} componentIndex The index of the component that is currently handling
+   * @param {KeyboardEvent} event - Event containing the key name and state
+   * @param {FocusTreeId} focusTreeId - Id of focus tree component thinks it's apart of
+   * @param {ComponentID} componentId - The id of the component that is currently handling
    *        the keyboard event as it bubbles towards the document root.
-   * @param {Object} options Hash of options that configure how the event
-   *        is handled.
+   * @param {Object} options - Hash of options that configure how the event is handled.
    * @returns Whether the event was discarded because it was part of an old focus tree
    */
-  handleKeydown(event, focusTreeId, componentIndex, options) {
+  handleKeydown(event, focusTreeId, componentId, options) {
     const _key = normalizeKeyName(event.key);
 
     if (focusTreeId !== this.focusTreeId) {
       this.logger.debug(
-        `${this._logPrefix(componentIndex, focusTreeId)} Ignored '${_key}' keydown event because it had an old focus tree id: ${focusTreeId}.`
+        `${this._logPrefix(componentId, focusTreeId)} Ignored '${_key}' keydown event because it had an old focus tree id: ${focusTreeId}.`
       );
 
       return true;
     }
 
     if (this._alreadyEstablishedShouldIgnoreEvent()) {
-      this._updateEventPropagationHistory(componentIndex);
+      this._updateEventPropagationHistory(componentId);
 
       this.logger.debug(
-        `${this._logPrefix(componentIndex, focusTreeId)} Ignored '${_key}' keydown event because ignoreEventsFilter rejected it.`
+        `${this._logPrefix(componentId, focusTreeId)} Ignored '${_key}' keydown event because ignoreEventsFilter rejected it.`
       );
 
       return false;
     }
 
-    if (this._isNewKeyEvent(componentIndex)) {
+    if (this._isNewKeyEvent(componentId)) {
       this._setNewEventParameters(event, KeyEventBitmapIndex.keydown);
 
       /**
@@ -267,24 +265,24 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this._setIgnoreEventFlag(event, options);
 
       if (this._alreadyEstablishedShouldIgnoreEvent()) {
-        this._updateEventPropagationHistory(componentIndex);
+        this._updateEventPropagationHistory(componentId);
 
         this.logger.debug(
-          `${this._logPrefix(componentIndex, focusTreeId)} Ignored '${_key}' keydown event because ignoreEventsFilter rejected it.`
+          `${this._logPrefix(componentId, focusTreeId)} Ignored '${_key}' keydown event because ignoreEventsFilter rejected it.`
         );
 
         return false;
       }
 
       this.logger.debug(
-        `${this._logPrefix(componentIndex, focusTreeId)} New '${_key}' keydown event.`
+        `${this._logPrefix(componentId, focusTreeId)} New '${_key}' keydown event.`
       );
 
       const keyInCurrentCombination = !!this._getCurrentKeyCombination().keys[_key];
 
       if (keyInCurrentCombination || this.keyCombinationIncludesKeyUp) {
         this.logger.verbose(
-          `${this._logPrefix(componentIndex, focusTreeId)} Started a new combination with '${_key}'.`
+          `${this._logPrefix(componentId, focusTreeId)} Started a new combination with '${_key}'.`
         );
 
         this._startNewKeyCombination(_key, KeyEventBitmapIndex.keydown);
@@ -292,12 +290,12 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keydown);
 
         this.logger.verbose(
-          `${this._logPrefix(componentIndex, focusTreeId)} Added '${_key}' to current combination: ${this._getCurrentKeyCombination().ids[0]}.`
+          `${this._logPrefix(componentId, focusTreeId)} Added '${_key}' to current combination: ${this._getCurrentKeyCombination().ids[0]}.`
         );
       }
     }
 
-    this._callHandlerIfActionNotHandled(event, _key, KeyEventBitmapIndex.keydown, componentIndex, focusTreeId);
+    this._callHandlerIfActionNotHandled(event, _key, KeyEventBitmapIndex.keydown, componentId, focusTreeId);
 
     if (!hasKeyPressEvent(_key) && Configuration.option('simulateMissingKeyPressEvents')) {
       /**
@@ -306,28 +304,28 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
        * the last focus-only HotKeysComponent
        */
       this.keypressEventsToSimulate.push({
-        event, focusTreeId, componentIndex, options
+        event, focusTreeId, componentId, options
       });
     }
 
-    if (this._isFocusTreeRoot(componentIndex)) {
+    if (this._isFocusTreeRoot(componentId)) {
       /**
        * The keydown event is propagating through the last HotKeys component and
        * so we need to simulate any pending keypress events
        */
 
-      this.keypressEventsToSimulate.forEach(({ event, focusTreeId, componentIndex, options }) => {
+      this.keypressEventsToSimulate.forEach(({ event, focusTreeId, componentId, options }) => {
         this.logger.debug(
-          `${this._logPrefix(componentIndex, focusTreeId)} Simulating '${_key}' keypress event because '${_key}' doesn't natively have one.`
+          `${this._logPrefix(componentId, focusTreeId)} Simulating '${_key}' keypress event because '${_key}' doesn't natively have one.`
         );
 
-        this.handleKeypress(event, focusTreeId, componentIndex, options);
+        this.handleKeypress(event, focusTreeId, componentId, options);
       });
 
       this.keypressEventsToSimulate = [];
     }
 
-    this._updateEventPropagationHistory(componentIndex);
+    this._updateEventPropagationHistory(componentId);
 
     return false;
   }
@@ -341,35 +339,35 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * render tree. The event is only registered the first time it is seen and results
    * of some calculations are cached. The event is matched against the handlers registered
    * at each component level, to ensure the proper handler declaration scoping.
-   * @param {KeyboardEvent} event Event containing the key name and state
-   * @param {Number} focusTreeId Id of focus tree component thinks it's apart of
-   * @param {ComponentIndex} componentIndex The index of the component that is currently handling
+   * @param {KeyboardEvent} event - Event containing the key name and state
+   * @param {FocusTreeId} focusTreeId Id - of focus tree component thinks it's apart of
+   * @param {ComponentID} componentId - The index of the component that is currently handling
    *        the keyboard event as it bubbles towards the document root.
-   * @param {Object} options Hash of options that configure how the event
+   * @param {Object} options - Hash of options that configure how the event
    *        is handled.
    */
-  handleKeypress(event, focusTreeId, componentIndex, options) {
+  handleKeypress(event, focusTreeId, componentId, options) {
     const _key = normalizeKeyName(event.key);
 
     if (focusTreeId !== this.focusTreeId) {
       this.logger.debug(
-        `${this._logPrefix(componentIndex, focusTreeId)} Ignored '${_key}' keypress event because it had an old focus tree id: ${focusTreeId}.`
+        `${this._logPrefix(componentId, focusTreeId)} Ignored '${_key}' keypress event because it had an old focus tree id: ${focusTreeId}.`
       );
 
       return true;
     }
 
     if (this._alreadyEstablishedShouldIgnoreEvent()) {
-      this._updateEventPropagationHistory(componentIndex);
+      this._updateEventPropagationHistory(componentId);
 
       this.logger.debug(
-        `${this._logPrefix(componentIndex, focusTreeId)} Ignored '${_key}' keypress event because ignoreEventsFilter rejected it.`
+        `${this._logPrefix(componentId, focusTreeId)} Ignored '${_key}' keypress event because ignoreEventsFilter rejected it.`
       );
 
       return;
     }
 
-    if (this._isNewKeyEvent(componentIndex)) {
+    if (this._isNewKeyEvent(componentId)) {
       this._setNewEventParameters(event, KeyEventBitmapIndex.keypress);
 
       /**
@@ -381,17 +379,17 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this._setIgnoreEventFlag(event, options);
 
       if (this._alreadyEstablishedShouldIgnoreEvent()) {
-        this._updateEventPropagationHistory(componentIndex);
+        this._updateEventPropagationHistory(componentId);
 
         this.logger.debug(
-          `${this._logPrefix(componentIndex, focusTreeId)} Ignored '${_key}' keypress event because ignoreEventsFilter rejected it.`
+          `${this._logPrefix(componentId, focusTreeId)} Ignored '${_key}' keypress event because ignoreEventsFilter rejected it.`
         );
 
         return;
       }
 
       this.logger.debug(
-        `${this._logPrefix(componentIndex, focusTreeId)} New '${_key}' keypress event.`
+        `${this._logPrefix(componentId, focusTreeId)} New '${_key}' keypress event.`
       );
 
       /**
@@ -403,7 +401,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
       if (alreadySeenKeyInCurrentCombo) {
         this.logger.verbose(
-          `${this._logPrefix(componentIndex, focusTreeId)} Started a new combination with '${_key}'.`
+          `${this._logPrefix(componentId, focusTreeId)} Started a new combination with '${_key}'.`
         );
 
         this._startNewKeyCombination(_key, KeyEventBitmapIndex.keypress)
@@ -412,9 +410,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       }
     }
 
-    this._callHandlerIfActionNotHandled(event, _key, KeyEventBitmapIndex.keypress, componentIndex, focusTreeId);
+    this._callHandlerIfActionNotHandled(event, _key, KeyEventBitmapIndex.keypress, componentId, focusTreeId);
 
-    this._updateEventPropagationHistory(componentIndex);
+    this._updateEventPropagationHistory(componentId);
   }
 
   /**
@@ -427,36 +425,36 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * of some calculations are cached. The event is matched against the handlers registered
    * at each component level, to ensure the proper handler declaration scoping.
    * @param {KeyboardEvent} event Event containing the key name and state
-   * @param {Number} focusTreeId Id of focus tree component thinks it's apart of
-   * @param {ComponentIndex} componentIndex The index of the component that is currently handling
+   * @param {FocusTreeId} focusTreeId Id of focus tree component thinks it's apart of
+   * @param {ComponentID} componentId The index of the component that is currently handling
    *        the keyboard event as it bubbles towards the document root.
    * @param {Object} options Hash of options that configure how the event
    *        is handled.
    * @return {Number} Length of component list so calling HotKeys component can establish
    *        if it's the last one in the list, or not
    */
-  handleKeyup(event, focusTreeId, componentIndex, options) {
+  handleKeyup(event, focusTreeId, componentId, options) {
     const _key = normalizeKeyName(event.key);
 
     if (focusTreeId !== this.focusTreeId) {
       this.logger.debug(
-        `${this._logPrefix(componentIndex, focusTreeId)} Ignored '${_key}' keyup event because it had an old focus tree id: ${focusTreeId}.`
+        `${this._logPrefix(componentId, focusTreeId)} Ignored '${_key}' keyup event because it had an old focus tree id: ${focusTreeId}.`
       );
 
       return true;
     }
 
     if (this._alreadyEstablishedShouldIgnoreEvent()) {
-      this._updateEventPropagationHistory(componentIndex);
+      this._updateEventPropagationHistory(componentId);
 
       this.logger.debug(
-        `${this._logPrefix(componentIndex, focusTreeId)} Ignored '${_key}' keyup event because ignoreEventsFilter rejected it.`
+        `${this._logPrefix(componentId, focusTreeId)} Ignored '${_key}' keyup event because ignoreEventsFilter rejected it.`
       );
 
       return;
     }
 
-    if (this._isNewKeyEvent(componentIndex)) {
+    if (this._isNewKeyEvent(componentId)) {
       this._setNewEventParameters(event, KeyEventBitmapIndex.keyup);
 
       /**
@@ -468,17 +466,17 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this._setIgnoreEventFlag(event, options);
 
       if (this._alreadyEstablishedShouldIgnoreEvent()) {
-        this._updateEventPropagationHistory(componentIndex);
+        this._updateEventPropagationHistory(componentId);
 
         this.logger.debug(
-          `${this._logPrefix(componentIndex, focusTreeId)} Ignored '${_key}' keyup event because ignoreEventsFilter rejected it.`
+          `${this._logPrefix(componentId, focusTreeId)} Ignored '${_key}' keyup event because ignoreEventsFilter rejected it.`
         );
 
         return;
       }
 
       this.logger.debug(
-        `${this._logPrefix(componentIndex, focusTreeId)} New '${_key}' keyup event.`
+        `${this._logPrefix(componentId, focusTreeId)} New '${_key}' keyup event.`
       );
 
       const keyCombination = this._getCurrentKeyCombination().keys[_key];
@@ -487,7 +485,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
       if (alreadySeenKeyEventInCombo) {
         this.logger.verbose(
-          `${this._logPrefix(componentIndex, focusTreeId)} Started a new combination with '${_key}'.`
+          `${this._logPrefix(componentId, focusTreeId)} Started a new combination with '${_key}'.`
         );
 
         this._startNewKeyCombination(_key, KeyEventBitmapIndex.keyup);
@@ -498,9 +496,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       }
     }
 
-    this._callHandlerIfActionNotHandled(event, _key, KeyEventBitmapIndex.keyup, componentIndex, focusTreeId);
+    this._callHandlerIfActionNotHandled(event, _key, KeyEventBitmapIndex.keyup, componentId, focusTreeId);
 
-    this._updateEventPropagationHistory(componentIndex);
+    this._updateEventPropagationHistory(componentId);
   }
 
   /**
@@ -517,20 +515,20 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   /**
    * Returns whether this is a previously seen event bubbling up to render tree towards
    * the document root, or whether it is a new event that has not previously been seen.
-   * @param {ComponentIndex} componentIndex Index of the component currently handling
+   * @param {ComponentID} componentId Index of the component currently handling
    *        the keyboard event
    * @return {Boolean} If the event has been seen before
    * @private
    */
-  _isNewKeyEvent(componentIndex) {
-    return this.eventPropagationState.previousComponentIndex >= componentIndex;
+  _isNewKeyEvent(componentId) {
+    return this.eventPropagationState.previousComponentIndex >= componentId;
   }
 
-  _updateEventPropagationHistory(componentIndex) {
-    if (this._isFocusTreeRoot(componentIndex)) {
+  _updateEventPropagationHistory(componentId) {
+    if (this._isFocusTreeRoot(componentId)) {
       this._clearEventPropagationState();
     } else {
-      this.eventPropagationState.previousComponentIndex = componentIndex;
+      this.eventPropagationState.previousComponentIndex = componentId;
     }
   }
 
@@ -549,8 +547,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     this.eventPropagationState.ignoreEvent = options.ignoreEventsCondition(event);
   }
 
-  _isFocusTreeRoot(componentIndex) {
-    return componentIndex >= this.componentList.length - 1;
+  _isFocusTreeRoot(componentId) {
+    return componentId >= this.componentList.length - 1;
   }
 
   _setNewEventParameters(event, type) {
@@ -573,23 +571,23 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {KeyboardEvent} event Keyboard event object to be passed to the handler
    * @param {NormalizedKeyName} keyName Normalized key name
    * @param {KeyEventBitmapIndex} eventBitmapIndex The bitmap index of the current key event type
-   * @param {Number} focusTreeId Id of focus tree component thinks it's apart of
-   * @param {ComponentIndex} componentIndex Index of the component that is currently handling
+   * @param {FocusTreeId} focusTreeId Id of focus tree component thinks it's apart of
+   * @param {ComponentID} componentId Index of the component that is currently handling
    *        the keyboard event
    * @private
    */
-  _callHandlerIfActionNotHandled(event, keyName, eventBitmapIndex, componentIndex, focusTreeId) {
+  _callHandlerIfActionNotHandled(event, keyName, eventBitmapIndex, componentId, focusTreeId) {
     const eventName = describeKeyEvent(eventBitmapIndex);
     const combinationName = this._describeCurrentKeyCombination();
 
     if (this.keyMapEventBitmap[eventBitmapIndex]) {
       if (this.eventPropagationState.actionHandled) {
         this.logger.debug(
-          `${this._logPrefix(componentIndex, focusTreeId)} Ignored '${combinationName}' ${eventName} as it has already been handled.`
+          `${this._logPrefix(componentId, focusTreeId)} Ignored '${combinationName}' ${eventName} as it has already been handled.`
         );
       } else {
         this.logger.verbose(
-          `${this._logPrefix(componentIndex, focusTreeId)} Attempting to find action matching '${combinationName}' ${eventName} . . .`
+          `${this._logPrefix(componentId, focusTreeId)} Attempting to find action matching '${combinationName}' ${eventName} . . .`
         );
 
         const handlerWasCalled =
@@ -597,7 +595,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
             event,
             keyName,
             eventBitmapIndex,
-            componentIndex
+            componentId
           );
 
         if (handlerWasCalled) {
@@ -607,7 +605,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       }
     } else {
       this.logger.verbose(
-        `${this._logPrefix(componentIndex, focusTreeId)} Ignored '${combinationName}' ${eventName} because it doesn't have any ${eventName} handlers.`
+        `${this._logPrefix(componentId, focusTreeId)} Ignored '${combinationName}' ${eventName} because it doesn't have any ${eventName} handlers.`
       );
     }
   }
@@ -616,12 +614,12 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * Logging
    ********************************************************************************/
 
-  _logPrefix(componentIndex, focusTreeId = this.focusTreeId) {
+  _logPrefix(componentId, focusTreeId = this.focusTreeId) {
     const logIcons = Logger.logIcons;
     const eventIcons = Logger.eventIcons;
     const componentIcons = Logger.componentIcons;
 
-    return `HotKeys (FT${focusTreeId}${logIcons[focusTreeId % logIcons.length]}-E${KeyEventCounter.getId()}${eventIcons[KeyEventCounter.getId() % eventIcons.length]}-C${componentIndex}${componentIcons[componentIndex % componentIcons.length]}):`
+    return `HotKeys (FT${focusTreeId}${logIcons[focusTreeId % logIcons.length]}-E${KeyEventCounter.getId()}${eventIcons[KeyEventCounter.getId() % eventIcons.length]}-C${componentId}${componentIcons[componentId % componentIcons.length]}):`
   }
 
 }

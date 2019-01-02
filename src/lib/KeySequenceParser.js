@@ -29,7 +29,7 @@ class KeySequenceParser {
    * @property {Number} size - Number of keys involved in the combination
    * @property {Object.<KeyName, Boolean>} keyDictionary - Dictionary of key names involved
    *           in the key combination
-   * @property {EventBitmapIndex} eventBitmapIndex - Bitmap index for key event that
+   * @property {KeyEventBitmapIndex} eventBitmapIndex - Bitmap index for key event that
    *          the matcher should match on
    */
 
@@ -56,7 +56,7 @@ class KeySequenceParser {
    *          to compared against key events
    * @property {KeySequenceString} id Id describing key sequence used for matching against
    *            key events
-   * @property {ComponentIndex} componentIndex Id associated with the HotKeys component
+   * @property {ComponentID} componentId Id associated with the HotKeys component
    *          that registered the key sequence
    * @property {BasicKeyCombination[]} sequence A list of key combinations involved in
    *            the sequence
@@ -82,7 +82,7 @@ class KeySequenceParser {
    *        parse
    * @param {Object} options Configuration object describing how the KeySequenceString
    *        should be parsed.
-   * @param {EventBitmapIndex} options.eventBitmapIndex Event bitmap index indicating
+   * @param {KeyEventBitmapIndex} options.eventBitmapIndex Event bitmap index indicating
    *        what key event the sequence should match
    * @param {Boolean} options.ensureValidKeys Whether to throw an exception if an invalid
    *        key name is found in the key combination string.

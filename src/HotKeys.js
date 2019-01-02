@@ -186,12 +186,12 @@ class HotKeys extends Component {
     );
   }
 
-  _focusTreeIdsPush(componentIndex) {
+  _focusTreeIdsPush(componentId) {
     if (!this._focusTreeIds) {
       this._focusTreeIds = [];
     }
 
-    this._focusTreeIds.push(componentIndex);
+    this._focusTreeIds.push(componentId);
   }
 
   _focusTreeIdsShift() {
@@ -247,7 +247,7 @@ class HotKeys extends Component {
            */
           this.constructor.getKeyEventManager().updateHotKeys(
             this._getFocusTreeId(),
-            this._componentIndex,
+            this._componentId,
             nextProps.keyMap,
             nextProps.handlers,
             this._getComponentOptions()
@@ -289,14 +289,14 @@ class HotKeys extends Component {
     }
 
     if (this._isFocusOnlyComponent()) {
-      const [ focusTreeId, componentIndex ] =
+      const [ focusTreeId, componentId ] =
         this.constructor.getKeyEventManager().addHotKeys(
           this.props.keyMap,
           this.props.handlers,
           this._getComponentOptions()
         );
 
-      this._componentIndex = componentIndex;
+      this._componentId = componentId;
       this._focusTreeIdsPush(focusTreeId);
 
       this._focused = true;
@@ -314,7 +314,7 @@ class HotKeys extends Component {
     }
 
     if (this._isFocusOnlyComponent()) {
-      const retainCurrentFocusTreeId = this.constructor.getKeyEventManager().removeHotKeys(this._getFocusTreeId(), this._componentIndex);
+      const retainCurrentFocusTreeId = this.constructor.getKeyEventManager().removeHotKeys(this._getFocusTreeId(), this._componentId);
 
       if (!retainCurrentFocusTreeId) {
         this._focusTreeIdsShift();
@@ -334,7 +334,7 @@ class HotKeys extends Component {
       this.constructor.getKeyEventManager().handleKeydown(
         event,
         this._getFocusTreeId(),
-        this._componentIndex,
+        this._componentId,
         this._getEventOptions()
       );
 
@@ -353,7 +353,7 @@ class HotKeys extends Component {
       this.constructor.getKeyEventManager().handleKeypress(
         event,
         this._getFocusTreeId(),
-        this._componentIndex,
+        this._componentId,
         this._getEventOptions()
       );
 
@@ -372,7 +372,7 @@ class HotKeys extends Component {
       this.constructor.getKeyEventManager().handleKeyup(
         event,
         this._getFocusTreeId(),
-        this._componentIndex,
+        this._componentId,
         this._getEventOptions()
       );
 
