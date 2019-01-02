@@ -52,22 +52,27 @@ class App extends React.Component {
     const className = konamiTime ? 'viewport konamiTime' : 'viewport';
 
     return (
-      <div className="app">
-        <div className="tips">
-          <ul>
-            <li>Select a node and move it with your arrow keys</li>
-            <li>Expand or contract a node with `alt+up` or `alt+down` respectively</li>
-            <li>Delete a node with `delete` or `backspace`</li>
-            <li>How about the konami code? `up up down down left right left right b a enter`</li>
-            <li>Want to get started? <a href="https://github.com/greena13/react-hotkeys/blob/master/README.md">Read the guide.</a></li>
-          </ul>
-        </div>
+      <HotKeys keyMap={keyMap} handlers={handlers}>
+        <div className="app">
+          <div className="tips">
+            <ul>
+              <li>Select a node and move it with your arrow keys</li>
+              <li>Expand or contract a node with `alt+up` or `alt+down` respectively</li>
+              <li>Delete a node with `delete` or `backspace`</li>
+              <li>How about the konami code? `up up down down left right left right b a enter`</li>
+              <li>Want to get started? <a href="https://github.com/greena13/react-hotkeys/blob/master/README.md">Read the guide.</a></li>
+            </ul>
+          </div>
 
-        <HotKeys keyMap={keyMap} handlers={handlers} className={className}>
-          <HOCWrappedNode />
-          {Array.apply(null, new Array(10)).map((e, i) => <Node key={i} />)}
-        </HotKeys>
-      </div>
+          <div className={className}>
+            <HOCWrappedNode />
+
+            <div>
+              {Array.apply(null, new Array(10)).map((e, i) => <Node key={i} />)}
+            </div>
+          </div>
+        </div>
+      </HotKeys>
     );
   }
 }

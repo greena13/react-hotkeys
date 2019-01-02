@@ -61,12 +61,15 @@ class Node extends React.Component {
     //   or focused programmatically
     return (
       <HotKeys
-        tabIndex="0"
         handlers={handlers}
-        className="node"
-        style={style}
       >
-       Node
+       <div
+        style={style}
+        className="node"
+        tabIndex="0"
+       >
+         Node
+       </div>
       </HotKeys>
     );
   }
