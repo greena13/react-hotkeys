@@ -6,7 +6,7 @@ import sinon from 'sinon';
 import FocusableElement from '../support/FocusableElement';
 
 import KeyCode from '../support/Key';
-import HotKeys from '../../lib/HotKeys';
+import HotKeys from '../../src/HotKeys';
 
 describe('Specifying actions with multiple key sequences:', function () {
   describe('when a action is defined with an array of key sequences', function () {

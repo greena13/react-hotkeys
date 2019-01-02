@@ -3,7 +3,7 @@ import {mount} from 'enzyme';
 import {expect} from 'chai';
 import sinon from 'sinon';
 
-import HotKeys from '../../lib/HotKeys';
+import HotKeys from '../../src/HotKeys';
 
 describe('Rendering children', () => {
   before(function () {

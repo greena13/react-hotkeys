@@ -6,7 +6,7 @@ import sinon from 'sinon';
 import FocusableElement from '../../support/FocusableElement';
 
 import KeyCode from '../../support/Key';
-import HotKeys from '../../../lib/HotKeys';
+import HotKeys from '../../../src/HotKeys';
 
 describe('Matching hotkey combinations:', function () {
   describe('when the actions are triggered by the keydown event', function () {

@@ -6,7 +6,7 @@ import sinon from 'sinon';
 import FocusableElement from '../../support/FocusableElement';
 
 import KeyCode from '../../support/Key';
-import HotKeys from '../../../lib/HotKeys';
+import HotKeys from '../../../src/HotKeys';
 
 describe('Action and handler resolution:', function () {
   describe('when an action is defined', function () {

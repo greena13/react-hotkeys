@@ -2,7 +2,7 @@ import React, {PureComponent} from 'react';
 import {mount} from 'enzyme';
 import {expect} from 'chai';
 
-import withHotKeys from '../lib/withHotKeys';
+import withHotKeys from '../src/withHotKeys';
 
 const ACTION_KEY_MAP = {
   fakeAction1: 'esc',

@@ -5,7 +5,7 @@ import sinon from 'sinon';
 import simulant from 'simulant';
 
 import KeyCode from '../../support/Key';
-import HotKeys from '../../../lib/HotKeys';
+import HotKeys from '../../../src/HotKeys';
 
 describe('Changing keyMap and handlers after mount for a global HotKeys component:', function () {
   beforeEach(function () {

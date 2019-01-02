@@ -9,7 +9,7 @@ import path from 'path';
  */
 
 export default {
-  input: 'lib/index.js',
+  input: 'src/index.js',
 
   output: {
     exports: 'named',

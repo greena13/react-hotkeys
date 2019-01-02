@@ -3,7 +3,7 @@ import {mount} from 'enzyme';
 import {expect} from 'chai';
 import sinon from 'sinon';
 
-import HotKeys from '../../../lib/HotKeys';
+import HotKeys from '../../../src/HotKeys';
 import KeyCode from '../../support/Key';
 import FocusableElement from '../../support/FocusableElement';
 

@@ -4,7 +4,7 @@ import {expect} from 'chai';
 import sinon from 'sinon';
 import simulant from 'simulant';
 
-import HotKeys from '../../../lib/HotKeys';
+import HotKeys from '../../../src/HotKeys';
 import KeyCode from '../../support/Key';
 
 describe('Component lifecycle for global HotKeys component:', () => {
