@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import FocusTrap from './FocusTrap';
 
 import KeyEventManager from './lib/KeyEventManager';
-import ignoreEventsCondition from './helpers/ignoreEventsCondition';
+import ignoreEventsCondition from './helpers/resolving-handlers/ignoreEventsCondition';
 import Logger from './lib/Logger';
 import isUndefined from './utils/isUndefined';
 import Configuration from './lib/Configuration';

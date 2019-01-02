@@ -1,9 +1,10 @@
 import KeyEventBitmapManager from '../KeyEventBitmapManager';
 import KeyEventBitmapIndex from '../../const/KeyEventBitmapIndex';
+import KeyEventSequenceIndex from '../../const/KeyEventSequenceIndex';
 import AbstractKeyEventStrategy from './AbstractKeyEventStrategy';
 import capitalize from '../../utils/string/capitalize';
-import normalizeKeyName from '../../helpers/normalizeKeyName';
-import hasKeyPressEvent from '../../helpers/hasKeyPressEvent';
+import normalizeKeyName from '../../helpers/resolving-handlers/normalizeKeyName';
+import hasKeyPressEvent from '../../helpers/resolving-handlers/hasKeyPressEvent';
 import KeyEventCounter from '../KeyEventCounter';
 import removeAtIndex from '../../utils/array/removeAtIndex';
 import isUndefined from '../../utils/isUndefined';
@@ -337,7 +338,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       const keyCombination = this._getCurrentKeyCombination().keys[_key];
 
       const alreadySeenKeyInCurrentCombo =
-        keyCombination && (keyCombination[KeyEventBitmapIndex.current][KeyEventBitmapIndex.keypress] || keyCombination[KeyEventBitmapIndex.current][KeyEventBitmapIndex.keyup]);
+        keyCombination && (keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keypress] || keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup]);
 
       if (alreadySeenKeyInCurrentCombo) {
         this._startNewKeyCombination(_key, KeyEventBitmapIndex.keypress);
@@ -389,7 +390,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
       const keyCombination = this._getCurrentKeyCombination().keys[_key];
 
-      const alreadySeenKeyInCurrentCombo = keyCombination && keyCombination[KeyEventBitmapIndex.current][KeyEventBitmapIndex.keyup];
+      const alreadySeenKeyInCurrentCombo = keyCombination && keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup];
 
       if (alreadySeenKeyInCurrentCombo) {
         this.logger.verbose(

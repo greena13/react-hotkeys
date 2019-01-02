@@ -1,7 +1,7 @@
 import Logger from './Logger';
 import FocusOnlyKeyEventStrategy from './strategies/FocusOnlyKeyEventStrategy';
 import GlobalKeyEventStrategy from './strategies/GlobalKeyEventStrategy';
-import isFromFocusOnlyComponent from '../helpers/isFromFocusOnlyComponent';
+import isFromFocusOnlyComponent from '../helpers/resolving-handlers/isFromFocusOnlyComponent';
 
 /**
  * Provides a registry for keyboard sequences and events, and the handlers that should

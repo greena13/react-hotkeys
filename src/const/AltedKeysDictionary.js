@@ -1,3 +1,8 @@
+/**
+ * A dictionary of symbols for each key, when pressed with the alt key also held.
+ * Used for combinations that involve the alt key and one or more others. (e.g.
+ * shift+a)
+ */
 const AltedKeysDictionary = {
   '`': ['`'],
   '1': ['¡'],

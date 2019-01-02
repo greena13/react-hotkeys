@@ -1,16 +1,18 @@
 import KeyEventBitmapManager from '../KeyEventBitmapManager';
 import KeyEventBitmapIndex from '../../const/KeyEventBitmapIndex';
 import Logger from '../Logger';
-import KeySerializer from '../KeySerializer';
+import KeyCombinationSerializer from '../KeyCombinationSerializer';
 import arrayFrom from '../../utils/array/arrayFrom';
 import indexFromEnd from '../../utils/array/indexFromEnd';
 import isObject from '../../utils/object/isObject';
 import isUndefined from '../../utils/isUndefined';
 import isEmpty from '../../utils/collection/isEmpty';
-import resolveAltShiftedAlias from '../../helpers/resolveAltShiftedAlias';
-import resolveShiftedAlias from '../../helpers/resolveShiftedAlias';
-import resolveAltedAlias from '../../helpers/resolveAltedAlias';
-import resolveKeyAlias from '../../helpers/resolveKeyAlias';
+import resolveAltShiftedAlias from '../../helpers/resolving-handlers/resolveAltShiftedAlias';
+import resolveShiftedAlias from '../../helpers/resolving-handlers/resolveShiftedAlias';
+import resolveAltedAlias from '../../helpers/resolving-handlers/resolveAltedAlias';
+import resolveKeyAlias from '../../helpers/resolving-handlers/resolveKeyAlias';
+import KeyEventSequenceIndex from '../../const/KeyEventSequenceIndex';
+import KeySequenceParser from '../KeySequenceParser';
 
 /**
  * @typedef {String} KeyName Name of the keyboard key
@@ -18,34 +20,18 @@ import resolveKeyAlias from '../../helpers/resolveKeyAlias';
 
 /**
  * @typedef {Number} ComponentIndex Unique index associated with every HotKeys component
- * as it registers itself as being in focus. The HotKeys component closest to the DOM
- * element in focus gets the smallest number (0) and those further up the render tree
- * get larger (incrementing) numbers.
- */
-
-/**
- * @typedef {Object} BasicKeyCombination Object containing the basic information that
- *          describes a key combination
- * @property {KeyCombinationId} id String description of keys involved in the key
- *          combination
- * @property {Number} size Number of keys involved in the combination
- * @property {Object.<KeyName, Boolean>} keyDictionary Dictionary of key names involved in
- *           the key combination
- */
-
-/**
- * @typedef {Object} KeySequenceObject Object containing description of a key sequence
- *          to compared against key events
- * @property {KeySequenceId} id Id describing key sequence used for matching against
- *            key events
- * @property {ComponentIndex} componentIndex Id associated with the HotKeys component
- *          that registered the key sequence
- * @property {BasicKeyCombination[]} sequence A list of key combinations involved in
- *            the sequence
- * @property {Number} size Number of key combinations in the key sequence
- * @property {KeyEventBitmapIndex} eventBitmapIndex Index that matches key event type
- * @property {ActionName} actionName Name of the action that should be triggered if a
- *           keyboard event matching the sequence and event type occur
+ * as it becomes active.
+ *
+ * For focus-only components, this happens when the component is focused. The HotKeys
+ * component closest to the DOM element in focus gets the smallest number (0) and
+ * those further up the render tree get larger (incrementing) numbers. When a different
+ * element is focused (triggering the creation of a new focus tree) all component indexes
+ * are reset (de-allocated) and re-assigned to the new tree of HotKeys components that
+ * are now in focus.
+ *
+ * For global components, component indexes are assigned when a HotKeys component is
+ * mounted, and de-allocated when it unmounts. The component index counter is never reset
+ * back to 0 and just keeps incrementing as new components are mounted.
  */
 
 /**
@@ -65,7 +51,7 @@ import resolveKeyAlias from '../../helpers/resolveKeyAlias';
  *          descriptions for a particular HotKeys component
  * @property {KeySequenceObject} sequences Map of key sequences
  * @property {KeyCombinationObject} combinations Map of key combinations
- * @property {KeyCombinationId[]} combinationsOrder Order of combinations from highest
+ * @property {KeyCombinationString[]} combinationsOrder Order of combinations from highest
  *            priority to lowest
  */
 
@@ -203,7 +189,7 @@ class AbstractKeyEventStrategy {
 
       const keysStillPressed = Object.keys(currentKeyCombination.keys).reduce((memo, keyName) => {
         const keyState = currentKeyCombination.keys[keyName];
-        const currentKeyState = keyState[KeyEventBitmapIndex.current];
+        const currentKeyState = keyState[KeyEventSequenceIndex.current];
 
         if (currentKeyState[KeyEventBitmapIndex.keydown] && !currentKeyState[KeyEventBitmapIndex.keyup]) {
           memo[keyName] = keyState;
@@ -215,7 +201,7 @@ class AbstractKeyEventStrategy {
       this.keyCombinationHistory = [
         {
           keys: keysStillPressed,
-          ids: KeySerializer.combination(keysStillPressed)
+          ids: KeyCombinationSerializer.serialize(keysStillPressed)
         }
       ]
     }
@@ -275,7 +261,7 @@ class AbstractKeyEventStrategy {
       ];
     }
 
-    keyCombination.ids = KeySerializer.combination(keyCombination.keys);
+    keyCombination.ids = KeyCombinationSerializer.serialize(keyCombination.keys);
   }
 
   /**
@@ -308,7 +294,7 @@ class AbstractKeyEventStrategy {
 
     this.keyCombinationHistory.push({
       keys,
-      ids: KeySerializer.combination(keys)
+      ids: KeyCombinationSerializer.serialize(keys)
     });
 
     this.keyCombinationIncludesKeyUp = false;
@@ -328,7 +314,7 @@ class AbstractKeyEventStrategy {
     return Object.keys(keyCombinationRecord.keys).reduce((memo, keyName) => {
       const keyState = keyCombinationRecord.keys[keyName];
 
-      if (!keyState[KeyEventBitmapIndex.current][KeyEventBitmapIndex.keyup]) {
+      if (!keyState[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup]) {
         memo[keyName] = keyState;
       }
 
@@ -689,11 +675,11 @@ class AbstractKeyEventStrategy {
   }
 
   _keyIsCurrentlyTriggeringEvent(keyState, eventBitmapIndex) {
-    return keyState[KeyEventBitmapIndex.current][eventBitmapIndex];
+    return keyState[KeyEventSequenceIndex.current][eventBitmapIndex];
   }
 
   _keyAlreadyTriggeredEvent(keyState, eventBitmapIndex) {
-    return keyState[KeyEventBitmapIndex.previous][eventBitmapIndex];
+    return keyState[KeyEventSequenceIndex.previous][eventBitmapIndex];
   }
 
   _keyNameAsItAppearsInKeyboardState(keyName) {
@@ -754,7 +740,7 @@ class AbstractKeyEventStrategy {
 
       const handler = actionNameToHandlersMap[actionNameOrKeyExpression];
 
-      if (!actionNameIsInKeyMap && KeySerializer.isValidKeySerialization(actionNameOrKeyExpression)) {
+      if (!actionNameIsInKeyMap && KeyCombinationSerializer.isValidKeySerialization(actionNameOrKeyExpression)) {
         memo.keyMap[actionNameOrKeyExpression] = actionNameOrKeyExpression;
       }
 
@@ -766,7 +752,7 @@ class AbstractKeyEventStrategy {
 
   /**
    * @typedef {Object} KeyExpressionObject Object describing a key event
-   * @property {KeySequenceId|KeyCombinationId|KeySequenceId[]|KeyCombinationId[]} sequence
+   * @property {KeySequenceString|KeyCombinationString|KeySequenceString[]|KeyCombinationString[]} sequence
    * @property {EventType} action
    */
 
@@ -778,6 +764,7 @@ class AbstractKeyEventStrategy {
    *        map is built.
    * @param {String} options.defaultKeyEvent The default key event to use for any action
    *        that does not explicitly define one.
+   * @param {ComponentIndex} componentIndex Index of the component the matcher belongs to
    * @return {KeyEventMatcher}
    * @private
    */
@@ -802,7 +789,7 @@ class AbstractKeyEventStrategy {
           }
         }();
 
-        const { sequence, combination } = KeySerializer.parseString(keySequence, { eventBitmapIndex });
+        const { sequence, combination } = KeySequenceParser.parse(keySequence, { eventBitmapIndex });
 
         if (sequence.size > this.longestSequence) {
           this.longestSequence = sequence.size;

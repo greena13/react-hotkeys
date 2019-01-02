@@ -1,34 +1,10 @@
 import hasKey from '../utils/object/hasKey';
+import ShiftedKeysDictionary from './ShiftedKeysDictionary';
 
-const ShiftedKeysDictionary = {
-  '`': [ '~' ],
-  '1': [ '!' ],
-  '2': [ '@', /** UK Keyboard: **/ '"' ],
-  '3': [ '#', /** UK Keyboard: **/ '£' ],
-  '4': [ '$' ],
-  '5': [ '%' ],
-  '6': [ '^' ],
-  '7': [ '&' ],
-  '8': [ '*' ],
-  '9': [ '(' ],
-  '0': [ ')' ],
-  '-': [ '_' ],
-  '=': [ 'plus' ],
-  ';': [ ':' ],
-  "'": [ '"', /** UK Keyboard: **/ '@' ],
-  ',': [ '<' ],
-  '.': [ '>' ],
-  '/': [ '?' ],
-  '\\':[  '|' ],
-  '[': [ '{' ],
-  ']': [ '}' ],
-
-  /**
-   * UK Keyboard:
-   */
-  '#': [ '~' ],
-};
-
+/**
+ * A dictionary of symbols to the keys that produce them, when pressed with the shift
+ * key
+ */
 const UnshiftedKeysDictionary = Object.keys(ShiftedKeysDictionary).reduce((memo, unshiftedKey) => {
   const shiftedKeys = ShiftedKeysDictionary[unshiftedKey];
 

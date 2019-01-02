@@ -6,7 +6,7 @@ import sinon from 'sinon';
 import FocusableElement from '../../support/FocusableElement';
 
 import HotKeys from '../../../src/HotKeys';
-import hasKeyPressEvent from '../../../src/helpers/hasKeyPressEvent';
+import hasKeyPressEvent from '../../../src/helpers/resolving-handlers/hasKeyPressEvent';
 
 const keyMapping = {
   "Escape": [ "escape", "esc" , "Escape"],

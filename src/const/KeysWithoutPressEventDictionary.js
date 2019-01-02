@@ -1,3 +1,6 @@
+/**
+ * Dictionary of keys that do not natively have a keypress event
+ */
 const KeysWithoutPressEventDictionary = {
   Shift: true,
   Control: true,

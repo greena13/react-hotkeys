@@ -1,3 +1,6 @@
+/**
+ * Dictionary of keys whose name is not a single symbol or character
+ */
 const SpecialKeysDictionary = {
   Shift: true,
   Control: true,

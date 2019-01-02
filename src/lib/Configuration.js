@@ -1,4 +1,4 @@
-import ignoreEventsCondition from '../helpers/ignoreEventsCondition';
+import ignoreEventsCondition from '../helpers/resolving-handlers/ignoreEventsCondition';
 import dictionaryFrom from '../utils/object/dictionaryFrom';
 
 let _configuration = {

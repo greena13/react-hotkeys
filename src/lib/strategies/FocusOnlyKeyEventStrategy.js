@@ -1,10 +1,10 @@
 import AbstractKeyEventStrategy from './AbstractKeyEventStrategy';
 import KeyEventBitmapIndex from '../../const/KeyEventBitmapIndex';
+import KeyEventSequenceIndex from '../../const/KeyEventSequenceIndex';
 import KeyEventCounter from '../KeyEventCounter';
-import normalizeKeyName from '../../helpers/normalizeKeyName';
-import hasKeyPressEvent from '../../helpers/hasKeyPressEvent';
+import normalizeKeyName from '../../helpers/resolving-handlers/normalizeKeyName';
+import hasKeyPressEvent from '../../helpers/resolving-handlers/hasKeyPressEvent';
 import Configuration from '../Configuration';
-import KeyEventBitmapManager from '../KeyEventBitmapManager';
 
 class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   /**
@@ -35,23 +35,13 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    */
 
   /**
-   * @typedef {Object.<KeySequenceId, KeyEventMatcher>} KeyMap A mapping from key
+   * @typedef {Object.<KeySequenceString, KeyEventMatcher>} KeyMap A mapping from key
    * sequence ids to key event matchers
    */
 
-  /**
-   * @typedef {String} KeyCombinationId String describing a combination of one or more
-   * keys separated by '+'
-   */
 
   /**
-   * @typedef {String} KeySequenceId String describing a sequence of one or more key
-   * combinations with whitespace separating key combinations in the sequence and '+'
-   * separating keys within a key combination.
-   */
-
-  /**
-   * @typedef {KeySequenceId|KeyCombinationId|KeySequenceId[]|KeyCombinationId[]} KeyEventExpression
+   * @typedef {KeySequenceString|KeyCombinationString|KeySequenceString[]|KeyCombinationString[]} KeyEventExpression
    *          expression describing a keyboard event
    */
 
@@ -453,7 +443,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
        */
 
       const keyCombination = this._getCurrentKeyCombination().keys[_key];
-      const alreadySeenKeyInCurrentCombo = keyCombination && (keyCombination[KeyEventBitmapIndex.current][KeyEventBitmapIndex.keypress] || keyCombination[KeyEventBitmapIndex.current][KeyEventBitmapIndex.keyup]);
+      const alreadySeenKeyInCurrentCombo = keyCombination && (keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keypress] || keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup]);
 
       if (alreadySeenKeyInCurrentCombo) {
         this.logger.verbose(
@@ -537,7 +527,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
       const keyCombination = this._getCurrentKeyCombination().keys[_key];
 
-      const alreadySeenKeyEventInCombo = keyCombination && keyCombination[KeyEventBitmapIndex.current][KeyEventBitmapIndex.keyup];
+      const alreadySeenKeyEventInCombo = keyCombination && keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup];
 
       if (alreadySeenKeyEventInCombo) {
         this.logger.verbose(

@@ -1,15 +1,17 @@
 /**
+ * @typedef {Number} EventBitmapIndex index (0-2) of which position in an event bitmap
+ * a particular event is located
+ */
+
+/**
  * Enum for index values for KeyEventBitmaps
  * @readonly
- * @enum {Number}
+ * @enum {EventBitmapIndex}
  */
 const KeyEventBitmapIndex = {
   keydown: 0,
   keypress: 1,
   keyup: 2,
-
-  previous: 0,
-  current: 1,
 };
 
 export default KeyEventBitmapIndex;
