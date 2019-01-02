@@ -19,6 +19,21 @@ class FocusTrap extends Component {
     onBlur: PropTypes.func,
 
     /**
+     * Function to call when a keydown event occurs in one of the component's children
+     */
+    onKeyDown: PropTypes.func,
+
+    /**
+     * Function to call when a keydown event occurs in one of the component's children
+     */
+    onKeyPress: PropTypes.func,
+
+    /**
+     * Function to call when a keydown event occurs in one of the component's children
+     */
+    onKeyUp: PropTypes.func,
+
+    /**
      * Component (or component type as a string) to use as a wrapper or
      * parent of this component's children
      */
