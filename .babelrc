@@ -1,4 +1,7 @@
 {
+  "plugins": [
+    "transform-node-env-inline"
+  ],
   "env": {
     "development": {
       "presets": [

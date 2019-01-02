@@ -1,8 +1,12 @@
 import babel from 'rollup-plugin-babel';
-import replace from 'rollup-plugin-replace';
 import uglify from 'rollup-plugin-uglify';
 import license from 'rollup-plugin-license';
+import strip from 'rollup-plugin-strip';
 import path from 'path';
+
+/**
+ * This configuration (and Rollup) is only used for the production builds
+ */
 
 export default {
   input: 'lib/index.js',
@@ -27,12 +31,16 @@ export default {
       exclude: 'node_modules/**'
     }),
 
-    replace({
-      exclude: 'node_modules/**',
-      ENV: JSON.stringify(process.env.NODE_ENV || 'development')
+    strip({
+      debugger: true,
+
+      functions: [
+        'console.log', 'assert.*', 'debug', 'alert',
+        '*.logger.verbose', '*.logger.debug', '*.logger.info'
+      ]
     }),
 
-    (process.env.NODE_ENV === 'production' && uglify()),
+    uglify(),
 
     license({
       banner: {
