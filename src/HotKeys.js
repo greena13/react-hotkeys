@@ -163,27 +163,37 @@ class HotKeys extends Component {
    * @returns {FocusTrap} FocusTrap with necessary props to capture keyboard events
    */
   render() {
-    /**
-     * Props used by HotKeys that should not be passed down to its focus trap
-     * component
-     */
     const {
-      keyMap, handlers, global, children,
+      /**
+       * Props used by HotKeys that should not be passed down to its focus trap
+       * component
+       */
+      keyMap, handlers, global,
+
+      children,
       ...props
     } = this.props;
 
-    return (
-      <FocusTrap
-        { ...props }
-        onFocus={ this._handleFocus }
-        onBlur={ this._handleBlur }
-        onKeyDown={ this._handleKeyDown }
-        onKeyPress={ this._handleKeyPress }
-        onKeyUp={ this._handleKeyUp }
-      >
-        { children }
-      </FocusTrap>
-    );
+    if (global && !children) {
+      /**
+       * There is no need to render the FocusTrap is component is global and
+       * without any children
+       */
+      return null;
+    } else {
+      return (
+        <FocusTrap
+          { ...props }
+          onFocus={ this._handleFocus }
+          onBlur={ this._handleBlur }
+          onKeyDown={ this._handleKeyDown }
+          onKeyPress={ this._handleKeyPress }
+          onKeyUp={ this._handleKeyUp }
+        >
+          { children }
+        </FocusTrap>
+      );
+    }
   }
 
   _focusTreeIdsPush(componentId) {
