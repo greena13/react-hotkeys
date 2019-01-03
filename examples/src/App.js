@@ -11,10 +11,13 @@ const keyMap = {
   MOVE_UP: 'up',
   MOVE_DOWN: 'down',
   MOVE_LEFT: 'left',
-  MOVE_RIGHT: 'right',
+  MOVE_RIGHT: 'right'
+};
+
+const globalKeyMap = {
   KONAMI: 'up up down down left right left right b a enter',
   LOG_DOWN: {sequence: 'command', action: 'keydown'},
-  LOG_UP: {sequence: 'command', action: 'keyup'},
+  LOG_UP: {sequence: 'command', action: 'keyup'}
 };
 
 class App extends React.Component {
@@ -43,7 +46,7 @@ class App extends React.Component {
   render() {
     const {konamiTime} = this.state;
 
-    const handlers = {
+    const globalHandlers = {
       KONAMI: this.onKonami,
       LOG_DOWN: this.constructor.logCommandKeyDown,
       LOG_UP: this.constructor.logCommandKeyUp,
@@ -52,26 +55,28 @@ class App extends React.Component {
     const className = konamiTime ? 'viewport konamiTime' : 'viewport';
 
     return (
-      <HotKeys keyMap={keyMap} handlers={handlers}>
-        <div className="app">
-          <div className="tips">
-            <ul>
-              <li>Select a node and move it with your arrow keys</li>
-              <li>Expand or contract a node with `alt+up` or `alt+down` respectively</li>
-              <li>Delete a node with `delete` or `backspace`</li>
-              <li>How about the konami code? `up up down down left right left right b a enter`</li>
-              <li>Want to get started? <a href="https://github.com/greena13/react-hotkeys/blob/master/README.md">Read the guide.</a></li>
-            </ul>
-          </div>
+      <HotKeys keyMap={globalKeyMap} handlers={globalHandlers} global>
+        <HotKeys keyMap={keyMap}>
+          <div className="app">
+            <div className="tips">
+              <ul>
+                <li>Select a node and move it with your arrow keys</li>
+                <li>Expand or contract a node with `alt+up` or `alt+down` respectively</li>
+                <li>Delete a node with `delete` or `backspace`</li>
+                <li>How about the konami code? `up up down down left right left right b a enter`</li>
+                <li>Want to get started? <a href="https://github.com/greena13/react-hotkeys/blob/master/README.md">Read the guide.</a></li>
+              </ul>
+            </div>
 
-          <div className={className}>
-            <HOCWrappedNode />
+            <div className={className}>
+              <HOCWrappedNode />
 
-            <div>
-              {Array.apply(null, new Array(10)).map((e, i) => <Node key={i} />)}
+              <div>
+                {Array.apply(null, new Array(10)).map((e, i) => <Node key={i} />)}
+              </div>
             </div>
           </div>
-        </div>
+        </HotKeys>
       </HotKeys>
     );
   }
