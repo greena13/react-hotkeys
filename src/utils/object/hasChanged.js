@@ -1,4 +1,10 @@
 function hasChanged(source, target) {
+  if (!source) {
+    return !!target;
+  } else if (!target) {
+    return !!source;
+  }
+
   const sourceKeys = Object.keys(source);
   const targetKeys = Object.keys(target);
 
