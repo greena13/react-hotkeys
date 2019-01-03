@@ -24,6 +24,9 @@ describe('Matching single hotkeys:', function () {
         'ACTION2': this.action2Handler,
       };
 
+      console.warn('HotKeys:');
+      console.warn(HotKeys);
+
       this.wrapper = mount(
         <div >
           <HotKeys keyMap={this.keyMap} handlers={handlers}>

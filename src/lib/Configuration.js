@@ -1,11 +1,10 @@
-import ignoreEventsCondition from '../helpers/resolving-handlers/ignoreEventsCondition';
 import dictionaryFrom from '../utils/object/dictionaryFrom';
 
 /**
  * Default configuration values
  * @private
  */
-let _configuration = {
+const _defaultConfiguration = {
   /**
    * The level of logging of its own behaviour React HotKeys should perform.
    * @type {LogLevel}
@@ -45,7 +44,17 @@ let _configuration = {
    *
    * @type {Function<KeyboardEvent>}
    */
-  ignoreEventsCondition,
+  ignoreEventsCondition: (event) => {
+    const { target } = event;
+
+    if (target && target.tagName) {
+      const tagName = target.tagName.toLowerCase();
+
+      return Configuration.option('_ignoreTagsDict')[tagName] || target.isContentEditable;
+    } else {
+      return false;
+    }
+  },
 
   /**
    * Whether React HotKeys should simulate keypress events for the keys that do not
@@ -53,6 +62,10 @@ let _configuration = {
    * @type {Boolean}
    */
   simulateMissingKeyPressEvents: true
+};
+
+const _configuration = {
+  ..._defaultConfiguration
 };
 
 /**
@@ -97,6 +110,10 @@ class Configuration {
    */
   static set(key, value) {
     _configuration[key] = value;
+  }
+
+  static reset(key) {
+    _configuration[key] = _defaultConfiguration[key];
   }
 
   /**

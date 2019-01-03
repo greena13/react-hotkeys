@@ -68,6 +68,5 @@ describe('Rendering children', () => {
       let div = this.wrapper.find('span');
       expect(div).to.have.attr('tabindex', '-1');
     });
-
   });
 });

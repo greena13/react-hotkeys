@@ -4,6 +4,10 @@ import React, { Fragment } from 'react';
 import Node from './Node';
 import HOCWrappedNode from './HOCWrappedNode';
 
+HotKeys.configure({
+  logLevel: 'verbose'
+});
+
 const keyMap = {
   DELETE: { sequence: 'backspace', action: 'keyup'},
   EXPAND: 'alt+up',
