@@ -1,5 +1,5 @@
 import { HotKeys } from 'react-hotkeys';
-import React from 'react';
+import React, { Fragment } from 'react';
 
 import Node from './Node';
 import HOCWrappedNode from './HOCWrappedNode';
@@ -55,7 +55,13 @@ class App extends React.Component {
     const className = konamiTime ? 'viewport konamiTime' : 'viewport';
 
     return (
-      <HotKeys keyMap={globalKeyMap} handlers={globalHandlers} global>
+      <Fragment>
+        <HotKeys
+          keyMap={globalKeyMap}
+          handlers={globalHandlers}
+          global
+        />
+
         <HotKeys keyMap={keyMap}>
           <div className="app">
             <div className="tips">
@@ -77,7 +83,7 @@ class App extends React.Component {
             </div>
           </div>
         </HotKeys>
-      </HotKeys>
+      </Fragment>
     );
   }
 }
