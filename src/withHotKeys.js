@@ -87,24 +87,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
        * the keys be matched)
        * @type {Boolean}
        */
-      global: PropTypes.bool,
-
-      /**
-       * Children to wrap within a focus trap
-       */
-      children: PropTypes.node,
-
-      /**
-       * Function to call when this component gains focus in the browser
-       * @type {Function}
-       */
-      onFocus: PropTypes.func,
-
-      /**
-       * Function to call when this component loses focus in the browser
-       * @type {Function}
-       */
-      onBlur: PropTypes.func,
+      global: PropTypes.bool
     };
 
     /**
