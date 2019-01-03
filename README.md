@@ -396,6 +396,12 @@ It is recommended to use focus-only `<HotKeys>` components whenever possible for
 
 > You can use the [autofocus attributes](#Autofocus) or [programmatically manage focus](#Programmatically-manage-focus) to automatically focus your React app so the user doesn't have to select it in order for hot keys to take effect. It is common practice to place a `<HotKeys>` component towards the top of your application to match hot keys across your entire React application.
 
+## Ignoring events
+
+By default, all key events that originate from `<input>`, `<select>` or `<textarea>`, or have a `isContentEditable` attribute of `true` are ignored by `react-hotkeys`.
+
+If this is not what you want for your application, you can modify the list of tags using the `ignoreTags` [configuration option](#Configuration) or if you need additional control, you can specify a brand new function using the `ignoreEventsCondition` [configuration option](#Configuration).
+
 ## HotKeys component API
 
 The HotKeys component provides a declarative and native JSX syntax that is best for succinctly declaring hotkeys in a way that best maintains separation and encapsulation with regards to the rest of your code base.
@@ -627,6 +633,8 @@ Check that the `<HotKeys>` component that defines the handler is also an ancesto
 
 Also make sure your React application is not calling `stopPropagation()` on the key events before they reach the `<HotKeys>` component that defines the `keyMap`.
 
+Finally, make sure your key event are not coming from one of the [tags ignored by react-hotkeys](#Ignoring-events).
+
 #### Sequence is not being matched when moving between components
 
 For efficiency, every time the focused element changes, the key event history is reset. HotKeys does not currently support key sequences that involve shifting focus mid-way through.
@@ -672,7 +680,7 @@ Each line is prefixed with (where applicable):
 
 Each id is also given a coloured emoticon, to make it easy to visually trace the propagation of particular events through multiple components.
 
-Below is an example (verbos) log output:
+Below is an example (verbose) log output:
 
 ```
 HotKeys (GLOBAL-C0🔺): Bound handler handleGlobalKeydown() to document.onkeydown()
