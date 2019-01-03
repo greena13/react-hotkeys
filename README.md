@@ -543,6 +543,7 @@ const MyHotKeysComponent = withHotKeys(MyComponent, {keyMap, handlers});
   </div>
 </MyHotKeysComponent>
 ```
+
 ## Configuration
 
 The default behaviour across all `<HotKeys>` components is configured using the `HotKeys.configure` method.
@@ -606,9 +607,31 @@ HotKeys.configure({
 
 ## Troubleshooting & Gotchas
 
-### Hotkeys is rendering a div that is breaking my styling
+#### Hotkeys is wrapping my components in a div that is breaking my styling
 
-### Blue border appears around children of HotKeys
+You have 3 options:
+
+1. Use the [`component` prop](#HotKeys-component-API) to specify a `span` or some other alternative DOM-mountable component to wrap your component in, each time you render a component you don't want to wrap in a div element.
+1. Use the [`defaultComponent` configuration option](#Configuration) to specify a `span` or some other alternative DOM-mountable component to wrap *all* `<HotKeys>` children in.
+1. Use the [withHotKeys HoC API](#withHotKeys-HoC-API) to avoid rendering a wrapping component at all.
+
+#### Actions aren't being triggered when using withHotKeys
+
+Check that you are [correctly passing the hotKeys props to a DOM-mountable component](#Pre-defining-default-prop-values).
+
+#### Actions aren't being triggered for focus-only HotKeys
+
+Make sure you are focusing a descendant of the `<HotKeys>` component before you press the keys.
+
+Check that the `<HotKeys>` component that defines the handler is also an ancestor of the focused component, and is above (or *is*) the component that defines the `handlers`.
+
+Also make sure your React application is not calling `stopPropagation()` on the key events before they reach the `<HotKeys>` component that defines the `keyMap`.
+
+#### Sequence is not being matched when moving between components
+
+For efficiency, every time the focused element changes, the key event history is reset. HotKeys does not currently support key sequences that involve shifting focus mid-way through.
+
+#### Blue border appears around children of HotKeys
 
 `react-hotkeys` adds a `<div />` around its children with a `tabindex="-1"` to allow them to be programmatically focused. This can result in browsers rendering a blue outline around them to visually indicate that they are the elements in the document that is currently in focus.
 
@@ -618,6 +641,360 @@ This can be disabled using CSS similar to the following:
 div[tabindex="-1"]:focus {
     outline: 0;
 }
+```
+
+## Logging
+
+`react-hotkeys` provides comprehensive logging of all of its internal behaviour and allows setting one of 6 log levels.
+
+The default level is `warn`, which provides warnings and errors only, and is generally sufficient for most usage. However, if you are troubleshooting an issue or reporting a bug, you should increase the log level to `debug` or `verbose` to see what is going on, and be able to communicate it concisely.
+
+You can set the logging level using the `logLevel` [configuration option](#Configuration).
+
+For performance reasons, only some of the log levels are available in the production build. You will need to use the development build to get the full log output.
+
+| Log Level | Severity | Description | Available in Dev | Available in Prod |
+| :-- | :-- | :-- | :-- | :-- |
+| verbose | (highest) | `debug` + internal data representations | Yes | No |
+| debug | | `info` + event propagation info | Yes | No |
+| info | | `warn` + general info | Yes | No |
+| warn | (default) | `error` + warnings | Yes | Yes |
+| error | | Errors only (ignore warnings) | Yes | Yes |
+| none | (lowest) | Log nothing | Yes | Yes |
+
+Logs appear in the developer console of the browser.
+
+Each line is prefixed with (where applicable):
+
+- The focus tree id
+- The component id
+- The event id
+
+Each id is also given a coloured emoticon, to make it easy to visually trace the propagation of particular events through multiple components.
+
+Below is an example (verbos) log output:
+
+```
+HotKeys (GLOBAL-C0🔺): Bound handler handleGlobalKeydown() to document.onkeydown()
+HotKeys (GLOBAL-C0🔺): Bound handler handleGlobalKeypress() to document.onkeypress()
+HotKeys (GLOBAL-C0🔺): Bound handler handleGlobalKeyup() to document.onkeyup()
+HotKeys (GLOBAL-C0🔺): Mounted.
+HotKeys (GLOBAL-C0🔺): Component options:
+ {
+    "actions": {
+        "KONAMI": [
+            {
+                "prefix": "ArrowUp ArrowUp ArrowDown ArrowDown ArrowLeft ArrowRight ArrowLeft ArrowRight b a",
+                "actionName": "KONAMI",
+                "sequenceLength": 11,
+                "id": "Enter",
+                "keyDictionary": {
+                    "Enter": true
+                },
+                "eventBitmapIndex": 1,
+                "size": 1
+            }
+        ],
+        "LOG_DOWN": [
+            {
+                "prefix": "",
+                "actionName": "LOG_DOWN",
+                "sequenceLength": 1,
+                "id": "Meta",
+                "keyDictionary": {
+                    "Meta": true
+                },
+                "eventBitmapIndex": 0,
+                "size": 1
+            }
+        ],
+        "LOG_UP": [
+            {
+                "prefix": "",
+                "actionName": "LOG_UP",
+                "sequenceLength": 1,
+                "id": "Meta",
+                "keyDictionary": {
+                    "Meta": true
+                },
+                "eventBitmapIndex": 2,
+                "size": 1
+            }
+        ]
+    },
+    "handlers": {
+        "KONAMI": "function () { [native code] }",
+        "LOG_DOWN": "function logCommandKeyDown() {\n      console.log('command down');\n    }",
+        "LOG_UP": "function logCommandKeyUp() {\n      console.log('command up');\n    }"
+    },
+    "componentId": 0,
+    "options": {
+        "defaultKeyEvent": "keypress"
+    }
+}
+HotKeys (FT0📕-E0❤️-C0🔺): Focused.
+
+HotKeys (FT0📕-E0❤️-C0🔺): Component options:
+ {
+    "actions": {},
+    "handlers": {
+        "MOVE_UP": "function () { [native code] }",
+        "MOVE_DOWN": "function () { [native code] }",
+        "MOVE_LEFT": "function () { [native code] }",
+        "MOVE_RIGHT": "function () { [native code] }",
+        "DELETE": "function () { [native code] }",
+        "EXPAND": "function () { [native code] }",
+        "CONTRACT": "function () { [native code] }"
+    },
+    "componentId": 0,
+    "options": {
+        "defaultKeyEvent": "keypress"
+    }
+}
+HotKeys (FT0📕-E0❤️-C1⭐️): Focused.
+
+HotKeys (FT0📕-E0❤️-C1⭐️): Component options:
+ {
+    "actions": {
+        "DELETE": [
+            {
+                "prefix": "",
+                "actionName": "DELETE",
+                "sequenceLength": 1,
+                "id": "Backspace",
+                "keyDictionary": {
+                    "Backspace": true
+                },
+                "eventBitmapIndex": 2,
+                "size": 1
+            }
+        ],
+        "EXPAND": [
+            {
+                "prefix": "",
+                "actionName": "EXPAND",
+                "sequenceLength": 1,
+                "id": "Alt+ArrowUp",
+                "keyDictionary": {
+                    "Alt": true,
+                    "ArrowUp": true
+                },
+                "eventBitmapIndex": 1,
+                "size": 2
+            }
+        ],
+        "CONTRACT": [
+            {
+                "prefix": "",
+                "actionName": "CONTRACT",
+                "sequenceLength": 1,
+                "id": "Alt+ArrowDown",
+                "keyDictionary": {
+                    "Alt": true,
+                    "ArrowDown": true
+                },
+                "eventBitmapIndex": 1,
+                "size": 2
+            }
+        ],
+        "MOVE_UP": [
+            {
+                "prefix": "",
+                "actionName": "MOVE_UP",
+                "sequenceLength": 1,
+                "id": "ArrowUp",
+                "keyDictionary": {
+                    "ArrowUp": true
+                },
+                "eventBitmapIndex": 1,
+                "size": 1
+            }
+        ],
+        "MOVE_DOWN": [
+            {
+                "prefix": "",
+                "actionName": "MOVE_DOWN",
+                "sequenceLength": 1,
+                "id": "ArrowDown",
+                "keyDictionary": {
+                    "ArrowDown": true
+                },
+                "eventBitmapIndex": 1,
+                "size": 1
+            }
+        ],
+        "MOVE_LEFT": [
+            {
+                "prefix": "",
+                "actionName": "MOVE_LEFT",
+                "sequenceLength": 1,
+                "id": "ArrowLeft",
+                "keyDictionary": {
+                    "ArrowLeft": true
+                },
+                "eventBitmapIndex": 1,
+                "size": 1
+            }
+        ],
+        "MOVE_RIGHT": [
+            {
+                "prefix": "",
+                "actionName": "MOVE_RIGHT",
+                "sequenceLength": 1,
+                "id": "ArrowRight",
+                "keyDictionary": {
+                    "ArrowRight": true
+                },
+                "eventBitmapIndex": 1,
+                "size": 1
+            }
+        ]
+    },
+    "handlers": {},
+    "componentId": 1,
+    "options": {
+        "defaultKeyEvent": "keypress"
+    }
+}
+HotKeys (FT0📕-E1💚-C0🔺): New 'ArrowDown' keydown event.
+HotKeys (FT0📕-E1💚-C0🔺): Added 'ArrowDown' to current combination: ArrowDown.
+HotKeys (FT0📕-E1💚-C0🔺): Ignored 'ArrowDown' keydown because it doesn't have any keydown handlers.
+HotKeys (FT0📕-E1💚-C1⭐️): Ignored 'ArrowDown' keydown because it doesn't have any keydown handlers.
+HotKeys (FT0📕-E1💚-C0🔺): Simulating 'ArrowDown' keypress event because 'ArrowDown' doesn't natively have one.
+HotKeys (FT0📕-E2💙-C0🔺): New 'ArrowDown' keypress event.
+HotKeys (FT0📕-E2💙-C0🔺): Attempting to find action matching 'ArrowDown' keypress . . .
+HotKeys (FT0📕-E2💙-C0🔺): Internal key mapping:
+ {
+    "sequences": {
+        "": {
+            "combinations": {
+                "Backspace": {
+                    "prefix": "",
+                    "sequenceLength": 1,
+                    "id": "Backspace",
+                    "keyDictionary": {
+                        "Backspace": true
+                    },
+                    "size": 1,
+                    "events": {
+                        "2": {
+                            "actionName": "DELETE",
+                            "eventBitmapIndex": 2,
+                            "handler": "function () { [native code] }"
+                        }
+                    }
+                },
+                "Alt+ArrowUp": {
+                    "prefix": "",
+                    "sequenceLength": 1,
+                    "id": "Alt+ArrowUp",
+                    "keyDictionary": {
+                        "Alt": true,
+                        "ArrowUp": true
+                    },
+                    "size": 2,
+                    "events": {
+                        "1": {
+                            "actionName": "EXPAND",
+                            "eventBitmapIndex": 1,
+                            "handler": "function () { [native code] }"
+                        }
+                    }
+                },
+                "Alt+ArrowDown": {
+                    "prefix": "",
+                    "sequenceLength": 1,
+                    "id": "Alt+ArrowDown",
+                    "keyDictionary": {
+                        "Alt": true,
+                        "ArrowDown": true
+                    },
+                    "size": 2,
+                    "events": {
+                        "1": {
+                            "actionName": "CONTRACT",
+                            "eventBitmapIndex": 1,
+                            "handler": "function () { [native code] }"
+                        }
+                    }
+                },
+                "ArrowUp": {
+                    "prefix": "",
+                    "sequenceLength": 1,
+                    "id": "ArrowUp",
+                    "keyDictionary": {
+                        "ArrowUp": true
+                    },
+                    "size": 1,
+                    "events": {
+                        "1": {
+                            "actionName": "MOVE_UP",
+                            "eventBitmapIndex": 1,
+                            "handler": "function () { [native code] }"
+                        }
+                    }
+                },
+                "ArrowDown": {
+                    "prefix": "",
+                    "sequenceLength": 1,
+                    "id": "ArrowDown",
+                    "keyDictionary": {
+                        "ArrowDown": true
+                    },
+                    "size": 1,
+                    "events": {
+                        "1": {
+                            "actionName": "MOVE_DOWN",
+                            "eventBitmapIndex": 1,
+                            "handler": "function () { [native code] }"
+                        }
+                    }
+                },
+                "ArrowLeft": {
+                    "prefix": "",
+                    "sequenceLength": 1,
+                    "id": "ArrowLeft",
+                    "keyDictionary": {
+                        "ArrowLeft": true
+                    },
+                    "size": 1,
+                    "events": {
+                        "1": {
+                            "actionName": "MOVE_LEFT",
+                            "eventBitmapIndex": 1,
+                            "handler": "function () { [native code] }"
+                        }
+                    }
+                },
+                "ArrowRight": {
+                    "prefix": "",
+                    "sequenceLength": 1,
+                    "id": "ArrowRight",
+                    "keyDictionary": {
+                        "ArrowRight": true
+                    },
+                    "size": 1,
+                    "events": {
+                        "1": {
+                            "actionName": "MOVE_RIGHT",
+                            "eventBitmapIndex": 1,
+                            "handler": "function () { [native code] }"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "eventBitmap": [
+        false,
+        true,
+        true
+    ],
+    "longestSequence": 1
+}
+HotKeys (FT0📕-E2💙-C0🔺): Found action that matches 'ArrowDown': MOVE_DOWN. Calling handler . . .
+HotKeys (FT0📕-E2💙-C1⭐️): Simulating 'ArrowDown' keypress event because 'ArrowDown' doesn't natively have one.
+HotKeys (FT0📕-E2💙-C1⭐️): Ignored 'ArrowDown' keypress as it has already been handled.
 ```
 
 ## Support
