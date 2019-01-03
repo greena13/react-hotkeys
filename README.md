@@ -10,67 +10,57 @@
 
 A declarative library for handling hotkeys and focus areas in React applications.
 
-## Maintenance
-
-react-hotkeys is [currently seeking new maintainers](https://github.com/greena13/react-hotkeys/issues/130).
-
 ## Feature Overview
 
-- Minimal and declarative API
-- Named hotkeys for easy customization
-- Intuitive key commands thanks to [Mousetrap](https://github.com/ccampbell/mousetrap)
-- Tree based priority - the deepest focused handler wins
-- Easy-to-use [HOC](https://github.com/greena13/react-hotkeys/blob/master/lib/withHotKeys.js) available.
+- Offers a minimal declarative JSX and HoC APIs
+- Supports React key names or [Mousetrap](https://github.com/ccampbell/mousetrap) syntax
+- Allows you to define global as well as and in-focus hot keys
+- Works with React's Synthetic KeyboardEvents and event delegation
+- Provides predictable behaviour to anyone who is familiar with React and its render tree
+- It's customizable through a simple configuration API
+- Optimized for larger applications, with many hot keys active at once
+- More than 1800 automated tests
+- No external dependencies (other than `prop-types`)
+- Uses rollup, uglifying and stripping out comments for a small production build
 
-## Live Example
+## Basic Usage
 
-Play with a live example of [react-hotkeys](https://codesandbox.io/s/x73mw4knlo)!
-
-## Usage
-
-#### Key map
+#### Define a key map
 
 ```javascript
 import {HotKeys} from 'react-hotkeys';
+import MyNode from './MyNode';
 
-// Simple "name:key sequence/s" to create a hotkey map
-
-const map = {
-  'snapLeft': 'command+left',
-  'deleteNode': ['del', 'backspace']
+const keyMap = {
+  SNAP_LEFT: 'command+left',
+  DELETE_NODE: ['del', 'backspace']
 };
-
-// Component with a key map
 
 const App = React.createClass({
   render() {
     return (
-      <HotKeys keyMap={map}>
+      <HotKeys keyMap={keyMap}>
         <div>
-          <MyNode></MyNode>
-          <MyNode></MyNode>
+          <MyNode />
+          <MyNode />
         </div>
       </HotKeys>
     );
   }
 });
+
+export default App;
 ```
 
-#### Handlers
+#### Define handlers
 
 ```javascript
 import {HotKeys} from 'react-hotkeys';
 
-/**
- * Component with hotkey handlers, which are only called when the component
- * is within the application's 'focus tree' and prevents cascading hotkeys from
- * being called
- */
-
 const MyNode = React.createClass({
   render() {
     const handlers = {
-      'deleteNode': this.deleteNode
+      DELETE_NODE: this.deleteNode
     };
 
     return (
@@ -80,6 +70,8 @@ const MyNode = React.createClass({
     );
   }
 });
+
+export default MyNode;
 ```
 
 ## Install
@@ -137,11 +129,14 @@ bower install react-hotkeys@0.10.0
 ```
 
 The Bower version of the package will **not** be supported going forward (including fixing any outstanding issues).
-## Defining Hot Keys
 
-`react-hotkeys` uses key maps to separate defining keyboard shortcuts from the actions that they trigger. This allows adding or changing hot keys in the future, without having to also update the actions in many places across your application.
+## Defining key maps
 
-Hotkey maps are simple JavaScript objects, where the keys are the names of the actions triggered and the values are a [Mousetrap-supported key sequence](https://craig.is/killing/mice) that must be activated in order to trigger the action.
+`react-hotkeys` uses key maps to decouple defining keyboard shortcuts from the functions they call. This allows hot keys and handler functions to be defined and maintained independent of one another.
+
+> When a user presses the corresponding combination or sequence of keys, it is said they *match* the hot keys, which causes an action to be *triggered*. `react-hotkeys` may then resolve an appropriate handler function to *handle* the action.
+
+Key maps are Plain Old JavaScript Objects, where the keys are the action names and the values are usually a [Mousetrap-supported](https://craig.is/killing/mice) or [Browser Key Values](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values) sequence string (but can also be an [array](#Alternative-Hotkeys) or an [object](#Key-Combination-vs-Sequences)) that must be matched in order to trigger the action.
 
 ```javascript
 const keyMap = {
@@ -150,61 +145,67 @@ const keyMap = {
 };
 ```
 
-#### Alternative Hotkeys
+#### Key Combinations vs Sequences
 
-You can specify multiple keys that will trigger the same action using arrays:
-
-```javascript
-const keyMap = {
-  'deleteNode': ['del', 'backspace'],
-  'moveUp': ['up', 'w']
-};
-```
-
-#### Key Combinations & Sequences
+Every hotkey or sequence string is parsed and treated as a sequence of key combinations. The simplest case is a sequence of 1 key combination, consisting of 1 key: e.g. `'a'` or `'shift'`.
 
 ```
-// Single key sequence
+// Key sequence with a combination of a single key
 '4'
 
 // Special single key sequence (ie. shift is handled automagically)
 '?'
 
-// Combination sequence
+// Sequence of a single combination with multiple keys (keys must be pressed at the same time)
 'command+shift+k'
 
-// GMail style sequences
+// Sequence of multiple combinations (keys must be pressed and released one after another)
 'up down left right'
 ```
 
-#### Binding to Special Keys
-
-Modifier keys: `shift`, `ctrl`, `alt`/`option`, `command`/`meta`
-
-Special keys: `backspace`, `tab`, `enter`, `return`, `capslock`, `esc`, `escape`, `space`, `pageup`, `pagedown`, `end`, `home`, `left`, `up`, `right`, `down`, `ins`, `del`, and `plus`
-
 #### Full Reference
 
-Refer to [Mousetrap's documentation](https://craig.is/killing/mice) for an exhaustive list of supported shortcuts and sequences.
+Please refer to [Mousetrap's documentation](https://craig.is/killing/mice) or [Browser Key Values](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values) for an exhaustive list of supported shortcuts and sequences.
 
-#### Specifying Key Event
+#### Alternative Hotkeys
 
-`react-hotkeys` tries to automatically determine the best key event (usually `keypress`) to monitor based on the key sequence provided.
-
-The object syntax and `action` attribute lets you explicitly set which key event you wish to bind to:
+You can specify multiple *alternative* key sequences (they will trigger the same action) using arrays:
 
 ```javascript
 const keyMap = {
-  'contract': 'alt+down',
-  'commandDown': {sequence: 'command', action: 'keydown'},
+  DELETE_NODE: ['del', 'backspace'],
+  MOVE_UP: ['up', 'w']
+};
+```
+#### Specifying key events (keydown, keypress, keyup)
+
+By default, `react-hotkeys` will match hotkey sequences on the `keypress` event (or, more precisely: on the `keypress` event of the last key to complete the last combination in a sequence).
+
+If you want to trigger a single action on a different key event, you can use the object syntax and the `action` attribute to explicitly set which key event you wish to bind to:
+
+```javascript
+const keyMap = {
+  CONTRACT: 'alt+down',
+  COMMAND_DOWN: {sequence: 'command', action: 'keydown'},
 };
 ```
 
+If you want to change the default key event for all hotkeys, you can use the `defaultKeyEvent` option of the [configuration API](#Configuration).
+
 The full list of valid key events is: `keypress`, `keydown`, and `keyup`.
+
+#### Deciding which key map syntax to use
+
+As a general rule, you should use the syntax that is the most brief, but still allows you to express the configuration you want.
+
+| Question | Yes | No |
+| :--- | :--- | :--- |
+| **Need to define alternative key sequences to trigger the same action?** | Use an array of strings or objects. | Use a string or object. |
+| **Need to explicitly define the key event to bind to (or some other additional option)?** | Use an object. | Use a string. |
 
 ## Defining Handlers
 
-Key maps trigger named actions when matching keys are pressed - but do not define any behaviour. Handlers are the functions called to handle when a matching action is triggered and define how your application should respond.
+Key maps trigger actions when they match a key sequence. Handlers are the functions that `react-hotkeys` calls to handle those actions.
 
 Handlers may be defined in the same `<HotKeys />` component as the key map:
 
@@ -212,11 +213,11 @@ Handlers may be defined in the same `<HotKeys />` component as the key map:
 import {HotKeys} from 'react-hotkeys';
 
 const keyMap = {
-    moveUp: 'up',
+    MOVE_UP: 'up',
 }
 
 const handlers = {
-  'moveUp': (event) => console.log('Move up hotkey called!')
+  MOVE_UP: (event) => console.log('Move up hotkey called!')
 };
 
 <HotKeys keyMap={keyMap} handlers={handlers}>
@@ -224,18 +225,17 @@ const handlers = {
 </HotKeys>
 ```
 
-Or in any descendant of the `<HotKeys />` component that defines the key map:
-
+Or they may be defined in any *descendant* of the `<HotKeys />` component that defines the key map:
 
  ```javascript
  import {HotKeys} from 'react-hotkeys';
 
  const keyMap = {
-     moveUp: 'up',
+     MOVE_UP: 'up',
  }
 
  const handlers = {
-   'moveUp': (event) => console.log('Move up hotkey called!')
+   MOVE_UP: (event) => console.log('Move up hotkey called!')
  };
 
  <HotKeys keyMap={keyMap}>
@@ -251,9 +251,11 @@ Or in any descendant of the `<HotKeys />` component that defines the key map:
  </HotKeys>
  ```
 
-#### Hard Sequence Handlers
+#### DEPRECATED: Hard Sequence Handlers
 
-You can also explicitly define sequences as handlers in case you want a *hard*-override.
+Handlers associated to actions with names that are valid key sequence strings implicitly define actions that are matched by the corresponding key sequence. This means you do not have to define the key maps in order for these handlers to "just work".
+
+This functionality is not advised and exists mainly for backwards compatibility. It is generally advisable to explicitly define an action in a key map rather than rely on this behaviour.
 
 ```javascript
 // If no named hotkey 'up' exists we assume it is a key sequence
@@ -262,31 +264,20 @@ const handlers = {
 };
 ```
 
-
-## Triggering Hot Keys
+## Resolving action handlers
 
 Key handlers are only called under the following conditions (all must be true):
 
-* One of the descendents of a `<HotKeys />` component that defines `handlers` is currently in focus (or the [focused prop](#simulating-an-elements-focus) is true)
+* One of the descendents of a `<HotKeys />` component that defines `handlers` is currently in focus
 * Either that `<HotKeys />` component, or one of its ancestors that is a `<HotKeys />` component, defines a `keyMap` that has a sequence that matches the keys being pressed
 * The `<HotKeys />` component that defines `handlers` has a handler that matches the action being triggered
 * A more deeply nested `<HotKeys />` component's handler has **not** already been called
 
-A more exhaustive enumration of `react-hotkeys` behaviour can be found by reviewing the [test suite](/test).
+A more exhaustive enumeration of `react-hotkeys` behaviour can be found by reviewing the [test suite](/test).
 
 ### Elements must be in focus
 
 In order for a hot key to be triggered, an element that is a descendent of the `<HotKey />` component that defines `handlers` must be in focus. It is not enough to have a descendent element of a `<HotKey />` that defines a `keyMap` in focus - it must be one that defines `handlers`. See [Managing focus in the browser](#managing-focus-in-the-browser) for more details.
-
-### Simulating an element's focus
-
-You can cause a `<HotKey />` with a `handlers` prop to behave as if one of its descendents is currently focused (and call any matching handlers) using the `focused` prop:
-
-```javasript
-<HotKeys keyMap={this.keyMap} handlers={this.handlers} focused>
-  <input />
-</HotKeys>
-```
 
 ### Hot Key Action Propagation
 
@@ -375,6 +366,8 @@ div[tabindex="-1"]:focus {
 }
 ```
 
+## Configuration
+
 ## Support
 
 Please use [Gitter](https://gitter.im/Chrisui/react-hotkeys) to ask any questions you may have regarding how to use `react-hotkeys`.
@@ -385,10 +378,6 @@ If you believe you have found a bug or have a feature request, please [open an i
 
 `react-hotkeys` is considered stable and already being widely used (most notably Lystable and Whatsapp).
 
-It has a non-comprehensive test suite. [![Build Status](https://travis-ci.org/greena13/react-hotkeys.svg)](https://travis-ci.org/greena13/react-hotkeys)
-
-In November 2017, responsibility for maintaining `react-hotkeys` has changed hands. The new group of contributors will be working towards improving performance and providing *additional* functionality rather than having any breaking changes.
-
 
 ## Contribute, please!
 
@@ -397,10 +386,6 @@ If you're interested in helping out with the maintenance of `react-hotkeys`, mak
 All contributions are welcome and greatly appreciated - from contributors of all levels of experience.
 
 Collaboration is loosely being coordinated across [Gitter](https://gitter.im/Chrisui/react-hotkeys) and [Projects](https://github.com/greena13/react-hotkeys/projects).
-
-### Roadmap
-
-The product roadmap is being currently being tracked in [Projects](https://github.com/greena13/react-hotkeys/projects), but is largely focused on improving performance, code quality and adding extra features to meet common requirements.
 
 ### Using GitHub Issues
 
@@ -418,11 +403,3 @@ The product roadmap is being currently being tracked in [Projects](https://githu
 ## Authorship
 
 All credit, and many thanks, goes to [Chris Pearce](https://github.com/Chrisui) for the inception of `react-hotkeys` and all versions before `1.0.0`.
-
-As of version `1.0.0`, [Aleck Greenham](https://github.com/greena13) maintained `react-hotkeys`. 
-
-react-hotkeys is [currently seeking new maintainers](https://github.com/greena13/react-hotkeys/issues/130).
-
-## Thanks
-
-Thanks to @ccampbell for [Mousetrap](https://github.com/ccampbell/mousetrap)
