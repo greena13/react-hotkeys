@@ -396,9 +396,156 @@ It is recommended to use focus-only `<HotKeys>` components whenever possible for
 
 > You can use the [autofocus attributes](#Autofocus) or [programmatically manage focus](#Programmatically-manage-focus) to automatically focus your React app so the user doesn't have to select it in order for hot keys to take effect. It is common practice to place a `<HotKeys>` component towards the top of your application to match hot keys across your entire React application.
 
+## HotKeys component API
+
+The HotKeys component provides a declarative and native JSX syntax that is best for succinctly declaring hotkeys in a way that best maintains separation and encapsulation with regards to the rest of your code base.
+
+However, it [does require that its children be wrapped in a DOM-mounted node](#Hotkeys-is-rendering-a-div-that-is-breaking-my-styling), which can break styling and add extra levels to your render tree.
+
+```javascript
+
+<HotKeys
+  /**
+   * An object that defines actions as keys and key sequences as values
+   * (using either a string, array or object).
+   *
+   * Actions defined in one HotKeys component are available to be handled
+   * in an descendent HotKeys component.
+   *
+   * Optional.
+   */
+  keyMap={ {} }
+
+  /**
+   * An object that defines handler functions as values, and the actions
+   * that they handle as keys.
+   *
+   * Optional.
+   */
+  handlers={ {} }
+
+  /**
+   * Whether the hotkeys are global or focus-only
+   */
+  global={ false }
+
+  /**
+   * The type of DOM-mountable component that should be used to wrap
+   * the component's children.
+   */
+  component={ 'div' }
+
+  /**
+   * tabindex value to pass to DOM-mountable component wrapping children
+   */
+  tabIndex={-1}
+  >
+
+  /**
+   * Wraps all children in a DOM-mountable component
+   */
+   { children }
+
+</HotKeys>
+```
+
+## withHotKeys HoC API
+
+The HotKeys component API is generally recommended, but if wrapping your component in a DOM-mountable node is not acceptable, or you need more control over how the `react-hotkeys` props are applied, then the `withHotKeys()` HoC is available.
+
+### Simple use-case
+
+The simplest use-case of `withHotKeys()` is to simply pass it your component class as the first argument. What is returned is a new component that will accept all of the same props as a `<HotKey>` component, so you can specify key maps and handlers at render time, for example.
+
+> The component you wrap **must** take responsibility for passing the `hotKeys` props to a DOM-mountable element. If you fail to do this, key events will not be detected when a descendant of the component is in focus.
+
+```javascript
+import {withHotKeys} from 'react-hotkeys';
+
+class MyComponent extends Component {
+  render() {
+    /**
+     * Must unwrap hotKeys prop and pass its values to a DOM-mountable
+     * element (like the div below).
+     */
+    const {hotKeys, ...remainingProps} = this.props;
+
+    return (
+      <div { ... { ...hotKeys, ...remainingProps } } >
+        <span>My HotKeys are effective here</span>
+
+       { this.props.children }
+      </div>
+    )
+  }
+}
+
+const MyHotKeysComponent = withHotKeys(MyComponent);
+
+const keyMap = {
+    TEST: 't'
+};
+
+const handlers = {
+    TEST: ()=> console.log('Test')
+};
+
+<MyHotKeysComponent keyMap={ keyMap } handlers={ handlers }>
+  <div>
+    You can press 't' to log to the console.
+  </div>
+</MyHotKeysComponent>
+```
+
+### Pre-defining default prop values
+
+You can use the second argument of `withHotKeys` to specify default values for any props you would normally pass to `<HotKeys />`. This means you do not have to specify them at render-time.
+
+> If you do provide prop values when you render the component, these will be merged with (and override) those defined in the second argument of `withHotKeys`.
+
+```javascript
+import {withHotKeys} from 'react-hotkeys';
+
+class MyComponent extends Component {
+  render() {
+    /**
+     * Must unwrap hotKeys prop and pass its values to a DOM-mountable
+     * element (like the div below).
+     */
+    const {hotKeys, ...remainingProps} = this.props;
+
+    return (
+      <div { ... { ...hotKeys, ...remainingProps } } >
+        <span>My HotKeys are effective here</span>
+
+       { this.props.children }
+      </div>
+    )
+  }
+}
+
+const keyMap = {
+    TEST: 't'
+};
+
+const handlers = {
+    TEST: ()=> console.log('Test')
+};
+
+const MyHotKeysComponent = withHotKeys(MyComponent, {keyMap, handlers});
+
+/**
+ * Render without having to specify prop values
+ */
+<MyHotKeysComponent>
+  <div>
+    You can press 't' to log to the console.
+  </div>
+</MyHotKeysComponent>
+```
 ## Configuration
 
-Default behaviour across all `<HotKeys>` components is configured using the `HotKeys.configure` method.
+The default behaviour across all `<HotKeys>` components is configured using the `HotKeys.configure` method.
 
 > HotKeys.configure() should be called as your app is initialising and before the first time you mount a `<HotKeys>` component anywhere your app.
 
@@ -458,6 +605,8 @@ HotKeys.configure({
 
 
 ## Troubleshooting & Gotchas
+
+### Hotkeys is rendering a div that is breaking my styling
 
 ### Blue border appears around children of HotKeys
 
