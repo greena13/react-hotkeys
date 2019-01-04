@@ -97,6 +97,13 @@ function withHotKeys(Component, hotKeysOptions = {}) {
        * @type {Function}
        */
       onBlur: PropTypes.func,
+
+      /**
+       * Whether the keyMap or handlers are permitted to change after the
+       * component mounts. If false, changes to the keyMap and handlers
+       * props will be ignored
+       */
+      allowChanges: PropTypes.bool
     };
 
     /**
@@ -131,7 +138,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
          * Props used by HotKeys that should not be passed down to its focus trap
          * component
          */
-        keyMap, handlers,
+        keyMap, handlers, allowChanges,
 
         ...props
       } = this.props;
@@ -186,7 +193,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
     }
 
     componentDidUpdate(previousProps) {
-      if (this._componentIsFocused()) {
+      if (this._componentIsFocused() && (this.props.allowChanges || !Configuration.option('ignoreKeymapAndHandlerChangesByDefault'))) {
         const {keyMap, handlers} = this.props;
 
         KeyEventManager.getInstance().updateHotKeys(

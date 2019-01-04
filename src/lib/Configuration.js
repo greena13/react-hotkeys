@@ -37,6 +37,15 @@ const _defaultConfiguration = {
    */
   ignoreTags: ['input', 'select', 'textarea'],
 
+
+  /**
+   * Whether to ignore changes to keyMap and handlers props by default (this reduces
+   * a significant amount of unnecessarily resetting internal state)
+   *
+   * @type {Boolean}
+   */
+  ignoreKeymapAndHandlerChangesByDefault: true,
+
   /**
    * The function used to determine whether a key event should be ignored by React
    * Hotkeys. By default, keyboard events originating elements with a tag name in

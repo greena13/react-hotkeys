@@ -415,6 +415,15 @@ However, it [does require that its children be wrapped in a DOM-mounted node](#H
    * tabindex value to pass to DOM-mountable component wrapping children
    */
   tabIndex={-1}
+
+  /**
+   * Whether the keyMap or handlers are permitted to change after the
+   * component mounts. If false, changes to the keyMap and handlers
+   * props will be ignored
+   *
+   * Optional.
+   */
+  allowChanges={false}
   >
 
   /**
@@ -570,6 +579,16 @@ The GlobalHotKeys component provides a declarative and native JSX syntax for def
   handlers={ {} }
 
   /**
+   * Whether the keyMap or handlers are permitted to change after the
+   * component mounts. If false, changes to the keyMap and handlers
+   * props will be ignored
+   *
+   * Optional.
+   */
+  allowChanges={false}
+  >
+
+  /**
    * Wraps all children in a DOM-mountable component
    */
    { children }
@@ -582,6 +601,15 @@ The GlobalHotKeys component provides a declarative and native JSX syntax for def
 By default, all key events that originate from `<input>`, `<select>` or `<textarea>`, or have a `isContentEditable` attribute of `true` are ignored by `react-hotkeys`.
 
 If this is not what you want for your application, you can modify the list of tags using the `ignoreTags` [configuration option](#Configuration) or if you need additional control, you can specify a brand new function using the `ignoreEventsCondition` [configuration option](#Configuration).
+
+## Allowing hotkeys and handlers props to change
+
+For performance reasons, by default `react-hotkeys` takes the `keyMap` and `handlers` prop values when `<HotKeys>` components are focused and when `<GlobalHotKeys>` components are mounted. It ignores all subsequent updates
+to their values when these props change.
+
+If you need the ability to change them while `<HotKeys>` are still in focus, or while `<GlobalHotKeys>` are still mounted, then you can passe the `allowChanges` prop, permitting this behaviour for the particular component.
+
+If you need to do this for all your `<HotKeys>` and `<GlobalHotKeys>` components, you can use the `ignoreKeymapAndHandlerChangesByDefault` option for the [Configuration API](#Configuration). This should normally never be done, as it can have significant performance implications.
 
 ## Configuration
 
@@ -633,6 +661,14 @@ HotKeys.configure({
    * @type {Function<KeyboardEvent>}
    */
   ignoreEventsCondition: function,
+
+  /**
+   * Whether to ignore changes to keyMap and handlers props by default
+   * (this reduces a significant amount of unnecessarily resetting
+   * internal state)
+   * @type {Boolean}
+   */
+  ignoreKeymapAndHandlerChangesByDefault: true,
 
   /**
    * Whether React HotKeys should simulate keypress events for the keys that do not
@@ -1047,6 +1083,7 @@ HotKeys (FT0📕-E2💙-C1⭐️): Ignored 'ArrowDown' keypress as it has alread
 - If an event is handled by an earlier handler, it is ignored by an further components (this is really a design decision, rather than an optimization, but it helps).
 - Events are ignored unless an action exists that is bound to that particular event type (keydown, keypress, keyup)
 - Events are processed at each level, as they propagate up the React render tree. If a action is triggered by a leaf node, `react-hotkeys` stops there (and does not build the full application's mappings of key sequences and handlers)
+- Changes to keyMaps and handlers are ignored unless you explicitly opt-in to the behaviour of resetting them each time their prop value changes.
 - Key histories longer than the longest registered key sequence are discarded.
 - The mapping between an action's key sequences and handlers is built "on-the-fly", so unless a particular action is triggered, `react-hotkeys` doesn't do the work of finding its corresponding handler.
 - Global event listeners are only bound to `document` when a global hotkey is defined (and are removed when the last one is unmounted).

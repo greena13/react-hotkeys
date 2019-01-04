@@ -35,6 +35,13 @@ interface HotKeysEnabledProps extends React.HTMLAttributes<HotKeys> {
    * Function to call when this component loses focus in the browser
    */
   onBlur?: () => void;
+
+  /**
+   * Whether the keyMap or handlers are permitted to change after the
+   * component mounts. If false, changes to the keyMap and handlers
+   * props will be ignored
+   */
+  allowChanges?: boolean;
 }
 
 interface HotKeysProps extends HotKeysEnabledProps {
