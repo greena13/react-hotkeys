@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React, {PureComponent} from 'react';
-import hasChanged from './utils/object/hasChanged';
 import Configuration from './lib/Configuration';
 import KeyEventManager from './lib/KeyEventManager';
 
@@ -188,25 +187,15 @@ function withHotKeys(Component, hotKeysOptions = {}) {
 
     componentDidUpdate(previousProps) {
       if (this._componentIsFocused()) {
-        const newHandlers = getHandlers(this.props);
-        const prevHandlers = getHandlers(previousProps);
+        const {keyMap, handlers} = this.props;
 
-        const newKeyMaps = getKeyMap(this.props);
-        const prevKeyMap = getKeyMap(previousProps);
-
-        if (hasChanged(newHandlers, prevHandlers) || hasChanged(newKeyMaps, prevKeyMap)) {
-          /**
-           * Component is in focus, so update key map as it may have changes that
-           * should have immediate effect
-           */
-          KeyEventManager.getInstance().updateHotKeys(
-            this._getFocusTreeId(),
-            this._componentId,
-            newKeyMaps,
-            newHandlers,
-            this._getComponentOptions()
-          );
-        }
+        KeyEventManager.getInstance().updateHotKeys(
+          this._getFocusTreeId(),
+          this._componentId,
+          keyMap,
+          handlers,
+          this._getComponentOptions()
+        );
       }
     }
 
