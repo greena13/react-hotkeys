@@ -65,7 +65,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
        */
 
       /**
-       * A map from action names to Mousetrap key sequences
+       * A map from action names to Mousetrap or Browser key sequences
        * @type {KeyMap}
        */
       keyMap: PropTypes.object,
@@ -87,7 +87,19 @@ function withHotKeys(Component, hotKeysOptions = {}) {
        * the keys be matched)
        * @type {Boolean}
        */
-      global: PropTypes.bool
+      global: PropTypes.bool,
+
+      /**
+       * Function to call when this component gains focus in the browser
+       * @type {Function}
+       */
+      onFocus: PropTypes.func,
+
+      /**
+       * Function to call when this component loses focus in the browser
+       * @type {Function}
+       */
+      onBlur: PropTypes.func,
     };
 
     /**
@@ -144,8 +156,8 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       } else {
 
         const hotKeys = {
-          onFocus: this._handleFocus,
-          onBlur: this._handleBlur,
+          onFocus: this._wrapFunction('onFocus', this._handleFocus),
+          onBlur: this._wrapFunction('onBlur', this._handleBlur),
           onKeyDown: this._handleKeyDown,
           onKeyPress: this._handleKeyPress,
           onKeyUp: this._handleKeyUp,
@@ -158,6 +170,17 @@ function withHotKeys(Component, hotKeysOptions = {}) {
             { ...props }
           />
         );
+      }
+    }
+
+    _wrapFunction(propName, func){
+      if (typeof this.props[propName] === 'function') {
+        return (event) => {
+          this.props[propName](event);
+          func(event);
+        }
+      } else {
+        return func;
       }
     }
 
