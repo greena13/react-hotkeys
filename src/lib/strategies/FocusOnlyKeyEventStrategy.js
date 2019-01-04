@@ -292,17 +292,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       const keyInCurrentCombination = !!this._getCurrentKeyCombination().keys[_key];
 
       if (keyInCurrentCombination || this.keyCombinationIncludesKeyUp) {
-        this.logger.verbose(
-          `${this._logPrefix(componentId, {focusTreeId})} Started a new combination with '${_key}'.`
-        );
-
-        this._startNewKeyCombination(_key, KeyEventBitmapIndex.keydown);
+        this._startNewKeyCombination(_key, KeyEventBitmapIndex.keydown, focusTreeId, componentId);
       } else {
-        this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keydown);
-
-        this.logger.verbose(
-          `${this._logPrefix(componentId, {focusTreeId})} Added '${_key}' to current combination: ${this._getCurrentKeyCombination().ids[0]}.`
-        );
+        this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keydown, focusTreeId, componentId);
       }
     }
 
@@ -423,13 +415,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       const alreadySeenKeyInCurrentCombo = keyCombination && (keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keypress] || keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup]);
 
       if (alreadySeenKeyInCurrentCombo) {
-        this.logger.verbose(
-          `${this._logPrefix(componentId, {focusTreeId})} Started a new combination with '${_key}'.`
-        );
-
-        this._startNewKeyCombination(_key, KeyEventBitmapIndex.keypress)
+        this._startNewKeyCombination(_key, KeyEventBitmapIndex.keypres, focusTreeId, componentId)
       } else {
-        this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keypress);
+        this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keypress, focusTreeId, componentId);
       }
     }
 
@@ -505,13 +493,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       const alreadySeenKeyEventInCombo = keyCombination && keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup];
 
       if (alreadySeenKeyEventInCombo) {
-        this.logger.verbose(
-          `${this._logPrefix(componentId, {focusTreeId})} Started a new combination with '${_key}'.`
-        );
-
-        this._startNewKeyCombination(_key, KeyEventBitmapIndex.keyup);
+        this._startNewKeyCombination(_key, KeyEventBitmapIndex.keyup, focusTreeId, componentId);
       } else {
-        this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keyup);
+        this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keyup, focusTreeId, componentId);
 
         this.keyCombinationIncludesKeyUp = true;
       }
@@ -580,6 +564,32 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       type,
       handled: false
     };
+  }
+
+  _startNewKeyCombination(keyName, eventBitmapIndex, focusTreeId, componentId) {
+    super._startNewKeyCombination(keyName, eventBitmapIndex);
+
+    this.logger.verbose(
+      `${this._logPrefix(componentId, {focusTreeId})} Started a new combination with '${keyName}'.`
+    );
+
+    this.logger.verbose(
+      `${this._logPrefix(componentId, {focusTreeId})} Key history: ${printComponent(this.keyCombinationHistory)}.`
+    );
+  }
+
+  _addToCurrentKeyCombination(keyName, eventBitmapIndex, focusTreeId, componentId) {
+    super._addToCurrentKeyCombination(keyName, eventBitmapIndex);
+
+    if (eventBitmapIndex === KeyEventBitmapIndex.keydown) {
+      this.logger.verbose(
+        `${this._logPrefix(componentId, {focusTreeId})} Added '${keyName}' to current combination: ${this._getCurrentKeyCombination().ids[0]}.`
+      );
+    }
+
+    this.logger.verbose(
+      `${this._logPrefix(componentId, {focusTreeId})} Key history: ${printComponent(this.keyCombinationHistory)}.`
+    );
   }
 
   /********************************************************************************

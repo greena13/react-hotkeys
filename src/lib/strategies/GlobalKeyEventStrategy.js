@@ -314,16 +314,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
       if (keyInCurrentCombination || this.keyCombinationIncludesKeyUp) {
         this._startNewKeyCombination(_key, KeyEventBitmapIndex.keydown);
-
-        this.logger.verbose(
-          `${this._logPrefix()} Started a new combination with '${_key}'.`
-        );
       } else {
         this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keydown);
-
-        this.logger.verbose(
-          `${this._logPrefix()} Added '${_key}' to current combination: ${this._getCurrentKeyCombination().ids[0]}.`
-        );
       }
 
       this._callHandlerIfExists(event, _key, KeyEventBitmapIndex.keydown);
@@ -400,10 +392,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
       if (alreadySeenKeyInCurrentCombo) {
         this._startNewKeyCombination(_key, KeyEventBitmapIndex.keypress);
-
-        this.logger.verbose(
-          `${this._logPrefix()} Started a new combination with '${_key}'.`
-        );
       } else {
         this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keypress);
       }
@@ -460,23 +448,41 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       const alreadySeenKeyInCurrentCombo = keyCombination && keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup];
 
       if (alreadySeenKeyInCurrentCombo) {
-        this.logger.verbose(
-          `${this._logPrefix()} Started a new combination with '${_key}'.`
-        );
-
         this._startNewKeyCombination(_key, KeyEventBitmapIndex.keyup);
       } else {
         this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keyup);
-
-        this.logger.verbose(
-          `${this._logPrefix()} Added '${_key}' to current combination: '${this._describeCurrentKeyCombination()}'.`
-        );
 
         this.keyCombinationIncludesKeyUp = true;
       }
 
       this._callHandlerIfExists(event, _key, KeyEventBitmapIndex.keyup);
     }
+  }
+
+  _startNewKeyCombination(keyName, eventBitmapIndex) {
+    super._startNewKeyCombination(keyName, eventBitmapIndex);
+
+    this.logger.verbose(
+      `${this._logPrefix()} Started a new combination with '${keyName}'.`
+    );
+
+    this.logger.verbose(
+      `${this._logPrefix()} Key history: ${printComponent(this.keyCombinationHistory)}.`
+    );
+  }
+
+  _addToCurrentKeyCombination(keyName, eventBitmapIndex) {
+    super._addToCurrentKeyCombination(keyName, eventBitmapIndex);
+
+    if (eventBitmapIndex === KeyEventBitmapIndex.keydown) {
+      this.logger.verbose(
+        `${this._logPrefix()} Added '${keyName}' to current combination: ${this._getCurrentKeyCombination().ids[0]}.`
+      );
+    }
+
+    this.logger.verbose(
+      `${this._logPrefix()} Key history: ${printComponent(this.keyCombinationHistory)}.`
+    );
   }
 
   _getComponentPosition(componentId){
