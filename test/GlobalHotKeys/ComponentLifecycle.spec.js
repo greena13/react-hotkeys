@@ -4,10 +4,10 @@ import {expect} from 'chai';
 import sinon from 'sinon';
 import simulant from 'simulant';
 
-import HotKeys from '../../../src/HotKeys';
-import KeyCode from '../../support/Key';
+import GlobalHotKeys from '../../src/GlobalHotKeys';
+import KeyCode from '../support/Key';
 
-describe('Component lifecycle for global HotKeys component:', () => {
+describe('Component lifecycle for GlobalHotKeys component:', () => {
   before(function () {
     this.keyMap = {
       'ACTION1': 'a',
@@ -27,9 +27,9 @@ describe('Component lifecycle for global HotKeys component:', () => {
       document.body.appendChild(this.reactDiv);
 
       this.wrapper = mount(
-        <HotKeys keyMap={this.keyMap} handlers={handlers} global>
+        <GlobalHotKeys keyMap={this.keyMap} handlers={handlers}>
           <div className="childElement" />
-        </HotKeys>,
+        </GlobalHotKeys>,
         { attachTo: this.reactDiv }
       );
     });
@@ -55,9 +55,9 @@ describe('Component lifecycle for global HotKeys component:', () => {
       document.body.appendChild(this.reactDiv);
 
       this.wrapper = mount(
-        <HotKeys keyMap={this.keyMap} handlers={handlers} global>
+        <GlobalHotKeys keyMap={this.keyMap} handlers={handlers}>
           <div className="childElement" />
-        </HotKeys>,
+        </GlobalHotKeys>,
         { attachTo: this.reactDiv }
       );
     });

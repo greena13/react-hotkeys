@@ -4,10 +4,10 @@ import {expect} from 'chai';
 import sinon from 'sinon';
 import simulant from 'simulant';
 
-import KeyCode from '../../support/Key';
-import HotKeys from '../../../src/HotKeys';
+import KeyCode from '../support/Key';
+import GlobalHotKeys from '../../src/GlobalHotKeys';
 
-describe('Matching hotkey combinations for global HotKeys:', function () {
+describe('Matching hotkey combinations for GlobalHotKeys:', function () {
   beforeEach(function () {
     this.parentDiv = document.createElement('div');
     this.reactDiv = document.createElement('div');
@@ -37,9 +37,9 @@ describe('Matching hotkey combinations for global HotKeys:', function () {
 
       this.wrapper = mount(
         <div >
-          <HotKeys keyMap={this.keyMap} handlers={handlers} global>
+          <GlobalHotKeys keyMap={this.keyMap} handlers={handlers}>
             <div className="childElement" />
-          </HotKeys>
+          </GlobalHotKeys>
 
           <div className="siblingElement" />
         </div>,
@@ -139,9 +139,9 @@ describe('Matching hotkey combinations for global HotKeys:', function () {
 
       this.wrapper = mount(
         <div >
-          <HotKeys keyMap={this.keyMap} handlers={handlers} global>
+          <GlobalHotKeys keyMap={this.keyMap} handlers={handlers}>
             <div className="childElement" />
-          </HotKeys>
+          </GlobalHotKeys>
 
           <div className="siblingElement" />
         </div>,
@@ -240,9 +240,9 @@ describe('Matching hotkey combinations for global HotKeys:', function () {
       };
 
       this.wrapper = mount(
-        <HotKeys keyMap={this.keyMap} handlers={handlers} global>
+        <GlobalHotKeys keyMap={this.keyMap} handlers={handlers}>
           <div className="childElement" />
-        </HotKeys>,
+        </GlobalHotKeys>,
         { attachTo: this.reactDiv }
       );
     });
@@ -397,9 +397,9 @@ describe('Matching hotkey combinations for global HotKeys:', function () {
 
         this.wrapper = mount(
           <div >
-            <HotKeys keyMap={this.keyMap} handlers={handlers} global>
+            <GlobalHotKeys keyMap={this.keyMap} handlers={handlers}>
               <div className="childElement" />
-            </HotKeys>
+            </GlobalHotKeys>
 
             <div className="siblingElement" />
           </div>,

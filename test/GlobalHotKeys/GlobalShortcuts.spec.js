@@ -3,10 +3,11 @@ import {mount} from 'enzyme';
 import {expect} from 'chai';
 import sinon from 'sinon';
 
-import HotKeys from '../../../src/HotKeys';
-import KeyCode from '../../support/Key';
-import FocusableElement from '../../support/FocusableElement';
-import KeyEventManager from '../../../src/lib/KeyEventManager';
+import GlobalHotKeys from '../../src/GlobalHotKeys';
+import HotKeys from '../../src/HotKeys';
+import KeyCode from '../support/Key';
+import FocusableElement from '../support/FocusableElement';
+import KeyEventManager from '../../src/lib/KeyEventManager';
 
 beforeEach(function() {
   KeyEventManager.clear();
@@ -20,7 +21,7 @@ describe('Global shortcuts:', () => {
     };
   });
 
-  context('when global handlers are defined at the top of a React application', () => {
+  context('when handlers are defined at the top of a React application', () => {
     beforeEach(function () {
       this.globalHandler = sinon.spy();
 
@@ -35,16 +36,16 @@ describe('Global shortcuts:', () => {
       document.body.removeChild(this.parentDiv);
     });
 
-    context('and there is no other HotKeys component', () => {
+    context('and there is no other GlobalHotKeys component', () => {
       beforeEach(function () {
         const handlers = {
           'GLOBAL_ACTION': this.globalHandler,
         };
 
         this.wrapper = mount(
-          <HotKeys keyMap={this.globalKeyMap} handlers={handlers} global>
+          <GlobalHotKeys keyMap={this.globalKeyMap} handlers={handlers}>
             <div className="childElement" />
-          </HotKeys>,
+          </GlobalHotKeys>,
           { attachTo: this.reactDiv }
         );
       });
@@ -55,13 +56,13 @@ describe('Global shortcuts:', () => {
           this.targetElement.focus();
         });
 
-        it('then calls the correct handler when a key is pressed that matches a global handler', function() {
+        it('then calls the correct handler when a key is pressed that matches a handler', function() {
           this.targetElement.keyPress(KeyCode.A, { forceEnzymeEvent: true });
 
           expect(this.globalHandler).to.have.been.called;
         });
 
-        it('then does NOT call the handler when a key is pressed that does NOT match a global handler', function() {
+        it('then does NOT call the handler when a key is pressed that does NOT match a handler', function() {
           this.targetElement.keyPress(KeyCode.B, { forceEnzymeEvent: true });
 
           expect(this.globalHandler).to.not.have.been.called;
@@ -87,7 +88,7 @@ describe('Global shortcuts:', () => {
       });
     });
 
-    context('and there is a focus HotKeys inside it', () => {
+    context('and there is a focus GlobalHotKeys inside it', () => {
       beforeEach(function () {
         this.globalCommonActionHandler = sinon.spy();
 
@@ -110,24 +111,24 @@ describe('Global shortcuts:', () => {
         };
 
         this.wrapper = mount(
-          <HotKeys keyMap={this.globalKeyMap} handlers={globalHandlers} global>
+          <GlobalHotKeys keyMap={this.globalKeyMap} handlers={globalHandlers}>
             <HotKeys keyMap={ this.focusKeyMap } handlers={ focusHandlers }>
               <div className="childElement" />
             </HotKeys>
 
             <div className="siblingElement" />
-          </HotKeys>,
+          </GlobalHotKeys>,
           { attachTo: this.reactDiv }
         );
       });
 
-      context('and the focus HotKeys is in focus', () => {
+      context('and the focus GlobalHotKeys is in focus', () => {
         beforeEach(function () {
           this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
           this.targetElement.focus();
         });
 
-        it('then calls the global handler when a matching key is pressed', function() {
+        it('then calls the handler when a matching key is pressed', function() {
           this.targetElement.keyPress(KeyCode.A, { forceEnzymeEvent: true });
 
           expect(this.globalHandler).to.have.been.called;
@@ -139,7 +140,7 @@ describe('Global shortcuts:', () => {
           expect(this.focusActionHandler).to.have.been.called;
         });
 
-        it('then calls the closest focus handler (over the global handler) when a matching key is pressed', function() {
+        it('then calls the closest focus handler (over the handler) when a matching key is pressed', function() {
           this.targetElement.keyPress(KeyCode.B, { forceEnzymeEvent: true });
 
           expect(this.focusCommonActionHandler).to.have.been.called;
@@ -147,13 +148,13 @@ describe('Global shortcuts:', () => {
         });
       });
 
-      context('and the focus HotKeys is NOT in focus (but the React app still is)', () => {
+      context('and the focus GlobalHotKeys is NOT in focus (but the React app still is)', () => {
         beforeEach(function () {
           this.targetElement = new FocusableElement(this.wrapper, '.siblingElement', { nativeElement: true });
           this.targetElement.focus();
         });
 
-        it('then calls the global handler when a matching key is pressed', function() {
+        it('then calls the handler when a matching key is pressed', function() {
           this.targetElement.keyPress(KeyCode.A, { forceEnzymeEvent: true });
 
           expect(this.globalHandler).to.have.been.called;
@@ -165,7 +166,7 @@ describe('Global shortcuts:', () => {
           expect(this.focusActionHandler).to.not.have.been.called;
         });
 
-        it('then calls the global handler when a matching key is pressed', function() {
+        it('then calls the handler when a matching key is pressed', function() {
           this.targetElement.keyPress(KeyCode.B, { forceEnzymeEvent: true });
 
           expect(this.globalCommonActionHandler).to.have.been.called;
@@ -178,7 +179,7 @@ describe('Global shortcuts:', () => {
           this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
         });
 
-        it('then calls the global handler when a matching key is pressed', function() {
+        it('then calls the handler when a matching key is pressed', function() {
           this.targetElement.keyPress(KeyCode.A);
 
           expect(this.globalHandler).to.have.been.called;
@@ -190,7 +191,7 @@ describe('Global shortcuts:', () => {
           expect(this.focusActionHandler).to.not.have.been.called;
         });
 
-        it('then calls the global handler when a matching key is pressed', function() {
+        it('then calls the handler when a matching key is pressed', function() {
           this.targetElement.keyPress(KeyCode.B);
 
           expect(this.globalCommonActionHandler).to.have.been.called;
@@ -200,7 +201,7 @@ describe('Global shortcuts:', () => {
     });
   });
 
-  context('when global HotKeys is nested inside a focus HotKeys', () => {
+  context('when GlobalHotKeys is nested inside a focus GlobalHotKeys', () => {
     beforeEach(function () {
       this.globalHandler = sinon.spy();
 
@@ -233,9 +234,9 @@ describe('Global shortcuts:', () => {
       this.wrapper = mount(
         <div>
           <HotKeys keyMap={ this.focusKeyMap } handlers={ focusHandlers }>
-            <HotKeys keyMap={this.globalKeyMap} handlers={globalHandlers} global>
+            <GlobalHotKeys keyMap={this.globalKeyMap} handlers={globalHandlers}>
               <div className="childElement" />
-            </HotKeys>
+            </GlobalHotKeys>
           </HotKeys>
 
           <div className="siblingElement" />
@@ -248,13 +249,13 @@ describe('Global shortcuts:', () => {
       document.body.removeChild(this.parentDiv);
     });
 
-    context('and the global HotKeys is in focus', () => {
+    context('and the GlobalHotKeys is in focus', () => {
       beforeEach(function () {
         this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
         this.targetElement.focus();
       });
 
-      it('then calls the global handler when a matching key is pressed', function() {
+      it('then calls the handler when a matching key is pressed', function() {
         this.targetElement.keyPress(KeyCode.A, { forceEnzymeEvent: true });
 
         expect(this.globalHandler).to.have.been.called;
@@ -266,7 +267,7 @@ describe('Global shortcuts:', () => {
         expect(this.focusActionHandler).to.have.been.called;
       });
 
-      it('then calls the closest focus handler (over the global handler) when a matching key is pressed', function() {
+      it('then calls the closest focus handler (over the handler) when a matching key is pressed', function() {
         this.targetElement.keyPress(KeyCode.B, { forceEnzymeEvent: true });
 
         expect(this.focusCommonActionHandler).to.have.been.called;
@@ -274,13 +275,13 @@ describe('Global shortcuts:', () => {
       });
     });
 
-    context('and the focus HotKeys is NOT in focus (but the React app still is)', () => {
+    context('and the focus GlobalHotKeys is NOT in focus (but the React app still is)', () => {
       beforeEach(function () {
         this.targetElement = new FocusableElement(this.wrapper, '.siblingElement', { nativeElement: true });
         this.targetElement.focus();
       });
 
-      it('then calls the global handler when a matching key is pressed', function() {
+      it('then calls the handler when a matching key is pressed', function() {
         this.targetElement.keyPress(KeyCode.A, { forceEnzymeEvent: true });
 
         expect(this.globalHandler).to.have.been.called;
@@ -292,7 +293,7 @@ describe('Global shortcuts:', () => {
         expect(this.focusActionHandler).to.not.have.been.called;
       });
 
-      it('then calls the global handler when a matching key is pressed', function() {
+      it('then calls the handler when a matching key is pressed', function() {
         this.targetElement.keyPress(KeyCode.B, { forceEnzymeEvent: true });
 
         expect(this.globalCommonActionHandler).to.have.been.called;
@@ -305,7 +306,7 @@ describe('Global shortcuts:', () => {
         this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
       });
 
-      it('then calls the global handler when a matching key is pressed', function() {
+      it('then calls the handler when a matching key is pressed', function() {
         this.targetElement.keyPress(KeyCode.A);
 
         expect(this.globalHandler).to.have.been.called;
@@ -317,7 +318,7 @@ describe('Global shortcuts:', () => {
         expect(this.focusActionHandler).to.not.have.been.called;
       });
 
-      it('then calls the global handler when a matching key is pressed', function() {
+      it('then calls the handler when a matching key is pressed', function() {
         this.targetElement.keyPress(KeyCode.B);
 
         expect(this.globalCommonActionHandler).to.have.been.called;

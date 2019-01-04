@@ -47,6 +47,12 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      */
     this.keyEventManager = keyEventManager;
 
+    /**
+     * Whether the global key event handlers have been bound to document yet or not
+     * @type {boolean}
+     */
+    this.listenersBound = false;
+
 
     this.eventOptions = {};
   }
@@ -230,7 +236,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _updateDocumentHandlers(){
-    if (this.keyMapEventBitmap.some((eventType) => eventType)) {
+    const listenersShouldBeBound = this.keyMapEventBitmap.some((eventType) => eventType);
+
+    if (!this.listenersBound && listenersShouldBeBound) {
       for(let bitmapIndex = 0; bitmapIndex < this.keyMapEventBitmap.length; bitmapIndex++) {
         const eventName = describeKeyEvent(bitmapIndex);
 
@@ -244,7 +252,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         );
       }
 
-    } else {
+      this.listenersBound = true;
+
+    } else if(this.listenersBound && !listenersShouldBeBound) {
 
       for(let bitmapIndex = 0; bitmapIndex < this.keyMapEventBitmap.length; bitmapIndex++) {
         const eventName = describeKeyEvent(bitmapIndex);
@@ -256,6 +266,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
           `Removed handler handleGlobal${capitalize(eventName)}() from document.on${eventName}()`
         );
       }
+
+      this.listenersBound = false;
     }
   }
 

@@ -1,12 +1,8 @@
-import { HotKeys } from 'react-hotkeys';
+import { HotKeys, GlobalHotKeys } from 'react-hotkeys';
 import React, { Fragment } from 'react';
 
 import Node from './Node';
 import HOCWrappedNode from './HOCWrappedNode';
-
-HotKeys.configure({
-  logLevel: 'verbose'
-});
 
 const keyMap = {
   DELETE: { sequence: 'backspace', action: 'keyup'},
@@ -60,7 +56,7 @@ class App extends React.Component {
 
     return (
       <Fragment>
-        <HotKeys
+        <GlobalHotKeys
           keyMap={globalKeyMap}
           handlers={globalHandlers}
           global

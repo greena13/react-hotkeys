@@ -4,11 +4,11 @@ import {expect} from 'chai';
 import sinon from 'sinon';
 import simulant from 'simulant';
 
-import HotKeys from '../../../src/HotKeys';
-import KeyCode from '../../support/Key';
-import FocusableElement from '../../support/FocusableElement';
+import GlobalHotKeys from '../../src/GlobalHotKeys';
+import KeyCode from '../support/Key';
+import FocusableElement from '../support/FocusableElement';
 
-describe('Nested global HotKeys components:', () => {
+describe('Nested GlobalHotKeys components:', () => {
   before(function () {
     this.outerKeyMap = {
       'ACTION1_OUTER': 'a',
@@ -46,13 +46,13 @@ describe('Nested global HotKeys components:', () => {
         };
 
         this.wrapper = mount(
-          <HotKeys keyMap={this.outerKeyMap} handlers={handlers} global>
+          <GlobalHotKeys keyMap={this.outerKeyMap} handlers={handlers}>
             <div className="outerChildElement" />
 
-            <HotKeys keyMap={this.innerKeyMap} global>
+            <GlobalHotKeys keyMap={this.innerKeyMap}>
               <div className="innerChildElement" />
-            </HotKeys>
-          </HotKeys>,
+            </GlobalHotKeys>
+          </GlobalHotKeys>,
           { attachTo: this.reactDiv }
         );
       });
@@ -98,13 +98,13 @@ describe('Nested global HotKeys components:', () => {
         };
 
         this.wrapper = mount(
-          <HotKeys keyMap={this.outerKeyMap} global>
+          <GlobalHotKeys keyMap={this.outerKeyMap}>
             <div className="outerChildElement" />
 
-            <HotKeys keyMap={this.innerKeyMap} handlers={handlers} global>
+            <GlobalHotKeys keyMap={this.innerKeyMap} handlers={handlers}>
               <div className="innerChildElement" />
-            </HotKeys>
-          </HotKeys>,
+            </GlobalHotKeys>
+          </GlobalHotKeys>,
           { attachTo: this.reactDiv }
         );
 
@@ -165,13 +165,13 @@ describe('Nested global HotKeys components:', () => {
         };
 
         this.wrapper = mount(
-          <HotKeys keyMap={this.outerKeyMap} handlers={outerHandlers} global>
+          <GlobalHotKeys keyMap={this.outerKeyMap} handlers={outerHandlers}>
             <div className="outerChildElement" />
 
-            <HotKeys keyMap={this.innerKeyMap} handlers={innerHandlers} global>
+            <GlobalHotKeys keyMap={this.innerKeyMap} handlers={innerHandlers}>
               <div className="innerChildElement" />
-            </HotKeys>
-          </HotKeys>,
+            </GlobalHotKeys>
+          </GlobalHotKeys>,
           { attachTo: this.reactDiv }
         );
 

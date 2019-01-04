@@ -27,13 +27,6 @@ interface HotKeysEnabledProps extends React.HTMLAttributes<HotKeys> {
   handlers?: { [key: string]: (keyEvent?: KeyboardEvent) => void };
 
   /**
-   * Whether the hotkeys should be applied globally (the current
-   * component or indeed the React app need not be in focus for
-   * the keys be matched)
-   */
-  global?: boolean;
-
-  /**
    * Function to call when this component gains focus in the browser
    */
   onFocus?: () => void;
@@ -58,6 +51,8 @@ interface HotKeysProps extends HotKeysEnabledProps {
  * based on which key (or key combination) is activated.
  */
 export class HotKeys extends React.Component<HotKeysProps, {}> { }
+
+export class GlobalHotKeys extends React.Component<HotKeysEnabled, {}> { }
 
 /**
  * Wraps a React component in a HotKeysEnabled component, which passes down the

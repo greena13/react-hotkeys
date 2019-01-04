@@ -1,10 +1,8 @@
 import PropTypes from 'prop-types';
 import React, {PureComponent} from 'react';
 import hasChanged from './utils/object/hasChanged';
-import isUndefined from './utils/isUndefined';
 import Configuration from './lib/Configuration';
 import KeyEventManager from './lib/KeyEventManager';
-import Logger from './lib/Logger';
 
 /**
  * Wraps a React component in a HotKeysEnabled component, which passes down the
@@ -32,10 +30,6 @@ function withHotKeys(Component, hotKeysOptions = {}) {
 
   function getKeyMap(props) {
     return mergeWithOptions('keyMap', props);
-  }
-
-  function getGlobal(props) {
-    return props.global || hotKeysOptions.global;
   }
 
   return class HotKeysEnabled extends PureComponent {
@@ -94,14 +88,6 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       handlers: PropTypes.object,
 
       /**
-       * Whether the hotkeys should be applied globally (the current
-       * component or indeed the React app need not be in focus for
-       * the keys be matched)
-       * @type {Boolean}
-       */
-      global: PropTypes.bool,
-
-      /**
        * Function to call when this component gains focus in the browser
        * @type {Function}
        */
@@ -112,16 +98,6 @@ function withHotKeys(Component, hotKeysOptions = {}) {
        * @type {Function}
        */
       onBlur: PropTypes.func,
-    };
-
-    /**
-     * Returns a KeyEventManager singleton
-     * @returns {KeyEventManager}
-     */
-    static getKeyEventManager() {
-      return KeyEventManager.getInstance({
-        logger: new Logger(Configuration.option('logLevel'))
-      });
     };
 
     /**
@@ -147,7 +123,6 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       this._handleKeyDown = this._handleKeyDown.bind(this);
       this._handleKeyPress = this._handleKeyPress.bind(this);
       this._handleKeyUp = this._handleKeyUp.bind(this);
-      this._isGlobalComponent = this._isGlobalComponent.bind(this);
       this._componentIsFocused = this._componentIsFocused.bind(this);
     }
 
@@ -157,32 +132,27 @@ function withHotKeys(Component, hotKeysOptions = {}) {
          * Props used by HotKeys that should not be passed down to its focus trap
          * component
          */
-        keyMap, handlers, global,
+        keyMap, handlers,
 
         ...props
       } = this.props;
 
 
-      if (getGlobal(this.props) && !this.props.children) {
-        return <Component{ ...props }/>;
-      } else {
+      const hotKeys = {
+        onFocus: this._wrapFunction('onFocus', this._handleFocus),
+        onBlur: this._wrapFunction('onBlur', this._handleBlur),
+        onKeyDown: this._handleKeyDown,
+        onKeyPress: this._handleKeyPress,
+        onKeyUp: this._handleKeyUp,
+        tabIndex: Configuration.option('defaultTabIndex')
+      };
 
-        const hotKeys = {
-          onFocus: this._wrapFunction('onFocus', this._handleFocus),
-          onBlur: this._wrapFunction('onBlur', this._handleBlur),
-          onKeyDown: this._handleKeyDown,
-          onKeyPress: this._handleKeyPress,
-          onKeyUp: this._handleKeyUp,
-          tabIndex: Configuration.option('defaultTabIndex')
-        };
-
-        return (
-          <Component
-            hotKeys={ hotKeys }
-            { ...props }
-          />
-        );
-      }
+      return (
+        <Component
+          hotKeys={ hotKeys }
+          { ...props }
+        />
+      );
     }
 
     _wrapFunction(propName, func){
@@ -216,18 +186,6 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       }
     }
 
-    componentDidMount() {
-      if (getGlobal(this.props)) {
-        this._globalIndex =
-          this.constructor.getKeyEventManager().addGlobalHotKeys(
-            getKeyMap(this.props),
-            getHandlers(this.props),
-            this._getComponentOptions(),
-            this._getEventOptions()
-          );
-      }
-    }
-
     componentWillReceiveProps(nextProps) {
       const nextHandlers = getHandlers(nextProps);
       const prevHandlers = getHandlers(this.props);
@@ -236,54 +194,24 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       const prevKeyMap = getKeyMap(this.props);
 
       if (hasChanged(nextHandlers, prevHandlers) || hasChanged(nextKeyMap, prevKeyMap)) {
-        /**
-         * NB: We are not supporting changing a component's global prop - once a component
-         * is mounted as global or non-global, it must remain that way.
-         */
-        if (this._isGlobalComponent(nextProps)) {
+        if (this._componentIsFocused()) {
           /**
-           * Component defines global hotkeys, so any changes to props may have changes
-           * that should have immediate effect
+           * Component is in focus, so update key map as it may have changes that
+           * should have immediate effect
            */
-          this.constructor.getKeyEventManager().updateGlobalHotKeys(
-            this._globalIndex,
+          KeyEventManager.getInstance().updateHotKeys(
+            this._getFocusTreeId(),
+            this._componentId,
             nextKeyMap,
             nextHandlers,
-            this._getComponentOptions(),
-            this._getEventOptions()
+            this._getComponentOptions()
           );
-        } else {
-          if (this._componentIsFocused()) {
-            /**
-             * Component is in focus and non-global, so update key map as it may have
-             * changes that should have immediate effect
-             */
-            this.constructor.getKeyEventManager().updateHotKeys(
-              this._getFocusTreeId(),
-              this._componentId,
-              nextKeyMap,
-              nextHandlers,
-              this._getComponentOptions()
-            );
-          }
         }
       }
     }
 
     componentWillUnmount(){
-      if (this._isGlobalComponent()) {
-        this.constructor.getKeyEventManager().removeGlobalHotKeys(this._globalIndex)
-      } else {
-        this._handleBlur();
-      }
-    }
-
-    _isGlobalComponent(props = this.props) {
-      return !isUndefined(getGlobal(props));
-    }
-
-    _isFocusOnlyComponent(props = this.props) {
-      return !this._isGlobalComponent(props);
+      this._handleBlur();
     }
 
     _componentIsFocused() {
@@ -300,19 +228,17 @@ function withHotKeys(Component, hotKeysOptions = {}) {
         this.props.onFocus(...arguments);
       }
 
-      if (this._isFocusOnlyComponent()) {
-        const [ focusTreeId, componentId ] =
-          this.constructor.getKeyEventManager().addHotKeys(
-            getKeyMap(this.props),
-            getHandlers(this.props),
-            this._getComponentOptions()
-          );
+      const [ focusTreeId, componentId ] =
+        KeyEventManager.getInstance().addHotKeys(
+          getKeyMap(this.props),
+          getHandlers(this.props),
+          this._getComponentOptions()
+        );
 
-        this._componentId = componentId;
-        this._focusTreeIdsPush(focusTreeId);
+      this._componentId = componentId;
+      this._focusTreeIdsPush(focusTreeId);
 
-        this._focused = true;
-      }
+      this._focused = true;
     }
 
     /**
@@ -325,15 +251,13 @@ function withHotKeys(Component, hotKeysOptions = {}) {
         this.props.onBlur(...arguments);
       }
 
-      if (this._isFocusOnlyComponent()) {
-        const retainCurrentFocusTreeId = this.constructor.getKeyEventManager().removeHotKeys(this._getFocusTreeId(), this._componentId);
+      const retainCurrentFocusTreeId = KeyEventManager.getInstance().removeHotKeys(this._getFocusTreeId(), this._componentId);
 
-        if (!retainCurrentFocusTreeId) {
-          this._focusTreeIdsShift();
-        }
-
-        this._focused = false;
+      if (!retainCurrentFocusTreeId) {
+        this._focusTreeIdsShift();
       }
+
+      this._focused = false;
     }
 
     /**
@@ -343,7 +267,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
      */
     _handleKeyDown(event) {
       const discardFocusTreeId =
-        this.constructor.getKeyEventManager().handleKeydown(
+        KeyEventManager.getInstance().handleKeydown(
           event,
           this._getFocusTreeId(),
           this._componentId,
@@ -362,7 +286,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
      */
     _handleKeyPress(event) {
       const discardFocusTreeId =
-        this.constructor.getKeyEventManager().handleKeypress(
+        KeyEventManager.getInstance().handleKeypress(
           event,
           this._getFocusTreeId(),
           this._componentId,
@@ -381,7 +305,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
      */
     _handleKeyUp(event) {
       const discardFocusTreeId =
-        this.constructor.getKeyEventManager().handleKeyup(
+        KeyEventManager.getInstance().handleKeyup(
           event,
           this._getFocusTreeId(),
           this._componentId,

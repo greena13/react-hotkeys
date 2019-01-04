@@ -4,10 +4,10 @@ import {expect} from 'chai';
 import sinon from 'sinon';
 import simulant from 'simulant';
 
-import KeyCode from '../../support/Key';
-import HotKeys from '../../../src/HotKeys';
+import KeyCode from '../support/Key';
+import GlobalHotKeys from '../../src/GlobalHotKeys';
 
-describe('Changing keyMap and handlers after mount for a global HotKeys component:', function () {
+describe('Changing keyMap and handlers after mount for a GlobalHotKeys component:', function () {
   beforeEach(function () {
     this.keyMap = {
       'ACTION': 'a',
@@ -25,9 +25,9 @@ describe('Changing keyMap and handlers after mount for a global HotKeys componen
     document.body.appendChild(this.reactDiv);
 
     this.wrapper = mount(
-      <HotKeys keyMap={this.keyMap} handlers={this.handlers} global>
+      <GlobalHotKeys keyMap={this.keyMap} handlers={this.handlers}>
         <div className="childElement" />
-      </HotKeys>,
+      </GlobalHotKeys>,
       { attachTo: this.reactDiv }
     );
   });

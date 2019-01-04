@@ -4,10 +4,10 @@ import {expect} from 'chai';
 import sinon from 'sinon';
 import simulant from 'simulant';
 
-import HotKeys from '../../../src/HotKeys';
-import ShiftKeyMappings from '../../support/ShiftKeyMappings';
+import GlobalHotKeys from '../../src/GlobalHotKeys';
+import ShiftKeyMappings from '../support/ShiftKeyMappings';
 
-describe('Sequences involving key aliases for global HotKeys components:', () => {
+describe('Sequences involving key aliases for GlobalHotKeys components:', () => {
   beforeEach(function () {
     this.reactDiv = document.createElement('div');
     document.body.appendChild(this.reactDiv);
@@ -105,9 +105,9 @@ describe('Sequences involving key aliases for global HotKeys components:', () =>
                     };
 
                     this.wrapper = mount(
-                      <HotKeys keyMap={this.keyMap} handlers={handlers} global>
+                      <GlobalHotKeys keyMap={this.keyMap} handlers={handlers}>
                         <div className="childElement" />
-                      </HotKeys>,
+                      </GlobalHotKeys>,
                       { attachTo: this.reactDiv }
                     );
                   });

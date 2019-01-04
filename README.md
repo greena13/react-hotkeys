@@ -269,9 +269,9 @@ const handlers = {
 };
 ```
 
-## In-focus HotKeys components
+## HotKeys components
 
-In-focus `<HotKeys />` components listen only to key events that happen when one of their DOM-mounted descendents are in focus (`<div/>`, `<span/>`, `<input/>`, etc). This emulates (and re-uses) the behaviour of the browser and React's SyntheticEvent propagation.
+`<HotKeys>` components listen only to key events that happen when one of their DOM-mounted descendents are in focus (`<div/>`, `<span/>`, `<input/>`, etc). This emulates (and re-uses) the behaviour of the browser and React's SyntheticEvent propagation.
 
 This is the default type of `<HotKeys />` component, and should normally be your first choice for efficiency and clarity (the user generally expects keyboard input to affect the focused element in the browser).
 
@@ -279,14 +279,14 @@ Each time a new element is focused, the history of the keys that have already be
 
 ### How action handlers are resolved
 
-> If one of the DOM-mounted descendents of an focus-only `<HotKeys />` component are in focus (and it is listening to key events) AND those key events match a hot key in the component's key map, then the corresponding action is triggered.
+> If one of the DOM-mounted descendents of an `<HotKeys>` component are in focus (and it is listening to key events) AND those key events match a hot key in the component's key map, then the corresponding action is triggered.
 
 `react-hotkeys` starts at the `<HotKeys />` component closest to the event's target (the element that was in focus when the key was pressed) and works its way up through the component tree of focused `<HotKeys />` components, looking for a matching handler for the action. The handler closest to the event target AND a descendant of the `<HotKeys />` component that defines the action (or the component itself), is the one that is called.
 
 That is:
 
-- Unless one of the DOM-mounted descendents of a focus-only `<HotKeys />` component is in focus, the component's actions are not matched
-- Unless a focus-only `<HotKeys />` component is nested within the `<HotKeys />` component that defines the action (or is the same `<HotKeys />` component), its handler is not called
+- Unless one of the DOM-mounted descendents of a `<HotKeys>` component is in focus, the component's actions are not matched
+- Unless a `<HotKeys>` component is nested within the `<HotKeys />` component that defines the action (or is the same `<HotKeys />` component), its handler is not called
 - If a `<HotKeys />` component closer to the event target has defined a handler for the same action, a `<HotKeys />` component's handler won't be called (the closer component's handler will)
 
 A more exhaustive enumeration of `react-hotkeys` behaviour can be found by reviewing the [test suite](/test).
@@ -371,37 +371,6 @@ You can retrieve the element that is currently focused using the following:
 document.activeElement
 ```
 
-## Global HotKeys component
-
-Global `<HotKeys>` components match key events that occur anywhere in the document (even when no part of your React application is in focus).
-
-They are enabled with the `global` prop:
-
-```javascript
-const keyMap = { SHOW_ALL_HOTKEYS: 'shift+?' };
-const handlers = { SHOW_ALL_HOTKEYS: this.showHotKeysDialog };
-
-<HotKeys keyMap={ keyMap } handlers={ handlers } global />
-```
-
-Global `<HotKeys>` generally have no need for children, so should use a self-closing tag (as shown above).
-
-### How actions and handlers are resolved
-
-Regardless of where global `<HotKeys>` components appear in the render tree, they are matched with key events after the event has finished propagating through the React app (if the event originated in the React at all). This means if your React app is in focus and it handles a key event, it will be ignored by the global `<HotKeys>` components.
-
-The order used for resolving actions and handlers amongst global `<HotKeys>` components, is the order in which they mounted. When a global `<HotKeys>` component is unmounted, it is removed from consideration. This can get somewhat less deterministic over the course of a long session using a React app, so it is best to define actions and handlers that are globally unique.
-
-It is recommended to use focus-only `<HotKeys>` components whenever possible for better performance and reliability.
-
-> You can use the [autofocus attributes](#Autofocus) or [programmatically manage focus](#Programmatically-manage-focus) to automatically focus your React app so the user doesn't have to select it in order for hot keys to take effect. It is common practice to place a `<HotKeys>` component towards the top of your application to match hot keys across your entire React application.
-
-## Ignoring events
-
-By default, all key events that originate from `<input>`, `<select>` or `<textarea>`, or have a `isContentEditable` attribute of `true` are ignored by `react-hotkeys`.
-
-If this is not what you want for your application, you can modify the list of tags using the `ignoreTags` [configuration option](#Configuration) or if you need additional control, you can specify a brand new function using the `ignoreEventsCondition` [configuration option](#Configuration).
-
 ## HotKeys component API
 
 The HotKeys component provides a declarative and native JSX syntax that is best for succinctly declaring hotkeys in a way that best maintains separation and encapsulation with regards to the rest of your code base.
@@ -429,11 +398,6 @@ However, it [does require that its children be wrapped in a DOM-mounted node](#H
    * Optional.
    */
   handlers={ {} }
-
-  /**
-   * Whether the hotkeys are global or focus-only
-   */
-  global={ false }
 
   /**
    * The type of DOM-mountable component that should be used to wrap
@@ -550,6 +514,69 @@ const MyHotKeysComponent = withHotKeys(MyComponent, {keyMap, handlers});
 </MyHotKeysComponent>
 ```
 
+## GlobalHotKeys component
+
+`<GlobalHotKeys>` components match key events that occur anywhere in the document (even when no part of your React application is in focus).
+
+```javascript
+const keyMap = { SHOW_ALL_HOTKEYS: 'shift+?' };
+const handlers = { SHOW_ALL_HOTKEYS: this.showHotKeysDialog };
+
+<GlobalHotKeys keyMap={ keyMap } handlers={ handlers } />
+```
+
+`<GlobalHotKeys>` generally have no need for children, so should use a self-closing tag (as shown above). The only exception is when you are nesting other `<GlobalHotKeys>` components somewhere in the descendents (these are mounted before their parents, and so are generally matched first).
+
+### How actions and handlers are resolved
+
+Regardless of where `<GlobalHotKeys>` components appear in the render tree, they are matched with key events after the event has finished propagating through the React app (if the event originated in the React at all). This means if your React app is in focus and it handles a key event, it will be ignored by the `<GlobalHotKeys>` components.
+
+The order used for resolving actions and handlers amongst `<GlobalHotKeys>` components, is the order in which they mounted (those mounted first, are given the chance to handle an action first). When a `<GlobalHotKeys>` component is unmounted, it is removed from consideration. This can get less deterministic over the course of a long session using a React app as components mount and unmount, so it is best to define actions and handlers that are globally unique.
+
+It is recommended to use `<HotKeys>` components whenever possible for better performance and reliability.
+
+> You can use the [autofocus attributes](#Autofocus) or [programmatically manage focus](#Programmatically-manage-focus) to automatically focus your React app so the user doesn't have to select it in order for hot keys to take effect. It is common practice to place a `<HotKeys>` component towards the top of your application to match hot keys across your entire React application.
+
+## GlobalHotKeys component API
+
+The GlobalHotKeys component provides a declarative and native JSX syntax for defining hotkeys that are applicable beyond you React application.
+
+```javascript
+
+<GlobalHotKeys
+  /**
+   * An object that defines actions as keys and key sequences as values
+   * (using either a string, array or object).
+   *
+   * Actions defined in one HotKeys component are available to be handled
+   * in an descendent HotKeys component.
+   *
+   * Optional.
+   */
+  keyMap={ {} }
+
+  /**
+   * An object that defines handler functions as values, and the actions
+   * that they handle as keys.
+   *
+   * Optional.
+   */
+  handlers={ {} }
+
+  /**
+   * Wraps all children in a DOM-mountable component
+   */
+   { children }
+
+</GlobalHotKeys>
+```
+
+## Ignoring events
+
+By default, all key events that originate from `<input>`, `<select>` or `<textarea>`, or have a `isContentEditable` attribute of `true` are ignored by `react-hotkeys`.
+
+If this is not what you want for your application, you can modify the list of tags using the `ignoreTags` [configuration option](#Configuration) or if you need additional control, you can specify a brand new function using the `ignoreEventsCondition` [configuration option](#Configuration).
+
 ## Configuration
 
 The default behaviour across all `<HotKeys>` components is configured using the `HotKeys.configure` method.
@@ -625,7 +652,7 @@ You have 3 options:
 
 Check that you are [correctly passing the hotKeys props to a DOM-mountable component](#Pre-defining-default-prop-values).
 
-#### Actions aren't being triggered for focus-only HotKeys
+#### Actions aren't being triggered for HotKeys
 
 Make sure you are focusing a descendant of the `<HotKeys>` component before you press the keys.
 

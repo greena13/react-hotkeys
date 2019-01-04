@@ -2,6 +2,7 @@ import Logger from './Logger';
 import FocusOnlyKeyEventStrategy from './strategies/FocusOnlyKeyEventStrategy';
 import GlobalKeyEventStrategy from './strategies/GlobalKeyEventStrategy';
 import isFromFocusOnlyComponent from '../helpers/resolving-handlers/isFromFocusOnlyComponent';
+import Configuration from './Configuration';
 
 /**
  * Provides a registry for keyboard sequences and events, and the handlers that should
@@ -34,7 +35,7 @@ class KeyEventManager {
    * will be used with a render tree.
    */
   constructor(configuration = {}) {
-    this.logger = configuration.logger || new Logger('warn');
+    this.logger = configuration.logger || new Logger(Configuration.option('logLevel'));
 
     this.focusOnlyEventStrategy =
       new FocusOnlyKeyEventStrategy({ configuration, logger: this.logger });

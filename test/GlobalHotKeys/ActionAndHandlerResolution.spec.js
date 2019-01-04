@@ -4,10 +4,10 @@ import {expect} from 'chai';
 import sinon from 'sinon';
 import simulant from 'simulant';
 
-import KeyCode from '../../support/Key';
-import HotKeys from '../../../src/HotKeys';
+import KeyCode from '../support/Key';
+import GlobalHotKeys from '../../src/GlobalHotKeys';
 
-describe('Action and handler resolution for global HotKeys component:', function () {
+describe('Action and handler resolution for GlobalHotKeys component:', function () {
   describe('when an action is defined', function () {
     describe('in the same component as its handlers', function () {
       beforeEach(function () {
@@ -25,9 +25,9 @@ describe('Action and handler resolution for global HotKeys component:', function
         document.body.appendChild(this.reactDiv);
 
         this.wrapper = mount(
-          <HotKeys keyMap={ this.keyMap } handlers={ handlers } global>
+          <GlobalHotKeys keyMap={ this.keyMap } handlers={ handlers }>
             <div className="childElement" />
-          </HotKeys>,
+          </GlobalHotKeys>,
           { attachTo: this.reactDiv }
         );
       });
@@ -63,11 +63,11 @@ describe('Action and handler resolution for global HotKeys component:', function
         document.body.appendChild(this.reactDiv);
 
         this.wrapper = mount(
-          <HotKeys keyMap={ this.keyMap } global>
-            <HotKeys handlers={ handlers } global>
+          <GlobalHotKeys keyMap={ this.keyMap }>
+            <GlobalHotKeys handlers={ handlers }>
               <div className="childElement" />
-            </HotKeys>
-          </HotKeys>,
+            </GlobalHotKeys>
+          </GlobalHotKeys>,
           { attachTo: this.reactDiv }
         );
       });
@@ -104,15 +104,15 @@ describe('Action and handler resolution for global HotKeys component:', function
         document.body.appendChild(this.reactDiv);
 
         this.wrapper = mount(
-          <HotKeys keyMap={ this.keyMap }  global>
-            <HotKeys keyMap={ { ACTION2: 'tab' } }  global>
+          <GlobalHotKeys keyMap={ this.keyMap }>
+            <GlobalHotKeys keyMap={ { ACTION2: 'tab' } }>
               <div >
-                <HotKeys handlers={ handlers } global>
+                <GlobalHotKeys handlers={ handlers }>
                   <div className="childElement" />
-                </HotKeys>
+                </GlobalHotKeys>
               </div>
-            </HotKeys>
-          </HotKeys>,
+            </GlobalHotKeys>
+          </GlobalHotKeys>,
           { attachTo: this.reactDiv }
         );
       });
