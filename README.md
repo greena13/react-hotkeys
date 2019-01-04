@@ -12,16 +12,15 @@ A declarative library for handling hotkeys and focus areas in React applications
 
 ## Feature Overview
 
-- Offers a minimal declarative JSX and HoC APIs
+- Offers a minimal declarative [JSX](#HotKeys-component-API) and [HoC](#withHotKeys-HoC-API) APIs
 - Supports [browser key names](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values) and [Mousetrap syntax](https://github.com/ccampbell/mousetrap)
-- Allows you to define global as well as and focus-only hot keys
-- Works with React's Synthetic KeyboardEvents and event delegation
-- Provides predictable behaviour to anyone who is familiar with React and its render tree
-- It's customizable through a simple configuration API
-- Optimized for larger applications, with many hot keys active at once
-- More than 1800 automated tests
-- Only external dependency is `prop-types`
+- Allows you to define [global](#GlobalHotKeys-component) and [in-focus](#HotKeys-component) hot keys
+- Works with React's Synthetic KeyboardEvents and event delegation and provides [predictable and expected behaviour](#Interaction-with-React) to anyone  familiar with React
+- It's customizable through a simple [configuration API](#Configuration)
+- [Optimized for larger applications](#Optimizations), with many hot keys active at once
+- Depends only on `prop-types` and a peer dependency of `react`
 - Uses rollup, Uglify and strips out comments and logging for a small production build
+- Has more than [1800 automated tests](/tests)
 
 ## Basic Usage
 
@@ -268,6 +267,13 @@ const handlers = {
   'up': (event) => console.log('up key called')
 };
 ```
+
+## Interaction with React
+
+Rather than re-invent the wheel, `react-hotkeys` piggy-backs of the React SyntheticEvent and event propagation, so all of the normal React behaviour that you expect still applies.
+
+- Key events propagate up from a source or target towards the root of the application.
+- If an event has `stopPropagation()` called on it, it will not be seen by components higher up in the render tree.
 
 ## HotKeys components
 
@@ -1031,6 +1037,24 @@ HotKeys (FT0📕-E2💙-C0🔺): Found action that matches 'ArrowDown': MOVE_DOW
 HotKeys (FT0📕-E2💙-C1⭐️): Simulating 'ArrowDown' keypress event because 'ArrowDown' doesn't natively have one.
 HotKeys (FT0📕-E2💙-C1⭐️): Ignored 'ArrowDown' keypress as it has already been handled.
 ```
+
+## Optimizations
+
+`react-hotkeys` uses a lot of optimizations to help keep it as performant as possible (both in terms of time and memory). It can be helpful to be aware of some of these measures if you are seeing unexpected behaviour:
+
+### Code optimizations
+
+- If an event is handled by an earlier handler, it is ignored by an further components (this is really a design decision, rather than an optimization, but it helps).
+- Events are ignored unless an action exists that is bound to that particular event type (keydown, keypress, keyup)
+- Events are processed at each level, as they propagate up the React render tree. If a action is triggered by a leaf node, `react-hotkeys` stops there (and does not build the full application's mappings of key sequences and handlers)
+- Key histories longer than the longest registered key sequence are discarded.
+- The mapping between an action's key sequences and handlers is built "on-the-fly", so unless a particular action is triggered, `react-hotkeys` doesn't do the work of finding its corresponding handler.
+- Global event listeners are only bound to `document` when a global hotkey is defined (and are removed when the last one is unmounted).
+
+### Production optimizations
+
+- The production build strips out all comments and logging statements below a level of warning, before undergoing minification using Uglify.
+- An es6 version is also available, that allows for tree-shaking in compatible build setups.
 
 ## Support
 
