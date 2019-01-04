@@ -6,6 +6,18 @@ import Configuration from './lib/Configuration';
 import KeyEventManager from './lib/KeyEventManager';
 import Logger from './lib/Logger';
 
+/**
+ * Wraps a React component in a HotKeysEnabled component, which passes down the
+ * callbacks and options necessary for React Hotkeys to work as a single prop value,
+ * hotkeys. These must be unwrapped and applied to a DOM-mountable element within
+ * the wrapped component (e.g. div, span, input, etc) in order for the key events
+ * to be recorded.
+ *
+ * @param {React.Component} Component - Component class to wrap
+ * @param {Object} hotKeysOptions - Options that become the wrapping
+ * @returns {React.Component} Wrapped component that is passed all of the React hotkeys
+ * props in a single value, hotkeys.
+ */
 function withHotKeys(Component, hotKeysOptions = {}) {
   function mergeWithOptions(key, props) {
     return {
