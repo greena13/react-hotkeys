@@ -26,7 +26,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     /**
      * Set state that gets cleared every time a component gets mounted or unmounted
      */
-    super(configuration);
+    super(configuration, keyEventManager);
 
     /**
      * Set state that doesn't get cleared each time a new new component is mounted
@@ -39,13 +39,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * @type {ComponentId}
      */
     this.componentId = -1;
-
-    /**
-     * Reference to key event manager, so that information may pass between the
-     * global strategy and the focus-only strategy
-     * @type {KeyEventManager}
-     */
-    this.keyEventManager = keyEventManager;
 
     /**
      * Whether the global key event handlers have been bound to document yet or not
@@ -336,10 +329,14 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this._callHandlerIfExists(event, _key, KeyEventBitmapIndex.keydown);
 
       if (!hasKeyPressEvent(_key)) {
+        /**
+         * We simulate keypress events in the React app before we do it globally
+         */
+        this.keyEventManager.simulatePendingKeyPressEvents();
+
         this.logger.debug(
           `${this._logPrefix()} Simulating '${_key}' keypress event because '${_key}' doesn't natively have one.`
         );
-
         /**
          * If a key does not have a keypress event, we simulate one immediately after
          * the keydown event, to keep the behaviour consistent across all keys

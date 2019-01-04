@@ -38,7 +38,7 @@ class KeyEventManager {
     this.logger = configuration.logger || new Logger(Configuration.option('logLevel'));
 
     this.focusOnlyEventStrategy =
-      new FocusOnlyKeyEventStrategy({ configuration, logger: this.logger });
+      new FocusOnlyKeyEventStrategy({ configuration, logger: this.logger }, this);
 
     this.globalEventStrategy =
       new GlobalKeyEventStrategy({ configuration, logger: this.logger }, this);
@@ -286,6 +286,14 @@ class KeyEventManager {
     } else {
       return 'unseen';
     }
+  }
+
+  simulatePendingKeyPressEvents() {
+    this.focusOnlyEventStrategy.simulatePendingKeyPressEvents();
+  }
+
+  isGlobalListenersBound() {
+    return this.globalEventStrategy.listenersBound;
   }
 }
 

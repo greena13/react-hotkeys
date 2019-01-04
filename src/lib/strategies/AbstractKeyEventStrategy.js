@@ -32,7 +32,7 @@ class AbstractKeyEventStrategy {
    * @param {Object} options Options for how event strategy should behave
    * @param {Logger} options.logger The Logger to use to report event strategy actions
    */
-  constructor(options = {}) {
+  constructor(options = {}, keyEventManager) {
     this.logger = options.logger || new Logger('warn');
     /**
      * @typedef {Number} ComponentId Unique index associated with every HotKeys component
@@ -55,6 +55,13 @@ class AbstractKeyEventStrategy {
      * @type {ComponentId}
      */
     this.componentId = 0;
+
+    /**
+     * Reference to key event manager, so that information may pass between the
+     * global strategy and the focus-only strategy
+     * @type {KeyEventManager}
+     */
+    this.keyEventManager = keyEventManager;
 
     this._reset();
   }

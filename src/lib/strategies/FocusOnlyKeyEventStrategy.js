@@ -18,11 +18,11 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * Init & Reset
    ********************************************************************************/
 
-  constructor(configuration = {}) {
+  constructor(configuration = {}, keyEventManager) {
     /**
      * Set state that DOES get cleared on each new focus tree
      */
-    super(configuration);
+    super(configuration, keyEventManager);
 
     /**
      * State that doesn't get cleared on each new focus tree
@@ -307,31 +307,39 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
        * event to simulate the keypress event, as the keydown event bubbles through
        * the last focus-only HotKeysComponent
        */
+      event.persist();
+      
       this.keypressEventsToSimulate.push({
-        event, focusTreeId, componentId, options
+        event, focusTreeId, componentId, options, key: _key
       });
     }
 
     if (this._isFocusTreeRoot(componentId)) {
+      if (!this.keyEventManager.isGlobalListenersBound()) {
+        this.simulatePendingKeyPressEvents(_key);
+      }
       /**
-       * The keydown event is propagating through the last HotKeys component and
-       * so we need to simulate any pending keypress events
+       * else, we wait for keydown event to propagate through global strategy
+       * before we simulate the keypress
        */
-
-      this.keypressEventsToSimulate.forEach(({ event, focusTreeId, componentId, options }) => {
-        this.logger.debug(
-          `${this._logPrefix(componentId, focusTreeId)} Simulating '${_key}' keypress event because '${_key}' doesn't natively have one.`
-        );
-
-        this.handleKeypress(event, focusTreeId, componentId, options);
-      });
-
-      this.keypressEventsToSimulate = [];
+    } else {
+      this._updateEventPropagationHistory(componentId);
     }
 
-    this._updateEventPropagationHistory(componentId);
-
     return false;
+  }
+
+  simulatePendingKeyPressEvents() {
+    this.keypressEventsToSimulate.forEach(({ event, focusTreeId, componentId, options, key }) => {
+      this.logger.debug(
+        `${this._logPrefix(componentId, focusTreeId)} Simulating '${key}' keypress event because '${key}' doesn't natively have one.`
+      );
+
+      this.handleKeypress(event, focusTreeId, componentId, options);
+    });
+
+    this.keypressEventsToSimulate = [];
+    this._clearEventPropagationState();
   }
 
   /**
