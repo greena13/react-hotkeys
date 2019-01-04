@@ -558,7 +558,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     let base = `HotKeys (GLOBAL`;
 
     if (options.eventId !== false) {
-      base = `${base}-E${KeyEventCounter.getId()}${eventIcons[KeyEventCounter.getId() % eventIcons.length]}`
+      const eventId = isUndefined(options.eventId) ? KeyEventCounter.getId() : options.eventId;
+
+      base = `${base}-E${eventId}${eventIcons[eventId % eventIcons.length]}`
     }
 
     if (isUndefined(componentId)) {
