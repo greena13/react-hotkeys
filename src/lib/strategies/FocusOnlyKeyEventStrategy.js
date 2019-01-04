@@ -133,7 +133,13 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *         when handling a key event
    */
   addHotKeys(actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
-    if (this.resetOnNextFocus) {
+    if (this.resetOnNextFocus || this.keyMaps) {
+      /**
+       * We know components have just lost focus or keymaps have already been built,
+       * meaning we are either anticipating a new set of components to be focused or
+       * we are receiving notice of a component being focused when we aren't expecting it.
+       * In either case, the internal state needs to be reset.
+       */
       this._reset();
       this.resetOnNextFocus = false;
     }
