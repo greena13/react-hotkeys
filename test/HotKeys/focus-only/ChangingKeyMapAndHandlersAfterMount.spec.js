@@ -6,7 +6,7 @@ import sinon from 'sinon';
 import FocusableElement from '../../support/FocusableElement';
 
 import KeyCode from '../../support/Key';
-import HotKeys from '../../../src/HotKeys';
+import {HotKeys} from '../../../src/';
 
 describe('Changing keyMap and handlers after mount:', function () {
   beforeEach(function () {

@@ -5,7 +5,7 @@ import sinon from 'sinon';
 
 import FocusableElement from '../../support/FocusableElement';
 
-import HotKeys from '../../../src/HotKeys';
+import {HotKeys} from '../../../src/';
 import hasKeyPressEvent from '../../../src/helpers/resolving-handlers/hasKeyPressEvent';
 
 const keyMapping = {

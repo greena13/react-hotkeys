@@ -3,8 +3,8 @@ import {mount} from 'enzyme';
 import {expect} from 'chai';
 import sinon from 'sinon';
 
-import GlobalHotKeys from '../../src/GlobalHotKeys';
-import HotKeys from '../../src/HotKeys';
+import {GlobalHotKeys} from '../../src';
+import {HotKeys} from '../../src/';
 import KeyCode from '../support/Key';
 import FocusableElement from '../support/FocusableElement';
 import KeyEventManager from '../../src/lib/KeyEventManager';

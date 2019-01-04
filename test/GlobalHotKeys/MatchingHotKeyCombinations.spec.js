@@ -5,7 +5,7 @@ import sinon from 'sinon';
 import simulant from 'simulant';
 
 import KeyCode from '../support/Key';
-import GlobalHotKeys from '../../src/GlobalHotKeys';
+import {GlobalHotKeys} from '../../src';
 
 describe('Matching hotkey combinations for GlobalHotKeys:', function () {
   beforeEach(function () {

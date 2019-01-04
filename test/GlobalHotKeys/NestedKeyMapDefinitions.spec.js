@@ -4,7 +4,7 @@ import {expect} from 'chai';
 import sinon from 'sinon';
 import simulant from 'simulant';
 
-import GlobalHotKeys from '../../src/GlobalHotKeys';
+import {GlobalHotKeys} from '../../src';
 import KeyCode from '../support/Key';
 import FocusableElement from '../support/FocusableElement';
 

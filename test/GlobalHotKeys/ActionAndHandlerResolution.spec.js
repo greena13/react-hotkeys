@@ -5,7 +5,7 @@ import sinon from 'sinon';
 import simulant from 'simulant';
 
 import KeyCode from '../support/Key';
-import GlobalHotKeys from '../../src/GlobalHotKeys';
+import {GlobalHotKeys} from '../../src';
 
 describe('Action and handler resolution for GlobalHotKeys component:', function () {
   describe('when an action is defined', function () {

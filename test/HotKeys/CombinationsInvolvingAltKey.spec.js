@@ -5,7 +5,7 @@ import sinon from 'sinon';
 
 import FocusableElement from '../support/FocusableElement';
 
-import HotKeys from '../../src/HotKeys';
+import {HotKeys} from '../../src/';
 import AltKeyMappings from '../support/AltKeyMappings';
 
 describe('Combinations involving alt key:', function () {
