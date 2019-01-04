@@ -90,7 +90,7 @@
   "contributors": [
     "Chris Pearce <hello@chrispearce.me> (chrispearce.co)"
   ],
-  "license": "MIT",
+  "license": "ISC",
   "keywords": [
     "react-component",
     "hotkeys",
