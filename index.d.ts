@@ -67,3 +67,5 @@ export class HotKeys extends React.Component<HotKeysProps, {}> { }
  * to be recorded.
  */
 export declare function withHotKeys(React.Component, HotKeysEnabledProps): HotKeysEnabled;
+
+export declare function deprecatedWithHotKeys(keyMap: { [key: string]: KeySequence }): HotKeys;
