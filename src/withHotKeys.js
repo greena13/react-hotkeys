@@ -186,15 +186,15 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       }
     }
 
-    componentWillReceiveProps(nextProps) {
-      const nextHandlers = getHandlers(nextProps);
-      const prevHandlers = getHandlers(this.props);
+    componentDidUpdate(previousProps) {
+      if (this._componentIsFocused()) {
+        const newHandlers = getHandlers(this.props);
+        const prevHandlers = getHandlers(previousProps);
 
-      const nextKeyMap = getKeyMap(nextProps);
-      const prevKeyMap = getKeyMap(this.props);
+        const newKeyMaps = getKeyMap(this.props);
+        const prevKeyMap = getKeyMap(previousProps);
 
-      if (hasChanged(nextHandlers, prevHandlers) || hasChanged(nextKeyMap, prevKeyMap)) {
-        if (this._componentIsFocused()) {
+        if (hasChanged(newHandlers, prevHandlers) || hasChanged(newKeyMaps, prevKeyMap)) {
           /**
            * Component is in focus, so update key map as it may have changes that
            * should have immediate effect
@@ -202,8 +202,8 @@ function withHotKeys(Component, hotKeysOptions = {}) {
           KeyEventManager.getInstance().updateHotKeys(
             this._getFocusTreeId(),
             this._componentId,
-            nextKeyMap,
-            nextHandlers,
+            newKeyMaps,
+            newHandlers,
             this._getComponentOptions()
           );
         }

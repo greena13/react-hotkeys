@@ -4,30 +4,30 @@ import KeyEventManager from './lib/KeyEventManager';
 import hasChanged from './utils/object/hasChanged';
 
 class GlobalHotKeys extends Component {
-  componentWillReceiveProps(nextProps) {
-    const nextHandlers = nextProps.handlers;
-    const prevHandlers = this.props.handlers;
+  render() {
+    return this.props.children || null;
+  }
 
-    const nextKeyMap = nextProps.keyMap;
-    const prevKeyMap = this.props.keyMap;
+  componentDidUpdate(previousProps) {
+    const newHandlers = this.props.handlers;
+    const prevHandlers = previousProps.handlers;
 
-    if (hasChanged(nextHandlers, prevHandlers) || hasChanged(nextKeyMap, prevKeyMap)) {
-      /**
+    const newKeyMaps = this.props.keyMap;
+    const prevKeyMap = previousProps.keyMaps;
+
+    if (hasChanged(newHandlers, prevHandlers) || hasChanged(newKeyMaps, prevKeyMap)) {
+        /**
        * Component defines global hotkeys, so any changes to props may have changes
        * that should have immediate effect
        */
       KeyEventManager.getInstance().updateGlobalHotKeys(
         this._id,
-        nextKeyMap,
-        nextHandlers,
+        newKeyMaps,
+        newHandlers,
         this._getComponentOptions(),
         this._getEventOptions()
       );
     }
-  }
-
-  render() {
-    return this.props.children || null;
   }
 
   componentDidMount() {

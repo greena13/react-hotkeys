@@ -38,7 +38,7 @@ describe('Changing keyMap and handlers after mount for a GlobalHotKeys component
 
   describe('when a keyMap action\'s key sequence is changed', () => {
     beforeEach(function () {
-      this.wrapper.setProps({ keyMap: { 'ACTION': 'b' }, handlers: this.handlers })
+      this.wrapper.setProps({ keyMap: { 'ACTION': 'b' }, handlers: this.handlers });
     });
 
     it('then the new sequence is used', function() {
