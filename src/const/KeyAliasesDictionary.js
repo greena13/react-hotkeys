@@ -4,7 +4,7 @@
  * of what React already does
  */
 const KeyAliasesDictionary = {
-  'Delete': [ 'Backspace' ],
+  'Backspace': [ 'Delete' ],
 };
 
 export default KeyAliasesDictionary;

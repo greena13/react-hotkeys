@@ -105,7 +105,7 @@ describe('withHotKeys:', () => {
     });
   });
 
-  context('when the second argement is specified', () => {
+  context('when the second argument is specified', () => {
     context('and no props are passed to the wrapped component', () => {
       beforeEach(function () {
         this.handler = sinon.spy();
@@ -161,16 +161,22 @@ describe('withHotKeys:', () => {
         this.targetElement = new FocusableElement(this.wrapper, '.childElement');
         this.targetElement.focus();
 
+        this.targetElement.keyDown(KeyCode.A);
         this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
 
         expect(this.propsHandlerA).to.have.been.called;
         expect(this.secondArdumentHandlerA).to.not.have.been.called;
 
+        this.targetElement.keyDown(KeyCode.B);
         this.targetElement.keyPress(KeyCode.B);
+        this.targetElement.keyUp(KeyCode.B);
 
         expect(this.secondArdumentHandlerB).to.have.been.called;
 
+        this.targetElement.keyDown(KeyCode.C);
         this.targetElement.keyPress(KeyCode.C);
+        this.targetElement.keyUp(KeyCode.C);
 
         expect(this.propsHandlerC).to.have.been.called;
       });

@@ -1,4 +1,4 @@
-import UnshiftedKeysDictionary from '../../const/UnshiftedKeysDictionary';
+import UnshiftedKeysDictionary from '../../const/reverse-dictionaries/UnshiftedKeysDictionary';
 
 /**
  * Returns the name of the key that must be pressed with the shift key, to yield the

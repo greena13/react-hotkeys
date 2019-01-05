@@ -3,7 +3,6 @@ import KeyEventBitmapIndex from '../../const/KeyEventBitmapIndex';
 import KeyEventSequenceIndex from '../../const/KeyEventSequenceIndex';
 import AbstractKeyEventStrategy from './AbstractKeyEventStrategy';
 import capitalize from '../../utils/string/capitalize';
-import normalizeKeyName from '../../helpers/resolving-handlers/normalizeKeyName';
 import hasKeyPressEvent from '../../helpers/resolving-handlers/hasKeyPressEvent';
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 import KeyEventCounter from '../KeyEventCounter';
@@ -12,6 +11,8 @@ import removeAtIndex from '../../utils/array/removeAtIndex';
 import isUndefined from '../../utils/isUndefined';
 import getEventKey from '../../vendor/react-dom/getEventKey';
 import printComponent from '../../helpers/logging/printComponent';
+import normalizeKeyName from '../../helpers/resolving-handlers/normalizeKeyName';
+import Configuration from '../Configuration';
 
 /**
  * Defines behaviour for dealing with key maps defined in global HotKey components
@@ -47,7 +48,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this.listenersBound = false;
 
 
-    this.eventOptions = {};
+    this.eventOptions = {
+      ignoreEventsCondition: Configuration.option('ignoreEventsCondition')
+    };
   }
 
   _reset() {
@@ -280,6 +283,14 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   handleKeydown(event) {
     const _key = normalizeKeyName(getEventKey(event));
 
+    const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
+
+    if (keyInCurrentCombination || this.keyCombinationIncludesKeyUp) {
+      this._startNewKeyCombination(_key, KeyEventBitmapIndex.keydown);
+    } else {
+      this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keydown);
+    }
+
     const reactAppHistoryWithEvent =
       this.keyEventManager.reactAppHistoryWithEvent(_key, KeyEventBitmapIndex.keydown);
 
@@ -291,7 +302,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     } else {
       if (reactAppHistoryWithEvent === 'seen') {
         this.logger.debug(
-          `${this._logPrefix()} '${_key}' keydown event (that has already passed through React app).`
+          `${this._logPrefix()} Received '${_key}' keydown event (that has already passed through React app).`
         );
 
       } else {
@@ -310,25 +321,18 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         return;
       }
 
-      const keyInCurrentCombination = !!this._getCurrentKeyCombination().keys[_key];
-
-      if (keyInCurrentCombination || this.keyCombinationIncludesKeyUp) {
-        this._startNewKeyCombination(_key, KeyEventBitmapIndex.keydown);
-      } else {
-        this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keydown);
-      }
-
       this._callHandlerIfExists(event, _key, KeyEventBitmapIndex.keydown);
 
       if (!hasKeyPressEvent(_key)) {
+        this.logger.debug(
+          `${this._logPrefix()} Simulating '${_key}' keypress event because '${_key}' doesn't natively have one.`
+        );
+
         /**
          * We simulate keypress events in the React app before we do it globally
          */
         this.keyEventManager.simulatePendingKeyPressEvents();
 
-        this.logger.debug(
-          `${this._logPrefix()} Simulating '${_key}' keypress event because '${_key}' doesn't natively have one.`
-        );
         /**
          * If a key does not have a keypress event, we simulate one immediately after
          * the keydown event, to keep the behaviour consistent across all keys
@@ -349,6 +353,21 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    */
   handleKeypress(event) {
     const _key = normalizeKeyName(getEventKey(event));
+
+    /**
+     * Add new key event to key combination history
+     */
+
+    const keyCombination = this._getCurrentKeyState(_key);
+
+    const alreadySeenKeyInCurrentCombo =
+      keyCombination && (keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keypress] || keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup]);
+
+    if (alreadySeenKeyInCurrentCombo) {
+      this._startNewKeyCombination(_key, KeyEventBitmapIndex.keypress);
+    } else {
+      this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keypress);
+    }
 
     const reactAppHistoryWithEvent =
       this.keyEventManager.reactAppHistoryWithEvent(_key, KeyEventBitmapIndex.keypress);
@@ -381,21 +400,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         return false;
       }
 
-      /**
-       * Add new key event to key combination history
-       */
-
-      const keyCombination = this._getCurrentKeyCombination().keys[_key];
-
-      const alreadySeenKeyInCurrentCombo =
-        keyCombination && (keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keypress] || keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup]);
-
-      if (alreadySeenKeyInCurrentCombo) {
-        this._startNewKeyCombination(_key, KeyEventBitmapIndex.keypress);
-      } else {
-        this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keypress);
-      }
-
       this._callHandlerIfExists(event, _key, KeyEventBitmapIndex.keypress);
     }
   }
@@ -411,6 +415,18 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    */
   handleKeyup(event) {
     const _key = normalizeKeyName(getEventKey(event));
+
+    const keyCombination = this._getCurrentKeyState(_key);
+
+    const alreadySeenKeyInCurrentCombo = keyCombination && keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup];
+
+    if (alreadySeenKeyInCurrentCombo) {
+      this._startNewKeyCombination(_key, KeyEventBitmapIndex.keyup);
+    } else {
+      this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keyup);
+
+      this.keyCombinationIncludesKeyUp = true;
+    }
 
     const reactAppHistoryWithEvent =
       this.keyEventManager.reactAppHistoryWithEvent(_key, KeyEventBitmapIndex.keyup);
@@ -443,18 +459,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         return false;
       }
 
-      const keyCombination = this._getCurrentKeyCombination().keys[_key];
-
-      const alreadySeenKeyInCurrentCombo = keyCombination && keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup];
-
-      if (alreadySeenKeyInCurrentCombo) {
-        this._startNewKeyCombination(_key, KeyEventBitmapIndex.keyup);
-      } else {
-        this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keyup);
-
-        this.keyCombinationIncludesKeyUp = true;
-      }
-
       this._callHandlerIfExists(event, _key, KeyEventBitmapIndex.keyup);
     }
   }
@@ -476,7 +480,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     if (eventBitmapIndex === KeyEventBitmapIndex.keydown) {
       this.logger.verbose(
-        `${this._logPrefix()} Added '${keyName}' to current combination: ${this._getCurrentKeyCombination().ids[0]}.`
+        `${this._logPrefix()} Added '${keyName}' to current combination: '${this._getCurrentKeyCombination().ids[0]}'.`
       );
     }
 

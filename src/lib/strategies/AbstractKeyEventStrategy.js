@@ -8,13 +8,16 @@ import isObject from '../../utils/object/isObject';
 import isUndefined from '../../utils/isUndefined';
 import isEmpty from '../../utils/collection/isEmpty';
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
-import resolveAltShiftedAlias from '../../helpers/resolving-handlers/resolveAltShiftedAlias';
-import resolveShiftedAlias from '../../helpers/resolving-handlers/resolveShiftedAlias';
-import resolveAltedAlias from '../../helpers/resolving-handlers/resolveAltedAlias';
-import resolveKeyAlias from '../../helpers/resolving-handlers/resolveKeyAlias';
 import KeyEventSequenceIndex from '../../const/KeyEventSequenceIndex';
 import KeySequenceParser from '../KeySequenceParser';
 import printComponent from '../../helpers/logging/printComponent';
+import resolveUnaltShiftedAlias from '../../helpers/resolving-handlers/resolveUnaltShiftedAlias';
+import resolveUnshiftedAlias from '../../helpers/resolving-handlers/resolveUnshiftedAlias';
+import resolveUnaltedAlias from '../../helpers/resolving-handlers/resolveUnaltedAlias';
+import resolveKeyAlias from '../../helpers/resolving-handlers/resolveKeyAlias';
+import resolveAltShiftedAlias from '../../helpers/resolving-handlers/resolveAltShiftedAlias';
+import resolveShiftedAlias from '../../helpers/resolving-handlers/resolveShiftedAlias';
+import resolveAltedAlias from '../../helpers/resolving-handlers/resolveAltedAlias';
 
 /**
  * Defines common behaviour for key event strategies
@@ -64,6 +67,7 @@ class AbstractKeyEventStrategy {
     this.keyEventManager = keyEventManager;
 
     this._reset();
+    this._resetKeyCombinationHistory();
   }
 
   /**
@@ -73,7 +77,6 @@ class AbstractKeyEventStrategy {
   _reset() {
     this._resetRegisteredKeyMapsState();
     this._resetHandlerResolutionState();
-    this._resetKeyCombinationState();
   }
 
   /**
@@ -173,7 +176,7 @@ class AbstractKeyEventStrategy {
    * Reset the state values that record the current and recent state of key events
    * @private
    */
-  _resetKeyCombinationState() {
+  _resetKeyCombinationHistory() {
     /**
      * Whether the current key combination includes at least one keyup event - indicating
      * that the current combination is ending (and keys are being released)
@@ -397,7 +400,7 @@ class AbstractKeyEventStrategy {
     if (this.keyCombinationHistory.length > 0) {
       return this.keyCombinationHistory[this.keyCombinationHistory.length - 1];
     } else {
-      return { keys: {}, ids: [ '' ] };
+      return { keys: {}, ids: [ '' ], keyAliases: {} };
     }
   }
 
@@ -410,27 +413,29 @@ class AbstractKeyEventStrategy {
    */
   _addToCurrentKeyCombination(keyName, bitmapIndex) {
     if (this.keyCombinationHistory.length === 0) {
-      this.keyCombinationHistory.push({ keys: {}, ids: [ '' ] });
+      this.keyCombinationHistory.push({ keys: {}, ids: [ '' ], keyAliases: {} });
     }
 
     const keyCombination = this._getCurrentKeyCombination();
+    const keyAlias = this._getKeyAlias(keyCombination, keyName);
 
-    const existingBitmap = keyCombination.keys[keyName];
+    const existingBitmap = this._getKeyState(keyCombination, keyName);
 
     if (!existingBitmap) {
-      keyCombination.keys[keyName] = [
+      keyCombination.keys[keyAlias] = [
         KeyEventBitmapManager.newBitmap(),
         KeyEventBitmapManager.newBitmap(bitmapIndex)
       ];
 
     } else {
-      keyCombination.keys[keyName] = [
+      keyCombination.keys[keyAlias] = [
         KeyEventBitmapManager.clone(existingBitmap[1]),
         KeyEventBitmapManager.newBitmap(bitmapIndex)
       ];
     }
 
     keyCombination.ids = KeyCombinationSerializer.serialize(keyCombination.keys);
+    keyCombination.keyAliases = this._buildCombinationKeyAliases(keyCombination.keys);
   }
 
   /**
@@ -464,7 +469,8 @@ class AbstractKeyEventStrategy {
 
     this.keyCombinationHistory.push({
       keys,
-      ids: KeyCombinationSerializer.serialize(keys)
+      ids: KeyCombinationSerializer.serialize(keys),
+      keyAliases: this._buildCombinationKeyAliases(keys)
     });
 
     this.keyCombinationIncludesKeyUp = false;
@@ -705,6 +711,7 @@ class AbstractKeyEventStrategy {
     const { sequences, longestSequence } = keyMap;
 
     const currentKeyState = this._getCurrentKeyCombination();
+    const normalizedKeyName = this._getKeyAlias(currentKeyState, keyName);
 
     let sequenceLengthCounter = longestSequence;
 
@@ -745,8 +752,10 @@ class AbstractKeyEventStrategy {
           const combinationId = combinationOrder[combinationIndex];
           const combinationMatcher = matchingSequence.combinations[combinationId];
 
-          if (this._combinationMatchesKeys(keyName, currentKeyState, combinationMatcher, eventBitmapIndex)) {
-            this.logger.debug(`${this._logPrefix(componentId)} Found action that matches '${this._describeCurrentKeyCombination()}': ${combinationMatcher.events[eventBitmapIndex].actionName}. Calling handler . . .`);
+          if (this._combinationMatchesKeys(normalizedKeyName, currentKeyState, combinationMatcher, eventBitmapIndex)) {
+            const subMatchDescription = KeyCombinationSerializer.serialize(combinationMatcher.keyDictionary);
+
+            this.logger.debug(`${this._logPrefix(componentId)} Found action that matches '${this._describeCurrentKeyCombination()}' (sub-match: '${subMatchDescription}'): ${combinationMatcher.events[eventBitmapIndex].actionName}. Calling handler . . .`);
             combinationMatcher.events[eventBitmapIndex].handler(event);
 
             return true;
@@ -810,7 +819,7 @@ class AbstractKeyEventStrategy {
     }
   }
 
-  _combinationMatchesKeys(keyBeingPressed, keyboardState, combinationMatch, eventBitmapIndex) {
+  _combinationMatchesKeys(keyBeingPressed, keyCombination, combinationMatch, eventBitmapIndex) {
     const combinationHasHandlerForEventType =
       combinationMatch.events[eventBitmapIndex];
 
@@ -821,14 +830,11 @@ class AbstractKeyEventStrategy {
     let keyCompletesCombination = false;
 
     const combinationMatchesKeysPressed = !Object.keys(combinationMatch.keyDictionary).some((candidateKeyName) => {
-      const keyInKeyboardState =
-        this._keyNameAsItAppearsInKeyboardState(candidateKeyName);
+      const keyState = this._getKeyState(keyCombination, candidateKeyName);
 
-      if (keyInKeyboardState) {
-        const keyState = keyboardState.keys[keyInKeyboardState];
-
+      if (keyState) {
         if (this._keyIsCurrentlyTriggeringEvent(keyState, eventBitmapIndex)) {
-          if (keyBeingPressed && keyInKeyboardState === keyBeingPressed) {
+          if (keyBeingPressed && (keyBeingPressed === this._getKeyAlias(keyCombination, candidateKeyName))) {
             keyCompletesCombination =
               !this._keyAlreadyTriggeredEvent(keyState, eventBitmapIndex);
           }
@@ -845,46 +851,81 @@ class AbstractKeyEventStrategy {
     return combinationMatchesKeysPressed && keyCompletesCombination;
   }
 
-  _keyNameAsItAppearsInKeyboardState(keyName) {
-    const keyboardState = this._getCurrentKeyCombination();
-
-    if (keyboardState.keys[keyName]) {
-      return keyName;
-    } else {
-      return this._tryMatchWithKeyAliases(keyboardState, keyName);
-    }
-  }
-
-
   _keyIsCurrentlyTriggeringEvent(keyState, eventBitmapIndex) {
-    return keyState[KeyEventSequenceIndex.current][eventBitmapIndex];
+    return keyState && keyState[KeyEventSequenceIndex.current][eventBitmapIndex];
   }
 
   _keyAlreadyTriggeredEvent(keyState, eventBitmapIndex) {
-    return keyState[KeyEventSequenceIndex.previous][eventBitmapIndex];
+    return keyState && keyState[KeyEventSequenceIndex.previous][eventBitmapIndex];
   }
 
-  _tryMatchWithKeyAliases(keyState, candidateKeyName) {
-    const candidateKeyNames = function(){
-      const combinationIncludesShift = keyState.keys['Shift'];
-      const combinationIncludesAlt = keyState.keys['Alt'];
+  _getCurrentKeyState(keyName) {
+    const currentCombination = this._getCurrentKeyCombination();
 
-      if (combinationIncludesShift) {
-        if (combinationIncludesAlt) {
-          return resolveAltShiftedAlias(candidateKeyName);
+    return this._getKeyState(currentCombination, keyName);
+  }
+
+  _getKeyState(keyCombination, keyName) {
+    const keyState = keyCombination.keys[keyName];
+
+    if (keyState) {
+      return keyState;
+    } else {
+      const keyAlias = keyCombination.keyAliases[keyName];
+
+      if (keyAlias) {
+        return keyCombination.keys[keyAlias];
+      }
+    }
+  }
+
+  _getKeyAlias(keyCombination, keyName) {
+    const keyState = keyCombination.keys[keyName];
+
+    if (keyState) {
+      return keyName;
+    } else {
+      const keyAlias = keyCombination.keyAliases[keyName];
+
+      if (keyAlias) {
+        return keyAlias;
+      } else {
+        return keyName;
+      }
+    }
+  }
+
+  _buildCombinationKeyAliases(keyDictionary) {
+    const aliasFunctions = (() => {
+      if (keyDictionary['Shift']) {
+        if (keyDictionary['Alt']) {
+          return [resolveAltShiftedAlias, resolveUnaltShiftedAlias];
         } else {
-          return resolveShiftedAlias(candidateKeyName);
+          return [resolveShiftedAlias, resolveUnshiftedAlias];
         }
       } else {
-        if (combinationIncludesAlt) {
-          return resolveAltedAlias(candidateKeyName);
+        if (keyDictionary['Alt']) {
+          return [resolveAltedAlias, resolveUnaltedAlias];
         } else {
-          return resolveKeyAlias(candidateKeyName);
+          const nop = (keyName) => [keyName];
+          return [nop, nop];
         }
       }
-    }();
+    })();
 
-    return candidateKeyNames.find((keyName) => keyState.keys[keyName]);
+    return Object.keys(keyDictionary).reduce((memo, keyName) => {
+      resolveKeyAlias(keyName).forEach((normalizedKey) => {
+        aliasFunctions.forEach((aliasFunction) => {
+          aliasFunction(normalizedKey).forEach((keyAlias) => {
+            if (keyAlias !== keyName || keyName !== normalizedKey) {
+              memo[keyAlias] = keyName;
+            }
+          });
+        })
+      });
+
+      return memo;
+    }, {});
   }
 }
 

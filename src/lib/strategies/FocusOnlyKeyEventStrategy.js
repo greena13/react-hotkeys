@@ -2,13 +2,13 @@ import AbstractKeyEventStrategy from './AbstractKeyEventStrategy';
 import KeyEventBitmapIndex from '../../const/KeyEventBitmapIndex';
 import KeyEventSequenceIndex from '../../const/KeyEventSequenceIndex';
 import KeyEventCounter from '../KeyEventCounter';
-import normalizeKeyName from '../../helpers/resolving-handlers/normalizeKeyName';
 import hasKeyPressEvent from '../../helpers/resolving-handlers/hasKeyPressEvent';
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 import Configuration from '../Configuration';
 import Logger from '../Logger';
 import printComponent from '../../helpers/logging/printComponent';
 import isUndefined from '../../utils/isUndefined';
+import normalizeKeyName from '../../helpers/resolving-handlers/normalizeKeyName';
 
 /**
  * Defines behaviour for dealing with key maps defined in focus-only HotKey components
@@ -248,7 +248,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     if (focusTreeId !== this.focusTreeId) {
       this.logger.debug(
-        `${this._logPrefix(componentId, {focusTreeId})}' Ignored '${_key}' keydown event because it had an old focus tree id: ${focusTreeId}.`
+        `${this._logPrefix(componentId)}' Ignored '${_key}' keydown event because it had an old focus tree id: ${focusTreeId}.`
       );
 
       return true;
@@ -258,7 +258,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this._updateEventPropagationHistory(componentId);
 
       this.logger.debug(
-        `${this._logPrefix(componentId, {focusTreeId})} Ignored '${_key}' keydown event because ignoreEventsFilter rejected it.`
+        `${this._logPrefix(componentId)} Ignored '${_key}' keydown event because ignoreEventsFilter rejected it.`
       );
 
       return false;
@@ -279,17 +279,17 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         this._updateEventPropagationHistory(componentId);
 
         this.logger.debug(
-          `${this._logPrefix(componentId, {focusTreeId})} Ignored '${_key}' keydown event because ignoreEventsFilter rejected it.`
+          `${this._logPrefix(componentId)} Ignored '${_key}' keydown event because ignoreEventsFilter rejected it.`
         );
 
         return false;
       }
 
       this.logger.debug(
-        `${this._logPrefix(componentId, {focusTreeId})} New '${_key}' keydown event.`
+        `${this._logPrefix(componentId)} New '${_key}' keydown event.`
       );
 
-      const keyInCurrentCombination = !!this._getCurrentKeyCombination().keys[_key];
+      const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
 
       if (keyInCurrentCombination || this.keyCombinationIncludesKeyUp) {
         this._startNewKeyCombination(_key, KeyEventBitmapIndex.keydown, focusTreeId, componentId);
@@ -321,9 +321,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
        * else, we wait for keydown event to propagate through global strategy
        * before we simulate the keypress
        */
-    } else {
-      this._updateEventPropagationHistory(componentId);
     }
+
+    this._updateEventPropagationHistory(componentId);
 
     return false;
   }
@@ -334,14 +334,18 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     }
 
     this.keypressEventsToSimulate.forEach(({ event, focusTreeId, componentId, options, key }) => {
-      this.logger.debug(
-        `${this._logPrefix(componentId, {focusTreeId})} Simulating '${key}' keypress event because '${key}' doesn't natively have one.`
-      );
-
       this.handleKeypress(event, focusTreeId, componentId, options);
     });
 
     this.keypressEventsToSimulate = [];
+
+    /**
+     * If an event gets handled and causes a focus shift, then subsequent components
+     * will ignore the event (including the root component) and the conditions to
+     * reset the propagation state are never met - so we ensure that after we are done
+     * simulating the keypress event, the propagation state is reset for the following
+     * keyup
+     */
     this._clearEventPropagationState();
   }
 
@@ -366,7 +370,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     if (focusTreeId !== this.focusTreeId) {
       this.logger.debug(
-        `${this._logPrefix(componentId, {focusTreeId})} Ignored '${_key}' keypress event because it had an old focus tree id: ${focusTreeId}.`
+        `${this._logPrefix(componentId)} Ignored '${_key}' keypress event because it had an old focus tree id: ${focusTreeId}.`
       );
 
       return true;
@@ -376,7 +380,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this._updateEventPropagationHistory(componentId);
 
       this.logger.debug(
-        `${this._logPrefix(componentId, {focusTreeId})} Ignored '${_key}' keypress event because ignoreEventsFilter rejected it.`
+        `${this._logPrefix(componentId)} Ignored '${_key}' keypress event because ignoreEventsFilter rejected it.`
       );
 
       return;
@@ -397,21 +401,21 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         this._updateEventPropagationHistory(componentId);
 
         this.logger.debug(
-          `${this._logPrefix(componentId, {focusTreeId})} Ignored '${_key}' keypress event because ignoreEventsFilter rejected it.`
+          `${this._logPrefix(componentId)} Ignored '${_key}' keypress event because ignoreEventsFilter rejected it.`
         );
 
         return;
       }
 
       this.logger.debug(
-        `${this._logPrefix(componentId, {focusTreeId})} New '${_key}' keypress event.`
+        `${this._logPrefix(componentId)} New '${_key}' keypress event.`
       );
 
       /**
        * Add new key event to key combination history
        */
 
-      const keyCombination = this._getCurrentKeyCombination().keys[_key];
+      const keyCombination = this._getCurrentKeyState(_key);
       const alreadySeenKeyInCurrentCombo = keyCombination && (keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keypress] || keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup]);
 
       if (alreadySeenKeyInCurrentCombo) {
@@ -447,7 +451,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     if (focusTreeId !== this.focusTreeId) {
       this.logger.debug(
-        `${this._logPrefix(componentId, {focusTreeId})} Ignored '${_key}' keyup event because it had an old focus tree id: ${focusTreeId}.`
+        `${this._logPrefix(componentId)} Ignored '${_key}' keyup event because it had an old focus tree id: ${focusTreeId}.`
       );
 
       return true;
@@ -457,7 +461,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this._updateEventPropagationHistory(componentId);
 
       this.logger.debug(
-        `${this._logPrefix(componentId, {focusTreeId})} Ignored '${_key}' keyup event because ignoreEventsFilter rejected it.`
+        `${this._logPrefix(componentId)} Ignored '${_key}' keyup event because ignoreEventsFilter rejected it.`
       );
 
       return;
@@ -478,17 +482,17 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         this._updateEventPropagationHistory(componentId);
 
         this.logger.debug(
-          `${this._logPrefix(componentId, {focusTreeId})} Ignored '${_key}' keyup event because ignoreEventsFilter rejected it.`
+          `${this._logPrefix(componentId)} Ignored '${_key}' keyup event because ignoreEventsFilter rejected it.`
         );
 
         return;
       }
 
       this.logger.debug(
-        `${this._logPrefix(componentId, {focusTreeId})} New '${_key}' keyup event.`
+        `${this._logPrefix(componentId)} New '${_key}' keyup event.`
       );
 
-      const keyCombination = this._getCurrentKeyCombination().keys[_key];
+      const keyCombination = this._getCurrentKeyState(_key);
 
       const alreadySeenKeyEventInCombo = keyCombination && keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup];
 
@@ -583,7 +587,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     if (eventBitmapIndex === KeyEventBitmapIndex.keydown) {
       this.logger.verbose(
-        `${this._logPrefix(componentId, {focusTreeId})} Added '${keyName}' to current combination: ${this._getCurrentKeyCombination().ids[0]}.`
+        `${this._logPrefix(componentId, {focusTreeId})} Added '${keyName}' to current combination: '${this._getCurrentKeyCombination().ids[0]}'.`
       );
     }
 
