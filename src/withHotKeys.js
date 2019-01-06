@@ -115,8 +115,8 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       Configuration.init(configuration);
     };
 
-    constructor(props, context) {
-      super(props, context);
+    constructor(props) {
+      super(props);
 
       /**
        * The focus and blur handlers need access to the current component as 'this'
