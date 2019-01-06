@@ -70,7 +70,29 @@ const _defaultConfiguration = {
    * natively emit them.
    * @type {Boolean}
    */
-  simulateMissingKeyPressEvents: true
+  simulateMissingKeyPressEvents: true,
+
+  /**
+   * Whether to call stopPropagation() on events after they are handled (preventing
+   * the event from bubbling up any further, both within React Hotkeys and any other
+   * event listeners bound in React).
+   *
+   * This does not affect the behaviour of React Hotkeys, but rather what happens to
+   * the event once React Hotkeys is done with it (whether it's allowed to propagate
+   * any further through the Render tree).
+   */
+  stopEventPropagationAfterHandling: true,
+
+  /**
+   * Whether to call stopPropagation() on events after they are ignored (preventing
+   * the event from bubbling up any further, both within React Hotkeys and any other
+   * event listeners bound in React).
+   *
+   * This does not affect the behaviour of React Hotkeys, but rather what happens to
+   * the event once React Hotkeys is done with it (whether it's allowed to propagate
+   * any further through the Render tree).
+   */
+  stopEventPropagationAfterIgnoring: true,
 };
 
 const _configuration = {

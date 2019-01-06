@@ -18,6 +18,7 @@ import resolveKeyAlias from '../../helpers/resolving-handlers/resolveKeyAlias';
 import resolveAltShiftedAlias from '../../helpers/resolving-handlers/resolveAltShiftedAlias';
 import resolveShiftedAlias from '../../helpers/resolving-handlers/resolveShiftedAlias';
 import resolveAltedAlias from '../../helpers/resolving-handlers/resolveAltedAlias';
+import Configuration from '../Configuration';
 
 /**
  * Defines common behaviour for key event strategies
@@ -758,6 +759,8 @@ class AbstractKeyEventStrategy {
             this.logger.debug(`${this._logPrefix(componentId)} Found action that matches '${this._describeCurrentKeyCombination()}' (sub-match: '${subMatchDescription}'): ${combinationMatcher.events[eventBitmapIndex].actionName}. Calling handler . . .`);
             combinationMatcher.events[eventBitmapIndex].handler(event);
 
+            this._stopEventPropagationAfterHandlingIfEnabled(event, componentId);
+
             return true;
           }
 
@@ -771,6 +774,32 @@ class AbstractKeyEventStrategy {
 
     const eventName = describeKeyEvent(eventBitmapIndex);
     this.logger.debug(`${this._logPrefix(componentId)} No matching actions found for '${this._describeCurrentKeyCombination()}' ${eventName}.`);
+  }
+
+  _stopEventPropagationAfterHandlingIfEnabled(event, componentId) {
+    if (Configuration.option('stopEventPropagationAfterHandling')) {
+      this._stopEventPropagation(event, componentId);
+
+      return true;
+    }
+
+    return false;
+  }
+
+  _stopEventPropagationAfterIgnoringIfEnabled(event, componentId) {
+    if (Configuration.option('stopEventPropagationAfterIgnoring')) {
+      this._stopEventPropagation(event, componentId);
+
+      return true;
+    }
+
+    return false;
+  }
+
+  _stopEventPropagation(event, componentId) {
+    this.logger.debug(`${this._logPrefix(componentId)} Stopping further event propagation.`);
+
+    event.stopPropagation();
   }
 
   _describeCurrentKeyCombination() {

@@ -251,15 +251,17 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         `${this._logPrefix(componentId)}' Ignored '${_key}' keydown event because it had an old focus tree id: ${focusTreeId}.`
       );
 
+      this._ignoreEvent(event, componentId);
+
       return true;
     }
 
     if (this._alreadyEstablishedShouldIgnoreEvent()) {
-      this._updateEventPropagationHistory(componentId);
-
       this.logger.debug(
         `${this._logPrefix(componentId)} Ignored '${_key}' keydown event because ignoreEventsFilter rejected it.`
       );
+
+      this._ignoreEvent(event, componentId);
 
       return false;
     }
@@ -276,11 +278,11 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this._setIgnoreEventFlag(event, options);
 
       if (this._alreadyEstablishedShouldIgnoreEvent()) {
-        this._updateEventPropagationHistory(componentId);
-
         this.logger.debug(
           `${this._logPrefix(componentId)} Ignored '${_key}' keydown event because ignoreEventsFilter rejected it.`
         );
+
+        this._ignoreEvent(event, componentId);
 
         return false;
       }
@@ -333,7 +335,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       KeyEventCounter.incrementId();
     }
 
-    this.keypressEventsToSimulate.forEach(({ event, focusTreeId, componentId, options, key }) => {
+    this.keypressEventsToSimulate.forEach(({ event, focusTreeId, componentId, options }) => {
       this.handleKeypress(event, focusTreeId, componentId, options);
     });
 
@@ -373,15 +375,17 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         `${this._logPrefix(componentId)} Ignored '${_key}' keypress event because it had an old focus tree id: ${focusTreeId}.`
       );
 
+      this._ignoreEvent(event, componentId);
+
       return true;
     }
 
     if (this._alreadyEstablishedShouldIgnoreEvent()) {
-      this._updateEventPropagationHistory(componentId);
-
       this.logger.debug(
         `${this._logPrefix(componentId)} Ignored '${_key}' keypress event because ignoreEventsFilter rejected it.`
       );
+
+      this._ignoreEvent(event, componentId);
 
       return;
     }
@@ -398,11 +402,11 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this._setIgnoreEventFlag(event, options);
 
       if (this._alreadyEstablishedShouldIgnoreEvent()) {
-        this._updateEventPropagationHistory(componentId);
-
         this.logger.debug(
           `${this._logPrefix(componentId)} Ignored '${_key}' keypress event because ignoreEventsFilter rejected it.`
         );
+
+        this._ignoreEvent(event, componentId);
 
         return;
       }
@@ -454,15 +458,17 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         `${this._logPrefix(componentId)} Ignored '${_key}' keyup event because it had an old focus tree id: ${focusTreeId}.`
       );
 
+      this._ignoreEvent(event, componentId);
+
       return true;
     }
 
     if (this._alreadyEstablishedShouldIgnoreEvent()) {
-      this._updateEventPropagationHistory(componentId);
-
       this.logger.debug(
         `${this._logPrefix(componentId)} Ignored '${_key}' keyup event because ignoreEventsFilter rejected it.`
       );
+
+      this._ignoreEvent(event, componentId);
 
       return;
     }
@@ -479,11 +485,11 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this._setIgnoreEventFlag(event, options);
 
       if (this._alreadyEstablishedShouldIgnoreEvent()) {
-        this._updateEventPropagationHistory(componentId);
-
         this.logger.debug(
           `${this._logPrefix(componentId)} Ignored '${_key}' keyup event because ignoreEventsFilter rejected it.`
         );
+
+        this._ignoreEvent(event, componentId);
 
         return;
       }
@@ -510,6 +516,14 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     this._updateEventPropagationHistory(componentId);
   }
 
+  _ignoreEvent(event, componentId) {
+    if(this._stopEventPropagationAfterIgnoringIfEnabled(event, componentId)) {
+      this._updateEventPropagationHistory(componentId, { forceReset: true });
+    } else {
+      this._updateEventPropagationHistory(componentId);
+    }
+  }
+
   /**
    * Whether KeyEventManager should ignore the event that is currently being handled
    * @returns {Boolean} Whether to ignore the event
@@ -533,8 +547,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     return this.eventPropagationState.previousComponentIndex >= componentId;
   }
 
-  _updateEventPropagationHistory(componentId) {
-    if (this._isFocusTreeRoot(componentId)) {
+  _updateEventPropagationHistory(componentId, options = { forceReset: false }) {
+    if (options.forceReset || this._isFocusTreeRoot(componentId)) {
       this._clearEventPropagationState();
     } else {
       this.eventPropagationState.previousComponentIndex = componentId;

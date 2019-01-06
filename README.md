@@ -16,6 +16,7 @@ A declarative library for handling hotkeys and focus areas in React applications
 - Supports [browser key names](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values) and [Mousetrap syntax](https://github.com/ccampbell/mousetrap)
 - Allows you to define [global](#GlobalHotKeys-component) and [in-focus](#HotKeys-component) hot keys
 - Works with React's Synthetic KeyboardEvents and event delegation and provides [predictable and expected behaviour](#Interaction-with-React) to anyone  familiar with React
+- It is optimized by default, but allows you to turn off different optimisation measures in a granular fashion
 - It's customizable through a simple [configuration API](#Configuration)
 - [Optimized for larger applications](#Optimizations), with many hot keys active at once
 - Depends only on `prop-types` and a peer dependency of `react`
@@ -673,10 +674,31 @@ HotKeys.configure({
    * natively emit them.
    * @type {Boolean}
    */
-  simulateMissingKeyPressEvents: true
+  simulateMissingKeyPressEvents: true,
+
+  /**
+   * Whether to call stopPropagation() on events after they are
+   * handled (preventing the event from bubbling up any further, both within
+   * React Hotkeys and any other event listeners bound in React).
+   *
+   * This does not affect the behaviour of React Hotkeys, but rather what
+   * happens to the event once React Hotkeys is done with it (whether it's
+   * allowed to propagate any further through the Render tree).
+   */
+   stopEventPropagationAfterHandling: true,
+
+  /**
+   * Whether to call stopPropagation() on events after they are
+   * ignored (preventing the event from bubbling up any further, both within
+   * React Hotkeys and any other event listeners bound in React).
+   *
+   * This does not affect the behaviour of React Hotkeys, but rather what
+   * happens to the event once React Hotkeys is done with it (whether it's
+   * allowed to propagate any further through the Render tree).
+   */
+   stopEventPropagationAfterIgnoring: true,
 });
 ```
-
 
 ## Troubleshooting & Gotchas
 
@@ -687,6 +709,10 @@ You have 3 options:
 1. Use the [`component` prop](#HotKeys-component-API) to specify a `span` or some other alternative DOM-mountable component to wrap your component in, each time you render a component you don't want to wrap in a div element.
 1. Use the [`defaultComponent` configuration option](#Configuration) to specify a `span` or some other alternative DOM-mountable component to wrap *all* `<HotKeys>` children in.
 1. Use the [withHotKeys HoC API](#withHotKeys-HoC-API) to avoid rendering a wrapping component at all.
+
+#### Other keyboard event listeners are no longer being triggered
+
+For improved performance, by default `react-hotkeys` calls `stopPropagation()` on all events that it handles. You can change this using the `stopEventPropagationAfterHandling` and `stopEventPropagationAfterIgnoring` [configuration options](#Configuration).
 
 #### Actions aren't being triggered when using withHotKeys
 
@@ -1075,6 +1101,7 @@ HotKeys (FT0📕-E2💙-C1⭐️): Ignored 'ArrowDown' keypress as it has alread
 ### Code optimizations
 
 - If an event is handled by an earlier handler, it is ignored by an further components (this is really a design decision, rather than an optimization, but it helps).
+- By default, `stopPropagation()` is called on all key events once `react-hotkeys` has handled them. This can be disabled via the `stopEventPropagationAfterHandling` and `stopEventPropagationAfterIgnoring` [configuration options](#Configuration).
 - Events are ignored unless an action exists that is bound to that particular event type (keydown, keypress, keyup)
 - Events are processed at each level, as they propagate up the React render tree. If a action is triggered by a leaf node, `react-hotkeys` stops there (and does not build the full application's mappings of key sequences and handlers)
 - Changes to keyMaps and handlers are ignored unless you explicitly opt-in to the behaviour of resetting them each time their prop value changes.
