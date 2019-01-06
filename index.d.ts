@@ -1,21 +1,21 @@
 import * as React from 'react';
 
-type MouseTrapKeySequence = string | Array<string>;
+export type MouseTrapKeySequence = string | Array<string>;
 
-type KeyEventName = 'keyup' | 'keydown' | 'keypress';
+export type KeyEventName = 'keyup' | 'keydown' | 'keypress';
 
-interface KeyMapOptions {
+export interface KeyMapOptions {
   sequence: MouseTrapKeySequence;
   action: KeyEventName;
 }
 
-type KeySequence = MouseTrapKeySequence | KeyMapOptions | Array<MouseTrapKeySequence> | Array<KeyMapOptions>;
+export type KeySequence = MouseTrapKeySequence | KeyMapOptions | Array<MouseTrapKeySequence> | Array<KeyMapOptions>;
 
-type KeyMap = { [key: string]: KeySequence };
+export type KeyMap = { [key: string]: KeySequence };
 
 interface HotKeysEnabled extends React.Component<HotKeysProps, {}> { }
 
-interface HotKeysEnabledProps extends React.HTMLAttributes<HotKeys> {
+export interface HotKeysEnabledProps extends React.HTMLAttributes<HotKeys> {
   /**
    * A map from action names to Mousetrap or Browser key sequences
    */
@@ -44,7 +44,7 @@ interface HotKeysEnabledProps extends React.HTMLAttributes<HotKeys> {
   allowChanges?: boolean;
 }
 
-interface HotKeysProps extends HotKeysEnabledProps {
+export interface HotKeysProps extends HotKeysEnabledProps {
   /**
    * The React component that should be used in the DOM to wrap the FocusTrap's
    * children and have the internal key listeners bound to
@@ -68,6 +68,6 @@ export class GlobalHotKeys extends React.Component<HotKeysEnabled, {}> { }
  * the wrapped component (e.g. div, span, input, etc) in order for the key events
  * to be recorded.
  */
-export declare function withHotKeys(React.Component, HotKeysEnabledProps): HotKeysEnabled;
+export declare function withHotKeys(React.ComponentClass, HotKeysEnabledProps): HotKeysEnabled;
 
 export declare function deprecatedWithHotKeys(keyMap: { [key: string]: KeySequence }): HotKeys;
