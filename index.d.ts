@@ -49,7 +49,7 @@ interface HotKeysProps extends HotKeysEnabledProps {
    * The React component that should be used in the DOM to wrap the FocusTrap's
    * children and have the internal key listeners bound to
    */
-  component?: React.Component | string;
+  component?: React.ComponentClass | string;
 }
 
 /**
