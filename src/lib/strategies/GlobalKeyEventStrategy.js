@@ -281,6 +281,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {KeyboardEvent} event - Event containing the key name and state
    */
   handleKeydown(event) {
+    this._checkForModifierFlagDiscrepancies(event);
+
     const _key = normalizeKeyName(getEventKey(event));
 
     const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
@@ -424,8 +426,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this._startNewKeyCombination(_key, KeyEventBitmapIndex.keyup);
     } else {
       this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keyup);
-
-      this.keyCombinationIncludesKeyUp = true;
     }
 
     const reactAppHistoryWithEvent =

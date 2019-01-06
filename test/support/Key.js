@@ -4,6 +4,7 @@ export default {
   ALT: 'Alt',
   COMMAND: 'Meta',
   SHIFT: 'Shift',
+  CONTROL: 'Control',
 
   A: 'a',
   B: 'b',

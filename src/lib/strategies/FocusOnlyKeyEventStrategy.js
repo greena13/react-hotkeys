@@ -243,7 +243,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {Object} options - Hash of options that configure how the event is handled.
    * @returns Whether the event was discarded because it was part of an old focus tree
    */
-  handleKeydown(event, focusTreeId, componentId, options) {
+  handleKeydown(event, focusTreeId, componentId, options = {}) {
     const _key = normalizeKeyName(event.key);
 
     if (focusTreeId !== this.focusTreeId) {
@@ -290,6 +290,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this.logger.debug(
         `${this._logPrefix(componentId)} New '${_key}' keydown event.`
       );
+
+      this._checkForModifierFlagDiscrepancies(event);
 
       const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
 
@@ -506,8 +508,6 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         this._startNewKeyCombination(_key, KeyEventBitmapIndex.keyup, focusTreeId, componentId);
       } else {
         this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keyup, focusTreeId, componentId);
-
-        this.keyCombinationIncludesKeyUp = true;
       }
     }
 

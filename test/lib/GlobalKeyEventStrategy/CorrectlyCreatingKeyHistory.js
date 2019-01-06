@@ -1,8 +1,8 @@
 import {expect} from 'chai';
 import simulant from 'simulant';
-import KeyEventManager from '../../src/lib/KeyEventManager';
+import KeyEventManager from '../../../src/lib/KeyEventManager';
 
-describe('GlobalKeyEventStrategy:', function () {
+describe('Correctly creating key history for GlobalKeyEventStrategy:', function () {
   beforeEach(function () {
     this.keyEventManager = new KeyEventManager();
 

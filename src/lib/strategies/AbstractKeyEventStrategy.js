@@ -19,6 +19,7 @@ import resolveAltShiftedAlias from '../../helpers/resolving-handlers/resolveAltS
 import resolveShiftedAlias from '../../helpers/resolving-handlers/resolveShiftedAlias';
 import resolveAltedAlias from '../../helpers/resolving-handlers/resolveAltedAlias';
 import Configuration from '../Configuration';
+import ModifierFlagsDictionary from '../../const/ModifierFlagsDictionary';
 
 /**
  * Defines common behaviour for key event strategies
@@ -437,6 +438,10 @@ class AbstractKeyEventStrategy {
 
     keyCombination.ids = KeyCombinationSerializer.serialize(keyCombination.keys);
     keyCombination.keyAliases = this._buildCombinationKeyAliases(keyCombination.keys);
+
+    if (bitmapIndex === KeyEventBitmapIndex.keyup) {
+      this.keyCombinationIncludesKeyUp = true;
+    }
   }
 
   /**
@@ -878,6 +883,31 @@ class AbstractKeyEventStrategy {
     });
 
     return combinationMatchesKeysPressed && keyCompletesCombination;
+  }
+
+  /**
+   * Synchronises the key combination history to match the modifier key flag attributes
+   * on new key events
+   * @param {KeyboardEvent} event - Event to check the modifier flags for
+   * @private
+   */
+  _checkForModifierFlagDiscrepancies(event) {
+    /**
+     * If a new key event is received with modifier key flags that contradict the
+     * key combination history we are maintaining, we can surmise that some keyup events
+     * for those modifier keys have been lost (possibly because the window lost focus).
+     * We update the key combination to match the modifier flags
+     */
+    Object.keys(ModifierFlagsDictionary).forEach((modifierKey) => {
+       const modifierKeyState = this._getCurrentKeyState(modifierKey);
+       const modifierStillPressed = modifierKeyState && !this._keyIsCurrentlyTriggeringEvent(modifierKeyState, KeyEventBitmapIndex.keyup);
+
+       ModifierFlagsDictionary[modifierKey].forEach((attributeName) => {
+         if (event[attributeName] === false && modifierStillPressed) {
+           this._addToCurrentKeyCombination(modifierKey, KeyEventBitmapIndex.keyup);
+         }
+       });
+     })
   }
 
   _keyIsCurrentlyTriggeringEvent(keyState, eventBitmapIndex) {
