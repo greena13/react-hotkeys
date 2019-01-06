@@ -281,8 +281,6 @@ Rather than re-invent the wheel, `react-hotkeys` piggy-backs of the React Synthe
 
 This is the default type of `<HotKeys />` component, and should normally be your first choice for efficiency and clarity (the user generally expects keyboard input to affect the focused element in the browser).
 
-Each time a new element is focused, the history of the keys that have already been pressed are reset.
-
 ### How action handlers are resolved
 
 > If one of the DOM-mounted descendents of an `<HotKeys>` component are in focus (and it is listening to key events) AND those key events match a hot key in the component's key map, then the corresponding action is triggered.
@@ -703,10 +701,6 @@ Check that the `<HotKeys>` component that defines the handler is also an ancesto
 Also make sure your React application is not calling `stopPropagation()` on the key events before they reach the `<HotKeys>` component that defines the `keyMap`.
 
 Finally, make sure your key event are not coming from one of the [tags ignored by react-hotkeys](#Ignoring-events).
-
-#### Sequence is not being matched when moving between components
-
-For efficiency, every time the focused element changes, the key event history is reset. HotKeys does not currently support key sequences that involve shifting focus mid-way through.
 
 #### Blue border appears around children of HotKeys
 
