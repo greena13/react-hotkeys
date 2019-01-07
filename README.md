@@ -257,6 +257,8 @@ Handlers associated to actions with names that are valid key sequence strings im
 
 This functionality is not advised and exists mainly for backwards compatibility. It is generally advisable to explicitly define an action in a key map rather than rely on this behaviour.
 
+To use hard sequence handlers, you must first enable them using the `enableHardSequences` [configuration option](#Configuration).
+
 ```javascript
 /**
  * If no named 'up' action has been defined in a key map and it is a valid
@@ -660,6 +662,13 @@ HotKeys.configure({
    * @type {Function<KeyboardEvent>}
    */
   ignoreEventsCondition: function,
+
+/**
+   * Whether to allow hard sequences, or the binding of handlers to actions
+   * that have names that are valid key sequences, which implicitly define
+   * actions that are triggered by that key sequence
+   */
+  enableHardSequences: false,
 
   /**
    * Whether to ignore changes to keyMap and handlers props by default

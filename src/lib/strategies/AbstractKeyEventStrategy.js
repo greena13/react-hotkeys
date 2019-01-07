@@ -281,19 +281,23 @@ class AbstractKeyEventStrategy {
    * @private
    */
   _applyHardSequences(actionNameToKeyMap, actionNameToHandlersMap) {
-    return Object.keys(actionNameToHandlersMap).reduce((memo, actionNameOrKeyExpression) => {
-      const actionNameIsInKeyMap = !!actionNameToKeyMap[actionNameOrKeyExpression];
+    if (Configuration.option('enableHardSequences')) {
+      return Object.keys(actionNameToHandlersMap).reduce((memo, actionNameOrKeyExpression) => {
+        const actionNameIsInKeyMap = !!actionNameToKeyMap[actionNameOrKeyExpression];
 
-      const handler = actionNameToHandlersMap[actionNameOrKeyExpression];
+        const handler = actionNameToHandlersMap[actionNameOrKeyExpression];
 
-      if (!actionNameIsInKeyMap && KeyCombinationSerializer.isValidKeySerialization(actionNameOrKeyExpression)) {
-        memo.keyMap[actionNameOrKeyExpression] = actionNameOrKeyExpression;
-      }
+        if (!actionNameIsInKeyMap && KeyCombinationSerializer.isValidKeySerialization(actionNameOrKeyExpression)) {
+          memo.keyMap[actionNameOrKeyExpression] = actionNameOrKeyExpression;
+        }
 
-      memo.handlers[actionNameOrKeyExpression] = handler;
+        memo.handlers[actionNameOrKeyExpression] = handler;
 
-      return memo;
-    }, { keyMap: {}, handlers: {}});
+        return memo;
+      }, {keyMap: {}, handlers: {}});
+    } else {
+      return { keyMap: actionNameToKeyMap, handlers: actionNameToHandlersMap };
+    }
   }
 
   /**
