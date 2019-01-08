@@ -614,16 +614,16 @@ If you need to do this for all your `<HotKeys>` and `<GlobalHotKeys>` components
 
 ## Configuration
 
-The default behaviour across all `<HotKeys>` components is configured using the `HotKeys.configure` method.
+The default behaviour across all `<HotKeys>` components is configured using the `configure` method.
 
-> HotKeys.configure() should be called as your app is initialising and before the first time you mount a `<HotKeys>` component anywhere your app.
+> configure() should be called as your app is initialising and before the first time you mount a `<HotKeys>` component anywhere your app.
 
 The following options are available (**default values are shown**):
 
 ```javascript
-import {HotKeys} from 'react-hotkeys';
+import {configure} from 'react-hotkeys';
 
-HotKeys.configure({
+configure({
   /**
    * The level of logging of its own behaviour React HotKeys should perform.
    */

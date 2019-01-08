@@ -108,15 +108,6 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       allowChanges: PropTypes.bool
     };
 
-    /**
-     * Configure the behaviour of HotKeys
-     * @param {Object} configuration Configuration object
-     * @see Configuration.init
-     */
-    static configure(configuration = {}) {
-      Configuration.init(configuration);
-    };
-
     constructor(props) {
       super(props);
 
