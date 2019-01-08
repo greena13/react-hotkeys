@@ -25,7 +25,7 @@ describe('Handling stopped event propagation:', function () {
     beforeEach(function () {
       this.wrapper = mount(
         <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
-          <div className="childElement" onKeyPress={(e) => e.stopPropagation() } />
+          <div className="childElement" onKeyDown={(e) => e.stopPropagation() } />
         </HotKeys>
       );
 
@@ -34,7 +34,7 @@ describe('Handling stopped event propagation:', function () {
     });
 
     it('then does not trigger an associated handler', function() {
-      this.targetElement.keyPress(KeyCode.A);
+      this.targetElement.keyDown(KeyCode.A);
 
       expect(this.handler).to.not.have.been.called;
     });
@@ -45,7 +45,7 @@ describe('Handling stopped event propagation:', function () {
       beforeEach(function () {
         this.wrapper = mount(
           <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
-            <div onKeyPress={(e) => e.stopPropagation() }>
+            <div onKeyDown={(e) => e.stopPropagation() }>
               <HotKeys >
                 <div className="childElement"  />
               </HotKeys>
@@ -58,7 +58,7 @@ describe('Handling stopped event propagation:', function () {
       });
 
       it('then does not trigger an associated handler', function() {
-        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyDown(KeyCode.A);
 
         expect(this.handler).to.not.have.been.called;
       });
@@ -68,7 +68,7 @@ describe('Handling stopped event propagation:', function () {
       beforeEach(function () {
         this.wrapper = mount(
           <HotKeys keyMap={this.keyMap} >
-            <div onKeyPress={(e) => e.stopPropagation() }>
+            <div onKeyDown={(e) => e.stopPropagation() }>
               <HotKeys handlers={this.handlers}>
                 <div className="childElement"  />
               </HotKeys>
@@ -81,7 +81,7 @@ describe('Handling stopped event propagation:', function () {
       });
 
       it('then does not trigger an associated handler', function() {
-        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyDown(KeyCode.A);
 
         expect(this.handler).to.not.have.been.called;
       });
@@ -91,7 +91,7 @@ describe('Handling stopped event propagation:', function () {
       beforeEach(function () {
         this.wrapper = mount(
           <HotKeys >
-            <div onKeyPress={(e) => e.stopPropagation() }>
+            <div onKeyDown={(e) => e.stopPropagation() }>
               <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
                 <div className="childElement"  />
               </HotKeys>
@@ -104,7 +104,7 @@ describe('Handling stopped event propagation:', function () {
       });
 
       it('then calls the associated action\'s handler', function() {
-        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyDown(KeyCode.A);
 
         expect(this.handler).to.have.been.calledOnce;
       });

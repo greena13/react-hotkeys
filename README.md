@@ -179,7 +179,7 @@ const keyMap = {
 ```
 #### Specifying key events (keydown, keypress, keyup)
 
-By default, `react-hotkeys` will match hotkey sequences on the `keypress` event (or, more precisely: on the `keypress` event of the last key to complete the last combination in a sequence).
+By default, `react-hotkeys` will match hotkey sequences on the `keydown` event (or, more precisely: on the `keydown` event of the last key to complete the last combination in a sequence).
 
 If you want to trigger a single action on a different key event, you can use the object syntax and the `action` attribute to explicitly set which key event you wish to bind to:
 
@@ -632,7 +632,7 @@ configure({
   /**
    * Default key event key maps are bound to (keydown|keypress|keyup)
    */
-  defaultKeyEvent: 'keypress',
+  defaultKeyEvent: 'keydown',
 
   /**
    * The default component type to wrap HotKey components' children in, to provide
@@ -835,7 +835,7 @@ HotKeys (GLOBAL-C0🔺): Component options:
     },
     "componentId": 0,
     "options": {
-        "defaultKeyEvent": "keypress"
+        "defaultKeyEvent": "keydown"
     }
 }
 HotKeys (FT0📕-E0❤️-C0🔺): Focused.
@@ -854,7 +854,7 @@ HotKeys (FT0📕-E0❤️-C0🔺): Component options:
     },
     "componentId": 0,
     "options": {
-        "defaultKeyEvent": "keypress"
+        "defaultKeyEvent": "keydown"
     }
 }
 HotKeys (FT0📕-E0❤️-C1⭐️): Focused.
@@ -959,7 +959,7 @@ HotKeys (FT0📕-E0❤️-C1⭐️): Component options:
     "handlers": {},
     "componentId": 1,
     "options": {
-        "defaultKeyEvent": "keypress"
+        "defaultKeyEvent": "keydown"
     }
 }
 HotKeys (FT0📕-E1💚-C0🔺): New 'ArrowDown' keydown event.

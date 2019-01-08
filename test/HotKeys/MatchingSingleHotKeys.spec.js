@@ -50,18 +50,17 @@ describe('Matching single hotkeys:', function () {
       });
 
       it('then the matching handler is called once', function() {
-        expect(this.action1Handler).to.not.have.been.called;
+        expect(this.action1Handler).to.have.been.calledOnce;
       });
     });
 
     describe('when a hotkey keypress event occurs', function () {
-
       beforeEach(function () {
         this.targetElement.keyDown(KeyCode.A);
         this.targetElement.keyPress(KeyCode.A);
       });
 
-      it('then the matching handler is called once', function() {
+      it('then the matching handler is not called again', function() {
         expect(this.action1Handler).to.have.been.calledOnce;
       });
     });
@@ -83,13 +82,12 @@ describe('Matching single hotkeys:', function () {
         this.targetElement.keyDown(KeyCode.A);
         this.targetElement.keyPress(KeyCode.A);
         this.targetElement.keyUp(KeyCode.A);
-
-        this.targetElement.keyDown(KeyCode.A);
       });
 
       it('then the matching handler is called again on the second keypress', function() {
         expect(this.action1Handler).to.have.been.calledOnce;
 
+        this.targetElement.keyDown(KeyCode.A);
         this.targetElement.keyPress(KeyCode.A);
         this.targetElement.keyUp(KeyCode.A);
 

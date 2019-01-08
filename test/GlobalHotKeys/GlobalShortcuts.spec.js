@@ -57,13 +57,13 @@ describe('Global shortcuts:', () => {
         });
 
         it('then calls the correct handler when a key is pressed that matches a handler', function() {
-          this.targetElement.keyPress(KeyCode.A, { forceEnzymeEvent: true });
+          this.targetElement.keyDown(KeyCode.A, { forceEnzymeEvent: true });
 
           expect(this.globalHandler).to.have.been.called;
         });
 
         it('then does NOT call the handler when a key is pressed that does NOT match a handler', function() {
-          this.targetElement.keyPress(KeyCode.B, { forceEnzymeEvent: true });
+          this.targetElement.keyDown(KeyCode.B, { forceEnzymeEvent: true });
 
           expect(this.globalHandler).to.not.have.been.called;
         });
@@ -75,13 +75,13 @@ describe('Global shortcuts:', () => {
         });
 
         it('then calls the correct handler when a key is pressed that matches the keyMap', function() {
-          this.targetElement.keyPress(KeyCode.A);
+          this.targetElement.keyDown(KeyCode.A);
 
           expect(this.globalHandler).to.have.been.called;
         });
 
         it('then does NOT call the handler when a key is pressed that does NOT matches the keyMap', function() {
-          this.targetElement.keyPress(KeyCode.B);
+          this.targetElement.keyDown(KeyCode.B);
 
           expect(this.globalHandler).to.not.have.been.called;
         });
@@ -129,19 +129,19 @@ describe('Global shortcuts:', () => {
         });
 
         it('then calls the handler when a matching key is pressed', function() {
-          this.targetElement.keyPress(KeyCode.A, { forceEnzymeEvent: true });
+          this.targetElement.keyDown(KeyCode.A, { forceEnzymeEvent: true });
 
           expect(this.globalHandler).to.have.been.called;
         });
 
         it('then calls the focus handler when a matching key is pressed', function() {
-          this.targetElement.keyPress(KeyCode.C, { forceEnzymeEvent: true });
+          this.targetElement.keyDown(KeyCode.C, { forceEnzymeEvent: true });
 
           expect(this.focusActionHandler).to.have.been.called;
         });
 
         it('then calls the closest focus handler (over the handler) when a matching key is pressed', function() {
-          this.targetElement.keyPress(KeyCode.B, { forceEnzymeEvent: true });
+          this.targetElement.keyDown(KeyCode.B, { forceEnzymeEvent: true });
 
           expect(this.focusCommonActionHandler).to.have.been.called;
           expect(this.globalCommonActionHandler).to.not.have.been.called;
@@ -155,19 +155,19 @@ describe('Global shortcuts:', () => {
         });
 
         it('then calls the handler when a matching key is pressed', function() {
-          this.targetElement.keyPress(KeyCode.A, { forceEnzymeEvent: true });
+          this.targetElement.keyDown(KeyCode.A, { forceEnzymeEvent: true });
 
           expect(this.globalHandler).to.have.been.called;
         });
 
         it('then does NOT call the focus handler when a matching key is pressed', function() {
-          this.targetElement.keyPress(KeyCode.C, { forceEnzymeEvent: true });
+          this.targetElement.keyDown(KeyCode.C, { forceEnzymeEvent: true });
 
           expect(this.focusActionHandler).to.not.have.been.called;
         });
 
         it('then calls the handler when a matching key is pressed', function() {
-          this.targetElement.keyPress(KeyCode.B, { forceEnzymeEvent: true });
+          this.targetElement.keyDown(KeyCode.B, { forceEnzymeEvent: true });
 
           expect(this.globalCommonActionHandler).to.have.been.called;
           expect(this.focusCommonActionHandler).to.not.have.been.called;
@@ -180,19 +180,19 @@ describe('Global shortcuts:', () => {
         });
 
         it('then calls the handler when a matching key is pressed', function() {
-          this.targetElement.keyPress(KeyCode.A);
+          this.targetElement.keyDown(KeyCode.A);
 
           expect(this.globalHandler).to.have.been.called;
         });
 
         it('then does NOT call the focus handler when a matching key is pressed', function() {
-          this.targetElement.keyPress(KeyCode.C);
+          this.targetElement.keyDown(KeyCode.C);
 
           expect(this.focusActionHandler).to.not.have.been.called;
         });
 
         it('then calls the handler when a matching key is pressed', function() {
-          this.targetElement.keyPress(KeyCode.B);
+          this.targetElement.keyDown(KeyCode.B);
 
           expect(this.globalCommonActionHandler).to.have.been.called;
           expect(this.focusCommonActionHandler).to.not.have.been.called;
@@ -256,19 +256,19 @@ describe('Global shortcuts:', () => {
       });
 
       it('then calls the handler when a matching key is pressed', function() {
-        this.targetElement.keyPress(KeyCode.A, { forceEnzymeEvent: true });
+        this.targetElement.keyDown(KeyCode.A, { forceEnzymeEvent: true });
 
         expect(this.globalHandler).to.have.been.called;
       });
 
       it('then calls the focus handler when a matching key is pressed', function() {
-        this.targetElement.keyPress(KeyCode.C, { forceEnzymeEvent: true });
+        this.targetElement.keyDown(KeyCode.C, { forceEnzymeEvent: true });
 
         expect(this.focusActionHandler).to.have.been.called;
       });
 
       it('then calls the closest focus handler (over the handler) when a matching key is pressed', function() {
-        this.targetElement.keyPress(KeyCode.B, { forceEnzymeEvent: true });
+        this.targetElement.keyDown(KeyCode.B, { forceEnzymeEvent: true });
 
         expect(this.focusCommonActionHandler).to.have.been.called;
         expect(this.globalCommonActionHandler).to.not.have.been.called;
@@ -282,19 +282,19 @@ describe('Global shortcuts:', () => {
       });
 
       it('then calls the handler when a matching key is pressed', function() {
-        this.targetElement.keyPress(KeyCode.A, { forceEnzymeEvent: true });
+        this.targetElement.keyDown(KeyCode.A, { forceEnzymeEvent: true });
 
         expect(this.globalHandler).to.have.been.called;
       });
 
       it('then does NOT call the focus handler when a matching key is pressed', function() {
-        this.targetElement.keyPress(KeyCode.C, { forceEnzymeEvent: true });
+        this.targetElement.keyDown(KeyCode.C, { forceEnzymeEvent: true });
 
         expect(this.focusActionHandler).to.not.have.been.called;
       });
 
       it('then calls the handler when a matching key is pressed', function() {
-        this.targetElement.keyPress(KeyCode.B, { forceEnzymeEvent: true });
+        this.targetElement.keyDown(KeyCode.B, { forceEnzymeEvent: true });
 
         expect(this.globalCommonActionHandler).to.have.been.called;
         expect(this.focusCommonActionHandler).to.not.have.been.called;
@@ -307,19 +307,19 @@ describe('Global shortcuts:', () => {
       });
 
       it('then calls the handler when a matching key is pressed', function() {
-        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyDown(KeyCode.A);
 
         expect(this.globalHandler).to.have.been.called;
       });
 
       it('then does NOT call the focus handler when a matching key is pressed', function() {
-        this.targetElement.keyPress(KeyCode.C);
+        this.targetElement.keyDown(KeyCode.C);
 
         expect(this.focusActionHandler).to.not.have.been.called;
       });
 
       it('then calls the handler when a matching key is pressed', function() {
-        this.targetElement.keyPress(KeyCode.B);
+        this.targetElement.keyDown(KeyCode.B);
 
         expect(this.globalCommonActionHandler).to.have.been.called;
         expect(this.focusCommonActionHandler).to.not.have.been.called;

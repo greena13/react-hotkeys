@@ -63,13 +63,13 @@ describe('Component lifecycle for GlobalHotKeys component:', () => {
     });
 
     it('then does not call the handler when a key matching a hot key is pressed', function() {
-      simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.A });
+      simulant.fire(this.reactDiv, 'keydown', { key: KeyCode.A });
 
       expect(this.handler).to.have.been.calledOnce;
 
       this.wrapper.unmount();
 
-      simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.A });
+      simulant.fire(this.reactDiv, 'keydown', { key: KeyCode.A });
 
       expect(this.handler).to.have.been.calledOnce;
     });

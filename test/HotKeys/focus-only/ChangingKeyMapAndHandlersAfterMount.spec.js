@@ -39,11 +39,11 @@ describe('Changing keyMap and handlers after mount:', function () {
       });
 
       it('then the new sequence is ignored', function() {
-        this.targetElement.keyPress(KeyCode.B);
+        this.targetElement.keyDown(KeyCode.B);
 
         expect(this.handler).to.not.have.been.called;
 
-        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyDown(KeyCode.A);
 
         expect(this.handler).to.have.been.calledOnce;
       });
@@ -83,7 +83,7 @@ describe('Changing keyMap and handlers after mount:', function () {
       it('then the new sequence is used', function() {
         expect(this.handler).to.not.have.been.called;
 
-        this.targetElement.keyPress(KeyCode.B);
+        this.targetElement.keyDown(KeyCode.B);
         expect(this.handler).to.have.been.calledOnce;
       });
     });
@@ -97,7 +97,7 @@ describe('Changing keyMap and handlers after mount:', function () {
         expect(this.handler).to.not.have.been.called;
         expect(this.handler2).to.not.have.been.called;
 
-        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyDown(KeyCode.A);
 
         expect(this.handler).to.not.have.been.called;
         expect(this.handler2).to.have.been.calledOnce;
@@ -113,7 +113,7 @@ describe('Changing keyMap and handlers after mount:', function () {
         expect(this.handler).to.not.have.been.called;
         expect(this.handler2).to.not.have.been.called;
 
-        this.targetElement.keyPress(KeyCode.B);
+        this.targetElement.keyDown(KeyCode.B);
 
         expect(this.handler).to.not.have.been.called;
         expect(this.handler2).to.have.been.calledOnce;
@@ -126,7 +126,7 @@ describe('Changing keyMap and handlers after mount:', function () {
       });
 
       it('then the new sequence is used', function() {
-        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyDown(KeyCode.A);
 
         expect(this.handler).to.not.have.been.called;
       });
@@ -139,7 +139,7 @@ describe('Changing keyMap and handlers after mount:', function () {
 
       it('then the new sequence is used', function() {
 
-        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyDown(KeyCode.A);
 
         expect(this.handler).to.not.have.been.called;
         expect(this.handler2).to.have.been.calledOnce;
@@ -158,7 +158,7 @@ describe('Changing keyMap and handlers after mount:', function () {
         expect(this.handler2).to.not.have.been.called;
         expect(this.handler3).to.not.have.been.called;
 
-        this.targetElement.keyPress(KeyCode.B);
+        this.targetElement.keyDown(KeyCode.B);
 
         expect(this.handler).to.not.have.been.called;
         expect(this.handler2).to.not.have.been.called;
@@ -174,7 +174,7 @@ describe('Changing keyMap and handlers after mount:', function () {
       });
 
       it('then the new sequence is used', function() {
-        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyDown(KeyCode.A);
 
         expect(this.handler).to.not.have.been.called;
       });

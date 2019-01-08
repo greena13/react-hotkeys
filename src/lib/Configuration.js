@@ -15,7 +15,7 @@ const _defaultConfiguration = {
    * Default key event key maps are bound to, if left unspecified
    * @type {KeyEventName}
    */
-  defaultKeyEvent: 'keypress',
+  defaultKeyEvent: 'keydown',
 
   /**
    * The default component type to wrap HotKey components' children in, to provide

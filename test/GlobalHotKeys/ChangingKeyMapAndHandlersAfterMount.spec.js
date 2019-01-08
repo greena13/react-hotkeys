@@ -43,6 +43,7 @@ describe('Changing keyMap and handlers after mount for a GlobalHotKeys component
       });
 
       it('then the new sequence is ignored', function() {
+        simulant.fire(this.reactDiv, 'keydown', { key: KeyCode.B });
         simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.B });
         simulant.fire(this.reactDiv, 'keyup', { key: KeyCode.B });
 
@@ -50,6 +51,7 @@ describe('Changing keyMap and handlers after mount for a GlobalHotKeys component
 
         simulant.fire(this.reactDiv, 'keydown', { key: KeyCode.A });
         simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.A });
+        simulant.fire(this.reactDiv, 'keyup', { key: KeyCode.A });
 
         expect(this.handler).to.have.been.calledOnce;
       });
@@ -93,7 +95,7 @@ describe('Changing keyMap and handlers after mount for a GlobalHotKeys component
       it('then the new sequence is used', function() {
         expect(this.handler).to.not.have.been.called;
 
-        simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.B });
+        simulant.fire(this.reactDiv, 'keydown', { key: KeyCode.B });
 
         expect(this.handler).to.have.been.calledOnce;
       });
@@ -108,7 +110,7 @@ describe('Changing keyMap and handlers after mount for a GlobalHotKeys component
         expect(this.handler).to.not.have.been.called;
         expect(this.handler2).to.not.have.been.called;
 
-        simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.A });
+        simulant.fire(this.reactDiv, 'keydown', { key: KeyCode.A });
 
         expect(this.handler).to.not.have.been.called;
         expect(this.handler2).to.have.been.calledOnce;
@@ -124,7 +126,7 @@ describe('Changing keyMap and handlers after mount for a GlobalHotKeys component
         expect(this.handler).to.not.have.been.called;
         expect(this.handler2).to.not.have.been.called;
 
-        simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.B });
+        simulant.fire(this.reactDiv, 'keydown', { key: KeyCode.B });
 
         expect(this.handler).to.not.have.been.called;
         expect(this.handler2).to.have.been.calledOnce;
@@ -137,7 +139,7 @@ describe('Changing keyMap and handlers after mount for a GlobalHotKeys component
       });
 
       it('then the new sequence is used', function() {
-        simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.A });
+        simulant.fire(this.reactDiv, 'keydown', { key: KeyCode.A });
 
         expect(this.handler).to.not.have.been.called;
       });
@@ -150,7 +152,7 @@ describe('Changing keyMap and handlers after mount for a GlobalHotKeys component
 
       it('then the new sequence is used', function() {
 
-        simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.A });
+        simulant.fire(this.reactDiv, 'keydown', { key: KeyCode.A });
 
         expect(this.handler).to.not.have.been.called;
         expect(this.handler2).to.have.been.calledOnce;
@@ -169,7 +171,7 @@ describe('Changing keyMap and handlers after mount for a GlobalHotKeys component
         expect(this.handler2).to.not.have.been.called;
         expect(this.handler3).to.not.have.been.called;
 
-        simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.B });
+        simulant.fire(this.reactDiv, 'keydown', { key: KeyCode.B });
 
         expect(this.handler).to.not.have.been.called;
         expect(this.handler2).to.not.have.been.called;
@@ -185,7 +187,7 @@ describe('Changing keyMap and handlers after mount for a GlobalHotKeys component
       });
 
       it('then the new sequence is used', function() {
-        simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.A });
+        simulant.fire(this.reactDiv, 'keydown', { key: KeyCode.A });
 
         expect(this.handler).to.not.have.been.called;
       });

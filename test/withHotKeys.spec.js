@@ -99,7 +99,7 @@ describe('withHotKeys:', () => {
       this.targetElement = new FocusableElement(this.wrapper, '.childElement');
       this.targetElement.focus();
 
-      this.targetElement.keyPress(KeyCode.A);
+      this.targetElement.keyDown(KeyCode.A);
 
       expect(this.handler).to.have.been.called;
     });
@@ -126,7 +126,7 @@ describe('withHotKeys:', () => {
         this.targetElement = new FocusableElement(this.wrapper, '.childElement');
         this.targetElement.focus();
 
-        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyDown(KeyCode.A);
 
         expect(this.handler).to.have.been.called;
       });

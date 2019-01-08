@@ -55,7 +55,7 @@ describe('Nested key map definitions:', () => {
 
         context('when keys that match an action defined only in the outer component are pressed', () => {
           it('then calls the handler for the action defined in the outer component', function() {
-            this.targetElement.keyPress(KeyCode.B);
+            this.targetElement.keyDown(KeyCode.B);
 
             expect(this.action2Handler).to.have.been.called;
 
@@ -67,7 +67,7 @@ describe('Nested key map definitions:', () => {
 
         context('when keys that match an action defined only in the inner component are pressed', () => {
           it('then does NOT call any handlers', function() {
-            this.targetElement.keyPress(KeyCode.C);
+            this.targetElement.keyDown(KeyCode.C);
 
             expect(this.action2Handler).to.not.have.been.called;
             expect(this.action1OuterHandler).to.not.have.been.called;
@@ -78,7 +78,7 @@ describe('Nested key map definitions:', () => {
 
         context('when keys that match an action defined in both components are pressed', () => {
           it('then calls the handler defined in the outer component', function() {
-            this.targetElement.keyPress(KeyCode.A);
+            this.targetElement.keyDown(KeyCode.A);
 
             expect(this.action1OuterHandler).to.have.been.called;
 
@@ -98,7 +98,7 @@ describe('Nested key map definitions:', () => {
 
         context('when keys that match an action defined only in the outer component are pressed', () => {
           it('then calls the handler defined in the outer component', function() {
-            this.targetElement.keyPress(KeyCode.B);
+            this.targetElement.keyDown(KeyCode.B);
 
             expect(this.action2Handler).to.have.been.called;
 
@@ -110,7 +110,7 @@ describe('Nested key map definitions:', () => {
 
         context('when keys that match an action defined only in the inner component are pressed', () => {
           it('then does NOT trigger any action', function() {
-            this.targetElement.keyPress(KeyCode.C);
+            this.targetElement.keyDown(KeyCode.C);
 
             expect(this.action2Handler).to.not.have.been.called;
 
@@ -122,7 +122,7 @@ describe('Nested key map definitions:', () => {
 
         context('when keys that match an action defined in both components are pressed', () => {
           it('then calls the handler defined in the outer component', function() {
-            this.targetElement.keyPress(KeyCode.A);
+            this.targetElement.keyDown(KeyCode.A);
 
             expect(this.action1OuterHandler).to.have.been.called;
             expect(this.action2Handler).to.not.have.been.called;
@@ -169,7 +169,7 @@ describe('Nested key map definitions:', () => {
 
         context('when keys that match an action defined only in the outer component are pressed', () => {
           it('then does NOT call any handlers', function() {
-            this.targetElement.keyPress(KeyCode.B);
+            this.targetElement.keyDown(KeyCode.B);
 
             expect(this.action2Handler).to.not.have.been.called;
             expect(this.action1OuterHandler).to.not.have.been.called;
@@ -180,7 +180,7 @@ describe('Nested key map definitions:', () => {
 
         context('when keys that match an action defined only in the inner component are pressed', () => {
           it('then does NOT call any handlers', function() {
-            this.targetElement.keyPress(KeyCode.C);
+            this.targetElement.keyDown(KeyCode.C);
 
             expect(this.action2Handler).to.not.have.been.called;
             expect(this.action1OuterHandler).to.not.have.been.called;
@@ -191,7 +191,7 @@ describe('Nested key map definitions:', () => {
 
         context('when keys that match an action defined in both components are pressed', () => {
           it('then does NOT call any handlers', function() {
-            this.targetElement.keyPress(KeyCode.A);
+            this.targetElement.keyDown(KeyCode.A);
 
             expect(this.action1OuterHandler).to.not.have.been.called;
             expect(this.action2Handler).to.not.have.been.called;
@@ -212,7 +212,7 @@ describe('Nested key map definitions:', () => {
 
         context('when keys that match an action defined only in the outer component are pressed', () => {
           it('then calls the handler defined in the outer component', function() {
-            this.targetElement.keyPress(KeyCode.B);
+            this.targetElement.keyDown(KeyCode.B);
 
             expect(this.action2Handler).to.have.been.called;
 
@@ -224,7 +224,7 @@ describe('Nested key map definitions:', () => {
 
         context('when keys that match an action defined only in the inner component are pressed', () => {
           it('then calls the handler defined in the inner component', function() {
-            this.targetElement.keyPress(KeyCode.C);
+            this.targetElement.keyDown(KeyCode.C);
 
             expect(this.action3Handler).to.have.been.called;
 
@@ -236,7 +236,7 @@ describe('Nested key map definitions:', () => {
 
         context('when keys that match an action defined in both components are pressed', () => {
           it('then calls the handler defined in the inner component', function() {
-            this.targetElement.keyPress(KeyCode.A);
+            this.targetElement.keyDown(KeyCode.A);
 
             expect(this.action1InnerHandler).to.have.been.called;
 
@@ -295,7 +295,7 @@ describe('Nested key map definitions:', () => {
 
         context('when keys that an action defined only in the outer component are pressed', () => {
           it('then calls the handler defined in the outer component', function() {
-            this.targetElement.keyPress(KeyCode.B);
+            this.targetElement.keyDown(KeyCode.B);
 
             expect(this.action1OuterActionOuterHandler).to.have.not.been.called;
             expect(this.action2OuterHandler).to.have.been.called;
@@ -311,7 +311,7 @@ describe('Nested key map definitions:', () => {
 
         context('when keys that match an action defined only in the inner component are pressed', () => {
           it('then does NOT call any handlers', function() {
-            this.targetElement.keyPress(KeyCode.C);
+            this.targetElement.keyDown(KeyCode.C);
 
             expect(this.action1OuterActionOuterHandler).to.have.not.been.called;
             expect(this.action2OuterHandler).to.have.not.been.called;
@@ -328,7 +328,7 @@ describe('Nested key map definitions:', () => {
 
         context('when keys that match an action defined in both components are pressed', () => {
           it('then calls the handler defined in the outer component', function() {
-            this.targetElement.keyPress(KeyCode.A);
+            this.targetElement.keyDown(KeyCode.A);
 
             expect(this.action1OuterActionOuterHandler).to.have.been.called;
             expect(this.action2OuterHandler).to.have.not.been.called;
@@ -352,7 +352,7 @@ describe('Nested key map definitions:', () => {
 
         context('when keys that match an action defined only in the outer component are pressed', () => {
           it('then calls the handler defined in the inner component', function() {
-            this.targetElement.keyPress(KeyCode.B);
+            this.targetElement.keyDown(KeyCode.B);
 
             expect(this.action1OuterActionOuterHandler).to.have.not.been.called;
             expect(this.action2OuterHandler).to.have.not.been.called;
@@ -368,7 +368,7 @@ describe('Nested key map definitions:', () => {
 
         context('when keys that match an action defined only in the inner component are pressed', () => {
           it('then calls the handler defined in the inner component', function() {
-            this.targetElement.keyPress(KeyCode.C);
+            this.targetElement.keyDown(KeyCode.C);
 
             expect(this.action1OuterActionOuterHandler).to.have.not.been.called;
             expect(this.action2OuterHandler).to.have.not.been.called;
@@ -384,7 +384,7 @@ describe('Nested key map definitions:', () => {
 
         context('when keys that match an action defined in both components are pressed', () => {
           it('then calls the handler defined in the inner component', function() {
-            this.targetElement.keyPress(KeyCode.A);
+            this.targetElement.keyDown(KeyCode.A);
 
             expect(this.action1OuterActionOuterHandler).to.have.not.been.called;
             expect(this.action2OuterHandler).to.have.not.been.called;
