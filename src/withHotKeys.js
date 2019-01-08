@@ -2,6 +2,8 @@ import PropTypes from 'prop-types';
 import React, {PureComponent} from 'react';
 import Configuration from './lib/Configuration';
 import KeyEventManager from './lib/KeyEventManager';
+import isEmpty from './utils/collection/isEmpty';
+import KeyCombinationSerializer from './lib/KeyCombinationSerializer';
 
 /**
  * Wraps a React component in a HotKeysEnabled component, which passes down the
@@ -10,9 +12,9 @@ import KeyEventManager from './lib/KeyEventManager';
  * the wrapped component (e.g. div, span, input, etc) in order for the key events
  * to be recorded.
  *
- * @param {React.Component} Component - Component class to wrap
+ * @param {React.ComponentClass} Component - Component class to wrap
  * @param {Object} hotKeysOptions - Options that become the wrapping
- * @returns {React.Component} Wrapped component that is passed all of the React hotkeys
+ * @returns {React.ComponentClass} Wrapped component that is passed all of the React hotkeys
  * props in a single value, hotkeys.
  */
 function withHotKeys(Component, hotKeysOptions = {}) {
@@ -147,11 +149,14 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       const hotKeys = {
         onFocus: this._wrapFunction('onFocus', this._handleFocus),
         onBlur: this._wrapFunction('onBlur', this._handleBlur),
-        onKeyDown: this._handleKeyDown,
-        onKeyPress: this._handleKeyPress,
-        onKeyUp: this._handleKeyUp,
         tabIndex: Configuration.option('defaultTabIndex')
       };
+
+      if (this._shouldBindKeyListeners()) {
+        hotKeys.onKeyDown = this._handleKeyDown;
+        hotKeys.onKeyPress = this._handleKeyPress;
+        hotKeys.onKeyUp = this._handleKeyUp;
+      }
 
       return (
         <Component
@@ -159,6 +164,20 @@ function withHotKeys(Component, hotKeysOptions = {}) {
           { ...props }
         />
       );
+    }
+
+    _shouldBindKeyListeners() {
+      const keyMap = getKeyMap(this.props);
+
+      return !isEmpty(keyMap) || (
+        Configuration.option('enableHardSequences') && this._handlersIncludeHardSequences(keyMap, getHandlers(this.props))
+      );
+    }
+
+    _handlersIncludeHardSequences(keyMap, handlers) {
+      return Object.keys(handlers).some((action) => {
+        return !keyMap[action] && KeyCombinationSerializer.isValidKeySerialization(action);
+      });
     }
 
     _wrapFunction(propName, func){

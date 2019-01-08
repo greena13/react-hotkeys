@@ -9,6 +9,7 @@ import Logger from '../Logger';
 import printComponent from '../../helpers/logging/printComponent';
 import isUndefined from '../../utils/isUndefined';
 import normalizeKeyName from '../../helpers/resolving-handlers/normalizeKeyName';
+import isEmpty from '../../utils/collection/isEmpty';
 
 /**
  * Defines behaviour for dealing with key maps defined in focus-only HotKey components
@@ -101,7 +102,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
        * Index of the component last seen to be handling a key event
        * @type {ComponentId}
        */
-      previousComponentIndex: 0,
+      previousComponentIndex: -1,
 
       /**
        * Whether the keyboard event currently being handled has already matched a
@@ -544,7 +545,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * @private
    */
   _isNewKeyEvent(componentId) {
-    return this.eventPropagationState.previousComponentIndex >= componentId;
+    const { previousComponentIndex } = this.eventPropagationState;
+
+    return previousComponentIndex === -1 || previousComponentIndex >= componentId;
   }
 
   _updateEventPropagationHistory(componentId, options = { forceReset: false }) {
@@ -639,12 +642,15 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
           `${this._logPrefix(componentId, {focusTreeId})} Attempting to find action matching '${combinationName}' ${eventName} . . .`
         );
 
+        const { previousComponentIndex } = this.eventPropagationState;
+
         const handlerWasCalled =
           this._callMatchingHandlerClosestToEventTarget(
             event,
             keyName,
             eventBitmapIndex,
-            componentId
+            componentId,
+            previousComponentIndex === -1 ? 0 : previousComponentIndex
           );
 
         if (handlerWasCalled) {

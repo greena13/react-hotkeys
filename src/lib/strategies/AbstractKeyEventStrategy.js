@@ -150,7 +150,7 @@ class AbstractKeyEventStrategy {
      * key events propagate up the React tree.
      * @type {Number}
      */
-    this.searchIndex =  0;
+    this.handlerResolutionSearchIndex =  0;
 
     /**
      * Array of counters - one for each component - to keep track of how many handlers
@@ -161,7 +161,7 @@ class AbstractKeyEventStrategy {
 
     /**
      * A dictionary of handlers to the components that register them. This is populated
-     * as this.searchIndex increases, moving from the end of this.componentList to the
+     * as this.handlerResolutionSearchIndex increases, moving from the end of this.componentList to the
      * front, populating this.keyMaps as needed
      * @type {Object<ActionName, ComponentId>}
      */
@@ -235,6 +235,8 @@ class AbstractKeyEventStrategy {
     );
 
     this.componentList.push(componentOptions);
+
+    return componentOptions;
   }
 
   /**
@@ -285,13 +287,12 @@ class AbstractKeyEventStrategy {
       return Object.keys(actionNameToHandlersMap).reduce((memo, actionNameOrKeyExpression) => {
         const actionNameIsInKeyMap = !!actionNameToKeyMap[actionNameOrKeyExpression];
 
-        const handler = actionNameToHandlersMap[actionNameOrKeyExpression];
-
         if (!actionNameIsInKeyMap && KeyCombinationSerializer.isValidKeySerialization(actionNameOrKeyExpression)) {
           memo.keyMap[actionNameOrKeyExpression] = actionNameOrKeyExpression;
         }
 
-        memo.handlers[actionNameOrKeyExpression] = handler;
+        memo.handlers[actionNameOrKeyExpression] =
+          actionNameToHandlersMap[actionNameOrKeyExpression];
 
         return memo;
       }, {keyMap: {}, handlers: {}});
@@ -512,7 +513,7 @@ class AbstractKeyEventStrategy {
    * Matching and calling handlers
    ********************************************************************************/
 
-  _callMatchingHandlerClosestToEventTarget(event, keyName, eventBitmapIndex, componentId) {
+  _callMatchingHandlerClosestToEventTarget(event, keyName, eventBitmapIndex, componentId, componentSearchIndex) {
     if (!this.keyMaps || !this.unmatchedHandlerStatus) {
       this.keyMaps = [];
 
@@ -524,265 +525,263 @@ class AbstractKeyEventStrategy {
       });
     }
 
-    const unmatchedHandlersStatus = this.unmatchedHandlerStatus[componentId];
-    let unmatchedHandlersCount = unmatchedHandlersStatus[0];
+    while (componentSearchIndex <= componentId) {
+      const unmatchedHandlersStatus = this.unmatchedHandlerStatus[componentSearchIndex];
+      let unmatchedHandlersCount = unmatchedHandlersStatus[0];
 
-    if (unmatchedHandlersCount > 0) {
-      /**
-       * Component currently handling key event has handlers that have not yet been
-       * associated with a key sequence. We need to continue walking up the component
-       * tree in search of the matching actions that describe the applicable key
-       * sequence.
-       */
-
-      if (this.searchIndex < componentId) {
-        this.searchIndex = componentId;
-      }
-
-      while (this.searchIndex < this.componentList.length && unmatchedHandlersCount > 0) {
-        const { handlers, actions } = this.componentList[this.searchIndex];
-
+      if (unmatchedHandlersCount > 0) {
         /**
-         * Add current component's handlers to the handlersDictionary so we know
-         * which component has defined them
+         * Component currently handling key event has handlers that have not yet been
+         * associated with a key sequence. We need to continue walking up the component
+         * tree in search of the matching actions that describe the applicable key
+         * sequence.
          */
-        Object.keys(handlers).forEach((actionName) => {
-          if (!this.handlersDictionary[actionName]) {
-            this.handlersDictionary[actionName] = [];
-          }
 
-          this.handlersDictionary[actionName].push(this.searchIndex);
-        });
+        while (this.handlerResolutionSearchIndex < this.componentList.length && unmatchedHandlersCount > 0) {
+          const { handlers, actions } = this.componentList[this.handlerResolutionSearchIndex];
 
-        /**
-         * Iterate over the actions of a component (starting with the current component
-         * and working through its ancestors), matching them to the current component's
-         * handlers
-         */
-        Object.keys(actions).forEach((actionName) => {
-          const handlerComponentIndexArray = this.handlersDictionary[actionName];
-
-          if (handlerComponentIndexArray) {
-            /**
-             * Get action handler closest to the event target
-             */
-            const handlerComponentIndex = handlerComponentIndexArray[0];
-
-            const handler =
-              this.componentList[handlerComponentIndex].handlers[actionName];
-
-            /**
-             * Get key map that corresponds with the component that defines the handler
-             * closest to the event target
-             */
-            const keyMap = this.keyMaps[handlerComponentIndex];
-
-            /**
-             * Store the key sequence with the handler that it should call at
-             * a given component level
-             */
-            if (!keyMap.sequences) {
-              keyMap.sequences = {};
+          /**
+           * Add current component's handlers to the handlersDictionary so we know
+           * which component has defined them
+           */
+          Object.keys(handlers).forEach((actionName) => {
+            if (!this.handlersDictionary[actionName]) {
+              this.handlersDictionary[actionName] = [];
             }
 
-            /**
-             * At least one child HotKeys component (or the component itself) has
-             * defined a handler for the action, so now we need to associate them
-             */
-            const keyMatchers = actions[actionName];
+            this.handlersDictionary[actionName].push(this.handlerResolutionSearchIndex);
+          });
 
-            keyMatchers.forEach((keyMatcher) => {
-              const keySequence = [keyMatcher.prefix, keyMatcher.id].join(' ');
+          /**
+           * Iterate over the actions of a component (starting with the current component
+           * and working through its ancestors), matching them to the current component's
+           * handlers
+           */
+          Object.keys(actions).forEach((actionName) => {
+            const handlerComponentIndexArray = this.handlersDictionary[actionName];
 
-              const closestSequenceHandlerAlreadyFound =
-                this.keySequencesDictionary[keySequence] &&
-                this.keySequencesDictionary[keySequence].some((dictEntry) => {
-                  return dictEntry[1] === keyMatcher.eventBitmapIndex
-                });
+            if (handlerComponentIndexArray) {
+              /**
+               * Get action handler closest to the event target
+               */
+              const handlerComponentIndex = handlerComponentIndexArray[0];
 
-              if (closestSequenceHandlerAlreadyFound) {
-                /**
-                 * Return if there is already a component with handlers for the current
-                 * key sequence closer to the event target
-                 */
-                return;
+              const handler =
+                this.componentList[handlerComponentIndex].handlers[actionName];
+
+              /**
+               * Get key map that corresponds with the component that defines the handler
+               * closest to the event target
+               */
+              const keyMap = this.keyMaps[handlerComponentIndex];
+
+              /**
+               * Store the key sequence with the handler that it should call at
+               * a given component level
+               */
+              if (!keyMap.sequences) {
+                keyMap.sequences = {};
               }
 
-              if (!keyMap.sequences[keyMatcher.prefix]) {
-                keyMap.sequences[keyMatcher.prefix] = { combinations: {} };
-              }
+              /**
+               * At least one child HotKeys component (or the component itself) has
+               * defined a handler for the action, so now we need to associate them
+               */
+              const keyMatchers = actions[actionName];
 
-              const {
-                prefix, sequenceLength, id, keyDictionary, size,
-                eventBitmapIndex: matcherEventBitmapIndex,
-                actionName
-              } = keyMatcher;
+              keyMatchers.forEach((keyMatcher) => {
+                const keySequence = [keyMatcher.prefix, keyMatcher.id].join(' ');
 
-              const combination =
-                keyMap.sequences[keyMatcher.prefix].combinations[keyMatcher.id];
+                const closestSequenceHandlerAlreadyFound =
+                  this.keySequencesDictionary[keySequence] &&
+                  this.keySequencesDictionary[keySequence].some((dictEntry) => {
+                    return dictEntry[1] === keyMatcher.eventBitmapIndex
+                  });
 
-              if (!combination) {
-                keyMap.sequences[keyMatcher.prefix].combinations[keyMatcher.id] = {
+                if (closestSequenceHandlerAlreadyFound) {
+                  /**
+                   * Return if there is already a component with handlers for the current
+                   * key sequence closer to the event target
+                   */
+                  return;
+                }
+
+                if (!keyMap.sequences[keyMatcher.prefix]) {
+                  keyMap.sequences[keyMatcher.prefix] = { combinations: {} };
+                }
+
+                const {
                   prefix, sequenceLength, id, keyDictionary, size,
-                  events: {
-                    [matcherEventBitmapIndex]: {
-                      actionName, eventBitmapIndex: matcherEventBitmapIndex, handler
+                  eventBitmapIndex: matcherEventBitmapIndex,
+                  actionName
+                } = keyMatcher;
+
+                const combination =
+                  keyMap.sequences[keyMatcher.prefix].combinations[keyMatcher.id];
+
+                if (!combination) {
+                  keyMap.sequences[keyMatcher.prefix].combinations[keyMatcher.id] = {
+                    prefix, sequenceLength, id, keyDictionary, size,
+                    events: {
+                      [matcherEventBitmapIndex]: {
+                        actionName, eventBitmapIndex: matcherEventBitmapIndex, handler
+                      }
                     }
-                  }
-                };
-              } else {
-                keyMap.sequences[keyMatcher.prefix].combinations[keyMatcher.id] = {
-                  ...combination,
-                  events: {
-                    ...combination.events,
-                    [matcherEventBitmapIndex]: {
-                      actionName, eventBitmapIndex: matcherEventBitmapIndex, handler
+                  };
+                } else {
+                  keyMap.sequences[keyMatcher.prefix].combinations[keyMatcher.id] = {
+                    ...combination,
+                    events: {
+                      ...combination.events,
+                      [matcherEventBitmapIndex]: {
+                        actionName, eventBitmapIndex: matcherEventBitmapIndex, handler
+                      }
                     }
                   }
                 }
-              }
-
-              /**
-               * Merge event bitmaps so we can quickly determine if a given component
-               * has any handlers bound to particular key events
-               */
-              if (!keyMap.eventBitmap) {
-                keyMap.eventBitmap = KeyEventBitmapManager.newBitmap();
-              }
-
-              KeyEventBitmapManager.setBit(keyMap.eventBitmap, keyMatcher.eventBitmapIndex);
-
-              /**
-               * Record the longest sequence length so we know to only check for sequences
-               * of that length or shorter for a particular component
-               */
-              if (!keyMap.longestSequence || keyMap.longestSequence < keyMatcher.sequenceLength) {
-                keyMap.longestSequence = keyMatcher.sequenceLength;
-              }
-
-              /**
-               * Record that we have already found a handler for the current action so
-               * that we do not override handlers for an action closest to the event target
-               * with handlers further up the tree
-               */
-              if (!this.keySequencesDictionary[keySequence]) {
-                this.keySequencesDictionary[keySequence] = [];
-              }
-
-              this.keySequencesDictionary[keySequence].push([
-                handlerComponentIndex,
-                keyMatcher.eventBitmapIndex
-              ]);
-            });
-
-            handlerComponentIndexArray.forEach((handlerComponentIndex) => {
-              const handlerComponentStatus = this.unmatchedHandlerStatus[handlerComponentIndex];
-
-              if (!handlerComponentStatus[1][actionName]) {
-                handlerComponentStatus[1][actionName] = true;
 
                 /**
-                 * Decrement the number of remaining unmatched handlers for the
-                 * component currently handling the propagating key event, so we know
-                 * when all handlers have been matched to sequences and we can move on
-                 * to matching them against the current key event
+                 * Merge event bitmaps so we can quickly determine if a given component
+                 * has any handlers bound to particular key events
                  */
-                handlerComponentStatus[0]--;
-              }
-            });
-          }
-        });
+                if (!keyMap.eventBitmap) {
+                  keyMap.eventBitmap = KeyEventBitmapManager.newBitmap();
+                }
 
-        /**
-         * Search next component up in the hierarchy for actions that match outstanding
-         * handlers
-         */
-        this.searchIndex++;
-      }
-    }
+                KeyEventBitmapManager.setBit(keyMap.eventBitmap, keyMatcher.eventBitmapIndex);
 
-    const keyMap = this.keyMaps[componentId];
+                /**
+                 * Record the longest sequence length so we know to only check for sequences
+                 * of that length or shorter for a particular component
+                 */
+                if (!keyMap.longestSequence || keyMap.longestSequence < keyMatcher.sequenceLength) {
+                  keyMap.longestSequence = keyMatcher.sequenceLength;
+                }
 
-    this.logger.verbose(
-      `${this._logPrefix(componentId)} Internal key mapping:\n`,
-      `${printComponent(keyMap)}`
-    );
+                /**
+                 * Record that we have already found a handler for the current action so
+                 * that we do not override handlers for an action closest to the event target
+                 * with handlers further up the tree
+                 */
+                if (!this.keySequencesDictionary[keySequence]) {
+                  this.keySequencesDictionary[keySequence] = [];
+                }
 
-    if (!keyMap || isEmpty(keyMap.sequences) || !keyMap.eventBitmap[eventBitmapIndex]) {
-      /**
-       * Component doesn't define any matchers for the current key event
-       */
+                this.keySequencesDictionary[keySequence].push([
+                  handlerComponentIndex,
+                  keyMatcher.eventBitmapIndex
+                ]);
+              });
 
-      this.logger.debug(`${this._logPrefix(componentId)} Doesn't define a handler for '${this._describeCurrentKeyCombination()}' ${describeKeyEvent(eventBitmapIndex)}.`);
+              handlerComponentIndexArray.forEach((handlerComponentIndex) => {
+                const handlerComponentStatus = this.unmatchedHandlerStatus[handlerComponentIndex];
 
-      return;
-    }
+                if (!handlerComponentStatus[1][actionName]) {
+                  handlerComponentStatus[1][actionName] = true;
 
-    const { sequences, longestSequence } = keyMap;
+                  /**
+                   * Decrement the number of remaining unmatched handlers for the
+                   * component currently handling the propagating key event, so we know
+                   * when all handlers have been matched to sequences and we can move on
+                   * to matching them against the current key event
+                   */
+                  handlerComponentStatus[0]--;
+                }
+              });
+            }
+          });
 
-    const currentKeyState = this._getCurrentKeyCombination();
-    const normalizedKeyName = this._getKeyAlias(currentKeyState, keyName);
-
-    let sequenceLengthCounter = longestSequence;
-
-    while(sequenceLengthCounter >= 0) {
-      const sequenceHistory = this.keyCombinationHistory.slice(-sequenceLengthCounter, -1);
-      const sequenceHistoryIds = sequenceHistory.map(({ ids }) => ids );
-
-      const matchingSequence = this._tryMatchSequenceWithKeyAliases(sequences, sequenceHistoryIds);
-
-      if (matchingSequence) {
-        if (!matchingSequence.order) {
           /**
-           * The first time the component that is currently handling the key event has
-           * its handlers searched for a match, order the combinations based on their
-           * size so that they may be applied in the correct priority order
+           * Search next component up in the hierarchy for actions that match outstanding
+           * handlers
            */
+          this.handlerResolutionSearchIndex++;
+        }
+      }
 
-          const combinationsPartitionedBySize = Object.values(matchingSequence.combinations).reduce((memo, { id, size }) => {
-            if (!memo[size]) {
-              memo[size] = [];
+      const keyMap = this.keyMaps[componentSearchIndex];
+
+      this.logger.verbose(
+        `${this._logPrefix(componentSearchIndex)} Internal key mapping:\n`,
+        `${printComponent(keyMap)}`
+      );
+
+      if (!keyMap || isEmpty(keyMap.sequences) || !keyMap.eventBitmap[eventBitmapIndex]) {
+        /**
+         * Component doesn't define any matchers for the current key event
+         */
+
+        this.logger.debug(`${this._logPrefix(componentSearchIndex)} Doesn't define a handler for '${this._describeCurrentKeyCombination()}' ${describeKeyEvent(eventBitmapIndex)}.`);
+      } else {
+        const { sequences, longestSequence } = keyMap;
+
+        const currentKeyState = this._getCurrentKeyCombination();
+        const normalizedKeyName = this._getKeyAlias(currentKeyState, keyName);
+
+        let sequenceLengthCounter = longestSequence;
+
+        while(sequenceLengthCounter >= 0) {
+          const sequenceHistory = this.keyCombinationHistory.slice(-sequenceLengthCounter, -1);
+          const sequenceHistoryIds = sequenceHistory.map(({ ids }) => ids );
+
+          const matchingSequence = this._tryMatchSequenceWithKeyAliases(sequences, sequenceHistoryIds);
+
+          if (matchingSequence) {
+            if (!matchingSequence.order) {
+              /**
+               * The first time the component that is currently handling the key event has
+               * its handlers searched for a match, order the combinations based on their
+               * size so that they may be applied in the correct priority order
+               */
+
+              const combinationsPartitionedBySize = Object.values(matchingSequence.combinations).reduce((memo, { id, size }) => {
+                if (!memo[size]) {
+                  memo[size] = [];
+                }
+
+                memo[size].push(id);
+
+                return memo;
+              }, {});
+
+              matchingSequence.order = Object.keys(combinationsPartitionedBySize).sort((a, b) => b-a ).reduce((memo, key) => {
+                return memo.concat(combinationsPartitionedBySize[key]);
+              }, []);
             }
 
-            memo[size].push(id);
+            const combinationOrder = matchingSequence.order;
 
-            return memo;
-          }, {});
+            let combinationIndex = 0;
 
-          matchingSequence.order = Object.keys(combinationsPartitionedBySize).sort((a, b) => b-a ).reduce((memo, key) => {
-            return memo.concat(combinationsPartitionedBySize[key]);
-          }, []);
-        }
+            while(combinationIndex < combinationOrder.length) {
+              const combinationId = combinationOrder[combinationIndex];
+              const combinationMatcher = matchingSequence.combinations[combinationId];
 
-        const combinationOrder = matchingSequence.order;
+              if (this._combinationMatchesKeys(normalizedKeyName, currentKeyState, combinationMatcher, eventBitmapIndex)) {
+                const subMatchDescription = KeyCombinationSerializer.serialize(combinationMatcher.keyDictionary);
 
-        let combinationIndex = 0;
+                this.logger.debug(`${this._logPrefix(componentSearchIndex)} Found action that matches '${this._describeCurrentKeyCombination()}' (sub-match: '${subMatchDescription}'): ${combinationMatcher.events[eventBitmapIndex].actionName}. Calling handler . . .`);
+                combinationMatcher.events[eventBitmapIndex].handler(event);
 
-        while(combinationIndex < combinationOrder.length) {
-          const combinationId = combinationOrder[combinationIndex];
-          const combinationMatcher = matchingSequence.combinations[combinationId];
+                this._stopEventPropagationAfterHandlingIfEnabled(event, componentSearchIndex);
 
-          if (this._combinationMatchesKeys(normalizedKeyName, currentKeyState, combinationMatcher, eventBitmapIndex)) {
-            const subMatchDescription = KeyCombinationSerializer.serialize(combinationMatcher.keyDictionary);
+                return true;
+              }
 
-            this.logger.debug(`${this._logPrefix(componentId)} Found action that matches '${this._describeCurrentKeyCombination()}' (sub-match: '${subMatchDescription}'): ${combinationMatcher.events[eventBitmapIndex].actionName}. Calling handler . . .`);
-            combinationMatcher.events[eventBitmapIndex].handler(event);
+              combinationIndex++;
+            }
 
-            this._stopEventPropagationAfterHandlingIfEnabled(event, componentId);
-
-            return true;
           }
 
-          combinationIndex++;
+          sequenceLengthCounter--;
         }
 
+        const eventName = describeKeyEvent(eventBitmapIndex);
+        this.logger.debug(`${this._logPrefix(componentSearchIndex)} No matching actions found for '${this._describeCurrentKeyCombination()}' ${eventName}.`);
       }
 
-      sequenceLengthCounter--;
+      componentSearchIndex++;
     }
-
-    const eventName = describeKeyEvent(eventBitmapIndex);
-    this.logger.debug(`${this._logPrefix(componentId)} No matching actions found for '${this._describeCurrentKeyCombination()}' ${eventName}.`);
   }
 
   _stopEventPropagationAfterHandlingIfEnabled(event, componentId) {

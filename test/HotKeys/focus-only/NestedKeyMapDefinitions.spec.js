@@ -18,7 +18,6 @@ describe('Nested key map definitions:', () => {
       'ACTION1_INNER': 'a',
       'ACTION3_INNER': 'c',
     };
-
   });
 
   context('when components are nested with overlapping key maps', () => {

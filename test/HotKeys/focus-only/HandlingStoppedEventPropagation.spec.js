@@ -80,10 +80,10 @@ describe('Handling stopped event propagation:', function () {
         this.targetElement.focus();
       });
 
-      it('then calls the handler', function() {
+      it('then does not trigger an associated handler', function() {
         this.targetElement.keyPress(KeyCode.A);
 
-        expect(this.handler).to.have.been.called;
+        expect(this.handler).to.not.have.been.called;
       });
     });
 

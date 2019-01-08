@@ -544,7 +544,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         event,
         keyName,
         eventBitmapIndex,
-        componentId
+        componentId,
+        0
       );
 
       if (matchFound) {

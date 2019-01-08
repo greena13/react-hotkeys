@@ -18,7 +18,7 @@ describe('Hard sequence handlers:', () => {
     };
   });
 
-  context('when the enableHardSequences is not set', () => {
+  context('when the enableHardSequences is NOT set to true', () => {
     beforeEach(function () {
       this.wrapper = mount(
         <div >
@@ -41,7 +41,7 @@ describe('Hard sequence handlers:', () => {
     });
   });
 
-  context('when the enableHardSequences configuration is set', () => {
+  context('when the enableHardSequences configuration is set to true', () => {
     before(function () {
       Configuration.init({
         enableHardSequences: true
@@ -54,7 +54,7 @@ describe('Hard sequence handlers:', () => {
       });
     });
 
-    describe('when the key sequence has not been associated with an action', () => {
+    describe('and the key sequence has not been associated with an action', () => {
       beforeEach(function () {
         this.wrapper = mount(
           <div >
@@ -77,7 +77,7 @@ describe('Hard sequence handlers:', () => {
       });
     });
 
-    describe('when the key sequence has been associated with an action in the same HotKeys component', () => {
+    describe('and the key sequence has been associated with an action in the same HotKeys component', () => {
       beforeEach(function () {
         this.wrapper = mount(
           <div >
@@ -100,11 +100,10 @@ describe('Hard sequence handlers:', () => {
       });
     });
 
-    describe('when the key sequence has been associated with an action in a parent HotKeys component', () => {
+    describe('and the key sequence has been associated with an action in a parent HotKeys component', () => {
       beforeEach(function () {
         this.wrapper = mount(
           <div >
-
             <HotKeys actions={{ 'ENTER': 'enter' }} >
               <HotKeys handlers={this.handlers}>
                 <div className="childElement" />
@@ -120,13 +119,13 @@ describe('Hard sequence handlers:', () => {
       });
 
       it('then calls the hard sequence handler when key sequence is pressed', function() {
-        this.targetElement.keyDown(KeyCode.ENTER);
+        this.targetElement.keyPress(KeyCode.ENTER);
 
         expect(this.hardSequenceHandler).to.have.been.called;
       });
     });
 
-    describe('when the key sequence has been associated with an action and has a handler in the same HotKeys component', () => {
+    describe('and the key sequence has been associated with an action and has a handler in the same HotKeys component', () => {
       beforeEach(function () {
         this.otherHandler = sinon.spy();
 
@@ -148,7 +147,7 @@ describe('Hard sequence handlers:', () => {
       });
     });
 
-    describe('when the key sequence has been associated with an action and has a handler in a parent HotKeys component', () => {
+    describe('and the key sequence has been associated with an action and has a handler in a parent HotKeys component', () => {
       beforeEach(function () {
         this.otherHandler = sinon.spy();
 
@@ -176,7 +175,7 @@ describe('Hard sequence handlers:', () => {
       });
     });
 
-    describe('when the hard key sequence handler has been defined in a parent HotKeys component', () => {
+    describe('and the hard key sequence handler has been defined in a parent HotKeys component', () => {
       beforeEach(function () {
         this.outerHardSequenceHandler = sinon.spy();
 
