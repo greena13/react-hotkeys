@@ -1,6 +1,6 @@
 import stripSuperfluousWhitespace from '../utils/string/stripSuperfluousWhitespace';
 import standardizeKeyName from '../helpers/parsing-key-maps/standardizeKeyName';
-import isSpecialKey from '../helpers/parsing-key-maps/isSpecialKey';
+import isValidKey, {InvalidKeyNameError} from '../helpers/parsing-key-maps/isValidKey';
 
 /**
  * Returns a normalized KeyCombinationString (with the key names in the combination
@@ -122,12 +122,6 @@ class KeySequenceParser {
   }
 
 
-}
-
-class InvalidKeyNameError extends Error {}
-
-function isValidKey(keyName) {
-  return isSpecialKey(keyName) || String.fromCharCode(keyName.charCodeAt(0)) === keyName;
 }
 
 /**

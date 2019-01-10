@@ -13,7 +13,12 @@ export type KeySequence = MouseTrapKeySequence | KeyMapOptions | Array<MouseTrap
 
 export type KeyMap = { [key: string]: KeySequence };
 
-interface HotKeysEnabled extends React.Component<HotKeysProps, {}> { }
+/**
+ * Component that listens to key events when one of its children are in focus and
+ * selectively triggers actions (that may be handled by handler functions) when a
+ * sequence of events matches a list of pre-defined sequences or combinations
+ */
+export interface HotKeysEnabled extends React.Component<HotKeysProps, {}> { }
 
 export interface HotKeysEnabledProps extends React.HTMLAttributes<HotKeys> {
   /**
@@ -53,9 +58,7 @@ export interface HotKeysProps extends HotKeysEnabledProps {
 }
 
 /**
- * Component that renders its children within a "focus trap" component that
- * binds to key event listeners and calls specified event handler functions
- * based on which key (or key combination) is activated.
+ * @see HotKeysEnabled
  */
 export class HotKeys extends React.Component<HotKeysProps, {}> { }
 
@@ -71,3 +74,42 @@ export class GlobalHotKeys extends React.Component<HotKeysEnabled, {}> { }
 export declare function withHotKeys(React.ComponentClass, HotKeysEnabledProps): HotKeysEnabled;
 
 export declare function deprecatedWithHotKeys(keyMap: { [key: string]: KeySequence }): HotKeys;
+
+export type ListOfKeys = string | Array<string>;
+
+/**
+ * A component that causes React Hotkeys to ignore all matching key events
+ * triggered by its children. By default, this is all key events, but you can use
+ * the only prop to provide a whitelist, or the except prop to pass a blacklist (and
+ * cause HotKeys components to still observe these events).
+ */
+export interface HotKeysIgnored extends React.Component<HotKeysProps, {}> { }
+
+export interface HotKeysIgnoredProps extends React.HTMLAttributes<HotKeys> {
+  /**
+   * The whitelist of keys that keyevents should be ignored. i.e. if you place
+   * a key in this list, all events related to it will be ignored by react hotkeys
+   */
+  only: ListOfKeys,
+
+  /**
+   * The blacklist of keys that keyevents should be not ignored. i.e. if you place
+   * a key in this list, all events related to it will be still be observed by react
+   * hotkeys
+   */
+  except: ListOfKeys
+}
+
+/**
+ * @see HotKeysIgnored
+ */
+export class HotKeysIgnore extends React.Component<HotKeysIgnoredProps, {}> { }
+
+/**
+ * Wraps a React component in a HotKeysIgnored component, which passes down the
+ * callbacks and options necessary for React Hotkeys to work as a single prop value,
+ * hotkeys. These must be unwrapped and applied to a DOM-mountable element within
+ * the wrapped component (e.g. div, span, input, etc) in order for the key events
+ * to be recorded.
+ */
+export declare function withHotKeysIgnore(React.ComponentClass, HotKeysIgnoredProps): HotKeysIgnored;

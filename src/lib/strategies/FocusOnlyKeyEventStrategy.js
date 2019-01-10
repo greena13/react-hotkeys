@@ -9,7 +9,6 @@ import Logger from '../Logger';
 import printComponent from '../../helpers/logging/printComponent';
 import isUndefined from '../../utils/isUndefined';
 import normalizeKeyName from '../../helpers/resolving-handlers/normalizeKeyName';
-import isEmpty from '../../utils/collection/isEmpty';
 
 /**
  * Defines behaviour for dealing with key maps defined in focus-only HotKey components
@@ -571,6 +570,10 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    */
   _setIgnoreEventFlag(event, options) {
     this.eventPropagationState.ignoreEvent = options.ignoreEventsCondition(event);
+  }
+
+  ignoreEvent(event) {
+    this.eventPropagationState.ignoreEvent = true;
   }
 
   _isFocusTreeRoot(componentId) {

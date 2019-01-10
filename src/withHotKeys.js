@@ -13,7 +13,8 @@ import KeyCombinationSerializer from './lib/KeyCombinationSerializer';
  * to be recorded.
  *
  * @param {React.ComponentClass} Component - Component class to wrap
- * @param {Object} hotKeysOptions - Options that become the wrapping
+ * @param {Object} hotKeysOptions - Options that become the wrapping component's
+ *                 default prop values
  * @returns {React.ComponentClass} Wrapped component that is passed all of the React hotkeys
  * props in a single value, hotkeys.
  */
@@ -33,6 +34,11 @@ function withHotKeys(Component, hotKeysOptions = {}) {
     return mergeWithOptions('keyMap', props);
   }
 
+  /**
+   * Component that listens to key events when one of its children are in focus and
+   * selectively triggers actions (that may be handled by handler functions) when a
+   * sequence of events matches a list of pre-defined sequences or combinations
+   */
   return class HotKeysEnabled extends PureComponent {
     static propTypes = {
       /**

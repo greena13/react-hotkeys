@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import Configuration from './lib/Configuration';
-import withHotKeys from './withHotKeys';
+import withHotKeysIgnore from './withHotKeysIgnore';
 
 /**
- * @see HotKeysEnabled
+ * @see HotKeysIgnored
  */
-class HotKeysWrapper extends Component {
+class HotKeysIgnore extends Component {
   render() {
     const {hotKeys, ...remainingProps} = this.props;
 
@@ -17,4 +17,5 @@ class HotKeysWrapper extends Component {
   }
 }
 
-export default withHotKeys(HotKeysWrapper);
+export default withHotKeysIgnore(HotKeysIgnore);
+

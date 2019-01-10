@@ -274,6 +274,10 @@ class KeyEventManager {
     return this._globalEventStrategy.handleKeyup(event);
   }
 
+  ignoreEvent(event) {
+    this._focusOnlyEventStrategy.ignoreEvent(event);
+  }
+
   reactAppHistoryWithEvent(key, type) {
     const { currentEvent } = this._focusOnlyEventStrategy;
 

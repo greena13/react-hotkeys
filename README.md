@@ -603,6 +603,121 @@ By default, all key events that originate from `<input>`, `<select>` or `<textar
 
 If this is not what you want for your application, you can modify the list of tags using the `ignoreTags` [configuration option](#Configuration) or if you need additional control, you can specify a brand new function using the `ignoreEventsCondition` [configuration option](#Configuration).
 
+### HotKeysIgnore component
+
+If you want `react-hotkeys` to ignore key events coming from a particular area of your app when it is in focus, you can use the `<HotKeysIgnore/>` component:
+
+```javascript
+import {HotKeysIgnore} from 'react-hotkeys';
+
+<HotKeysIgnore>
+    /**
+     * Children that, when in focus, should have its key events ignored by
+     * react hotkeys
+     */
+</HotKeysIgnore>
+```
+
+### HotKeysIgnore component API
+
+By default, `<HotKeysIgnore />` will ignore all key events, but you can customize this behaviour by providing a whitelist or blacklist of events to ignore:
+
+```javascript
+<HotKeysIgnore
+    /**
+     * The whitelist of keys that keyevents should be ignored. i.e. if you place
+     * a key in this list, all events related to it will be ignored by react
+     * hotkeys.
+     *
+     * Accepts a string or an array of strings.
+     */
+      only: { [] }
+
+     /**
+      * The blacklist of keys that keyevents should be not ignored. i.e.
+      * if you place a key in this list, all events related to it will be
+      * still be observed by react hotkeys
+      */
+     except: { [] }
+    >
+
+    /**
+     * Children that, when in focus, should have its key events ignored by
+     * react hotkeys
+     */
+
+     { children }
+
+</HotKeysIgnore>
+```
+
+### withHotKeysIgnore HoC API
+
+Similar to the `<HotKeys>`'s `withHotKeys()` function, there is a `withHotKeysIgnore()` function for achieving the `<HotKeysIgnore>` functionality, without the need for rendering a surrounding DOM-mountable element.
+
+```javascript
+import {withHotKeysIgnore} from 'react-hotkeys';
+
+class MyComponent extends Component {
+  render() {
+    /**
+     * Must unwrap hotKeys prop and pass its values to a DOM-mountable
+     * element (like the div below).
+     */
+    const {hotKeys, ...remainingProps} = this.props;
+
+    return (
+      <div { ... { ...hotKeys, ...remainingProps } } >
+        <span>HotKeys ignores key events from here</span>
+
+       { this.props.children }
+      </div>
+    )
+  }
+}
+
+const MyHotKeysComponent = withHotKeysIgnore(MyComponent);
+
+<MyHotKeysComponent except={ 'Escape' }>
+  <div>
+    All key events except the 'Escape' key are ignored here
+  </div>
+</MyHotKeysComponent>
+```
+
+`withHotKeysIgnore()` also accepts a second argument that becomes the default props of the component it returns:
+
+```javascript
+import {withHotKeysIgnore} from 'react-hotkeys';
+
+class MyComponent extends Component {
+  render() {
+    /**
+     * Must unwrap hotKeys prop and pass its values to a DOM-mountable
+     * element (like the div below).
+     */
+    const {hotKeys, ...remainingProps} = this.props;
+
+    return (
+      <div { ... { ...hotKeys, ...remainingProps } } >
+        <span>HotKeys ignores key events from here</span>
+
+       { this.props.children }
+      </div>
+    )
+  }
+}
+
+const MyHotKeysComponent = withHotKeysIgnore(MyComponent, { except: 'Escape' });
+
+<MyHotKeysComponent>
+  <div>
+    All key events except the 'Escape' key are ignored here
+  </div>
+</MyHotKeysComponent>
+```
+
+
 ## Allowing hotkeys and handlers props to change
 
 For performance reasons, by default `react-hotkeys` takes the `keyMap` and `handlers` prop values when `<HotKeys>` components are focused and when `<GlobalHotKeys>` components are mounted. It ignores all subsequent updates
