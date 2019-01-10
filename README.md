@@ -8,6 +8,8 @@
 [![GitHub license](https://img.shields.io/github/license/greena13/react-hotkeys.svg)](https://github.com/greena13/react-hotkeys/blob/master/LICENSE)
 [![Gitter](https://img.shields.io/gitter/room/chrisui/react-hotkeys.svg)](https://gitter.im/chrisui/react-hotkeys)
 
+> Warning: This Readme is for the latest pre-release. The documentation for the latest stable release is available [here](https://github.com/greena13/react-hotkeys/tree/v1.1.4).
+
 A declarative library for handling hotkeys and focus areas in React applications.
 
 ## Feature Overview
@@ -82,13 +84,29 @@ export default MyNode;
 
 It is expected you will use a bundling tool like Webpack or Uglify to remove the version of the bundle you are not using with each version of your application's code, to keep the library size to a minimum.
 
-#### npm
+#### The latest pre-release
+
+##### npm
+
+```
+npm install react-hotkeys@next --save
+```
+
+##### yarn
+
+```
+yarn add react-hotkeys@next
+```
+
+#### Latest stable release
+
+##### npm
 
 ```
 npm install react-hotkeys --save
 ```
 
-#### yarn
+##### yarn
 
 ```
 yarn add react-hotkeys
