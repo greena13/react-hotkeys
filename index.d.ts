@@ -55,6 +55,8 @@ export interface HotKeysProps extends HotKeysEnabledProps {
    * children and have the internal key listeners bound to
    */
   component?: React.ComponentClass | string;
+
+  innerRef?: React.RefObject<HTMLInputElement>;
 }
 
 /**
