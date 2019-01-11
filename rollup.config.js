@@ -40,7 +40,7 @@ export default {
       ]
     }),
 
-    process.env.BABEL_ENV == "production" && uglify(),
+    process.env.BABEL_ENV === "production" && uglify(),
 
     license({
       banner: {

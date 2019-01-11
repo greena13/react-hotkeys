@@ -2,7 +2,6 @@ import {expect} from 'chai';
 
 import Key from '../support/Key';
 import KeyEventManager from '../../src/lib/KeyEventManager';
-import {HotKeys} from '../../src';
 import Configuration from '../../src/lib/Configuration';
 import MockSyntheticEvent from '../support/MockSyntheticEvent';
 

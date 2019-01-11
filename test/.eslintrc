@@ -4,6 +4,7 @@
   },
   "globals": {
     "context": true,
-    "before": true
+    "before": true,
+    "after": true
   }
 }

@@ -19,3 +19,4 @@ cjs
 es
 index.es.js
 index.js
+examples/public/**
