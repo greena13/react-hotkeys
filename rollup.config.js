@@ -1,5 +1,5 @@
 import babel from 'rollup-plugin-babel';
-import uglify from 'rollup-plugin-uglify';
+import { uglify } from 'rollup-plugin-uglify';
 import license from 'rollup-plugin-license';
 import strip from 'rollup-plugin-strip';
 import path from 'path';
@@ -40,7 +40,7 @@ export default {
       ]
     }),
 
-    uglify(),
+    process.env.BABEL_ENV == "production" && uglify(),
 
     license({
       banner: {

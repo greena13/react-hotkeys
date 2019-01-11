@@ -1288,6 +1288,51 @@ Collaboration is loosely being coordinated across [Gitter](https://gitter.im/Chr
 - Lint your code with eslint (config provided)
 - Include relevant test updates/additions
 
+## Build notes
+
+`react-hotkeys` uses a mixture of build tools to create each of the development and production bundles, which can be confusing to navigate and understand.
+
+### Build scripts
+
+All build commands are included in the `package.json`:
+
+| Command | Description |
+|:--|:--|
+| `yarn prepublish` | Build all bundles using babel and rollup |
+| `yarn build-cjs` | Build the development and production CommonJS bundles using babel and rollup, respectively |
+| `yarn build-es` | Build the development and production ES6 bundles using babel and rollup, respectively |
+| `yarn build-umd` | Build the development and production UMD bundles using rollup |
+| `yarn build-development` | Build the development CommonJS bundle using babel |
+| `yarn build-es-development` | Build the development ES6 bundle using babel |
+| `yarn build-umd-development` | Build the development ES6 bundle using rollup |
+| `yarn build-production` | Build the production CommonJS bundle using rollup |
+| `yarn build-es-production` | Build the production ES6 bundle using rollup |
+| `yarn build-umd-production` | Build the production ES6 bundle using rollup |
+
+### Development builds
+
+| Bundle | Transpiled with | Modularized with | Output |
+|:-- |:-- |:-- |:-- | 
+| CommonJS | Babel | Babel | /cjs/index.js |
+| UMD | Babel | Rollup | /umd/index.js |
+| ES6 | Babel | Babel | /es/index.js |
+
+### Production builds
+
+| Bundle | Transpiled with | Optimized with | Minified with | Output |
+|:-- |:-- |:-- |:-- | :-- |
+| CommonJS | Babel | Rollup | Uglify | cjs/react-hotkeys.production.min.js |
+| UMD | Babel | Rollup | Uglify | /umd/react-hotkeys.min.js |
+| ES6 | Babel | Rollup | Babel-minify | /es/react-hotkeys.production.min.js |
+
+### Build configuration
+
+To understand the configuration for any one build, you need to consult 3 places:
+
+* The CLI arguments used in the `scripts` of `package.json`
+* The `.babelrc` file (match the env to the `BABEL_ENV` value set in `scripts` above)
+* The `rollup.configs.js` (if applicable)
+
 ## Authorship
 
 All credit, and many thanks, goes to [Chris Pearce](https://github.com/Chrisui) for the inception of `react-hotkeys` and all versions before `1.0.0`.

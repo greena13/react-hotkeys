@@ -76,7 +76,7 @@ const translateToKey = {
  * @param {object} nativeEvent Native browser event.
  * @return {string} Normalized `key` property.
  */
-function getEventKey(nativeEvent: KeyboardEvent): string {
+function getEventKey(nativeEvent) {
   if (nativeEvent.key) {
     // Normalize inconsistent values reported by browsers due to
     // implementations of a working draft specification.
