@@ -3,8 +3,11 @@
     "no-unused-expressions": 0
   },
   "globals": {
-    "context": true,
+    "after": true,
     "before": true,
-    "after": true
+    "beforeEach": true,
+    "context": true,
+    "describe": true,
+    "it": true
   }
 }
