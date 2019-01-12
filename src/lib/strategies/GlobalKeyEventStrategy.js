@@ -53,17 +53,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     };
   }
 
-  _reset() {
-    super._reset();
-
-    /**
-     * Set of ComponentOptions indexed by ComponentId to allow efficient retrieval
-     * when components need to be updated or unmounted by their ComponentId
-     * @type {Object<ComponentId, ComponentOptions>}
-     */
-    this.componentIdDict = {};
-  }
-
   /********************************************************************************
    * Registering key maps and handlers
    ********************************************************************************/
@@ -205,10 +194,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     );
 
     this._setComponentPosition(componentId, this.componentList.length - 1);
-  }
-
-  _setComponentPosition(componentId, position) {
-    this.componentIdDict[componentId] = position;
   }
 
   _updateLongestKeySequenceIfNecessary(componentId) {
@@ -487,20 +472,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this.logger.verbose(
       `${this._logPrefix()} Key history: ${printComponent(this.keyCombinationHistory)}.`
     );
-  }
-
-  _getComponentPosition(componentId){
-    return this.componentIdDict[componentId];
-  }
-
-  _getComponent(componentId){
-    const componentPosition = this._getComponentPosition(componentId);
-    return this.componentList[componentPosition];
-  }
-
-  _getComponentAndPosition(componentId){
-    const componentPosition = this._getComponentPosition(componentId);
-    return [ this.componentList[componentPosition], componentPosition ];
   }
 
   /********************************************************************************

@@ -70,6 +70,13 @@ class AbstractKeyEventStrategy {
 
     this._reset();
     this._resetKeyCombinationHistory();
+
+    /**
+     * Set of ComponentOptions indexed by ComponentId to allow efficient retrieval
+     * when components need to be updated or unmounted by their ComponentId
+     * @type {Object<ComponentId, ComponentOptions>}
+     */
+    this.componentIdDict = {};
   }
 
   /**
@@ -988,6 +995,24 @@ class AbstractKeyEventStrategy {
 
       return memo;
     }, {});
+  }
+
+  _setComponentPosition(componentId, position) {
+    this.componentIdDict[componentId] = position;
+  }
+
+  _getComponentPosition(componentId){
+    return this.componentIdDict[componentId];
+  }
+
+  _getComponent(componentId){
+    const componentPosition = this._getComponentPosition(componentId);
+    return this.componentList[componentPosition];
+  }
+
+  _getComponentAndPosition(componentId){
+    const componentPosition = this._getComponentPosition(componentId);
+    return [ this.componentList[componentPosition], componentPosition ];
   }
 }
 
