@@ -25,6 +25,10 @@ describe('Correcting for missed keyup events for modifier keys:', function () {
         this.eventOptions = {
           ignoreEventsCondition: Configuration.option('ignoreEventsCondition')
         };
+
+        const result = this.eventStrategy.enableHotKeys({}, {}, {}, { ignoreEventsCondition: Configuration.option('ignoreEventsCondition')});
+
+        this.componentId = Array.isArray(result) ? result[1] : result;
       });
 
       [
@@ -44,12 +48,12 @@ describe('Correcting for missed keyup events for modifier keys:', function () {
           key: Key.ALT,
           eventAttribute: 'altKey'
         }
-      ].forEach(({key, eventAttribute, expected}) => {
+      ].forEach(({key, eventAttribute}) => {
         context(`misses the keyup event for ${key}`, () => {
           it('then its absence is correctly detected on the next key event and a new combination is created', function() {
-            this.eventStrategy.handleKeydown(new MockSyntheticEvent('keydown', {key}), 0, 0, this.eventOptions);
+            this.eventStrategy.handleKeydown(new MockSyntheticEvent('keydown', {key}), 0, this.componentId, this.eventOptions);
 
-            this.eventStrategy.handleKeydown(new MockSyntheticEvent('keydown', { key: Key.A, [eventAttribute]: false }), 0, 0, this.eventOptions);
+            this.eventStrategy.handleKeydown(new MockSyntheticEvent('keydown', { key: Key.A, [eventAttribute]: false }), 0, this.componentId, this.eventOptions);
 
             expect(this.eventStrategy.keyCombinationHistory).to.eql([
               {

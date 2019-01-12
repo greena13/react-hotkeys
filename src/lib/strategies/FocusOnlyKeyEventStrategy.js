@@ -65,23 +65,25 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     };
   }
 
+  _init() {
+    super._init();
+
+    /**
+     * Increase the unique ID associated with each unique focus tree
+     * @type {number}
+     */
+    this.focusTreeId += 1;
+
+    this._clearEventPropagationState();
+  }
+
   /**
    * Clears the internal state, wiping any history of key events and registered handlers
    * so they have no effect on the next tree of focused HotKeys components
    * @private
    */
   _reset() {
-    super._reset();
-
-    /**
-     * Increase the unique ID associated with each unique focus tree
-     * @type {number}
-     */
-    this.componentId = 0;
-
-    this.focusTreeId += 1;
-
-    this._clearEventPropagationState();
+    this._init();
   }
 
   /**
@@ -94,14 +96,14 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     /**
      * Object containing state of a key events propagation up the render tree towards
      * the document root
-     * @type {{previousComponentIndex: number, actionHandled: boolean}}}
+     * @type {{previousComponentPosition: number, actionHandled: boolean}}}
      */
     this.eventPropagationState = {
       /**
        * Index of the component last seen to be handling a key event
        * @type {ComponentId}
        */
-      previousComponentIndex: -1,
+      previousComponentPosition: -1,
 
       /**
        * Whether the keyboard event currently being handled has already matched a
@@ -144,7 +146,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this.resetOnNextFocus = false;
     }
 
-    this.componentId = this.componentList.length;
+    this.componentId += 1;
 
     this._addComponentToList(
       this.componentId,
@@ -157,9 +159,11 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       `${this._logPrefix(this.componentId, { eventId: false })} Focused. \n`
     );
 
+    const component = this._getComponent(this.componentId);
+
     this.logger.verbose(
       `${this._logPrefix(this.componentId, { eventId: false })} Component options:\n`,
-      printComponent(this.componentList[this.componentId])
+      printComponent(component)
     );
 
     return [ this.focusTreeId, this.componentId ];
@@ -179,11 +183,13 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *        and handlers are associated and called.
    */
   updateEnabledHotKeys(focusTreeId, componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
-    if (focusTreeId !== this.focusTreeId || !this.componentList[componentId]) {
+    const componentPosition = this._getComponentPosition(componentId);
+
+    if (focusTreeId !== this.focusTreeId || isUndefined(componentPosition)) {
       return;
     }
 
-    this.componentList[componentId] = this._buildComponentOptions(
+    this.componentList[componentPosition] = this._buildComponentOptions(
       componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
@@ -194,9 +200,11 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       `${this._logPrefix(componentId, {focusTreeId, eventId: false})} Received new props.`,
     );
 
+    const component = this._getComponent(componentId);
+
     this.logger.verbose(
       `${this._logPrefix(componentId, {focusTreeId, eventId: false})} Component options:\n`,
-      printComponent(this.componentList[componentId])
+      printComponent(component)
     );
   }
 
@@ -213,7 +221,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this.resetOnNextFocus = true;
     }
 
-    const outstandingEventPropagation = (this.eventPropagationState.previousComponentIndex + 1) < componentId;
+    const componentPosition = this._getComponentPosition(componentId);
+
+    const outstandingEventPropagation = (this.eventPropagationState.previousComponentPosition + 1) < componentPosition;
 
     this.logger.debug(
       `${this._logPrefix(componentId, {focusTreeId, eventId: false})}`,
@@ -544,16 +554,16 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * @private
    */
   _isNewKeyEvent(componentId) {
-    const { previousComponentIndex } = this.eventPropagationState;
+    const { previousComponentPosition } = this.eventPropagationState;
 
-    return previousComponentIndex === -1 || previousComponentIndex >= componentId;
+    return previousComponentPosition === -1 || previousComponentPosition >= this._getComponentPosition(componentId);
   }
 
   _updateEventPropagationHistory(componentId, options = { forceReset: false }) {
     if (options.forceReset || this._isFocusTreeRoot(componentId)) {
       this._clearEventPropagationState();
     } else {
-      this.eventPropagationState.previousComponentIndex = componentId;
+      this.eventPropagationState.previousComponentPosition = this._getComponentPosition(componentId);
     }
   }
 
@@ -577,7 +587,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _isFocusTreeRoot(componentId) {
-    return componentId >= this.componentList.length - 1;
+    return this._getComponentPosition(componentId) >= this.componentList.length - 1;
   }
 
   _setNewEventParameters(event, type) {
@@ -635,6 +645,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const eventName = describeKeyEvent(eventBitmapIndex);
     const combinationName = this._describeCurrentKeyCombination();
 
+
     if (this.keyMapEventBitmap[eventBitmapIndex]) {
       if (this.eventPropagationState.actionHandled) {
         this.logger.debug(
@@ -645,15 +656,17 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
           `${this._logPrefix(componentId, {focusTreeId})} Attempting to find action matching '${combinationName}' ${eventName} . . .`
         );
 
-        const { previousComponentIndex } = this.eventPropagationState;
+        const { previousComponentPosition } = this.eventPropagationState;
+
+        const componentPosition = this._getComponentPosition(componentId);
 
         const handlerWasCalled =
           this._callMatchingHandlerClosestToEventTarget(
             event,
             keyName,
             eventBitmapIndex,
-            componentId,
-            previousComponentIndex === -1 ? 0 : previousComponentIndex
+            componentPosition,
+            previousComponentPosition === -1 ? 0 : previousComponentPosition
           );
 
         if (handlerWasCalled) {
@@ -690,7 +703,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       base += `E${eventId}${eventIcons[eventId % eventIcons.length]}-`;
     }
 
-    return base +`C${componentId}${componentIcons[componentId % componentIcons.length]}):`;
+    return base +`C${componentId}-P${this._getComponentPosition(componentId)}-${componentIcons[componentId % componentIcons.length]}):`;
   }
 
 }

@@ -68,24 +68,17 @@ class AbstractKeyEventStrategy {
      */
     this.keyEventManager = keyEventManager;
 
-    this._reset();
+    this._init();
     this._resetKeyCombinationHistory();
-
-    /**
-     * Set of ComponentOptions indexed by ComponentId to allow efficient retrieval
-     * when components need to be updated or unmounted by their ComponentId
-     * @type {Object<ComponentId, ComponentOptions>}
-     */
-    this.componentIdDict = {};
   }
 
   /**
    * Resets all strategy state to the values it had when it was first created
    * @private
    */
-  _reset() {
-    this._resetRegisteredKeyMapsState();
-    this._resetHandlerResolutionState();
+  _init() {
+    this._initRegisteredKeyMapsState();
+    this._initHandlerResolutionState();
   }
 
   /**
@@ -95,7 +88,7 @@ class AbstractKeyEventStrategy {
    * After initialization, this state is generally maintained manually by
    * the _buildKeyMatcherMap() method and this method should not be called.
    */
-  _resetRegisteredKeyMapsState() {
+  _initRegisteredKeyMapsState() {
     /**
      * Object containing a component's defined key maps and handlers
      * @typedef {Object} ComponentOptions
@@ -137,6 +130,13 @@ class AbstractKeyEventStrategy {
      * @type {KeyEventBitmap}
      */
     this.keyMapEventBitmap = KeyEventBitmapManager.newBitmap();
+
+    /**
+     * Set of ComponentOptions indexed by ComponentId to allow efficient retrieval
+     * when components need to be updated or unmounted by their ComponentId
+     * @type {Object<ComponentId, ComponentOptions>}
+     */
+    this.componentIdDict = {};
   }
 
   /**
@@ -144,7 +144,7 @@ class AbstractKeyEventStrategy {
    * called when key events match a registered key map
    * @private
    */
-  _resetHandlerResolutionState() {
+  _initHandlerResolutionState() {
     /**
      * List of mappings from key sequences to handlers that is constructed on-the-fly
      * as key events propagate up the render tree
@@ -243,7 +243,7 @@ class AbstractKeyEventStrategy {
 
     this.componentList.push(componentOptions);
 
-    return componentOptions;
+    this._setComponentPosition(componentId, this.componentList.length - 1);
   }
 
   /**
@@ -520,7 +520,7 @@ class AbstractKeyEventStrategy {
    * Matching and calling handlers
    ********************************************************************************/
 
-  _callMatchingHandlerClosestToEventTarget(event, keyName, eventBitmapIndex, componentId, componentSearchIndex) {
+  _callMatchingHandlerClosestToEventTarget(event, keyName, eventBitmapIndex, componentPosition, componentSearchIndex) {
     if (!this.keyMaps || !this.unmatchedHandlerStatus) {
       this.keyMaps = [];
 
@@ -532,7 +532,7 @@ class AbstractKeyEventStrategy {
       });
     }
 
-    while (componentSearchIndex <= componentId) {
+    while (componentSearchIndex <= componentPosition) {
       const unmatchedHandlersStatus = this.unmatchedHandlerStatus[componentSearchIndex];
       let unmatchedHandlersCount = unmatchedHandlersStatus[0];
 

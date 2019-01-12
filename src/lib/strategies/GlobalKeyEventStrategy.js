@@ -134,15 +134,15 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     /**
      * Reset handler resolution state
      */
-    this._resetHandlerResolutionState();
+    this._initHandlerResolutionState();
 
     this.logger.debug(
-      this._logPrefix(this.componentId, {eventId: false}),
+      this._logPrefix(componentId, {eventId: false}),
       `Global component ${componentId} updated.`,
     );
 
     this.logger.verbose(
-      this._logPrefix(this.componentId, {eventId: false}),
+      this._logPrefix(componentId, {eventId: false}),
       'Component options: \n',
       printComponent(this._getComponent(componentId))
     );
@@ -177,23 +177,12 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     /**
      * Reset handler resolution state
      */
-    this._resetHandlerResolutionState();
+    this._initHandlerResolutionState();
 
     this.logger.debug(
       this._logPrefix(this.componentId, {eventId: false}),
       `Unmounted global component ${componentId}`
     );
-  }
-
-  _addComponentToList(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
-    super._addComponentToList(
-      componentId,
-      actionNameToKeyMap,
-      actionNameToHandlersMap,
-      options
-    );
-
-    this._setComponentPosition(componentId, this.componentList.length - 1);
   }
 
   _updateLongestKeySequenceIfNecessary(componentId) {
@@ -510,12 +499,12 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _callMatchingHandlerClosestToEventTarget(event, keyName, eventBitmapIndex) {
-    for(let componentId = 0; componentId < this.componentList.length; componentId++) {
+    for(let componentPosition = 0; componentPosition < this.componentList.length; componentPosition++) {
       const matchFound = super._callMatchingHandlerClosestToEventTarget(
         event,
         keyName,
         eventBitmapIndex,
-        componentId,
+        componentPosition,
         0
       );
 
