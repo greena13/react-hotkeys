@@ -36,12 +36,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      */
 
     /**
-     * Counter to keep track of what component ID should be allocated next
-     * @type {ComponentId}
-     */
-    this.componentId = -1;
-
-    /**
      * Whether the global key event handlers have been bound to document yet or not
      * @type {boolean}
      */
@@ -59,18 +53,15 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
   /**
    * Registers the actions and handlers of a HotKeys component that has mounted
+   * @param {ComponentId} componentId - Id of the component that the keyMap belongs to
    * @param {KeyMap} actionNameToKeyMap - Map of actions to key expressions
    * @param {HandlersMap} actionNameToHandlersMap - Map of actions to handler functions
    * @param {Object} options Hash of options that configure how the actions
    *        and handlers are associated and called.
    * @param {Object} eventOptions - Options for how the event should be handled
-   * @returns {ComponentId} A unique component ID to assign to the focused HotKeys
-   *        component and passed back when handling a key event
    */
-  enableHotKeys(actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
+  enableHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
     this.eventOptions = eventOptions;
-
-    this.componentId += 1;
 
     this._addComponentToList(
       this.componentId,
@@ -91,8 +82,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       'Component options: \n',
       printComponent(this._getComponent(this.componentId))
     );
-
-    return this.componentId;
   }
 
   /**

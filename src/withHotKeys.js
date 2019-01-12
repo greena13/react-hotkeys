@@ -209,10 +209,14 @@ function withHotKeys(Component, hotKeysOptions = {}) {
     }
 
     componentDidUpdate(previousProps) {
+      const keyEventManager = KeyEventManager.getInstance();
+
+      keyEventManager.reregisterKeyMap(this._componentId, this.props.keyMap);
+
       if (this._componentIsFocused() && (this.props.allowChanges || !Configuration.option('ignoreKeymapAndHandlerChangesByDefault'))) {
         const {keyMap, handlers} = this.props;
 
-        KeyEventManager.getInstance().updateEnabledHotKeys(
+        keyEventManager.updateEnabledHotKeys(
           this._getFocusTreeId(),
           this._componentId,
           keyMap,
@@ -222,12 +226,23 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       }
     }
 
-    componentWillUnmount(){
-      this._handleBlur();
-    }
-
     _componentIsFocused() {
       return this._focused === true;
+    }
+
+    componentDidMount() {
+      const keyEventManager = KeyEventManager.getInstance();
+
+      this._componentId = keyEventManager.registerKeyMap(
+        this.props.keyMap
+      );
+    }
+
+    componentWillUnmount(){
+      const keyEventManager = KeyEventManager.getInstance();
+
+      keyEventManager.deregisterKeyMap(this._componentId);
+      this._handleBlur();
     }
 
     /**
@@ -240,14 +255,14 @@ function withHotKeys(Component, hotKeysOptions = {}) {
         this.props.onFocus(...arguments);
       }
 
-      const [ focusTreeId, componentId ] =
+      const focusTreeId =
         KeyEventManager.getInstance().enableHotKeys(
+          this._componentId,
           getKeyMap(this.props),
           getHandlers(this.props),
           this._getComponentOptions()
         );
 
-      this._componentId = componentId;
       this._focusTreeIdsPush(focusTreeId);
 
       this._focused = true;

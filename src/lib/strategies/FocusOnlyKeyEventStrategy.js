@@ -65,8 +65,13 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     };
   }
 
-  _init() {
-    super._init();
+  /**
+   * Clears the internal state, wiping any history of key events and registered handlers
+   * so they have no effect on the next tree of focused HotKeys components
+   * @private
+   */
+  _reset() {
+    super._reset();
 
     /**
      * Increase the unique ID associated with each unique focus tree
@@ -75,15 +80,6 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     this.focusTreeId += 1;
 
     this._clearEventPropagationState();
-  }
-
-  /**
-   * Clears the internal state, wiping any history of key events and registered handlers
-   * so they have no effect on the next tree of focused HotKeys components
-   * @private
-   */
-  _reset() {
-    this._init();
   }
 
   /**
@@ -126,6 +122,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
   /**
    * Registers the actions and handlers of a HotKeys component that has gained focus
+   * @param {ComponentId} componentId - Id of the component that the keyMap belongs to
    * @param {KeyMap} actionNameToKeyMap - Map of actions to key expressions
    * @param {HandlersMap} actionNameToHandlersMap - Map of actions to handler functions
    * @param {Object} options Hash of options that configure how the actions
@@ -134,7 +131,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *         component ID to assign to the focused HotKeys component and passed back
    *         when handling a key event
    */
-  enableHotKeys(actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
+  enableHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
     if (this.resetOnNextFocus || this.keyMaps) {
       /**
        * We know components have just lost focus or keymaps have already been built,
@@ -146,27 +143,25 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this.resetOnNextFocus = false;
     }
 
-    this.componentId += 1;
-
     this._addComponentToList(
-      this.componentId,
+      componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options
     );
 
     this.logger.debug(
-      `${this._logPrefix(this.componentId, { eventId: false })} Focused. \n`
+      `${this._logPrefix(componentId, { eventId: false })} Focused. \n`
     );
 
-    const component = this._getComponent(this.componentId);
+    const component = this._getComponent(componentId);
 
     this.logger.verbose(
-      `${this._logPrefix(this.componentId, { eventId: false })} Component options:\n`,
+      `${this._logPrefix(componentId, { eventId: false })} Component options:\n`,
       printComponent(component)
     );
 
-    return [ this.focusTreeId, this.componentId ];
+    return this.focusTreeId;
   }
 
   /**

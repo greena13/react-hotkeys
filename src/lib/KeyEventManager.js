@@ -47,21 +47,81 @@ class KeyEventManager {
   }
 
   /********************************************************************************
+   * Registering key maps
+   ********************************************************************************/
+
+  /**
+   * Registers a new mounted component's key map so that it can be included in the
+   * application's key map
+   * @param {KeyMap} keyMap - Map of actions to key expressions
+   * @returns {ComponentId} Unique component ID to assign to the focused HotKeys
+   *          component and passed back when handling a key event
+   */
+  registerKeyMap(keyMap) {
+    return this._focusOnlyEventStrategy.registerKeyMap(keyMap);
+  }
+
+  /**
+   * Re-registers (updates) a mounted component's key map
+   * @param {ComponentId} componentId - Id of the component that the keyMap belongs to
+   * @param {KeyMap} keyMap - Map of actions to key expressions
+   */
+  reregisterKeyMap(componentId, keyMap) {
+    this._focusOnlyEventStrategy.reregisterKeyMap(componentId, keyMap);
+  }
+
+  /**
+   * De-registers (removes) a mounted component's key map from the registry
+   * @param {ComponentId} componentId - Id of the component that the keyMap belongs to
+   */
+  deregisterKeyMap(componentId) {
+    this._focusOnlyEventStrategy.deregisterKeyMap(componentId);
+  }
+
+  /**
+   * Registers a new mounted component's global key map so that it can be included in the
+   * application's key map
+   * @param {KeyMap} keyMap - Map of actions to key expressions
+   * @returns {ComponentId} Unique component ID to assign to the focused HotKeys
+   *          component and passed back when handling a key event
+   */
+  registerGlobalKeyMap(keyMap) {
+    return this._globalEventStrategy.registerKeyMap(keyMap);
+  }
+
+  /**
+   * Re-registers (updates) a mounted component's global key map
+   * @param {ComponentId} componentId - Id of the component that the keyMap belongs to
+   * @param {KeyMap} keyMap - Map of actions to key expressions
+   */
+  reregisterGlobalKeyMap(componentId, keyMap) {
+    this._globalEventStrategy.reregisterKeyMap(componentId, keyMap);
+  }
+
+  /**
+   * De-registers (removes) a mounted component's global key map from the registry
+   * @param {ComponentId} componentId - Id of the component that the keyMap belongs to
+   */
+  deregisterGlobalKeyMap(componentId) {
+    this._globalEventStrategy.deregisterKeyMap(componentId);
+  }
+
+  /********************************************************************************
    * Focus key events
    ********************************************************************************/
 
   /**
    * Registers the actions and handlers of a HotKeys component that has gained focus
+   * @param {ComponentId} componentId - Id of the component that the keyMap belongs to
    * @param {KeyMap} actionNameToKeyMap - Map of actions to key expressions
    * @param {HandlersMap} actionNameToHandlersMap - Map of actions to handler functions
    * @param {Object} options Hash of options that configure how the actions
    *        and handlers are associated and called.
-   * @returns {[FocusTreeId, ComponentId]} The current focus tree's ID and a unique
-   *         component ID to assign to the focused HotKeys component and passed back
-   *         when handling a key event
+   * @returns {FocusTreeId} The current focus tree's ID
    */
-  enableHotKeys(actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
+  enableHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
     return this._focusOnlyEventStrategy.enableHotKeys(
+      componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options
@@ -189,6 +249,7 @@ class KeyEventManager {
 
   /**
    * Registers the actions and handlers of a HotKeys component that has mounted
+   * @param {ComponentId} componentId - Id of the component that the keyMap belongs to
    * @param {KeyMap} actionNameToKeyMap - Map of actions to key expressions
    * @param {HandlersMap} actionNameToHandlersMap - Map of actions to handler functions
    * @param {Object} options Hash of options that configure how the actions
@@ -197,8 +258,9 @@ class KeyEventManager {
    * @returns {ComponentId} A unique component ID to assign to the focused HotKeys
    *        component and passed back when handling a key event
    */
-  enableGlobalHotKeys(actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
+  enableGlobalHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
     return this._globalEventStrategy.enableHotKeys(
+      componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options,

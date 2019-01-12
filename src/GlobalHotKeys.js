@@ -47,13 +47,17 @@ class GlobalHotKeys extends Component {
   }
 
   componentDidUpdate() {
+    const keyEventManager = KeyEventManager.getInstance();
+
+    keyEventManager.reregisterGlobalKeyMap(this._id, this.props.keyMap);
+
     if (this.props.allowChanges || !Configuration.option('ignoreKeymapAndHandlerChangesByDefault')) {
       const {keyMap, handlers} = this.props;
       /**
        * Component defines global hotkeys, so any changes to props may have changes
        * that should have immediate effect
        */
-      KeyEventManager.getInstance().updateEnabledGlobalHotKeys(
+      keyEventManager.updateEnabledGlobalHotKeys(
         this._id,
         keyMap,
         handlers,
@@ -66,17 +70,26 @@ class GlobalHotKeys extends Component {
   componentDidMount() {
     const {keyMap, handlers} = this.props;
 
-    this._id =
-      KeyEventManager.getInstance().enableGlobalHotKeys(
-        keyMap,
-        handlers,
-        this._getComponentOptions(),
-        this._getEventOptions()
-      );
+    const keyEventManager = KeyEventManager.getInstance();
+
+    this._id = keyEventManager.registerGlobalKeyMap(
+      this.props.keyMap
+    );
+
+    keyEventManager.enableGlobalHotKeys(
+      this._id,
+      keyMap,
+      handlers,
+      this._getComponentOptions(),
+      this._getEventOptions()
+    );
   }
 
   componentWillUnmount(){
-    KeyEventManager.getInstance().disableGlobalHotKeys(this._id)
+    const keyEventManager = KeyEventManager.getInstance();
+
+    keyEventManager.deregisterGlobalKeyMap(this._id);
+    keyEventManager.disableGlobalHotKeys(this._id)
   }
 
   _getComponentOptions() {

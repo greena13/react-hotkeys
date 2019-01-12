@@ -59,7 +59,7 @@ class AbstractKeyEventStrategy {
      * Counter to maintain what the next component index should be
      * @type {ComponentId}
      */
-    this.componentId = 0;
+    this.componentId = -1;
 
     /**
      * Reference to key event manager, so that information may pass between the
@@ -68,7 +68,9 @@ class AbstractKeyEventStrategy {
      */
     this.keyEventManager = keyEventManager;
 
-    this._init();
+    this.keyMapRegistry = {};
+
+    this._reset();
     this._resetKeyCombinationHistory();
   }
 
@@ -76,7 +78,7 @@ class AbstractKeyEventStrategy {
    * Resets all strategy state to the values it had when it was first created
    * @private
    */
-  _init() {
+  _reset() {
     this._initRegisteredKeyMapsState();
     this._initHandlerResolutionState();
   }
@@ -220,6 +222,42 @@ class AbstractKeyEventStrategy {
   }
 
   /********************************************************************************
+   * Registering key maps
+   ********************************************************************************/
+
+  /**
+   * Registers a new mounted component's key map so that it can be included in the
+   * application's key map
+   * @param {KeyMap} keyMap - Map of actions to key expressions
+   * @returns {ComponentId} Unique component ID to assign to the focused HotKeys
+   *          component and passed back when handling a key event
+   */
+  registerKeyMap(keyMap) {
+    this.componentId += 1;
+
+    this.keyMapRegistry[this.componentId] = keyMap;
+
+    return this.componentId;
+  }
+
+  /**
+   * Re-registers (updates) a mounted component's key map
+   * @param {ComponentId} componentId - Id of the component that the keyMap belongs to
+   * @param {KeyMap} keyMap - Map of actions to key expressions
+   */
+  reregisterKeyMap(componentId, keyMap) {
+    this.keyMapRegistry[componentId] = keyMap;
+  }
+
+  /**
+   * De-registers (removes) a mounted component's key map from the registry
+   * @param {ComponentId} componentId - Id of the component that the keyMap belongs to
+   */
+  deregisterKeyMap(componentId) {
+    delete this.keyMapRegistry[componentId];
+  }
+
+  /********************************************************************************
    * Registering key maps and handlers
    ********************************************************************************/
 
@@ -231,7 +269,7 @@ class AbstractKeyEventStrategy {
    * @param {HandlersMap} actionNameToHandlersMap - Map of ActionNames to handlers
    *        defined in the HotKeys component
    * @param {Object} options - Hash of options that configure how the key map is built.
-   * @private
+   * @protected
    */
   _addComponentToList(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
     const componentOptions = this._buildComponentOptions(

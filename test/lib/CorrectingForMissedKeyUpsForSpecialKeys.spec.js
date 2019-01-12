@@ -26,9 +26,8 @@ describe('Correcting for missed keyup events for modifier keys:', function () {
           ignoreEventsCondition: Configuration.option('ignoreEventsCondition')
         };
 
-        const result = this.eventStrategy.enableHotKeys({}, {}, {}, { ignoreEventsCondition: Configuration.option('ignoreEventsCondition')});
-
-        this.componentId = Array.isArray(result) ? result[1] : result;
+        this.componentId = this.eventStrategy.registerKeyMap({});
+        this.eventStrategy.enableHotKeys(this.componentId, {}, {}, {}, { ignoreEventsCondition: Configuration.option('ignoreEventsCondition')});
       });
 
       [
