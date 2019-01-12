@@ -212,7 +212,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       if (this._componentIsFocused() && (this.props.allowChanges || !Configuration.option('ignoreKeymapAndHandlerChangesByDefault'))) {
         const {keyMap, handlers} = this.props;
 
-        KeyEventManager.getInstance().updateHotKeys(
+        KeyEventManager.getInstance().updateEnabledHotKeys(
           this._getFocusTreeId(),
           this._componentId,
           keyMap,
@@ -241,7 +241,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       }
 
       const [ focusTreeId, componentId ] =
-        KeyEventManager.getInstance().addHotKeys(
+        KeyEventManager.getInstance().enableHotKeys(
           getKeyMap(this.props),
           getHandlers(this.props),
           this._getComponentOptions()
@@ -263,7 +263,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
         this.props.onBlur(...arguments);
       }
 
-      const retainCurrentFocusTreeId = KeyEventManager.getInstance().removeHotKeys(this._getFocusTreeId(), this._componentId);
+      const retainCurrentFocusTreeId = KeyEventManager.getInstance().disableHotKeys(this._getFocusTreeId(), this._componentId);
 
       if (!retainCurrentFocusTreeId) {
         this._focusTreeIdsShift();

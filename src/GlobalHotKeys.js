@@ -53,7 +53,7 @@ class GlobalHotKeys extends Component {
        * Component defines global hotkeys, so any changes to props may have changes
        * that should have immediate effect
        */
-      KeyEventManager.getInstance().updateGlobalHotKeys(
+      KeyEventManager.getInstance().updateEnabledGlobalHotKeys(
         this._id,
         keyMap,
         handlers,
@@ -67,7 +67,7 @@ class GlobalHotKeys extends Component {
     const {keyMap, handlers} = this.props;
 
     this._id =
-      KeyEventManager.getInstance().addGlobalHotKeys(
+      KeyEventManager.getInstance().enableGlobalHotKeys(
         keyMap,
         handlers,
         this._getComponentOptions(),
@@ -76,7 +76,7 @@ class GlobalHotKeys extends Component {
   }
 
   componentWillUnmount(){
-    KeyEventManager.getInstance().removeGlobalHotKeys(this._id)
+    KeyEventManager.getInstance().disableGlobalHotKeys(this._id)
   }
 
   _getComponentOptions() {

@@ -60,8 +60,8 @@ class KeyEventManager {
    *         component ID to assign to the focused HotKeys component and passed back
    *         when handling a key event
    */
-  addHotKeys(actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
-    return this._focusOnlyEventStrategy.addHotKeys(
+  enableHotKeys(actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
+    return this._focusOnlyEventStrategy.enableHotKeys(
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options
@@ -81,8 +81,8 @@ class KeyEventManager {
    * @param {Object} options Hash of options that configure how the actions
    *        and handlers are associated and called.
    */
-  updateHotKeys(focusTreeId, componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
-    return this._focusOnlyEventStrategy.updateHotKeys(
+  updateEnabledHotKeys(focusTreeId, componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
+    return this._focusOnlyEventStrategy.updateEnabledHotKeys(
       focusTreeId,
       componentId,
       actionNameToKeyMap,
@@ -99,8 +99,8 @@ class KeyEventManager {
    * @param {ComponentId} componentId - Index of component that is blurring
    * @returns {Boolean} Whether the component still has event propagation yet to handle
    */
-  removeHotKeys(focusTreeId, componentId){
-    return this._focusOnlyEventStrategy.removeHotKeys(
+  disableHotKeys(focusTreeId, componentId){
+    return this._focusOnlyEventStrategy.disableHotKeys(
       focusTreeId, componentId
     )
   }
@@ -197,8 +197,8 @@ class KeyEventManager {
    * @returns {ComponentId} A unique component ID to assign to the focused HotKeys
    *        component and passed back when handling a key event
    */
-  addGlobalHotKeys(actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
-    return this._globalEventStrategy.addHotKeys(
+  enableGlobalHotKeys(actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
+    return this._globalEventStrategy.enableHotKeys(
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options,
@@ -217,8 +217,8 @@ class KeyEventManager {
    *        and handlers are associated and called.
    * @param {Object} eventOptions - Options for how the event should be handled
    */
-  updateGlobalHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
-    return this._globalEventStrategy.updateHotKeys(
+  updateEnabledGlobalHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
+    return this._globalEventStrategy.updateEnabledHotKeys(
       componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
@@ -231,8 +231,8 @@ class KeyEventManager {
    * Handles when a component is unmounted
    * @param {ComponentId} componentId - Index of component that is being unmounted
    */
-  removeGlobalHotKeys(componentId) {
-    return this._globalEventStrategy.removeHotKeys(componentId);
+  disableGlobalHotKeys(componentId) {
+    return this._globalEventStrategy.disableHotKeys(componentId);
   }
 
   /**

@@ -67,7 +67,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * @returns {ComponentId} A unique component ID to assign to the focused HotKeys
    *        component and passed back when handling a key event
    */
-  addHotKeys(actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
+  enableHotKeys(actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
     this.eventOptions = eventOptions;
 
     this.componentId += 1;
@@ -106,7 +106,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    *        and handlers are associated and called.
    * @param {Object} eventOptions - Options for how the event should be handled
    */
-  updateHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
+  updateEnabledHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
     this.eventOptions = eventOptions;
 
     const componentPosition = this._getComponentPosition(componentId);
@@ -152,7 +152,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * Handles when a component is unmounted
    * @param {ComponentId} componentId - Index of component that is being unmounted
    */
-  removeHotKeys(componentId) {
+  disableHotKeys(componentId) {
     const [{ keyMapEventBitmap }, componentPosition ] =
       this._getComponentAndPosition(componentId);
 

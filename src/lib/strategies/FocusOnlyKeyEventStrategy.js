@@ -132,7 +132,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *         component ID to assign to the focused HotKeys component and passed back
    *         when handling a key event
    */
-  addHotKeys(actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
+  enableHotKeys(actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
     if (this.resetOnNextFocus || this.keyMaps) {
       /**
        * We know components have just lost focus or keymaps have already been built,
@@ -178,7 +178,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {Object} options Hash of options that configure how the actions
    *        and handlers are associated and called.
    */
-  updateHotKeys(focusTreeId, componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
+  updateEnabledHotKeys(focusTreeId, componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
     if (focusTreeId !== this.focusTreeId || !this.componentList[componentId]) {
       return;
     }
@@ -208,7 +208,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {ComponentId} componentId - Index of component that is blurring
    * @returns {Boolean} Whether the component still has event propagation yet to handle
    */
-  removeHotKeys(focusTreeId, componentId){
+  disableHotKeys(focusTreeId, componentId){
     if (!this.resetOnNextFocus) {
       this.resetOnNextFocus = true;
     }
