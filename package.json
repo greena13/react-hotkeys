@@ -71,7 +71,7 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "tests": "mocha --compilers js:@babel/register",
+    "tests": "mocha",
     "watch-tests": "nodemon --exec 'npm run tests || true'",
     "prepublish": "npm run build-cjs && npm run build-es && npm run build-umd",
     "build-cjs": "rm -rf cjs && npm run build-development && npm run build-production",
