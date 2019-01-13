@@ -366,7 +366,6 @@ To programmatically focus a DOM element, it must meet two requirements:
 
 You can get a reference to an element using React's `ref` property:
 
-
 ```javascript
 class MyComponent extends Component {
 
@@ -388,6 +387,26 @@ class MyComponent extends Component {
 
 }
 ```
+
+To get a reference to the DOM-mountable node used as a wrapper by `<HotKeys />`, use the `innerRef` prop:
+
+```javascript
+class MyComponent extends Component {
+    componentDidMount() {
+        this._container.focus();
+    }
+
+    render() {
+        return (
+            <HotKeys innerRef={ (c) => this._container = c } >
+                My focusable content
+            </div>
+        )
+    }
+
+}
+```
+
 
 #### Get the element currently in focus
 
@@ -444,6 +463,12 @@ However, it [does require that its children be wrapped in a DOM-mounted node](#H
    * Optional.
    */
   allowChanges={false}
+
+  /**
+   * A ref to add to the underlying DOM-mountable node. Pass a function
+   * to get a reference to the node, so you can call .focus() on it
+   */
+  innerRef: {undefined}
   >
 
   /**
