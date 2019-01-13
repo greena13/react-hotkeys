@@ -1,6 +1,6 @@
 {
   "name": "react-hotkeys",
-  "version": "2.0.0-pre1",
+  "version": "2.0.0-pre2",
   "description": "A declarative library for handling hotkeys and focus within a React application",
   "main": "index",
   "module": "index.es",
