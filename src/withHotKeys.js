@@ -139,7 +139,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       this._handleKeyUp = this._handleKeyUp.bind(this);
       this._componentIsFocused = this._componentIsFocused.bind(this);
 
-      this._id = KeyEventManager.getInstance().registerKeyMap(props);
+      this._id = KeyEventManager.getInstance().registerKeyMap(props.keyMap);
     }
 
     getChildContext() {

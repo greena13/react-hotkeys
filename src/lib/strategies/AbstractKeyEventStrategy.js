@@ -70,7 +70,10 @@ class AbstractKeyEventStrategy {
     this.keyEventManager = keyEventManager;
 
     this.keyMapRegistry = {};
+
     this.componentRegistry = {};
+
+    this.rootComponentId = null;
 
     this._reset();
     this._resetKeyCombinationHistory();
@@ -224,6 +227,53 @@ class AbstractKeyEventStrategy {
   }
 
   /********************************************************************************
+   * Generating key maps
+   ********************************************************************************/
+
+  /**
+   * Returns a mapping of all of the application's actions and the key sequences
+   * needed to trigger them.
+   *
+   * @returns {ApplicationKeyMap} The application's key map
+   */
+  getApplicationKeyMap() {
+    if (this.rootComponentId === null) {
+      return {};
+    }
+
+    return this._buildApplicationKeyMap([this.rootComponentId], {});
+  }
+
+  _buildApplicationKeyMap(componentIds, keyMapSummary) {
+    componentIds.forEach((componentId) => {
+      const component = this.componentRegistry[componentId];
+      const keyMap = this.keyMapRegistry[componentId];
+
+      if (keyMap) {
+        Object.keys(keyMap).forEach((actionName) => {
+          keyMapSummary[actionName] = [];
+
+          arrayFrom(keyMap[actionName]).forEach((keySequenceOptions) => {
+            const sequence = function(){
+              if (isObject(keySequenceOptions)) {
+                return keySequenceOptions.sequence;
+              } else {
+                return keySequenceOptions;
+              }
+            }();
+
+            keyMapSummary[actionName].push(sequence);
+          })
+        })
+      }
+
+      this._buildApplicationKeyMap(component.childIds, keyMapSummary);
+    });
+
+    return keyMapSummary;
+  }
+
+  /********************************************************************************
    * Registering key maps
    ********************************************************************************/
 
@@ -238,7 +288,18 @@ class AbstractKeyEventStrategy {
     this.componentId += 1;
 
     this.keyMapRegistry[this.componentId] = keyMap;
+
+    this.logger.verbose(
+      `${this._logPrefix(this.componentId)} Registered keyMap:\n`,
+      `${printComponent(keyMap)}`
+    );
+
     this.componentRegistry[this.componentId] = this._newComponentRegistryItem();
+
+    this.logger.verbose(
+      `${this._logPrefix(this.componentId)} Registered component:\n`,
+      `${printComponent(this.componentRegistry[this.componentId])}`
+    );
 
     return this.componentId;
   }
@@ -252,11 +313,24 @@ class AbstractKeyEventStrategy {
     this.keyMapRegistry[componentId] = keyMap;
   }
 
+  /**
+   * Registers that a component has now mounted, and declares its parent hot keys
+   * component id so that actions may be properly resolved
+   * @param {ComponentId} componentId - Id of the component that has mounted
+   * @param {ComponentId} parentId - Id of the parent hot keys component
+   */
   registerComponentMount(componentId, parentId) {
     if (!isUndefined(parentId)) {
       this.componentRegistry[componentId].parentId = parentId;
       this.componentRegistry[parentId].childIds.push(componentId);
+    } else {
+      this.rootComponentId = componentId;
     }
+
+    this.logger.verbose(
+      `${this._logPrefix(componentId)} Registered component mount:\n`,
+      `${printComponent(this.componentRegistry[componentId])}`
+    );
   }
 
   _newComponentRegistryItem() {
@@ -268,7 +342,8 @@ class AbstractKeyEventStrategy {
 
   /**
    * De-registers (removes) a mounted component's key map from the registry
-   * @param {ComponentId} componentId - Id of the component that the keyMap belongs to
+   * @param {ComponentId} componentId - Id of the component that the keyMap
+   *        belongs to
    */
   deregisterKeyMap(componentId) {
     const parentId = this.componentRegistry[componentId].parentId;
@@ -280,7 +355,21 @@ class AbstractKeyEventStrategy {
 
     delete this.componentRegistry[componentId];
 
+    this.logger.verbose(
+      `${this._logPrefix(componentId)} De-registered component. Remaining component Registry:\n`,
+      `${printComponent(this.componentRegistry)}`
+    );
+
     delete this.keyMapRegistry[componentId];
+
+    this.logger.verbose(
+      `${this._logPrefix(componentId)} De-registered key map. Remaining key map Registry:\n`,
+      `${printComponent(this.keyMapRegistry)}`
+    );
+
+    if (componentId === this.rootComponentId) {
+      this.rootComponentId = null;
+    }
   }
 
   /********************************************************************************

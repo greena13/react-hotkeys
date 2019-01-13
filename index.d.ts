@@ -2,6 +2,8 @@ import * as React from 'react';
 
 export type MouseTrapKeySequence = string | Array<string>;
 
+export type ActionName = string;
+
 export type KeyEventName = 'keyup' | 'keydown' | 'keypress';
 
 export interface KeyMapOptions {
@@ -11,7 +13,7 @@ export interface KeyMapOptions {
 
 export type KeySequence = MouseTrapKeySequence | KeyMapOptions | Array<MouseTrapKeySequence> | Array<KeyMapOptions>;
 
-export type KeyMap = { [key: string]: KeySequence };
+export type KeyMap = { [key: ActionName]: KeySequence };
 
 /**
  * Component that listens to key events when one of its children are in focus and
@@ -115,3 +117,12 @@ export class HotKeysIgnore extends React.Component<HotKeysIgnoredProps, {}> { }
  * to be recorded.
  */
 export declare function withHotKeysIgnore(React.ComponentClass, HotKeysIgnoredProps): HotKeysIgnored;
+
+export type ApplicationKeyMap = { [key: ActionName]: Array<MouseTrapKeySequence> };
+
+/**
+ * Generates and returns the application's key map, including not only those
+ * that are live in the current focus, but all the key maps from all the
+ * HotKeys and GlobalHotKeys components that are currently mounted
+ */
+export declare function getApplicationKeyMap(): ApplicationKeyMap;

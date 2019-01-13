@@ -76,7 +76,7 @@ class GlobalHotKeys extends Component {
   constructor(props) {
     super(props);
 
-    this._id = KeyEventManager.getInstance().registerGlobalKeyMap(props);
+    this._id = KeyEventManager.getInstance().registerGlobalKeyMap(props.keyMap);
   }
 
   componentDidMount() {

@@ -1,4 +1,4 @@
-import { HotKeys, GlobalHotKeys } from 'react-hotkeys';
+import { HotKeys, GlobalHotKeys, getApplicationKeyMap } from 'react-hotkeys';
 import React, { Fragment } from 'react';
 
 import Node from './Node';
@@ -17,7 +17,25 @@ const keyMap = {
 const globalKeyMap = {
   KONAMI: 'up up down down left right left right b a enter',
   LOG_DOWN: {sequence: 'command', action: 'keydown'},
-  LOG_UP: {sequence: 'command', action: 'keyup'}
+  LOG_UP: {sequence: 'command', action: 'keyup'},
+  SHOW_DIALOG: 'shift+?'
+};
+
+const styles = {
+  DIALOG: {
+    width: 600,
+    position: 'fixed',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    padding: '0 24',
+    backgroundColor: 'white',
+    zIndex: 100,
+    color: 'rgba(0,0,0,0.87)'
+  },
+  KEYMAP_TABLE_CELL: {
+    padding: 8
+  }
 };
 
 class App extends React.Component {
@@ -35,12 +53,42 @@ class App extends React.Component {
     this.onKonami = this.onKonami.bind(this);
 
     this.state = {
-      konamiTime: false
+      konamiTime: false,
+      showDialog: false
     };
   }
 
   onKonami() {
     this.setState({konamiTime: true});
+  }
+
+  renderDialog() {
+    if (this.state.showDialog) {
+      const keyMap = getApplicationKeyMap();
+
+      return (
+        <div style={styles.DIALOG}>
+          <h2>
+            Keyboard shortcuts
+          </h2>
+
+          <table>
+            <tbody>
+            { Object.keys(keyMap).map((actionName) => (
+              <tr key={actionName}>
+                <td style={styles.KEYMAP_TABLE_CELL}>
+                  { actionName.replace('_', ' ') }
+                </td>
+                <td style={styles.KEYMAP_TABLE_CELL}>
+                  { keyMap[actionName].map((keySequence) => <span key={keySequence}>{keySequence}</span>) }
+                </td>
+              </tr>
+            )) }
+            </tbody>
+          </table>
+        </div>
+      );
+    }
   }
 
   render() {
@@ -50,6 +98,7 @@ class App extends React.Component {
       KONAMI: this.onKonami,
       LOG_DOWN: this.constructor.logCommandKeyDown,
       LOG_UP: this.constructor.logCommandKeyUp,
+      SHOW_DIALOG: () => this.setState({ showDialog: !this.state.showDialog })
     };
 
     const className = konamiTime ? 'viewport konamiTime' : 'viewport';
@@ -61,6 +110,8 @@ class App extends React.Component {
           handlers={globalHandlers}
           global
         />
+
+        { this.renderDialog() }
 
         <HotKeys keyMap={keyMap}>
           <div className="app">

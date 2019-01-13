@@ -47,6 +47,16 @@ class KeyEventManager {
   }
 
   /********************************************************************************
+   * Generating key maps
+   ********************************************************************************/
+
+  getApplicationKeyMap() {
+    return Object.assign(
+      this._globalEventStrategy.getApplicationKeyMap(),
+      this._focusOnlyEventStrategy.getApplicationKeyMap()
+    );
+  }
+  /********************************************************************************
    * Registering key maps
    ********************************************************************************/
 
@@ -57,7 +67,7 @@ class KeyEventManager {
    * @returns {ComponentId} Unique component ID to assign to the focused HotKeys
    *          component and passed back when handling a key event
    */
-  registerKeyMap(keyMap) {
+  registerKeyMap(keyMap = {}) {
     return this._focusOnlyEventStrategy.registerKeyMap(keyMap);
   }
 
@@ -66,7 +76,7 @@ class KeyEventManager {
    * @param {ComponentId} componentId - Id of the component that the keyMap belongs to
    * @param {KeyMap} keyMap - Map of actions to key expressions
    */
-  reregisterKeyMap(componentId, keyMap) {
+  reregisterKeyMap(componentId, keyMap = {}) {
     this._focusOnlyEventStrategy.reregisterKeyMap(componentId, keyMap);
   }
 
@@ -78,6 +88,12 @@ class KeyEventManager {
     this._focusOnlyEventStrategy.deregisterKeyMap(componentId);
   }
 
+  /**
+   * Registers that a component has now mounted, and declares its parent HotKeys
+   * component id so that actions may be properly resolved
+   * @param {ComponentId} componentId - Id of the component that has mounted
+   * @param {ComponentId} parentId - Id of the parent HotKeys component
+   */
   registerComponentMount(componentId, parentId) {
     return this._focusOnlyEventStrategy.registerComponentMount(componentId, parentId);
   }
@@ -89,10 +105,16 @@ class KeyEventManager {
    * @returns {ComponentId} Unique component ID to assign to the focused HotKeys
    *          component and passed back when handling a key event
    */
-  registerGlobalKeyMap(keyMap) {
+  registerGlobalKeyMap(keyMap = {}) {
     return this._globalEventStrategy.registerKeyMap(keyMap);
   }
 
+  /**
+   * Registers that a component has now mounted, and declares its parent GlobalHotKeys
+   * component id so that actions may be properly resolved
+   * @param {ComponentId} componentId - Id of the component that has mounted
+   * @param {ComponentId} parentId - Id of the parent GlobalHotKeys component
+   */
   registerGlobalComponentMount(componentId, parentId) {
     return this._globalEventStrategy.registerComponentMount(componentId, parentId);
   }

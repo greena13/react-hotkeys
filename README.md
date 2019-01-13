@@ -17,6 +17,7 @@ A declarative library for handling hotkeys and focus areas in React applications
 - Offers a minimal declarative [JSX](#HotKeys-component-API) and [HoC](#withHotKeys-HoC-API) APIs
 - Supports [browser key names](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values) and [Mousetrap syntax](https://github.com/ccampbell/mousetrap)
 - Allows you to define [global](#GlobalHotKeys-component) and [in-focus](#HotKeys-component) hot keys
+- Allows you to easily [display a list of available hot keys to the user](#Displaying-a-list-of-available-hot-keys)
 - Works with React's Synthetic KeyboardEvents and event delegation and provides [predictable and expected behaviour](#Interaction-with-React) to anyone  familiar with React
 - It is optimized by default, but allows you to turn off different optimisation measures in a granular fashion
 - It's customizable through a simple [configuration API](#Configuration)
@@ -613,6 +614,49 @@ The GlobalHotKeys component provides a declarative and native JSX syntax for def
    { children }
 
 </GlobalHotKeys>
+```
+
+## Displaying a list of available hot keys
+
+`react-hotkeys` provides the `getApplicationKeyMap()` function for getting a mapping of all actions and key sequences that have been defined by components that are currently mounted.
+
+They are returned as an object, with the action names as keys (it is up to you to decide how to translate them to be displayed) and arrays of key sequences that trigger them, as keys.
+
+Below is how the example application renders a dialog of all available hot keys:
+
+```javascript
+import { getApplicationKeyMap } from 'react-hotkeys';
+
+// ...
+
+renderDialog() {
+    if (this.state.showDialog) {
+      const keyMap = getApplicationKeyMap();
+
+      return (
+        <div style={styles.DIALOG}>
+          <h2>
+            Keyboard shortcuts
+          </h2>
+
+          <table>
+            <tbody>
+            { Object.keys(keyMap).map((actionName) => (
+              <tr key={actionName}>
+                <td style={styles.KEYMAP_TABLE_CELL}>
+                  { actionName.replace('_', ' ') }
+                </td>
+                <td style={styles.KEYMAP_TABLE_CELL}>
+                  { keyMap[actionName].map((keySequence) => <span key={keySequence}>{keySequence}</span>) }
+                </td>
+              </tr>
+            )) }
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+  }
 ```
 
 ## Ignoring events
@@ -1312,7 +1356,7 @@ All build commands are included in the `package.json`:
 ### Development builds
 
 | Bundle | Transpiled with | Modularized with | Output |
-|:-- |:-- |:-- |:-- | 
+|:-- |:-- |:-- |:-- |
 | CommonJS | Babel | Babel | /cjs/index.js |
 | UMD | Babel | Rollup | /umd/index.js |
 | ES6 | Babel | Babel | /es/index.js |
