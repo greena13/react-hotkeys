@@ -23,7 +23,7 @@ A declarative library for handling hotkeys and focus areas in React applications
 - [Optimized for larger applications](#Optimizations), with many hot keys active at once
 - Depends only on `prop-types` and a peer dependency of `react`
 - Uses rollup, Uglify and strips out comments and logging for a small production build
-- Has more than [1800 automated tests](/tests)
+- Has more than [1800 automated tests](/tree/master/test)
 
 ## Basic Usage
 
