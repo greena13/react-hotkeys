@@ -8,9 +8,13 @@
 [![GitHub license](https://img.shields.io/github/license/greena13/react-hotkeys.svg)](https://github.com/greena13/react-hotkeys/blob/master/LICENSE)
 [![Gitter](https://img.shields.io/gitter/room/chrisui/react-hotkeys.svg)](https://gitter.im/chrisui/react-hotkeys)
 
+A declarative library for handling hotkeys and focus areas in React applications.
+
 > Warning: This Readme is for the latest pre-release. The documentation for the latest stable release is available [here](https://github.com/greena13/react-hotkeys/tree/v1.1.4).
 
-A declarative library for handling hotkeys and focus areas in React applications.
+### Upgrading from 1.\*.\* ?
+
+See the [upgrade notes](https://github.com/greena13/react-hotkeys/releases/tag/v2.0.0-pre1).
 
 ## Feature Overview
 
