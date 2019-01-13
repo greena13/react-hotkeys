@@ -24,7 +24,7 @@ A declarative library for handling hotkeys and focus areas in React applications
 - [Optimized for larger applications](#Optimizations), with many hot keys active at once
 - Depends only on `prop-types` and a peer dependency of `react`
 - Uses rollup, Uglify and strips out comments and logging for a small production build
-- Has more than [1800 automated tests](/tree/master/test)
+- Has more than [1800 automated tests](https://github.com/greena13/react-hotkeys/tree/master/test)
 
 ## Basic Usage
 
@@ -315,7 +315,7 @@ That is:
 - Unless a `<HotKeys>` component is nested within the `<HotKeys />` component that defines the action (or is the same `<HotKeys />` component), its handler is not called
 - If a `<HotKeys />` component closer to the event target has defined a handler for the same action, a `<HotKeys />` component's handler won't be called (the closer component's handler will)
 
-A more exhaustive enumeration of `react-hotkeys` behaviour can be found by reviewing the [test suite](/test).
+A more exhaustive enumeration of `react-hotkeys` behaviour can be found by reviewing the [test suite](https://github.com/greena13/react-hotkeys/tree/master/test).
 
 ### Managing focus in the browser
 
