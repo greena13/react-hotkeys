@@ -20,6 +20,7 @@ import resolveShiftedAlias from '../../helpers/resolving-handlers/resolveShifted
 import resolveAltedAlias from '../../helpers/resolving-handlers/resolveAltedAlias';
 import Configuration from '../Configuration';
 import ModifierFlagsDictionary from '../../const/ModifierFlagsDictionary';
+import without from '../../utils/collection/without';
 
 /**
  * Defines common behaviour for key event strategies
@@ -69,6 +70,7 @@ class AbstractKeyEventStrategy {
     this.keyEventManager = keyEventManager;
 
     this.keyMapRegistry = {};
+    this.componentRegistry = {};
 
     this._reset();
     this._resetKeyCombinationHistory();
@@ -236,6 +238,7 @@ class AbstractKeyEventStrategy {
     this.componentId += 1;
 
     this.keyMapRegistry[this.componentId] = keyMap;
+    this.componentRegistry[this.componentId] = this._newComponentRegistryItem();
 
     return this.componentId;
   }
@@ -249,11 +252,34 @@ class AbstractKeyEventStrategy {
     this.keyMapRegistry[componentId] = keyMap;
   }
 
+  registerComponentMount(componentId, parentId) {
+    if (!isUndefined(parentId)) {
+      this.componentRegistry[componentId].parentId = parentId;
+      this.componentRegistry[parentId].childIds.push(componentId);
+    }
+  }
+
+  _newComponentRegistryItem() {
+    return {
+      childIds: [],
+      parentId: null
+    };
+  }
+
   /**
    * De-registers (removes) a mounted component's key map from the registry
    * @param {ComponentId} componentId - Id of the component that the keyMap belongs to
    */
   deregisterKeyMap(componentId) {
+    const parentId = this.componentRegistry[componentId].parentId;
+    const parent = this.componentRegistry[parentId];
+
+    if (parent) {
+      parent.childIds = without(parent.childIds, componentId);
+    }
+
+    delete this.componentRegistry[componentId];
+
     delete this.keyMapRegistry[componentId];
   }
 

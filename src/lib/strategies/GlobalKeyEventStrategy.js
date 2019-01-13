@@ -41,14 +41,13 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      */
     this.listenersBound = false;
 
-
     this.eventOptions = {
       ignoreEventsCondition: Configuration.option('ignoreEventsCondition')
     };
   }
 
   /********************************************************************************
-   * Registering key maps and handlers
+   * Enabling key maps and handlers
    ********************************************************************************/
 
   /**
@@ -64,7 +63,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this.eventOptions = eventOptions;
 
     this._addComponentToList(
-      this.componentId,
+      componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options
@@ -73,14 +72,14 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this._updateDocumentHandlers();
 
     this.logger.debug(
-      this._logPrefix(this.componentId, {eventId: false}),
+      this._logPrefix(componentId, {eventId: false}),
       `Mounted.`,
     );
 
     this.logger.verbose(
-      this._logPrefix(this.componentId, {eventId: false}),
+      this._logPrefix(componentId, {eventId: false}),
       'Component options: \n',
-      printComponent(this._getComponent(this.componentId))
+      printComponent(this._getComponent(componentId))
     );
   }
 
@@ -169,7 +168,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this._initHandlerResolutionState();
 
     this.logger.debug(
-      this._logPrefix(this.componentId, {eventId: false}),
+      this._logPrefix(componentId, {eventId: false}),
       `Unmounted global component ${componentId}`
     );
   }

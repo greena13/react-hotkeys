@@ -78,6 +78,10 @@ class KeyEventManager {
     this._focusOnlyEventStrategy.deregisterKeyMap(componentId);
   }
 
+  registerComponentMount(componentId, parentId) {
+    return this._focusOnlyEventStrategy.registerComponentMount(componentId, parentId);
+  }
+
   /**
    * Registers a new mounted component's global key map so that it can be included in the
    * application's key map
@@ -87,6 +91,10 @@ class KeyEventManager {
    */
   registerGlobalKeyMap(keyMap) {
     return this._globalEventStrategy.registerKeyMap(keyMap);
+  }
+
+  registerGlobalComponentMount(componentId, parentId) {
+    return this._globalEventStrategy.registerComponentMount(componentId, parentId);
   }
 
   /**

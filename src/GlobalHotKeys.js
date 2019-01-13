@@ -42,6 +42,12 @@ class GlobalHotKeys extends Component {
     allowChanges: PropTypes.bool
   };
 
+  getChildContext() {
+    return {
+      globalHotKeysParentId: this._id
+    };
+  }
+
   render() {
     return this.props.children || null;
   }
@@ -67,14 +73,19 @@ class GlobalHotKeys extends Component {
     }
   }
 
+  constructor(props) {
+    super(props);
+
+    this._id = KeyEventManager.getInstance().registerGlobalKeyMap(props);
+  }
+
   componentDidMount() {
     const {keyMap, handlers} = this.props;
+    const {globalHotKeysParentId} = this.context;
 
     const keyEventManager = KeyEventManager.getInstance();
 
-    this._id = keyEventManager.registerGlobalKeyMap(
-      this.props.keyMap
-    );
+    keyEventManager.registerGlobalComponentMount(this._id, globalHotKeysParentId);
 
     keyEventManager.enableGlobalHotKeys(
       this._id,
@@ -89,7 +100,7 @@ class GlobalHotKeys extends Component {
     const keyEventManager = KeyEventManager.getInstance();
 
     keyEventManager.deregisterGlobalKeyMap(this._id);
-    keyEventManager.disableGlobalHotKeys(this._id)
+    keyEventManager.disableGlobalHotKeys(this._id);
   }
 
   _getComponentOptions() {
@@ -104,5 +115,11 @@ class GlobalHotKeys extends Component {
     };
   }
 }
+
+GlobalHotKeys.contextTypes = {
+  globalHotKeysParentId: PropTypes.number,
+};
+
+GlobalHotKeys.childContextTypes = GlobalHotKeys.contextTypes;
 
 export default GlobalHotKeys;

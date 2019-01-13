@@ -4,6 +4,7 @@ import Configuration from './lib/Configuration';
 import KeyEventManager from './lib/KeyEventManager';
 import isEmpty from './utils/collection/isEmpty';
 import KeyCombinationSerializer from './lib/KeyCombinationSerializer';
+import GlobalHotKeys from './GlobalHotKeys';
 
 /**
  * Wraps a React component in a HotKeysEnabled component, which passes down the
@@ -114,6 +115,14 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       allowChanges: PropTypes.bool
     };
 
+     static contextTypes = {
+      hotKeysParentId: PropTypes.number,
+    };
+
+     static childContextTypes = {
+       hotKeysParentId: PropTypes.number,
+     };
+
     constructor(props) {
       super(props);
 
@@ -129,6 +138,14 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       this._handleKeyPress = this._handleKeyPress.bind(this);
       this._handleKeyUp = this._handleKeyUp.bind(this);
       this._componentIsFocused = this._componentIsFocused.bind(this);
+
+      this._id = KeyEventManager.getInstance().registerKeyMap(props);
+    }
+
+    getChildContext() {
+      return {
+        hotKeysParentId: this._id
+      };
     }
 
     render() {
@@ -211,14 +228,14 @@ function withHotKeys(Component, hotKeysOptions = {}) {
     componentDidUpdate(previousProps) {
       const keyEventManager = KeyEventManager.getInstance();
 
-      keyEventManager.reregisterKeyMap(this._componentId, this.props.keyMap);
+      keyEventManager.reregisterKeyMap(this._id, this.props.keyMap);
 
       if (this._componentIsFocused() && (this.props.allowChanges || !Configuration.option('ignoreKeymapAndHandlerChangesByDefault'))) {
         const {keyMap, handlers} = this.props;
 
         keyEventManager.updateEnabledHotKeys(
           this._getFocusTreeId(),
-          this._componentId,
+          this._id,
           keyMap,
           handlers,
           this._getComponentOptions()
@@ -232,17 +249,9 @@ function withHotKeys(Component, hotKeysOptions = {}) {
 
     componentDidMount() {
       const keyEventManager = KeyEventManager.getInstance();
+      const {hotKeysParentId} = this.context;
 
-      this._componentId = keyEventManager.registerKeyMap(
-        this.props.keyMap
-      );
-    }
-
-    componentWillUnmount(){
-      const keyEventManager = KeyEventManager.getInstance();
-
-      keyEventManager.deregisterKeyMap(this._componentId);
-      this._handleBlur();
+      keyEventManager.registerComponentMount(this._id, hotKeysParentId);
     }
 
     /**
@@ -257,7 +266,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
 
       const focusTreeId =
         KeyEventManager.getInstance().enableHotKeys(
-          this._componentId,
+          this._id,
           getKeyMap(this.props),
           getHandlers(this.props),
           this._getComponentOptions()
@@ -266,6 +275,13 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       this._focusTreeIdsPush(focusTreeId);
 
       this._focused = true;
+    }
+
+    componentWillUnmount(){
+      const keyEventManager = KeyEventManager.getInstance();
+
+      keyEventManager.deregisterKeyMap(this._id);
+      this._handleBlur();
     }
 
     /**
@@ -278,7 +294,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
         this.props.onBlur(...arguments);
       }
 
-      const retainCurrentFocusTreeId = KeyEventManager.getInstance().disableHotKeys(this._getFocusTreeId(), this._componentId);
+      const retainCurrentFocusTreeId = KeyEventManager.getInstance().disableHotKeys(this._getFocusTreeId(), this._id);
 
       if (!retainCurrentFocusTreeId) {
         this._focusTreeIdsShift();
@@ -297,7 +313,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
         KeyEventManager.getInstance().handleKeydown(
           event,
           this._getFocusTreeId(),
-          this._componentId,
+          this._id,
           this._getEventOptions()
         );
 
@@ -316,7 +332,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
         KeyEventManager.getInstance().handleKeypress(
           event,
           this._getFocusTreeId(),
-          this._componentId,
+          this._id,
           this._getEventOptions()
         );
 
@@ -335,7 +351,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
         KeyEventManager.getInstance().handleKeyup(
           event,
           this._getFocusTreeId(),
-          this._componentId,
+          this._id,
           this._getEventOptions()
         );
 
