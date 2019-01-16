@@ -689,7 +689,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     if (options.focusTreeId !== false) {
       const focusTreeId = isUndefined(options.focusTreeId) ? this.focusTreeId : options.focusTreeId;
-      base += `FT${focusTreeId}${logIcons[focusTreeId % logIcons.length]}-`;
+      base += `F${focusTreeId}${logIcons[focusTreeId % logIcons.length]}-`;
     }
 
     if (options.eventId !== false) {
@@ -698,7 +698,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       base += `E${eventId}${eventIcons[eventId % eventIcons.length]}-`;
     }
 
-    return base +`C${componentId}-P${this._getComponentPosition(componentId)}-${componentIcons[componentId % componentIcons.length]}):`;
+    const position = this._getComponentPosition(componentId);
+    return base +`C${componentId}${componentIcons[componentId % componentIcons.length]}-P${position}${componentIcons[position % componentIcons.length]}):`;
   }
 
 }
