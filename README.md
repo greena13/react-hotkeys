@@ -10,7 +10,7 @@
 
 A declarative library for handling hotkeys and focus areas in React applications.
 
-> Warning: This Readme is for the latest pre-release. The documentation for the latest stable release is available [here](https://github.com/greena13/react-hotkeys/tree/v1.1.4).
+> 🚨 🚨 Warning: This Readme is for the latest pre-release. The documentation for the latest stable release is available [here](https://github.com/greena13/react-hotkeys/tree/v1.1.4). 🚨 🚨
 
 ### Upgrading from 1.\*.\* ?
 
