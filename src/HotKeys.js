@@ -9,9 +9,9 @@ import withHotKeys from './withHotKeys';
 class HotKeysWrapper extends Component {
 
   render() {
-    const {hotKeys, innerRef, ...remainingProps} = this.props;
+    const {hotKeys, innerRef, component, ...remainingProps} = this.props;
 
-    const DefaultComponent = remainingProps.component || Configuration.option('defaultComponent');
+    const DefaultComponent = component || Configuration.option('defaultComponent');
 
     return (
       <DefaultComponent { ... { ...hotKeys, ref: innerRef, ...remainingProps } } />
