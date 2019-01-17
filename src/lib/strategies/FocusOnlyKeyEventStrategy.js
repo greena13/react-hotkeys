@@ -218,7 +218,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     const componentPosition = this._getComponentPosition(componentId);
 
-    const outstandingEventPropagation = (this.eventPropagationState.previousComponentPosition + 1) < componentPosition;
+    const previousComponentPosition = this.eventPropagationState.previousComponentPosition;
+    const outstandingEventPropagation = previousComponentPosition !== -1 && (previousComponentPosition + 1) < componentPosition;
 
     this.logger.debug(
       `${this._logPrefix(componentId, {focusTreeId, eventId: false})}`,
