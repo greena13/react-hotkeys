@@ -640,7 +640,6 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const eventName = describeKeyEvent(eventBitmapIndex);
     const combinationName = this._describeCurrentKeyCombination();
 
-
     if (this.keyMapEventBitmap[eventBitmapIndex]) {
       if (this.eventPropagationState.actionHandled) {
         this.logger.debug(
@@ -698,8 +697,15 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       base += `E${eventId}${eventIcons[eventId % eventIcons.length]}-`;
     }
 
+    base += `C${componentId}${componentIcons[componentId % componentIcons.length]}`;
+
     const position = this._getComponentPosition(componentId);
-    return base +`C${componentId}${componentIcons[componentId % componentIcons.length]}-P${position}${componentIcons[position % componentIcons.length]}):`;
+
+    if (!isUndefined(position)) {
+      base += `-P${position}${componentIcons[position % componentIcons.length]}:`
+    }
+
+    return `${base})`;
   }
 
 }
