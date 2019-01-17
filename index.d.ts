@@ -75,7 +75,7 @@ export class GlobalHotKeys extends React.Component<HotKeysEnabled, {}> { }
  * the wrapped component (e.g. div, span, input, etc) in order for the key events
  * to be recorded.
  */
-export declare function withHotKeys(React.ComponentClass, HotKeysEnabledProps): HotKeysEnabled;
+export declare function withHotKeys(Component: React.ComponentClass, hotKeysOptions: HotKeysEnabledProps): HotKeysEnabled;
 
 export declare function deprecatedWithHotKeys(keyMap: { [key: string]: KeySequence }): HotKeys;
 
@@ -116,7 +116,7 @@ export class HotKeysIgnore extends React.Component<HotKeysIgnoredProps, {}> { }
  * the wrapped component (e.g. div, span, input, etc) in order for the key events
  * to be recorded.
  */
-export declare function withHotKeysIgnore(React.ComponentClass, HotKeysIgnoredProps): HotKeysIgnored;
+export declare function withHotKeysIgnore(Component: React.ComponentClass, hotKeysIgnoreOptions: HotKeysIgnoredProps): HotKeysIgnored;
 
 export type ApplicationKeyMap = { [key: ActionName]: Array<MouseTrapKeySequence> };
 
