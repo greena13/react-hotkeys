@@ -1,6 +1,6 @@
 import resolveShiftedAlias from '../helpers/resolving-handlers/resolveShiftedAlias';
 import resolveUnshiftedAlias from '../helpers/resolving-handlers/resolveUnshiftedAlias';
-import KeyAliasesDictionary from '../const/KeyAliasesDictionary';
+import KeyOSAndLayoutAliasesDictionary from '../const/KeyOSAndLayoutAliasesDictionary';
 import KeySequenceParser from './KeySequenceParser';
 import resolveUnaltedAlias from '../helpers/resolving-handlers/resolveUnaltedAlias';
 import resolveAltedAlias from '../helpers/resolving-handlers/resolveAltedAlias';
@@ -64,7 +64,7 @@ class KeyCombinationSerializer {
       } else {
         keyAliases.push(keyName);
 
-        const keyAlias = KeyAliasesDictionary[keyName];
+        const keyAlias = KeyOSAndLayoutAliasesDictionary[keyName];
 
         if (keyAlias) {
           keyAliases = [

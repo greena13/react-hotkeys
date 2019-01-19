@@ -1,4 +1,4 @@
-import KeyAliasesDictionary from '../../const/KeyAliasesDictionary';
+import KeyOSAndLayoutAliasesDictionary from '../../const/KeyOSAndLayoutAliasesDictionary';
 
 /**
  * Returns a list of accepted aliases for the specified key
@@ -6,7 +6,7 @@ import KeyAliasesDictionary from '../../const/KeyAliasesDictionary';
  * @returns {ReactKeyName[]} List of key aliases
  */
 function resolveKeyAlias(keyName) {
-  return KeyAliasesDictionary[keyName] || [ keyName ];
+  return KeyOSAndLayoutAliasesDictionary[keyName] || [ keyName ];
 }
 
 export default resolveKeyAlias;

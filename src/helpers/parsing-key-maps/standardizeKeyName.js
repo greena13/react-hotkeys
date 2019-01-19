@@ -1,4 +1,5 @@
 import MousetrapToReactKeyNamesDictionary from '../../const/MousetrapToReactKeyNamesDictionary';
+import KeyShorthandDictionary from '../../const/KeyShorthandDictionary';
 
 /**
  * @typedef {String} KeyName Name of the keyboard key
@@ -15,7 +16,9 @@ import MousetrapToReactKeyNamesDictionary from '../../const/MousetrapToReactKeyN
  * @returns {ReactKeyName} Name used by React to refer to the key
  */
 function standardizeKeyName(keyName) {
-  return MousetrapToReactKeyNamesDictionary[keyName.toLowerCase()] || (keyName.match(/^f\d+$/) ? keyName.toUpperCase() : keyName);
+  const _keyName = keyName.toLowerCase();
+
+  return MousetrapToReactKeyNamesDictionary[_keyName] || KeyShorthandDictionary[_keyName] || (keyName.match(/^f\d+$/) ? keyName.toUpperCase() : keyName);
 }
 
 export default standardizeKeyName;
