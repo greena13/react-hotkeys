@@ -13,7 +13,7 @@ export interface KeyMapOptions {
 
 export type KeySequence = MouseTrapKeySequence | KeyMapOptions | Array<MouseTrapKeySequence> | Array<KeyMapOptions>;
 
-export type KeyMap = { [key: ActionName]: KeySequence };
+export type KeyMap = { [key in ActionName]: KeySequence };
 
 /**
  * Component that listens to key events when one of its children are in focus and
@@ -118,7 +118,7 @@ export class HotKeysIgnore extends React.Component<HotKeysIgnoredProps, {}> { }
  */
 export declare function withHotKeysIgnore(Component: React.ComponentClass, hotKeysIgnoreOptions: HotKeysIgnoredProps): HotKeysIgnored;
 
-export type ApplicationKeyMap = { [key: ActionName]: Array<MouseTrapKeySequence> };
+export type ApplicationKeyMap = { [key in ActionName]: Array<MouseTrapKeySequence> };
 
 /**
  * Generates and returns the application's key map, including not only those
