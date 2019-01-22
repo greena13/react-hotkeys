@@ -10,6 +10,7 @@ const SpecialKeysDictionary = {
   Tab: true,
   CapsLock: true,
   BackSpace: true,
+  Escape: true,
 };
 
 export default SpecialKeysDictionary;
