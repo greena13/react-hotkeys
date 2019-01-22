@@ -82,14 +82,14 @@ export declare function deprecatedWithHotKeys(keyMap: { [key: string]: KeySequen
 export type ListOfKeys = string | Array<string>;
 
 /**
- * A component that causes React Hotkeys to ignore all matching key events
- * triggered by its children. By default, this is all key events, but you can use
- * the only prop to provide a whitelist, or the except prop to pass a blacklist (and
- * cause HotKeys components to still observe these events).
+ * A component that causes React Hotkeys to ignore the results of
+ * Configuration.ignoreEventCondition and instead either force the event to be
+ * ignored or observed. By default, this is all key events, but you can use
+ * the only prop to provide a whitelist, or the except prop to pass a blacklist.
  */
-export interface HotKeysIgnored extends React.Component<HotKeysProps, {}> { }
+export interface HotKeysIgnoreOverride extends React.Component<HotKeysProps, {}> { }
 
-export interface HotKeysIgnoredProps extends React.HTMLAttributes<HotKeys> {
+export interface HotKeysOverrideProps extends React.HTMLAttributes<HotKeys> {
   /**
    * The whitelist of keys that keyevents should be ignored. i.e. if you place
    * a key in this list, all events related to it will be ignored by react hotkeys
@@ -105,9 +105,16 @@ export interface HotKeysIgnoredProps extends React.HTMLAttributes<HotKeys> {
 }
 
 /**
- * @see HotKeysIgnored
+ * A component that causes React Hotkeys to ignore all matching key events
+ * triggered by its children. By default, this is all key events, but you can use
+ * the only prop to provide a whitelist, or the except prop to pass a blacklist (and
+ * cause HotKeys components to still observe these events).
+ *
+ * @see HotKeysIgnoreOverride
  */
-export class HotKeysIgnore extends React.Component<HotKeysIgnoredProps, {}> { }
+export class HotKeysIgnore extends React.Component<HotKeysOverrideProps, {}> { }
+
+export class HotKeysAlwaysObserve extends React.Component<HotKeysOverrideProps, {}> { }
 
 /**
  * Wraps a React component in a HotKeysIgnored component, which passes down the
@@ -116,7 +123,7 @@ export class HotKeysIgnore extends React.Component<HotKeysIgnoredProps, {}> { }
  * the wrapped component (e.g. div, span, input, etc) in order for the key events
  * to be recorded.
  */
-export declare function withHotKeysIgnore(Component: React.ComponentClass, hotKeysIgnoreOptions: HotKeysIgnoredProps): HotKeysIgnored;
+export declare function withHotKeysIgnore(Component: React.ComponentClass, hotKeysIgnoreOptions: HotKeysOverrideProps): HotKeysIgnored;
 
 export type ApplicationKeyMap = { [key in ActionName]: Array<MouseTrapKeySequence> };
 

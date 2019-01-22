@@ -694,6 +694,8 @@ By default, all key events that originate from `<input>`, `<select>` or `<textar
 
 If this is not what you want for your application, you can modify the list of tags using the `ignoreTags` [configuration option](#Configuration) or if you need additional control, you can specify a brand new function using the `ignoreEventsCondition` [configuration option](#Configuration).
 
+If you want an exception to the global ignore policy for a particular part of your app, then you can use the HotKeysAlwaysObserve component.
+
 ### HotKeysIgnore component
 
 If you want `react-hotkeys` to ignore key events coming from a particular area of your app when it is in focus, you can use the `<HotKeysIgnore/>` component:
@@ -808,6 +810,120 @@ const MyHotKeysComponent = withHotKeysIgnore(MyComponent, { except: 'Escape' });
 </MyHotKeysComponent>
 ```
 
+### HotKeysAlwaysObserve component
+
+If you want `react-hotkeys` to always observe key events coming from a particular area of your app when it is in focus (despite the global `ignoreEventsCondition`), you can use the `<HotKeysAlwaysObserve/>` component:
+
+```javascript
+import {HotKeysAlwaysObserve} from 'react-hotkeys';
+
+<HotKeysAlwaysObserve>
+    /**
+     * Children that, when in focus, should have its key events always
+     * observed by react hotkeys
+     */
+</HotKeysAlwaysObserve>
+```
+
+### HotKeysAlwaysObserve component API
+
+By default, `<HotKeysAlwaysObserve />` will force all key events to be observed, but you can customize this behaviour by providing a whitelist or blacklist of events to ignore:
+
+```javascript
+<HotKeysAlwaysObserve
+    /**
+     * The whitelist of keys that keyevents should be forced to be observed.
+     * i.e. if you place a key in this list, all events related to it will be
+     * observed by react hotkeys - even if it's ignored by the
+     * ignoreEventsCondition.
+     *
+     * Accepts a string or an array of strings.
+     */
+      only: { [] }
+
+     /**
+      * The blacklist of keys that keyevents should be forced to be observed.
+      * i.e. if you place a key in this list, all events related to it will be
+      * still be ignored by react hotkeys if they match ignoreEventsCondition
+      */
+     except: { [] }
+    >
+
+    /**
+     * Children that, when in focus, should have its key events observed by
+     * react hotkeys - even if they match ignoreEventsCondition
+     */
+
+     { children }
+
+</HotKeysAlwaysObserve>
+```
+
+### withHotKeysIgnore HoC API
+
+Similar to the `<HotKeys>`'s `withHotKeys()` function, there is a `withHotKeysAlwaysObserve()` function for achieving the `<HotKeysAlwaysObserve>` functionality, without the need for rendering a surrounding DOM-mountable element.
+
+```javascript
+import {withHotKeysAlwaysObserve} from 'react-hotkeys';
+
+class MyComponent extends Component {
+  render() {
+    /**
+     * Must unwrap hotKeys prop and pass its values to a DOM-mountable
+     * element (like the div below).
+     */
+    const {hotKeys, ...remainingProps} = this.props;
+
+    return (
+      <div { ... { ...hotKeys, ...remainingProps } } >
+        <span>HotKeys always observes key events from here</span>
+
+       { this.props.children }
+      </div>
+    )
+  }
+}
+
+const MyHotKeysComponent = withHotKeysAlwaysObserve(MyComponent);
+
+<MyHotKeysComponent except={ 'Escape' }>
+  <div>
+    All key events except the 'Escape' key are observed here
+  </div>
+</MyHotKeysComponent>
+```
+
+`withHotKeysAlwaysObserve()` also accepts a second argument that becomes the default props of the component it returns:
+
+```javascript
+import {withHotKeysAlwaysObserve} from 'react-hotkeys';
+
+class MyComponent extends Component {
+  render() {
+    /**
+     * Must unwrap hotKeys prop and pass its values to a DOM-mountable
+     * element (like the div below).
+     */
+    const {hotKeys, ...remainingProps} = this.props;
+
+    return (
+      <div { ... { ...hotKeys, ...remainingProps } } >
+        <span>HotKeys observes key events from here</span>
+
+       { this.props.children }
+      </div>
+    )
+  }
+}
+
+const MyHotKeysComponent = withHotKeysAlwaysObserve(MyComponent, { except: 'Escape' });
+
+<MyHotKeysComponent>
+  <div>
+    All key events that match the ignoreEventsCondition are still observed here, except the 'Escape' key
+  </div>
+</MyHotKeysComponent>
+```
 
 ## Allowing hotkeys and handlers props to change
 

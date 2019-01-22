@@ -113,6 +113,13 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
        * @type {Boolean}
        */
       ignoreEvent: false,
+
+      /**
+       * Whether the keyboard event current being handled should be observed, even
+       * if matches the ignoreEventCondition
+       * @type {Boolean}
+       */
+      forceObserveEvent: false,
     };
   }
 
@@ -262,7 +269,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       return true;
     }
 
-    if (this._alreadyEstablishedShouldIgnoreEvent()) {
+    if (this._shouldIgnoreEvent()) {
       this.logger.debug(
         `${this._logPrefix(componentId)} Ignored '${_key}' keydown event because ignoreEventsFilter rejected it.`
       );
@@ -283,7 +290,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
       this._setIgnoreEventFlag(event, options);
 
-      if (this._alreadyEstablishedShouldIgnoreEvent()) {
+      if (this._shouldIgnoreEvent()) {
         this.logger.debug(
           `${this._logPrefix(componentId)} Ignored '${_key}' keydown event because ignoreEventsFilter rejected it.`
         );
@@ -388,7 +395,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       return true;
     }
 
-    if (this._alreadyEstablishedShouldIgnoreEvent()) {
+    if (this._shouldIgnoreEvent()) {
       this.logger.debug(
         `${this._logPrefix(componentId)} Ignored '${_key}' keypress event because ignoreEventsFilter rejected it.`
       );
@@ -409,7 +416,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
       this._setIgnoreEventFlag(event, options);
 
-      if (this._alreadyEstablishedShouldIgnoreEvent()) {
+      if (this._shouldIgnoreEvent()) {
         this.logger.debug(
           `${this._logPrefix(componentId)} Ignored '${_key}' keypress event because ignoreEventsFilter rejected it.`
         );
@@ -471,7 +478,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       return true;
     }
 
-    if (this._alreadyEstablishedShouldIgnoreEvent()) {
+    if (this._shouldIgnoreEvent()) {
       this.logger.debug(
         `${this._logPrefix(componentId)} Ignored '${_key}' keyup event because ignoreEventsFilter rejected it.`
       );
@@ -492,7 +499,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
       this._setIgnoreEventFlag(event, options);
 
-      if (this._alreadyEstablishedShouldIgnoreEvent()) {
+      if (this._shouldIgnoreEvent()) {
         this.logger.debug(
           `${this._logPrefix(componentId)} Ignored '${_key}' keyup event because ignoreEventsFilter rejected it.`
         );
@@ -537,8 +544,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * Do not override this method. Use setIgnoreEventsCondition() instead.
    * @private
    */
-  _alreadyEstablishedShouldIgnoreEvent() {
-    return this.eventPropagationState.ignoreEvent;
+  _shouldIgnoreEvent() {
+    const { ignoreEvent, forceObserveEvent } = this.eventPropagationState;
+    return !forceObserveEvent && ignoreEvent;
   }
 
   /**
@@ -580,6 +588,10 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
   ignoreEvent(event) {
     this.eventPropagationState.ignoreEvent = true;
+  }
+
+  forceObserveEvent(event) {
+    this.eventPropagationState.forceObserveEvent = true;
   }
 
   _isFocusTreeRoot(componentId) {

@@ -3,14 +3,14 @@ import Configuration from './lib/Configuration';
 import withHotKeysIgnoreOverride from './withHotKeysIgnoreOverride';
 
 /**
- * A component that causes React Hotkeys to ignore all matching key events
- * triggered by its children. By default, this is all key events, but you can use
- * the only prop to provide a whitelist, or the except prop to pass a blacklist (and
- * cause HotKeys components to still observe these events).
+ * A component that forces React Hotkeys to observe all matching key events
+ * triggered by its children, even if they are matched by Configuration.ignoreEventsCondition.
+ * By default, this is all key events, but you can use the only prop to provide a
+ * whitelist, or the except prop to pass a blacklist.
  *
  * @see HotKeysIgnoreOverride
  */
-class HotKeysIgnore extends Component {
+class HotKeysAlwaysObserve extends Component {
   render() {
     const {hotKeys, ...remainingProps} = this.props;
 
@@ -22,5 +22,5 @@ class HotKeysIgnore extends Component {
   }
 }
 
-export default withHotKeysIgnoreOverride(HotKeysIgnore, {}, 'ignoreEvent');
+export default withHotKeysIgnoreOverride(HotKeysAlwaysObserve, {}, 'forceObserveEvent');
 
