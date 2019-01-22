@@ -10,7 +10,7 @@ import withHotKeysIgnoreOverride from './withHotKeysIgnoreOverride';
  *
  * @see HotKeysIgnoreOverride
  */
-class HotKeysAlwaysObserve extends Component {
+class ObserveKeys extends Component {
   render() {
     const {hotKeys, ...remainingProps} = this.props;
 
@@ -22,5 +22,5 @@ class HotKeysAlwaysObserve extends Component {
   }
 }
 
-export default withHotKeysIgnoreOverride(HotKeysAlwaysObserve, {}, 'forceObserveEvent');
+export default withHotKeysIgnoreOverride(ObserveKeys, {}, 'forceObserveEvent');
 

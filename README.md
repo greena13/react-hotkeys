@@ -694,9 +694,11 @@ By default, all key events that originate from `<input>`, `<select>` or `<textar
 
 If this is not what you want for your application, you can modify the list of tags using the `ignoreTags` [configuration option](#Configuration) or if you need additional control, you can specify a brand new function using the `ignoreEventsCondition` [configuration option](#Configuration).
 
-If you want an exception to the global ignore policy for a particular part of your app, then you can use the HotKeysAlwaysObserve component.
+If you want an exception to the global ignore policy for a particular part of your app, then you can use the ObserveKeys component.
 
 ### IgnoreKeys component
+
+> You only need this component if you want to add extra key events to ignore, that are not already matched by `ignoreEventsCondition()`.
 
 If you want `react-hotkeys` to ignore key events coming from a particular area of your app when it is in focus, you can use the `<IgnoreKeys/>` component:
 
@@ -810,27 +812,29 @@ const MyHotKeysComponent = withHotKeysIgnore(MyComponent, { except: 'Escape' });
 </MyHotKeysComponent>
 ```
 
-### HotKeysAlwaysObserve component
+### ObserveKeys component
 
-If you want `react-hotkeys` to always observe key events coming from a particular area of your app when it is in focus (despite the global `ignoreEventsCondition`), you can use the `<HotKeysAlwaysObserve/>` component:
+> You only need this component if you want to add *exceptions* to the key events that are matched by `ignoreEventsCondition()` (i.e. you want to observe key events, even though they are globally ignored by default).
+
+If you want `react-hotkeys` to always observe key events coming from a particular area of your app when it is in focus (despite the global `ignoreEventsCondition`), you can use the `<ObserveKeys/>` component:
 
 ```javascript
-import {HotKeysAlwaysObserve} from 'react-hotkeys';
+import {ObserveKeys} from 'react-hotkeys';
 
-<HotKeysAlwaysObserve>
+<ObserveKeys>
     /**
      * Children that, when in focus, should have its key events always
      * observed by react hotkeys
      */
-</HotKeysAlwaysObserve>
+</ObserveKeys>
 ```
 
-### HotKeysAlwaysObserve component API
+### ObserveKeys component API
 
-By default, `<HotKeysAlwaysObserve />` will force all key events to be observed, but you can customize this behaviour by providing a whitelist or blacklist of events to ignore:
+By default, `<ObserveKeys />` will force all key events to be observed, but you can customize this behaviour by providing a whitelist or blacklist of events to ignore:
 
 ```javascript
-<HotKeysAlwaysObserve
+<ObserveKeys
     /**
      * The whitelist of keys that keyevents should be forced to be observed.
      * i.e. if you place a key in this list, all events related to it will be
@@ -856,12 +860,12 @@ By default, `<HotKeysAlwaysObserve />` will force all key events to be observed,
 
      { children }
 
-</HotKeysAlwaysObserve>
+</ObserveKeys>
 ```
 
 ### withHotKeysIgnore HoC API
 
-Similar to the `<HotKeys>`'s `withHotKeys()` function, there is a `withHotKeysAlwaysObserve()` function for achieving the `<HotKeysAlwaysObserve>` functionality, without the need for rendering a surrounding DOM-mountable element.
+Similar to the `<HotKeys>`'s `withHotKeys()` function, there is a `withObserveKeys()` function for achieving the `<ObserveKeys>` functionality, without the need for rendering a surrounding DOM-mountable element.
 
 ```javascript
 import {withHotKeysAlwaysObserve} from 'react-hotkeys';
@@ -893,7 +897,7 @@ const MyHotKeysComponent = withHotKeysAlwaysObserve(MyComponent);
 </MyHotKeysComponent>
 ```
 
-`withHotKeysAlwaysObserve()` also accepts a second argument that becomes the default props of the component it returns:
+`withObserveKeys()` also accepts a second argument that becomes the default props of the component it returns:
 
 ```javascript
 import {withHotKeysAlwaysObserve} from 'react-hotkeys';

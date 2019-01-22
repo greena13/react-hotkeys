@@ -114,7 +114,7 @@ export interface HotKeysOverrideProps extends React.HTMLAttributes<HotKeys> {
  */
 export class IgnoreKeys extends React.Component<HotKeysOverrideProps, {}> { }
 
-export class HotKeysAlwaysObserve extends React.Component<HotKeysOverrideProps, {}> { }
+export class ObserveKeys extends React.Component<HotKeysOverrideProps, {}> { }
 
 /**
  * Wraps a React component in a HotKeysIgnored component, which passes down the

@@ -5,10 +5,10 @@ import sinon from 'sinon';
 
 import FocusableElement from '../support/FocusableElement';
 
-import {HotKeys, HotKeysAlwaysObserve} from '../../src/';
+import {HotKeys, ObserveKeys} from '../../src/';
 import Key from '../support/Key';
 
-describe('Forcing observing key events using HotKeysAlwaysObserve:', function () {
+describe('Forcing observing key events using ObserveKeys:', function () {
   beforeEach(function () {
     this.keyMap = {
       'ACTION_A': 'a',
@@ -27,7 +27,7 @@ describe('Forcing observing key events using HotKeysAlwaysObserve:', function ()
     };
   });
 
-  describe('when HotKeysAlwaysObserve is not used and key events match Configuration.ignoreKeyEvents', () => {
+  describe('when ObserveKeys is not used and key events match Configuration.ignoreKeyEvents', () => {
     beforeEach(function () {
       this.wrapper = mount(
         <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
@@ -54,14 +54,14 @@ describe('Forcing observing key events using HotKeysAlwaysObserve:', function ()
     });
   });
 
-  describe('when HotKeysAlwaysObserve is used and key events match Configuration.ignoreEventsCondition', () => {
+  describe('when ObserveKeys is used and key events match Configuration.ignoreEventsCondition', () => {
     describe('and no keys are specified', () => {
       beforeEach(function () {
         this.wrapper = mount(
           <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
-            <HotKeysAlwaysObserve>
+            <ObserveKeys>
               <input className="inputElement" />
-            </HotKeysAlwaysObserve>
+            </ObserveKeys>
           </HotKeys>
         );
 
@@ -88,9 +88,9 @@ describe('Forcing observing key events using HotKeysAlwaysObserve:', function ()
       beforeEach(function () {
         this.wrapper = mount(
           <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
-            <HotKeysAlwaysObserve only={'a'}>
+            <ObserveKeys only={'a'}>
               <input className="inputElement" />
-            </HotKeysAlwaysObserve>
+            </ObserveKeys>
           </HotKeys>
         );
 
@@ -117,9 +117,9 @@ describe('Forcing observing key events using HotKeysAlwaysObserve:', function ()
       beforeEach(function () {
         this.wrapper = mount(
           <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
-            <HotKeysAlwaysObserve except={'b'}>
+            <ObserveKeys except={'b'}>
               <input className="inputElement" />
-            </HotKeysAlwaysObserve>
+            </ObserveKeys>
           </HotKeys>
         );
 
@@ -146,9 +146,9 @@ describe('Forcing observing key events using HotKeysAlwaysObserve:', function ()
       beforeEach(function () {
         this.wrapper = mount(
           <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
-            <HotKeysAlwaysObserve only={'a'} except={'b'}>
+            <ObserveKeys only={'a'} except={'b'}>
               <input className="inputElement" />
-            </HotKeysAlwaysObserve>
+            </ObserveKeys>
           </HotKeys>
         );
 

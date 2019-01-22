@@ -1,4 +1,4 @@
-import { HotKeys, GlobalHotKeys, HotKeysAlwaysObserve, getApplicationKeyMap } from 'react-hotkeys';
+import { HotKeys, GlobalHotKeys, ObserveKeys, getApplicationKeyMap } from 'react-hotkeys';
 import React, { Fragment } from 'react';
 
 import Node from './Node';
@@ -80,14 +80,14 @@ class App extends React.Component {
               Keyboard shortcuts
             </h2>
 
-            <HotKeysAlwaysObserve only={'Escape'}>
+            <ObserveKeys only={'Escape'}>
               <input
                 autoFocus
                 onChange={({target: {value}}) => this.setState({ filter: value })}
                 value={filter}
                 placeholder='Filter'
               />
-            </HotKeysAlwaysObserve>
+            </ObserveKeys>
 
             <table>
               <tbody>
