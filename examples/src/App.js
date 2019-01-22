@@ -1,4 +1,4 @@
-import { HotKeys, GlobalHotKeys, getApplicationKeyMap } from 'react-hotkeys';
+import { HotKeys, GlobalHotKeys, HotKeysAlwaysObserve, getApplicationKeyMap } from 'react-hotkeys';
 import React, { Fragment } from 'react';
 
 import Node from './Node';
@@ -18,7 +18,7 @@ const globalKeyMap = {
   KONAMI: 'up up down down left right left right b a enter',
   LOG_DOWN: {sequence: 'command', action: 'keydown'},
   LOG_UP: {sequence: 'command', action: 'keyup'},
-  SHOW_DIALOG: 'shift+?'
+  SHOW_DIALOG: { sequence: 'shift+?', action: 'keyup' },
 };
 
 const styles = {
@@ -54,7 +54,8 @@ class App extends React.Component {
 
     this.state = {
       konamiTime: false,
-      showDialog: false
+      showDialog: false,
+      filter: '',
     };
   }
 
@@ -65,28 +66,51 @@ class App extends React.Component {
   renderDialog() {
     if (this.state.showDialog) {
       const keyMap = getApplicationKeyMap();
+      const { filter } = this.state;
+      const _filter = filter.toUpperCase();
 
       return (
-        <div style={styles.DIALOG}>
-          <h2>
-            Keyboard shortcuts
-          </h2>
+        <HotKeys
+          keyMap={{CLOSE_DIALOG: 'Escape' }}
+          handlers={{ CLOSE_DIALOG: () => this.setState({ showDialog: false })} }
+          >
 
-          <table>
-            <tbody>
-            { Object.keys(keyMap).map((actionName) => (
-              <tr key={actionName}>
-                <td style={styles.KEYMAP_TABLE_CELL}>
-                  { actionName.replace('_', ' ') }
-                </td>
-                <td style={styles.KEYMAP_TABLE_CELL}>
-                  { keyMap[actionName].map((keySequence) => <span key={keySequence}>{keySequence}</span>) }
-                </td>
-              </tr>
-            )) }
-            </tbody>
-          </table>
-        </div>
+          <div style={styles.DIALOG}>
+            <h2>
+              Keyboard shortcuts
+            </h2>
+
+            <HotKeysAlwaysObserve only={'Escape'}>
+              <input
+                autoFocus
+                onChange={({target: {value}}) => this.setState({ filter: value })}
+                value={filter}
+                placeholder='Filter'
+              />
+            </HotKeysAlwaysObserve>
+
+            <table>
+              <tbody>
+              { Object.keys(keyMap).reduce((memo, actionName) => {
+                if (filter.length === 0 || actionName.indexOf(_filter) !== -1) {
+                  memo.push(
+                    <tr key={actionName}>
+                      <td style={styles.KEYMAP_TABLE_CELL}>
+                        { actionName.replace('_', ' ') }
+                      </td>
+                      <td style={styles.KEYMAP_TABLE_CELL}>
+                        { keyMap[actionName].map((keySequence) => <span key={keySequence}>{keySequence}</span>) }
+                      </td>
+                    </tr>
+                  )
+                }
+
+                return memo;
+              }, []) }
+              </tbody>
+            </table>
+          </div>
+        </HotKeys>
       );
     }
   }
