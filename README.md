@@ -696,27 +696,27 @@ If this is not what you want for your application, you can modify the list of ta
 
 If you want an exception to the global ignore policy for a particular part of your app, then you can use the HotKeysAlwaysObserve component.
 
-### HotKeysIgnore component
+### IgnoreKeys component
 
-If you want `react-hotkeys` to ignore key events coming from a particular area of your app when it is in focus, you can use the `<HotKeysIgnore/>` component:
+If you want `react-hotkeys` to ignore key events coming from a particular area of your app when it is in focus, you can use the `<IgnoreKeys/>` component:
 
 ```javascript
-import {HotKeysIgnore} from 'react-hotkeys';
+import {IgnoreKeys} from 'react-hotkeys';
 
-<HotKeysIgnore>
+<IgnoreKeys>
     /**
      * Children that, when in focus, should have its key events ignored by
      * react hotkeys
      */
-</HotKeysIgnore>
+</IgnoreKeys>
 ```
 
-### HotKeysIgnore component API
+### IgnoreKeys component API
 
-By default, `<HotKeysIgnore />` will ignore all key events, but you can customize this behaviour by providing a whitelist or blacklist of events to ignore:
+By default, `<IgnoreKeys />` will ignore all key events, but you can customize this behaviour by providing a whitelist or blacklist of events to ignore:
 
 ```javascript
-<HotKeysIgnore
+<IgnoreKeys
     /**
      * The whitelist of keys that keyevents should be ignored. i.e. if you place
      * a key in this list, all events related to it will be ignored by react
@@ -741,12 +741,12 @@ By default, `<HotKeysIgnore />` will ignore all key events, but you can customiz
 
      { children }
 
-</HotKeysIgnore>
+</IgnoreKeys>
 ```
 
 ### withHotKeysIgnore HoC API
 
-Similar to the `<HotKeys>`'s `withHotKeys()` function, there is a `withHotKeysIgnore()` function for achieving the `<HotKeysIgnore>` functionality, without the need for rendering a surrounding DOM-mountable element.
+Similar to the `<HotKeys>`'s `withHotKeys()` function, there is a `withIgnoreKeys()` function for achieving the `<IgnoreKeys>` functionality, without the need for rendering a surrounding DOM-mountable element.
 
 ```javascript
 import {withHotKeysIgnore} from 'react-hotkeys';
@@ -778,7 +778,7 @@ const MyHotKeysComponent = withHotKeysIgnore(MyComponent);
 </MyHotKeysComponent>
 ```
 
-`withHotKeysIgnore()` also accepts a second argument that becomes the default props of the component it returns:
+`withIgnoreKeys()` also accepts a second argument that becomes the default props of the component it returns:
 
 ```javascript
 import {withHotKeysIgnore} from 'react-hotkeys';

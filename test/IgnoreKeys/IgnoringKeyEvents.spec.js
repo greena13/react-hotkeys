@@ -5,10 +5,10 @@ import sinon from 'sinon';
 
 import FocusableElement from '../support/FocusableElement';
 
-import {HotKeys, HotKeysIgnore} from '../../src/';
+import {HotKeys, IgnoreKeys} from '../../src/';
 import Key from '../support/Key';
 
-describe('Ignoring key events using HotKeysIgnore:', function () {
+describe('Ignoring key events using IgnoreKeys:', function () {
   beforeEach(function () {
     this.keyMap = {
       'ACTION_A': 'a',
@@ -31,9 +31,9 @@ describe('Ignoring key events using HotKeysIgnore:', function () {
     beforeEach(function () {
       this.wrapper = mount(
         <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
-          <HotKeysIgnore>
+          <IgnoreKeys>
             <div className="childElement" />
-          </HotKeysIgnore>
+          </IgnoreKeys>
         </HotKeys>
       );
 
@@ -60,9 +60,9 @@ describe('Ignoring key events using HotKeysIgnore:', function () {
     beforeEach(function () {
       this.wrapper = mount(
         <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
-          <HotKeysIgnore only={'a'}>
+          <IgnoreKeys only={'a'}>
             <div className="childElement" />
-          </HotKeysIgnore>
+          </IgnoreKeys>
         </HotKeys>
       );
 
@@ -89,9 +89,9 @@ describe('Ignoring key events using HotKeysIgnore:', function () {
     beforeEach(function () {
       this.wrapper = mount(
         <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
-          <HotKeysIgnore except={'b'}>
+          <IgnoreKeys except={'b'}>
             <div className="childElement" />
-          </HotKeysIgnore>
+          </IgnoreKeys>
         </HotKeys>
       );
 
@@ -118,9 +118,9 @@ describe('Ignoring key events using HotKeysIgnore:', function () {
     beforeEach(function () {
       this.wrapper = mount(
         <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
-          <HotKeysIgnore only={'a'} except={'b'}>
+          <IgnoreKeys only={'a'} except={'b'}>
             <div className="childElement" />
-          </HotKeysIgnore>
+          </IgnoreKeys>
         </HotKeys>
       );
 

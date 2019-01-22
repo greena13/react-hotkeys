@@ -10,7 +10,7 @@ assignees: ''
 **Describe the bug**
 A clear and concise description of what the bug is.
 
-**How are you using react hotkeys components? (HotKeys, GlobalHotKeys, HotKeysIgnore etc)**
+**How are you using react hotkeys components? (HotKeys, GlobalHotKeys, IgnoreKeys etc)**
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
