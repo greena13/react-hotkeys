@@ -438,7 +438,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       const alreadySeenKeyInCurrentCombo = keyCombination && (keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keypress] || keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup]);
 
       if (alreadySeenKeyInCurrentCombo) {
-        this._startNewKeyCombination(_key, KeyEventBitmapIndex.keypres, focusTreeId, componentId)
+        this._startNewKeyCombination(_key, KeyEventBitmapIndex.keypress, focusTreeId, componentId)
       } else {
         this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keypress, focusTreeId, componentId);
       }
