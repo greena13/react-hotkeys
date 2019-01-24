@@ -81,7 +81,7 @@ class AbstractKeyEventStrategy {
 
   /**
    * Resets all strategy state to the values it had when it was first created
-   * @private
+   * @protected
    */
   _reset() {
     this._initRegisteredKeyMapsState();
@@ -149,7 +149,7 @@ class AbstractKeyEventStrategy {
   /**
    * Resets the state of the values used to resolve which handler function should be
    * called when key events match a registered key map
-   * @private
+   * @protected
    */
   _initHandlerResolutionState() {
     /**
@@ -411,7 +411,7 @@ class AbstractKeyEventStrategy {
    * @param {String} options.defaultKeyEvent - The default key event to use for any
    *        action that does not explicitly define one.
    * @returns {ComponentOptions} Options for the specified component
-   * @private
+   * @protected
    */
   _buildComponentOptions(componentId, actionNameToKeyMap, actionNameToHandlersMap, options) {
     const { keyMap: hardSequenceKeyMap, handlers: includingHardSequenceHandlers } =
@@ -561,7 +561,7 @@ class AbstractKeyEventStrategy {
    * Returns the current key combination, i.e. the key combination that represents
    * the current key events.
    * @returns {KeyCombinationRecord} The current key combination
-   * @private
+   * @protected
    */
   _getCurrentKeyCombination() {
     if (this.keyCombinationHistory.length > 0) {
@@ -576,7 +576,7 @@ class AbstractKeyEventStrategy {
    * keyboard combination).
    * @param {ReactKeyName} keyName - Name of the key to add to the current combination
    * @param {KeyEventBitmapIndex} bitmapIndex - Index in bitmap to set to true
-   * @private
+   * @protected
    */
   _addToCurrentKeyCombination(keyName, bitmapIndex) {
     if (this.keyCombinationHistory.length === 0) {
@@ -616,7 +616,7 @@ class AbstractKeyEventStrategy {
    *        KeyCombinationRecord
    * @param {KeyEventBitmapIndex} eventBitmapIndex - Index of bit to set to true in new
    *        KeyEventBitmap
-   * @private
+   * @protected
    */
   _startNewKeyCombination(keyName, eventBitmapIndex) {
     if (this.keyCombinationHistory.length > this.longestSequence) {
@@ -1052,7 +1052,7 @@ class AbstractKeyEventStrategy {
    * Synchronises the key combination history to match the modifier key flag attributes
    * on new key events
    * @param {KeyboardEvent} event - Event to check the modifier flags for
-   * @private
+   * @protected
    */
   _checkForModifierFlagDiscrepancies(event) {
     /**
