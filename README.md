@@ -22,7 +22,7 @@ See the [upgrade notes](https://github.com/greena13/react-hotkeys/releases/tag/v
 - Supports [browser key names](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values) and [Mousetrap syntax](https://github.com/ccampbell/mousetrap)
 - Allows you to define [global](#GlobalHotKeys-component) and [in-focus](#HotKeys-component) hot keys
 - Allows you to easily [display a list of available hot keys to the user](#Displaying-a-list-of-available-hot-keys)
-- Works with React's Synthetic KeyboardEvents and event delegation and provides [predictable and expected behaviour](#Interaction-with-React) to anyone  familiar with React
+- Works with React's Synthetic KeyboardEvents and event delegation and provides [predictable and expected behaviour](#Interaction-with-React) to anyone familiar with React
 - It is optimized by default, but allows you to turn off different optimisation measures in a granular fashion
 - It's customizable through a simple [configuration API](#Configuration)
 - [Optimized for larger applications](#Optimizations), with many hot keys active at once
@@ -35,26 +35,24 @@ See the [upgrade notes](https://github.com/greena13/react-hotkeys/releases/tag/v
 #### Define a key map
 
 ```javascript
-import {HotKeys} from 'react-hotkeys';
-import MyNode from './MyNode';
+import { HotKeys } from "react-hotkeys";
+import MyNode from "./MyNode";
 
 const keyMap = {
-  SNAP_LEFT: 'command+left',
-  DELETE_NODE: ['del', 'backspace']
+  SNAP_LEFT: "command+left",
+  DELETE_NODE: ["del", "backspace"]
 };
 
-const App = React.createClass({
-  render() {
-    return (
-      <HotKeys keyMap={keyMap}>
-        <div>
-          <MyNode />
-          <MyNode />
-        </div>
-      </HotKeys>
-    );
-  }
-});
+const App = () => {
+  return (
+    <HotKeys keyMap={keyMap}>
+      <div>
+        <MyNode />
+        <MyNode />
+      </div>
+    </HotKeys>
+  );
+};
 
 export default App;
 ```
@@ -62,21 +60,15 @@ export default App;
 #### Define handlers
 
 ```javascript
-import {HotKeys} from 'react-hotkeys';
+import { HotKeys } from "react-hotkeys";
 
-const MyNode = React.createClass({
-  render() {
-    const handlers = {
-      DELETE_NODE: this.deleteNode
-    };
+const MyNode = () => {
+  const handlers = {
+    DELETE_NODE: this.deleteNode
+  };
 
-    return (
-      <HotKeys handlers={handlers}>
-        Node contents
-      </HotKeys>
-    );
-  }
-});
+  return <HotKeys handlers={handlers}>Node contents</HotKeys>;
+};
 
 export default MyNode;
 ```
@@ -157,14 +149,14 @@ The Bower version of the package will **not** be supported going forward (includ
 
 `react-hotkeys` uses key maps to decouple defining keyboard shortcuts from the functions they call. This allows hot keys and handler functions to be defined and maintained independent of one another.
 
-> When a user presses the corresponding combination or sequence of keys, it is said they *match* the hot keys, which causes an action to be *triggered*. `react-hotkeys` may then resolve an appropriate handler function to *handle* the action.
+> When a user presses the corresponding combination or sequence of keys, it is said they _match_ the hot keys, which causes an action to be _triggered_. `react-hotkeys` may then resolve an appropriate handler function to _handle_ the action.
 
 Key maps are Plain Old JavaScript Objects, where the keys are the action names and the values are usually a [Mousetrap-supported](https://craig.is/killing/mice) or [Browser Key Values](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values) sequence string (but can also be an [array](#Alternative-Hotkeys) or an [object](#Key-Combination-vs-Sequences)) that must be matched in order to trigger the action.
 
 ```javascript
 const keyMap = {
-  'deleteNode': 'del',
-  'moveUp': 'up'
+  deleteNode: "del",
+  moveUp: "up"
 };
 ```
 
@@ -192,14 +184,15 @@ Please refer to [Mousetrap's documentation](https://craig.is/killing/mice) or [B
 
 #### Alternative Hotkeys
 
-You can specify multiple *alternative* key sequences (they will trigger the same action) using arrays:
+You can specify multiple _alternative_ key sequences (they will trigger the same action) using arrays:
 
 ```javascript
 const keyMap = {
-  DELETE_NODE: ['del', 'backspace'],
-  MOVE_UP: ['up', 'w']
+  DELETE_NODE: ["del", "backspace"],
+  MOVE_UP: ["up", "w"]
 };
 ```
+
 #### Specifying key events (keydown, keypress, keyup)
 
 By default, `react-hotkeys` will match hotkey sequences on the `keydown` event (or, more precisely: on the `keydown` event of the last key to complete the last combination in a sequence).
@@ -208,8 +201,8 @@ If you want to trigger a single action on a different key event, you can use the
 
 ```javascript
 const keyMap = {
-  CONTRACT: 'alt+down',
-  COMMAND_DOWN: {sequence: 'command', action: 'keydown'},
+  CONTRACT: "alt+down",
+  COMMAND_DOWN: { sequence: "command", action: "keydown" }
 };
 ```
 
@@ -221,10 +214,10 @@ The full list of valid key events is: `keypress`, `keydown`, and `keyup`.
 
 As a general rule, you should use the syntax that is the most brief, but still allows you to express the configuration you want.
 
-| Question | Yes | No |
-| :--- | :--- | :--- |
-| **Need to define alternative key sequences to trigger the same action?** | Use an array of strings or objects. | Use a string or object. |
-| **Need to explicitly define the key event to bind to (or some other additional option)?** | Use an object. | Use a string. |
+| Question                                                                                  | Yes                                 | No                      |
+| :---------------------------------------------------------------------------------------- | :---------------------------------- | :---------------------- |
+| **Need to define alternative key sequences to trigger the same action?**                  | Use an array of strings or objects. | Use a string or object. |
+| **Need to explicitly define the key event to bind to (or some other additional option)?** | Use an object.                      | Use a string.           |
 
 ## Defining Handlers
 
@@ -233,46 +226,46 @@ Key maps trigger actions when they match a key sequence. Handlers are the functi
 Handlers may be defined in the same `<HotKeys />` component as the key map:
 
 ```javascript
-import {HotKeys} from 'react-hotkeys';
+import { HotKeys } from "react-hotkeys";
 
 const keyMap = {
-    MOVE_UP: 'up',
-}
+  MOVE_UP: "up"
+};
 
 const handlers = {
-  MOVE_UP: (event) => console.log('Move up hotkey called!')
+  MOVE_UP: event => console.log("Move up hotkey called!")
 };
 
 <HotKeys keyMap={keyMap} handlers={handlers}>
   <input />
-</HotKeys>
+</HotKeys>;
 ```
 
-Or they may be defined in any *descendant* of the `<HotKeys />` component that defines the key map:
+Or they may be defined in any _descendant_ of the `<HotKeys />` component that defines the key map:
 
- ```javascript
- import {HotKeys} from 'react-hotkeys';
+```javascript
+import { HotKeys } from "react-hotkeys";
 
- const keyMap = {
-     MOVE_UP: 'up',
- }
+const keyMap = {
+  MOVE_UP: "up"
+};
 
- const handlers = {
-   MOVE_UP: (event) => console.log('Move up hotkey called!')
- };
+const handlers = {
+  MOVE_UP: event => console.log("Move up hotkey called!")
+};
 
- <HotKeys keyMap={keyMap}>
-   <div>
+<HotKeys keyMap={keyMap}>
+  <div>
     <HotKeys handlers={handlers}>
       <input />
     </HotKeys>
-   </div>
+  </div>
 
-   <div>
+  <div>
     <input />
-   </div>
- </HotKeys>
- ```
+  </div>
+</HotKeys>;
+```
 
 #### DEPRECATED: Hard Sequence Handlers
 
@@ -290,7 +283,7 @@ To use hard sequence handlers, you must first enable them using the `enableHardS
  */
 
 const handlers = {
-  'up': (event) => console.log('up key called')
+  up: event => console.log("up key called")
 };
 ```
 
@@ -329,14 +322,13 @@ HTML5 allows any element with a `tabindex` attribute to receive focus.
 
 If you wish to support HTML4 you are limited to the following focusable elements:
 
-* `<a>`
-* `<area>`
-* `<button>`
-* `<input>`
-* `<object>`
-* `<select>`
-* `<textarea>`
-
+- `<a>`
+- `<area>`
+- `<button>`
+- `<input>`
+- `<object>`
+- `<select>`
+- `<textarea>`
 
 #### Tab Index
 
@@ -346,16 +338,16 @@ If there are elements with `tabindex` values greater than zero, they are iterate
 
 If any element is given a negative `tabindex`, it will be skipped when a user tabs through the document. However, a user may still click or touch on that element and it can be focused programmatically (see below).
 
-> By default, `<HotKeys>` render its children inside an element with a `tabindex` of `-1`. You can change this by passing a `tabIndex` prop to `<HotKeys>` or you can change the default `tabindex` value for all <HotKeys>` components using the `defaultTabIndex` option for the [Configuration API](#Configuration).
+> By default, `<HotKeys>` render its children inside an element with a `tabindex` of `-1`. You can change this by passing a `tabIndex` prop to `<HotKeys>` or you can change the default `tabindex` value for all <HotKeys>`components using the`defaultTabIndex` option for the [Configuration API](#Configuration).
 
 #### Autofocus
 
 HTML5 supports a boolean `autofocus` attribute on the following input elements:
 
-* `<button>`
-* `<input>`
-* `<select>`
-* `<textarea>`
+- `<button>`
+- `<input>`
+- `<select>`
+- `<textarea>`
 
 It can be used to automatically focus parts of your React application, without the need to [programmatically manage focus](#Programmatically-manage-focus).
 
@@ -365,30 +357,22 @@ Only one element in the document should have this attribute at any one time (the
 
 To programmatically focus a DOM element, it must meet two requirements:
 
-* It must be a [focusable elements](#Focusable-element)
-* You must have a reference to it
+- It must be a [focusable elements](#Focusable-element)
+- You must have a reference to it
 
 You can get a reference to an element using React's `ref` property:
 
 ```javascript
 class MyComponent extends Component {
-
-    componentDidUpdate(prevProps) {
-
-        if(!prevProps.isFocused && this.props.isFocused) {
-            this._container.focus();
-        }
-
+  componentDidUpdate(prevProps) {
+    if (!prevProps.isFocused && this.props.isFocused) {
+      this._container.focus();
     }
+  }
 
-    render() {
-        return (
-            <div ref={ (c) => this._container = c } >
-                My focusable content
-            </div>
-        )
-    }
-
+  render() {
+    return <div ref={c => (this._container = c)}>My focusable content</div>;
+  }
 }
 ```
 
@@ -411,13 +395,12 @@ class MyComponent extends Component {
 }
 ```
 
-
 #### Get the element currently in focus
 
 You can retrieve the element that is currently focused using the following:
 
 ```javascript
-document.activeElement
+document.activeElement;
 ```
 
 ## HotKeys component API
@@ -494,7 +477,7 @@ The simplest use-case of `withHotKeys()` is to simply pass it your component cla
 > The component you wrap **must** take responsibility for passing the `hotKeys` props to a DOM-mountable element. If you fail to do this, key events will not be detected when a descendant of the component is in focus.
 
 ```javascript
-import {withHotKeys} from 'react-hotkeys';
+import { withHotKeys } from "react-hotkeys";
 
 class MyComponent extends Component {
   render() {
@@ -502,33 +485,31 @@ class MyComponent extends Component {
      * Must unwrap hotKeys prop and pass its values to a DOM-mountable
      * element (like the div below).
      */
-    const {hotKeys, ...remainingProps} = this.props;
+    const { hotKeys, ...remainingProps } = this.props;
 
     return (
-      <div { ... { ...hotKeys, ...remainingProps } } >
+      <div {...{ ...hotKeys, ...remainingProps }}>
         <span>My HotKeys are effective here</span>
 
-       { this.props.children }
+        {this.props.children}
       </div>
-    )
+    );
   }
 }
 
 const MyHotKeysComponent = withHotKeys(MyComponent);
 
 const keyMap = {
-    TEST: 't'
+  TEST: "t"
 };
 
 const handlers = {
-    TEST: ()=> console.log('Test')
+  TEST: () => console.log("Test")
 };
 
-<MyHotKeysComponent keyMap={ keyMap } handlers={ handlers }>
-  <div>
-    You can press 't' to log to the console.
-  </div>
-</MyHotKeysComponent>
+<MyHotKeysComponent keyMap={keyMap} handlers={handlers}>
+  <div>You can press 't' to log to the console.</div>
+</MyHotKeysComponent>;
 ```
 
 ### Pre-defining default prop values
@@ -538,7 +519,7 @@ You can use the second argument of `withHotKeys` to specify default values for a
 > If you do provide prop values when you render the component, these will be merged with (and override) those defined in the second argument of `withHotKeys`.
 
 ```javascript
-import {withHotKeys} from 'react-hotkeys';
+import { withHotKeys } from "react-hotkeys";
 
 class MyComponent extends Component {
   render() {
@@ -546,36 +527,34 @@ class MyComponent extends Component {
      * Must unwrap hotKeys prop and pass its values to a DOM-mountable
      * element (like the div below).
      */
-    const {hotKeys, ...remainingProps} = this.props;
+    const { hotKeys, ...remainingProps } = this.props;
 
     return (
-      <div { ... { ...hotKeys, ...remainingProps } } >
+      <div {...{ ...hotKeys, ...remainingProps }}>
         <span>My HotKeys are effective here</span>
 
-       { this.props.children }
+        {this.props.children}
       </div>
-    )
+    );
   }
 }
 
 const keyMap = {
-    TEST: 't'
+  TEST: "t"
 };
 
 const handlers = {
-    TEST: ()=> console.log('Test')
+  TEST: () => console.log("Test")
 };
 
-const MyHotKeysComponent = withHotKeys(MyComponent, {keyMap, handlers});
+const MyHotKeysComponent = withHotKeys(MyComponent, { keyMap, handlers });
 
 /**
  * Render without having to specify prop values
  */
 <MyHotKeysComponent>
-  <div>
-    You can press 't' to log to the console.
-  </div>
-</MyHotKeysComponent>
+  <div>You can press 't' to log to the console.</div>
+</MyHotKeysComponent>;
 ```
 
 ## GlobalHotKeys component
@@ -583,10 +562,10 @@ const MyHotKeysComponent = withHotKeys(MyComponent, {keyMap, handlers});
 `<GlobalHotKeys>` components match key events that occur anywhere in the document (even when no part of your React application is in focus).
 
 ```javascript
-const keyMap = { SHOW_ALL_HOTKEYS: 'shift+?' };
+const keyMap = { SHOW_ALL_HOTKEYS: "shift+?" };
 const handlers = { SHOW_ALL_HOTKEYS: this.showHotKeysDialog };
 
-<GlobalHotKeys keyMap={ keyMap } handlers={ handlers } />
+<GlobalHotKeys keyMap={keyMap} handlers={handlers} />;
 ```
 
 `<GlobalHotKeys>` generally have no need for children, so should use a self-closing tag (as shown above). The only exception is when you are nesting other `<GlobalHotKeys>` components somewhere in the descendents (these are mounted before their parents, and so are generally matched first).
@@ -606,7 +585,6 @@ It is recommended to use `<HotKeys>` components whenever possible for better per
 The GlobalHotKeys component provides a declarative and native JSX syntax for defining hotkeys that are applicable beyond you React application.
 
 ```javascript
-
 <GlobalHotKeys
   /**
    * An object that defines actions as keys and key sequences as values
@@ -617,16 +595,14 @@ The GlobalHotKeys component provides a declarative and native JSX syntax for def
    *
    * Optional.
    */
-  keyMap={ {} }
-
+  keyMap={{}}
   /**
    * An object that defines handler functions as values, and the actions
    * that they handle as keys.
    *
    * Optional.
    */
-  handlers={ {} }
-
+  handlers={{}}
   /**
    * Whether the keyMap or handlers are permitted to change after the
    * component mounts. If false, changes to the keyMap and handlers
@@ -635,13 +611,9 @@ The GlobalHotKeys component provides a declarative and native JSX syntax for def
    * Optional.
    */
   allowChanges={false}
-  >
-
-  /**
-   * Wraps all children in a DOM-mountable component
-   */
-   { children }
-
+>
+  /** * Wraps all children in a DOM-mountable component */
+  {children}
 </GlobalHotKeys>
 ```
 
@@ -699,14 +671,12 @@ If this is not what you want for your application, you can modify the list of ta
 If you want `react-hotkeys` to ignore key events coming from a particular area of your app when it is in focus, you can use the `<HotKeysIgnore/>` component:
 
 ```javascript
-import {HotKeysIgnore} from 'react-hotkeys';
+import { HotKeysIgnore } from "react-hotkeys";
 
 <HotKeysIgnore>
-    /**
-     * Children that, when in focus, should have its key events ignored by
-     * react hotkeys
-     */
-</HotKeysIgnore>
+  /** * Children that, when in focus, should have its key events ignored by *
+  react hotkeys */
+</HotKeysIgnore>;
 ```
 
 ### HotKeysIgnore component API
@@ -747,7 +717,7 @@ By default, `<HotKeysIgnore />` will ignore all key events, but you can customiz
 Similar to the `<HotKeys>`'s `withHotKeys()` function, there is a `withHotKeysIgnore()` function for achieving the `<HotKeysIgnore>` functionality, without the need for rendering a surrounding DOM-mountable element.
 
 ```javascript
-import {withHotKeysIgnore} from 'react-hotkeys';
+import { withHotKeysIgnore } from "react-hotkeys";
 
 class MyComponent extends Component {
   render() {
@@ -755,31 +725,29 @@ class MyComponent extends Component {
      * Must unwrap hotKeys prop and pass its values to a DOM-mountable
      * element (like the div below).
      */
-    const {hotKeys, ...remainingProps} = this.props;
+    const { hotKeys, ...remainingProps } = this.props;
 
     return (
-      <div { ... { ...hotKeys, ...remainingProps } } >
+      <div {...{ ...hotKeys, ...remainingProps }}>
         <span>HotKeys ignores key events from here</span>
 
-       { this.props.children }
+        {this.props.children}
       </div>
-    )
+    );
   }
 }
 
 const MyHotKeysComponent = withHotKeysIgnore(MyComponent);
 
-<MyHotKeysComponent except={ 'Escape' }>
-  <div>
-    All key events except the 'Escape' key are ignored here
-  </div>
-</MyHotKeysComponent>
+<MyHotKeysComponent except={"Escape"}>
+  <div>All key events except the 'Escape' key are ignored here</div>
+</MyHotKeysComponent>;
 ```
 
 `withHotKeysIgnore()` also accepts a second argument that becomes the default props of the component it returns:
 
 ```javascript
-import {withHotKeysIgnore} from 'react-hotkeys';
+import { withHotKeysIgnore } from "react-hotkeys";
 
 class MyComponent extends Component {
   render() {
@@ -787,27 +755,24 @@ class MyComponent extends Component {
      * Must unwrap hotKeys prop and pass its values to a DOM-mountable
      * element (like the div below).
      */
-    const {hotKeys, ...remainingProps} = this.props;
+    const { hotKeys, ...remainingProps } = this.props;
 
     return (
-      <div { ... { ...hotKeys, ...remainingProps } } >
+      <div {...{ ...hotKeys, ...remainingProps }}>
         <span>HotKeys ignores key events from here</span>
 
-       { this.props.children }
+        {this.props.children}
       </div>
-    )
+    );
   }
 }
 
-const MyHotKeysComponent = withHotKeysIgnore(MyComponent, { except: 'Escape' });
+const MyHotKeysComponent = withHotKeysIgnore(MyComponent, { except: "Escape" });
 
 <MyHotKeysComponent>
-  <div>
-    All key events except the 'Escape' key are ignored here
-  </div>
-</MyHotKeysComponent>
+  <div>All key events except the 'Escape' key are ignored here</div>
+</MyHotKeysComponent>;
 ```
-
 
 ## Allowing hotkeys and handlers props to change
 
@@ -922,7 +887,7 @@ configure({
 You have 3 options:
 
 1. Use the [`component` prop](#HotKeys-component-API) to specify a `span` or some other alternative DOM-mountable component to wrap your component in, each time you render a component you don't want to wrap in a div element.
-1. Use the [`defaultComponent` configuration option](#Configuration) to specify a `span` or some other alternative DOM-mountable component to wrap *all* `<HotKeys>` children in.
+1. Use the [`defaultComponent` configuration option](#Configuration) to specify a `span` or some other alternative DOM-mountable component to wrap _all_ `<HotKeys>` children in.
 1. Use the [withHotKeys HoC API](#withHotKeys-HoC-API) to avoid rendering a wrapping component at all.
 
 #### Other keyboard event listeners are no longer being triggered
@@ -937,7 +902,7 @@ Check that you are [correctly passing the hotKeys props to a DOM-mountable compo
 
 Make sure you are focusing a descendant of the `<HotKeys>` component before you press the keys.
 
-Check that the `<HotKeys>` component that defines the handler is also an ancestor of the focused component, and is above (or *is*) the component that defines the `handlers`.
+Check that the `<HotKeys>` component that defines the handler is also an ancestor of the focused component, and is above (or _is_) the component that defines the `handlers`.
 
 Also make sure your React application is not calling `stopPropagation()` on the key events before they reach the `<HotKeys>` component that defines the `keyMap`.
 
@@ -951,7 +916,7 @@ This can be disabled using CSS similar to the following:
 
 ```css
 div[tabindex="-1"]:focus {
-    outline: 0;
+  outline: 0;
 }
 ```
 
@@ -965,14 +930,14 @@ You can set the logging level using the `logLevel` [configuration option](#Confi
 
 For performance reasons, only some of the log levels are available in the production build. You will need to use the development build to get the full log output.
 
-| Log Level | Severity | Description | Available in Dev | Available in Prod |
-| :-- | :-- | :-- | :-- | :-- |
-| verbose | (highest) | `debug` + internal data representations | Yes | No |
-| debug | | `info` + event propagation info | Yes | No |
-| info | | `warn` + general info | Yes | No |
-| warn | (default) | `error` + warnings | Yes | Yes |
-| error | | Errors only (ignore warnings) | Yes | Yes |
-| none | (lowest) | Log nothing | Yes | Yes |
+| Log Level | Severity  | Description                             | Available in Dev | Available in Prod |
+| :-------- | :-------- | :-------------------------------------- | :--------------- | :---------------- |
+| verbose   | (highest) | `debug` + internal data representations | Yes              | No                |
+| debug     |           | `info` + event propagation info         | Yes              | No                |
+| info      |           | `warn` + general info                   | Yes              | No                |
+| warn      | (default) | `error` + warnings                      | Yes              | Yes               |
+| error     |           | Errors only (ignore warnings)           | Yes              | Yes               |
+| none      | (lowest)  | Log nothing                             | Yes              | Yes               |
 
 Logs appear in the developer console of the browser.
 
@@ -983,7 +948,6 @@ Each line is prefixed with (where applicable):
 - The event id
 
 Each id is also given a coloured emoticon, to make it easy to visually trace the propagation of particular events through multiple components.
-
 
 ## Optimizations
 
@@ -1015,7 +979,6 @@ If you believe you have found a bug or have a feature request, please [open an i
 
 `react-hotkeys` is considered stable and already being widely used (most notably Lystable and Whatsapp).
 
-
 ## Contribute, please!
 
 If you're interested in helping out with the maintenance of `react-hotkeys`, make yourself known on [Gitter](https://gitter.im/Chrisui/react-hotkeys), [open an issue](https://github.com/greena13/react-hotkeys/issues) or create a pull request.
@@ -1026,10 +989,10 @@ Collaboration is loosely being coordinated across [Gitter](https://gitter.im/Chr
 
 ### Using GitHub Issues
 
-* Use the search feature to check for an existing issue
-* Include as much information as possible and provide any relevant resources (Eg. screenshots)
-* For bug reports ensure you have a reproducible test case
-    * A pull request with a breaking test would be super preferable here but isn't required
+- Use the search feature to check for an existing issue
+- Include as much information as possible and provide any relevant resources (Eg. screenshots)
+- For bug reports ensure you have a reproducible test case
+  - A pull request with a breaking test would be super preferable here but isn't required
 
 ### Submitting a Pull Request
 
@@ -1045,42 +1008,42 @@ Collaboration is loosely being coordinated across [Gitter](https://gitter.im/Chr
 
 All build commands are included in the `package.json`:
 
-| Command | Description |
-|:--|:--|
-| `yarn prepublish` | Build all bundles using babel and rollup |
-| `yarn build-cjs` | Build the development and production CommonJS bundles using babel and rollup, respectively |
-| `yarn build-es` | Build the development and production ES6 bundles using babel and rollup, respectively |
-| `yarn build-umd` | Build the development and production UMD bundles using rollup |
-| `yarn build-development` | Build the development CommonJS bundle using babel |
-| `yarn build-es-development` | Build the development ES6 bundle using babel |
-| `yarn build-umd-development` | Build the development ES6 bundle using rollup |
-| `yarn build-production` | Build the production CommonJS bundle using rollup |
-| `yarn build-es-production` | Build the production ES6 bundle using rollup |
-| `yarn build-umd-production` | Build the production ES6 bundle using rollup |
+| Command                      | Description                                                                                |
+| :--------------------------- | :----------------------------------------------------------------------------------------- |
+| `yarn prepublish`            | Build all bundles using babel and rollup                                                   |
+| `yarn build-cjs`             | Build the development and production CommonJS bundles using babel and rollup, respectively |
+| `yarn build-es`              | Build the development and production ES6 bundles using babel and rollup, respectively      |
+| `yarn build-umd`             | Build the development and production UMD bundles using rollup                              |
+| `yarn build-development`     | Build the development CommonJS bundle using babel                                          |
+| `yarn build-es-development`  | Build the development ES6 bundle using babel                                               |
+| `yarn build-umd-development` | Build the development ES6 bundle using rollup                                              |
+| `yarn build-production`      | Build the production CommonJS bundle using rollup                                          |
+| `yarn build-es-production`   | Build the production ES6 bundle using rollup                                               |
+| `yarn build-umd-production`  | Build the production ES6 bundle using rollup                                               |
 
 ### Development builds
 
-| Bundle | Transpiled with | Modularized with | Output |
-|:-- |:-- |:-- |:-- |
-| CommonJS | Babel | Babel | /cjs/index.js |
-| UMD | Babel | Rollup | /umd/index.js |
-| ES6 | Babel | Babel | /es/index.js |
+| Bundle   | Transpiled with | Modularized with | Output        |
+| :------- | :-------------- | :--------------- | :------------ |
+| CommonJS | Babel           | Babel            | /cjs/index.js |
+| UMD      | Babel           | Rollup           | /umd/index.js |
+| ES6      | Babel           | Babel            | /es/index.js  |
 
 ### Production builds
 
-| Bundle | Transpiled with | Optimized with | Minified with | Output |
-|:-- |:-- |:-- |:-- | :-- |
-| CommonJS | Babel | Rollup | Uglify | cjs/react-hotkeys.production.min.js |
-| UMD | Babel | Rollup | Uglify | /umd/react-hotkeys.min.js |
-| ES6 | Babel | Rollup | Babel-minify | /es/react-hotkeys.production.min.js |
+| Bundle   | Transpiled with | Optimized with | Minified with | Output                              |
+| :------- | :-------------- | :------------- | :------------ | :---------------------------------- |
+| CommonJS | Babel           | Rollup         | Uglify        | cjs/react-hotkeys.production.min.js |
+| UMD      | Babel           | Rollup         | Uglify        | /umd/react-hotkeys.min.js           |
+| ES6      | Babel           | Rollup         | Babel-minify  | /es/react-hotkeys.production.min.js |
 
 ### Build configuration
 
 To understand the configuration for any one build, you need to consult 3 places:
 
-* The CLI arguments used in the `scripts` of `package.json`
-* The `.babelrc` file (match the env to the `BABEL_ENV` value set in `scripts` above)
-* The `rollup.configs.js` (if applicable)
+- The CLI arguments used in the `scripts` of `package.json`
+- The `.babelrc` file (match the env to the `BABEL_ENV` value set in `scripts` above)
+- The `rollup.configs.js` (if applicable)
 
 ## Authorship
 
