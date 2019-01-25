@@ -66,7 +66,7 @@ export interface HotKeysProps extends HotKeysEnabledProps {
  */
 export class HotKeys extends React.Component<HotKeysProps, {}> { }
 
-export class GlobalHotKeys extends React.Component<HotKeysEnabled, {}> { }
+export class GlobalHotKeys extends React.Component<HotKeysEnabledProps, {}> { }
 
 /**
  * Wraps a React component in a HotKeysEnabled component, which passes down the
