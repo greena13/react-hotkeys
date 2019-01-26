@@ -190,6 +190,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     while(counter < this.componentList.length) {
       this._setComponentPosition(this.componentList[counter].componentId, counter);
+      counter++;
     }
   }
 
