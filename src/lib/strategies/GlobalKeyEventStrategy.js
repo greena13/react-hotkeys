@@ -186,7 +186,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _updateComponentIndexDictFromList(options = { startingAt: 0 }) {
-    let counter = options.startAt;
+    let counter = options.startingAt;
 
     while(counter < this.componentList.length) {
       this._setComponentPosition(this.componentList[counter].componentId, counter);

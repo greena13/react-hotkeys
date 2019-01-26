@@ -31,14 +31,14 @@ class KeyCombinationSerializer {
 
       if (combinationIncludesShift) {
         if (combinationIncludesAlt) {
-          const unaltShiftededKeyNames = resolveUnaltShiftedAlias(keyName);
-          const altShiftededKeyNames = resolveAltShiftedAlias(keyName);
+          const unaltShiftedKeyNames = resolveUnaltShiftedAlias(keyName);
+          const altShiftedKeyNames = resolveAltShiftedAlias(keyName);
 
           keyAliases = [
             ...keyAliases,
             keyName,
-            ...unaltShiftededKeyNames,
-            ...altShiftededKeyNames
+            ...unaltShiftedKeyNames,
+            ...altShiftedKeyNames
           ];
         } else {
           const unshiftedKeyNames = resolveUnshiftedAlias(keyName);

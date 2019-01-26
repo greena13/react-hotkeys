@@ -37,6 +37,8 @@ class AbstractKeyEventStrategy {
    * not intended to be instantiated directly)
    * @param {Object} options Options for how event strategy should behave
    * @param {Logger} options.logger The Logger to use to report event strategy actions
+   * @param {KeyEventManager} keyEventManager KeyEventManager used for passing
+   *        messages between key event strategies
    */
   constructor(options = {}, keyEventManager) {
     this.logger = options.logger || new Logger('warn');
@@ -199,8 +201,6 @@ class AbstractKeyEventStrategy {
      */
     this.keyCombinationIncludesKeyUp = false;
 
-    this.keypressEventsToSimulate = [];
-
     if (!this.keyCombinationHistory || this.keyCombinationHistory.length < 1) {
       this.keyCombinationHistory = [];
     } else {
@@ -295,7 +295,7 @@ class AbstractKeyEventStrategy {
       `${printComponent(keyMap)}`
     );
 
-    this.componentRegistry[this.componentId] = this._newComponentRegistryItem();
+    this.componentRegistry[this.componentId] = newComponentRegistryItem();
 
     this.logger.verbose(
       this._logPrefix(this.componentId),
@@ -334,13 +334,6 @@ class AbstractKeyEventStrategy {
       'Registered component mount:\n',
       `${printComponent(this.componentRegistry[componentId])}`
     );
-  }
-
-  _newComponentRegistryItem() {
-    return {
-      childIds: [],
-      parentId: null
-    };
   }
 
   /**
@@ -560,6 +553,8 @@ class AbstractKeyEventStrategy {
    * names of the keyboard keys. May contain 1 or more keyboard keys.
    * @property {KeySequenceString} ids - Serialization of keys currently pressed in
    *        combination
+   * @property {Object<ReactKeyName, ReactKeyName>} keyAliases - Dictionary of key
+   *      aliases, when modifier keys like alt or shift are pressed.
    */
 
   /**
@@ -589,9 +584,9 @@ class AbstractKeyEventStrategy {
     }
 
     const keyCombination = this._getCurrentKeyCombination();
-    const keyAlias = this._getKeyAlias(keyCombination, keyName);
+    const keyAlias = getKeyAlias(keyCombination, keyName);
 
-    const existingBitmap = this._getKeyState(keyCombination, keyName);
+    const existingBitmap = getKeyState(keyCombination, keyName);
 
     if (!existingBitmap) {
       keyCombination.keys[keyAlias] = [
@@ -615,8 +610,8 @@ class AbstractKeyEventStrategy {
   }
 
   /**
-   * Adds a new KeyCombinationRecord to the event history and resets the keystateIncludesKeyUp
-   * flag to false.
+   * Adds a new KeyCombinationRecord to the event history and resets the
+   * keystateIncludesKeyUp flag to false.
    * @param {ReactKeyName} keyName - Name of the keyboard key to add to the new
    *        KeyCombinationRecord
    * @param {KeyEventBitmapIndex} eventBitmapIndex - Index of bit to set to true in new
@@ -885,7 +880,7 @@ class AbstractKeyEventStrategy {
         const { sequences, longestSequence } = keyMap;
 
         const currentKeyState = this._getCurrentKeyCombination();
-        const normalizedKeyName = this._getKeyAlias(currentKeyState, keyName);
+        const normalizedKeyName = getKeyAlias(currentKeyState, keyName);
 
         let sequenceLengthCounter = longestSequence;
 
@@ -1047,13 +1042,13 @@ class AbstractKeyEventStrategy {
     let keyCompletesCombination = false;
 
     const combinationMatchesKeysPressed = !Object.keys(combinationMatch.keyDictionary).some((candidateKeyName) => {
-      const keyState = this._getKeyState(keyCombination, candidateKeyName);
+      const keyState = getKeyState(keyCombination, candidateKeyName);
 
       if (keyState) {
-        if (this._keyIsCurrentlyTriggeringEvent(keyState, eventBitmapIndex)) {
-          if (keyBeingPressed && (keyBeingPressed === this._getKeyAlias(keyCombination, candidateKeyName))) {
+        if (keyIsCurrentlyTriggeringEvent(keyState, eventBitmapIndex)) {
+          if (keyBeingPressed && (keyBeingPressed === getKeyAlias(keyCombination, candidateKeyName))) {
             keyCompletesCombination =
-              !this._keyAlreadyTriggeredEvent(keyState, eventBitmapIndex);
+              !keyAlreadyTriggeredEvent(keyState, eventBitmapIndex);
           }
 
           return false;
@@ -1083,7 +1078,7 @@ class AbstractKeyEventStrategy {
      */
     Object.keys(ModifierFlagsDictionary).forEach((modifierKey) => {
        const modifierKeyState = this._getCurrentKeyState(modifierKey);
-       const modifierStillPressed = modifierKeyState && !this._keyIsCurrentlyTriggeringEvent(modifierKeyState, KeyEventBitmapIndex.keyup);
+       const modifierStillPressed = modifierKeyState && !keyIsCurrentlyTriggeringEvent(modifierKeyState, KeyEventBitmapIndex.keyup);
 
        ModifierFlagsDictionary[modifierKey].forEach((attributeName) => {
          if (event[attributeName] === false && modifierStillPressed) {
@@ -1093,48 +1088,10 @@ class AbstractKeyEventStrategy {
      })
   }
 
-  _keyIsCurrentlyTriggeringEvent(keyState, eventBitmapIndex) {
-    return keyState && keyState[KeyEventSequenceIndex.current][eventBitmapIndex];
-  }
-
-  _keyAlreadyTriggeredEvent(keyState, eventBitmapIndex) {
-    return keyState && keyState[KeyEventSequenceIndex.previous][eventBitmapIndex];
-  }
-
   _getCurrentKeyState(keyName) {
     const currentCombination = this._getCurrentKeyCombination();
 
-    return this._getKeyState(currentCombination, keyName);
-  }
-
-  _getKeyState(keyCombination, keyName) {
-    const keyState = keyCombination.keys[keyName];
-
-    if (keyState) {
-      return keyState;
-    } else {
-      const keyAlias = keyCombination.keyAliases[keyName];
-
-      if (keyAlias) {
-        return keyCombination.keys[keyAlias];
-      }
-    }
-  }
-
-  _getKeyAlias(keyCombination, keyName) {
-    const keyState = keyCombination.keys[keyName];
-
-    if (keyState) {
-      return keyName;
-    } else {
-      const keyAlias = keyCombination.keyAliases[keyName];
-
-      if (keyAlias) {
-        return keyAlias;
-      } else {
-        return keyName;
-      }
-    }
+    return getKeyState(currentCombination, keyName);
   }
 
   _buildCombinationKeyAliases(keyDictionary) {
@@ -1196,6 +1153,52 @@ class AbstractKeyEventStrategy {
   _logPrefix() {
 
   }
+}
+
+function keyIsCurrentlyTriggeringEvent(keyState, eventBitmapIndex) {
+  return keyState && keyState[KeyEventSequenceIndex.current][eventBitmapIndex];
+}
+
+function getKeyAlias(keyCombination, keyName) {
+  const keyState = keyCombination.keys[keyName];
+
+  if (keyState) {
+    return keyName;
+  } else {
+    const keyAlias = keyCombination.keyAliases[keyName];
+
+    if (keyAlias) {
+      return keyAlias;
+    } else {
+      return keyName;
+    }
+  }
+}
+
+function getKeyState(keyCombination, keyName) {
+  const keyState = keyCombination.keys[keyName];
+
+  if (keyState) {
+    return keyState;
+  } else {
+    const keyAlias = keyCombination.keyAliases[keyName];
+
+    if (keyAlias) {
+      return keyCombination.keys[keyAlias];
+    }
+  }
+}
+
+
+function newComponentRegistryItem() {
+  return {
+    childIds: [],
+    parentId: null
+  };
+}
+
+function keyAlreadyTriggeredEvent(keyState, eventBitmapIndex) {
+  return keyState && keyState[KeyEventSequenceIndex.previous][eventBitmapIndex];
 }
 
 export default AbstractKeyEventStrategy;

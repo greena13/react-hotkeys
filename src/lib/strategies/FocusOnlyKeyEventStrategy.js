@@ -73,6 +73,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   _reset() {
     super._reset();
 
+    this.keypressEventsToSimulate = [];
+
     /**
      * Increase the unique ID associated with each unique focus tree
      * @type {number}
@@ -245,6 +247,11 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    ********************************************************************************/
 
   /**
+   * @typedef {KeyboardEvent} SyntheticKeyboardEvent
+   * @property {Function} persist
+   */
+
+  /**
    * Records a keydown keyboard event and matches it against the list of pre-registered
    * event handlers, calling the first matching handler with the highest priority if
    * one exists.
@@ -253,7 +260,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * render tree. The event is only registered the first time it is seen and results
    * of some calculations are cached. The event is matched against the handlers registered
    * at each component level, to ensure the proper handler declaration scoping.
-   * @param {KeyboardEvent} event - Event containing the key name and state
+   * @param {SyntheticKeyboardEvent} event - Event containing the key name and state
    * @param {FocusTreeId} focusTreeId - Id of focus tree component thinks it's apart of
    * @param {ComponentId} componentId - The id of the component that is currently handling
    *        the keyboard event as it bubbles towards the document root.
@@ -316,9 +323,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
 
       if (keyInCurrentCombination || this.keyCombinationIncludesKeyUp) {
-        this._startNewKeyCombination(_key, KeyEventBitmapIndex.keydown, focusTreeId, componentId);
+        this._startAndLogNewKeyCombination(_key, KeyEventBitmapIndex.keydown, focusTreeId, componentId);
       } else {
-        this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keydown, focusTreeId, componentId);
+        this._addToAndLogCurrentKeyCombination(_key, KeyEventBitmapIndex.keydown, focusTreeId, componentId);
       }
     }
 
@@ -449,9 +456,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       const alreadySeenKeyInCurrentCombo = keyCombination && (keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keypress] || keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup]);
 
       if (alreadySeenKeyInCurrentCombo) {
-        this._startNewKeyCombination(_key, KeyEventBitmapIndex.keypress, focusTreeId, componentId)
+        this._startAndLogNewKeyCombination(_key, KeyEventBitmapIndex.keypress, focusTreeId, componentId)
       } else {
-        this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keypress, focusTreeId, componentId);
+        this._addToAndLogCurrentKeyCombination(_key, KeyEventBitmapIndex.keypress, focusTreeId, componentId);
       }
     }
 
@@ -533,9 +540,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       const alreadySeenKeyEventInCombo = keyCombination && keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup];
 
       if (alreadySeenKeyEventInCombo) {
-        this._startNewKeyCombination(_key, KeyEventBitmapIndex.keyup, focusTreeId, componentId);
+        this._startAndLogNewKeyCombination(_key, KeyEventBitmapIndex.keyup, focusTreeId, componentId);
       } else {
-        this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keyup, focusTreeId, componentId);
+        this._addToAndLogCurrentKeyCombination(_key, KeyEventBitmapIndex.keyup, focusTreeId, componentId);
       }
     }
 
@@ -601,11 +608,11 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     this.eventPropagationState.ignoreEvent = options.ignoreEventsCondition(event);
   }
 
-  ignoreEvent(event) {
+  ignoreEvent() {
     this.eventPropagationState.ignoreEvent = true;
   }
 
-  forceObserveEvent(event) {
+  forceObserveEvent() {
     this.eventPropagationState.forceObserveEvent = true;
   }
 
@@ -623,8 +630,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     };
   }
 
-  _startNewKeyCombination(keyName, eventBitmapIndex, focusTreeId, componentId) {
-    super._startNewKeyCombination(keyName, eventBitmapIndex);
+  _startAndLogNewKeyCombination(keyName, eventBitmapIndex, focusTreeId, componentId) {
+    this._startNewKeyCombination(keyName, eventBitmapIndex);
 
     this.logger.verbose(
       this._logPrefix(componentId, {focusTreeId}),
@@ -637,8 +644,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     );
   }
 
-  _addToCurrentKeyCombination(keyName, eventBitmapIndex, focusTreeId, componentId) {
-    super._addToCurrentKeyCombination(keyName, eventBitmapIndex);
+  _addToAndLogCurrentKeyCombination(keyName, eventBitmapIndex, focusTreeId, componentId) {
+    this._addToCurrentKeyCombination(keyName, eventBitmapIndex);
 
     if (eventBitmapIndex === KeyEventBitmapIndex.keydown) {
       this.logger.verbose(
