@@ -42,8 +42,6 @@ class KeyEventManager {
 
     this._globalEventStrategy =
       new GlobalKeyEventStrategy({ configuration, logger: this.logger }, this);
-
-    this.lastEventSeen = null;
   }
 
   /********************************************************************************
@@ -215,8 +213,6 @@ class KeyEventManager {
     if (isFromFocusOnlyComponent(focusTreeId)) {
       return this._focusOnlyEventStrategy.handleKeydown(event, focusTreeId, componentId, options);
     }
-
-    this._recordLastSeenEvent(event);
   }
 
   /**
@@ -239,8 +235,6 @@ class KeyEventManager {
     if (isFromFocusOnlyComponent(focusTreeId)) {
       return this._focusOnlyEventStrategy.handleKeypress(event, focusTreeId, componentId, options);
     }
-
-    this._recordLastSeenEvent(event);
   }
 
   /**
@@ -262,14 +256,6 @@ class KeyEventManager {
   handleKeyup(event, focusTreeId, componentId, options) {
     if (isFromFocusOnlyComponent(focusTreeId)) {
       return this._focusOnlyEventStrategy.handleKeyup(event, focusTreeId, componentId, options);
-    }
-
-    this._recordLastSeenEvent(event);
-  }
-
-  _recordLastSeenEvent({key, type, nativeEvent}) {
-    this.lastEventSeen = {
-      key, type, nativeEvent
     }
   }
 
