@@ -69,9 +69,9 @@ class KeySequenceParser {
   /**
    * @typedef {Object} KeySequenceOptions Object containing the results of parsing a
    *          KeySequenceString
-   * @param {BasicKeyCombination} combination Properties of the final combination in
+   * @property {BasicKeyCombination} combination Properties of the final combination in
    *        the sequence
-   * @param {BasicKeySequence} sequence Properties of the sequence of keys leading
+   * @property {BasicKeySequence} sequence Properties of the sequence of keys leading
    *        up to the final combination
    */
 

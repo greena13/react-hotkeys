@@ -555,10 +555,10 @@ class AbstractKeyEventStrategy {
   /**
    * Record of the combination of keys that are currently being pressed
    * @typedef {Object} KeyCombinationRecord
-   * @param {Object<ReactKeyName, KeyEventBitmap[]>} keys - A dictionary
+   * @property {Object<ReactKeyName, KeyEventBitmap[]>} keys - A dictionary
    * of keys that have been pressed down at once. The keys of the map are the lowercase
    * names of the keyboard keys. May contain 1 or more keyboard keys.
-   * @param {KeySequenceString} ids - Serialization of keys currently pressed in
+   * @property {KeySequenceString} ids - Serialization of keys currently pressed in
    *        combination
    */
 
