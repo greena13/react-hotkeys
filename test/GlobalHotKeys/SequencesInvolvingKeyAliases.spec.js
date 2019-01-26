@@ -53,7 +53,7 @@ describe('Sequences involving key aliases for GlobalHotKeys components:', () => 
                 ]
               },
               {
-                description: `in the middle of the sequence`,
+                description: 'in the middle of the sequence',
                 keySequence: `a shift+${keyUsedInCombination} b`,
                 keyEvents: [
                   [ 'keydown', 'a' ],
@@ -74,7 +74,7 @@ describe('Sequences involving key aliases for GlobalHotKeys components:', () => 
                 ]
               },
               {
-                description: `at the end of the sequence`,
+                description: 'at the end of the sequence',
                 keySequence: `a shift+${keyUsedInCombination}`,
                 keyEvents: [
                   [ 'keydown', 'a' ],

@@ -44,7 +44,7 @@ describe('Sequences involving key aliases:', () => {
                 ]
               },
               {
-                description: `in the middle of the sequence`,
+                description: 'in the middle of the sequence',
                 keySequence: `a shift+${keyUsedInCombination} b`,
                 keyEvents: [
                   [ 'keyDown', 'a' ],
@@ -65,7 +65,7 @@ describe('Sequences involving key aliases:', () => {
                 ]
               },
               {
-                description: `at the end of the sequence`,
+                description: 'at the end of the sequence',
                 keySequence: `a shift+${keyUsedInCombination}`,
                 keyEvents: [
                   [ 'keyDown', 'a' ],

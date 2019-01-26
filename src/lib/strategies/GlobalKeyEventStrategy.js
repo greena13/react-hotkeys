@@ -73,7 +73,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     this.logger.debug(
       this._logPrefix(componentId, {eventId: false}),
-      `Mounted.`,
+      'Mounted.',
     );
 
     this.logger.verbose(
@@ -514,7 +514,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     const eventIcons = Logger.eventIcons;
     const componentIcons = Logger.componentIcons;
 
-    let base = `HotKeys (GLOBAL`;
+    let base = 'HotKeys (GLOBAL';
 
     if (options.eventId !== false) {
       const eventId = isUndefined(options.eventId) ? KeyEventCounter.getId() : options.eventId;
