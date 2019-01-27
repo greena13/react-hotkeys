@@ -2,13 +2,14 @@ import AbstractKeyEventStrategy from './AbstractKeyEventStrategy';
 import KeyEventBitmapIndex from '../../const/KeyEventBitmapIndex';
 import KeyEventSequenceIndex from '../../const/KeyEventSequenceIndex';
 import KeyEventCounter from '../KeyEventCounter';
-import hasKeyPressEvent from '../../helpers/resolving-handlers/hasKeyPressEvent';
-import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
+import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import Configuration from '../Configuration';
 import Logger from '../Logger';
 import printComponent from '../../helpers/logging/printComponent';
 import isUndefined from '../../utils/isUndefined';
 import normalizeKeyName from '../../helpers/resolving-handlers/normalizeKeyName';
+import isCmdKey from '../../helpers/parsing-key-maps/isCmdKey';
+import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 
 /**
  * Defines behaviour for dealing with key maps defined in focus-only HotKey components
@@ -272,7 +273,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     if (focusTreeId !== this.focusTreeId) {
       this.logger.debug(
-        `${this._logPrefix(componentId)}' Ignored '${_key}' keydown event because it had an old focus tree id: ${focusTreeId}.`
+        `${this._logPrefix(componentId)}' Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event because it had an old focus tree id: ${focusTreeId}.`
       );
 
       this._ignoreEvent(event, componentId);
@@ -283,7 +284,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     if (this._shouldIgnoreEvent()) {
       this.logger.debug(
         this._logPrefix(componentId),
-        `Ignored '${_key}' keydown event because ignoreEventsFilter rejected it.`
+        `Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event because ignoreEventsFilter rejected it.`
       );
 
       this._ignoreEvent(event, componentId);
@@ -305,7 +306,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       if (this._shouldIgnoreEvent()) {
         this.logger.debug(
           this._logPrefix(componentId),
-          `Ignored '${_key}' keydown event because ignoreEventsFilter rejected it.`
+          `Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event because ignoreEventsFilter rejected it.`
         );
 
         this._ignoreEvent(event, componentId);
@@ -315,7 +316,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
       this.logger.debug(
         this._logPrefix(componentId),
-        `New '${_key}' keydown event.`
+        `New ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event.`
       );
 
       this._checkForModifierFlagDiscrepancies(event);
@@ -331,53 +332,11 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     this._callHandlerIfActionNotHandled(event, _key, KeyEventBitmapIndex.keydown, componentId, focusTreeId);
 
-    if (!hasKeyPressEvent(_key) && Configuration.option('simulateMissingKeyPressEvents')) {
-      /**
-       * If a key does not have a keypress event, we save the details of the keydown
-       * event to simulate the keypress event, as the keydown event bubbles through
-       * the last focus-only HotKeysComponent
-       */
-      event.persist();
-
-      this.keypressEventsToSimulate.push({
-        event, focusTreeId, componentId, options, key: _key
-      });
-    }
-
-    if (this._isFocusTreeRoot(componentId)) {
-      if (!this.keyEventManager.isGlobalListenersBound()) {
-        this.simulatePendingKeyPressEvents(_key);
-      }
-      /**
-       * else, we wait for keydown event to propagate through global strategy
-       * before we simulate the keypress
-       */
-    }
+    this._simulateKeyPressesMissingFromBrowser(event, _key, focusTreeId, componentId, options);
 
     this._updateEventPropagationHistory(componentId);
 
     return false;
-  }
-
-  simulatePendingKeyPressEvents() {
-    if (this.keypressEventsToSimulate.length > 0) {
-      KeyEventCounter.incrementId();
-    }
-
-    this.keypressEventsToSimulate.forEach(({ event, focusTreeId, componentId, options }) => {
-      this.handleKeypress(event, focusTreeId, componentId, options);
-    });
-
-    this.keypressEventsToSimulate = [];
-
-    /**
-     * If an event gets handled and causes a focus shift, then subsequent components
-     * will ignore the event (including the root component) and the conditions to
-     * reset the propagation state are never met - so we ensure that after we are done
-     * simulating the keypress event, the propagation state is reset for the following
-     * keyup
-     */
-    this._clearEventPropagationState();
   }
 
   /**
@@ -395,30 +354,71 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *        the keyboard event as it bubbles towards the document root.
    * @param {Object} options - Hash of options that configure how the event
    *        is handled.
+   * @return {Boolean} Whether the HotKeys component should discard its current focus
+   *        tree Id, because it belongs to an old focus tree.
    */
   handleKeypress(event, focusTreeId, componentId, options) {
     const _key = normalizeKeyName(event.key);
 
+    const shouldDiscardFocusTreeId = focusTreeId !== this.focusTreeId;
+
+    /**
+     * We first decide if the keypress event should be handled (to ensure the correct
+     * order of logging statements)
+     */
+    const shouldHandleEvent = this._shouldHandleKeyPressEvent(
+      event, focusTreeId, componentId, _key, options
+    );
+
+    if (this._isNewKeyEvent(componentId) && this._getCurrentKeyState(_key)) {
+      this._addToAndLogCurrentKeyCombination(
+        _key,
+        KeyEventBitmapIndex.keypress,
+        focusTreeId,
+        componentId
+      );
+    }
+
+    /**
+     * We attempt to find a handler of the event, only if it has not already
+     * been handled and should not be ignored
+     */
+    if (shouldHandleEvent) {
+      this._callHandlerIfActionNotHandled(
+        event,
+        _key,
+        KeyEventBitmapIndex.keypress,
+        componentId,
+        focusTreeId
+      );
+    }
+
+    this._updateEventPropagationHistory(componentId);
+
+    return shouldDiscardFocusTreeId;
+  }
+
+  _shouldHandleKeyPressEvent(event, focusTreeId, componentId, key, options) {
     if (focusTreeId !== this.focusTreeId) {
       this.logger.debug(
         this._logPrefix(componentId),
-        `Ignored '${_key}' keypress event because it had an old focus tree id: ${focusTreeId}.`
+        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event because it had an old focus tree id: ${focusTreeId}.`
       );
 
       this._ignoreEvent(event, componentId);
 
-      return true;
+      return false;
     }
 
     if (this._shouldIgnoreEvent()) {
       this.logger.debug(
         this._logPrefix(componentId),
-        `Ignored '${_key}' keypress event because ignoreEventsFilter rejected it.`
+        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event because ignoreEventsFilter rejected it.`
       );
 
       this._ignoreEvent(event, componentId);
 
-      return;
+      return false;
     }
 
     if (this._isNewKeyEvent(componentId)) {
@@ -435,37 +435,23 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       if (this._shouldIgnoreEvent()) {
         this.logger.debug(
           this._logPrefix(componentId),
-          `Ignored '${_key}' keypress event because ignoreEventsFilter rejected it.`
+          `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event because ignoreEventsFilter rejected it.`
         );
 
         this._ignoreEvent(event, componentId);
 
-        return;
+        return false;
       }
 
       this.logger.debug(
         this._logPrefix(componentId),
-        `New '${_key}' keypress event.`
+        `New ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event.`
       );
 
-      /**
-       * Add new key event to key combination history
-       */
-
-      const keyCombination = this._getCurrentKeyState(_key);
-      const alreadySeenKeyInCurrentCombo = keyCombination && (keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keypress] || keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup]);
-
-      if (alreadySeenKeyInCurrentCombo) {
-        this._startAndLogNewKeyCombination(_key, KeyEventBitmapIndex.keypress, focusTreeId, componentId)
-      } else {
-        this._addToAndLogCurrentKeyCombination(_key, KeyEventBitmapIndex.keypress, focusTreeId, componentId);
-      }
+      return true;
     }
-
-    this._callHandlerIfActionNotHandled(event, _key, KeyEventBitmapIndex.keypress, componentId, focusTreeId);
-
-    this._updateEventPropagationHistory(componentId);
   }
+
 
   /**
    * Records a keyup keyboard event and matches it against the list of pre-registered
@@ -482,30 +468,83 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *        the keyboard event as it bubbles towards the document root.
    * @param {Object} options Hash of options that configure how the event
    *        is handled.
+   * @return {Boolean} Whether HotKeys component should discard its current focusTreeId
+   *        because it's stale (part of an old focus tree)
    */
   handleKeyup(event, focusTreeId, componentId, options) {
     const _key = normalizeKeyName(event.key);
 
+    const shouldDiscardFocusId = focusTreeId !== this.focusTreeId;
+
+    /**
+     * We first decide if the keyup event should be handled (to ensure the correct
+     * order of logging statements)
+     */
+    const shouldHandleKeyUp = this._shouldHandleKeyupEvent(
+      event,
+      focusTreeId,
+      componentId,
+      _key,
+      options
+    );
+
+    /**
+     * We then add the keyup to our current combination - regardless of whether
+     * it's to be handled or not. We need to do this to ensure that if a handler
+     * function changes focus to a context that ignored events, the keyup event
+     * is not lost (leaving react hotkeys thinking the key is still pressed).
+     */
+    if (this._isNewKeyEvent(componentId) && this._getCurrentKeyState(_key)) {
+      this._addToAndLogCurrentKeyCombination(
+        _key,
+        KeyEventBitmapIndex.keyup,
+        focusTreeId,
+        componentId
+      );
+    }
+
+    /**
+     * We attempt to find a handler of the event, only if it has not already
+     * been handled and should not be ignored
+     */
+    if (shouldHandleKeyUp) {
+      this._callHandlerIfActionNotHandled(event, _key, KeyEventBitmapIndex.keyup, componentId, focusTreeId);
+    }
+
+    /**
+     * We simulate any hidden keyup events hidden by the command key, regardless
+     * of whether the event should be ignored or not
+     */
+    this._simulateKeyUpEventsHiddenByCmd(event, _key, focusTreeId, componentId, options);
+
+    this._updateEventPropagationHistory(componentId);
+
+    return shouldDiscardFocusId;
+  }
+
+  _shouldHandleKeyupEvent(event, focusTreeId, componentId, key, options){
     if (focusTreeId !== this.focusTreeId) {
       this.logger.debug(
         this._logPrefix(componentId),
-        `Ignored '${_key}' keyup event because it had an old focus tree id: ${focusTreeId}.`
+        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} because it had an old focus tree id: ${focusTreeId}.`
       );
 
       this._ignoreEvent(event, componentId);
 
-      return true;
+      return false;
     }
 
     if (this._shouldIgnoreEvent()) {
       this.logger.debug(
         this._logPrefix(componentId),
-        `Ignored '${_key}' keyup event because ignoreEventsFilter rejected it.`
+        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} event because ignoreEventsFilter rejected it.`
       );
+
+      this._simulateKeyUpEventsHiddenByCmd(event, key, focusTreeId, componentId, options);
 
       this._ignoreEvent(event, componentId);
 
-      return;
+      return false;
     }
 
     if (this._isNewKeyEvent(componentId)) {
@@ -522,33 +561,57 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       if (this._shouldIgnoreEvent()) {
         this.logger.debug(
           this._logPrefix(componentId),
-          `Ignored '${_key}' keyup event because ignoreEventsFilter rejected it.`
+          `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} event because ignoreEventsFilter rejected it.`
         );
 
         this._ignoreEvent(event, componentId);
 
-        return;
+        return false;
       }
 
       this.logger.debug(
         this._logPrefix(componentId),
-        `New '${_key}' keyup event.`
+        `New ${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} event.`
       );
 
-      const keyCombination = this._getCurrentKeyState(_key);
-
-      const alreadySeenKeyEventInCombo = keyCombination && keyCombination[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup];
-
-      if (alreadySeenKeyEventInCombo) {
-        this._startAndLogNewKeyCombination(_key, KeyEventBitmapIndex.keyup, focusTreeId, componentId);
-      } else {
-        this._addToAndLogCurrentKeyCombination(_key, KeyEventBitmapIndex.keyup, focusTreeId, componentId);
-      }
+      return true;
     }
+  }
 
-    this._callHandlerIfActionNotHandled(event, _key, KeyEventBitmapIndex.keyup, componentId, focusTreeId);
+  _simulateKeyPressesMissingFromBrowser(event, key, focusTreeId, componentId, options){
+    this._handleEventSimulation(
+      'keypressEventsToSimulate',
+      'simulatePendingKeyPressEvents',
+      this._shouldSimulate(KeyEventBitmapIndex.keypress, key),
+      {
+        event, key, focusTreeId, componentId, options
+      }
+    );
+  }
 
-    this._updateEventPropagationHistory(componentId);
+  _simulateKeyUpEventsHiddenByCmd(event, key, focusTreeId, componentId, options) {
+    if (isCmdKey(key) && !event.simulated) {
+      /**
+       * When the command key is pressed down with other non-modifier keys, the browser
+       * does not trigger the keyup event of those keys, so we simulate them when the
+       * command key is released
+       */
+
+      Object.keys(this._getCurrentKeyCombination().keys).forEach((keyName) => {
+        if (isCmdKey(keyName)) {
+          return;
+        }
+
+        this._handleEventSimulation(
+          'keyupEventsToSimulate',
+          'simulatePendingKeyUpEvents',
+          this._shouldSimulate(KeyEventBitmapIndex.keyup, keyName),
+          {
+            event, key: keyName, focusTreeId, componentId, options
+          }
+        );
+      })
+    }
   }
 
   _ignoreEvent(event, componentId) {
@@ -661,6 +724,63 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   /********************************************************************************
+   * Event simulation
+   ********************************************************************************/
+
+  _handleEventSimulation(listName, handlerName, shouldSimulate, {event, key, focusTreeId, componentId, options}) {
+    if (shouldSimulate && Configuration.option('simulateMissingKeyPressEvents')) {
+      /**
+       * If a key does not have a keypress event, we save the details of the keydown
+       * event to simulate the keypress event, as the keydown event bubbles through
+       * the last focus-only HotKeysComponent
+       */
+      const _event = this._cloneAndMergeEvent(event, {key, simulated: true });
+
+      this[listName].push({
+        event: _event, focusTreeId, componentId, options
+      });
+    }
+
+    if (this._isFocusTreeRoot(componentId)) {
+      if (!this.keyEventManager.isGlobalListenersBound()) {
+        this[handlerName]();
+      }
+      /**
+       * else, we wait for keydown event to propagate through global strategy
+       * before we simulate the keypress
+       */
+    }
+  }
+
+  simulatePendingKeyPressEvents() {
+    this._simulatePendingKeyEvents('keypressEventsToSimulate', 'handleKeypress');
+  }
+
+  simulatePendingKeyUpEvents() {
+    this._simulatePendingKeyEvents('keyupEventsToSimulate', 'handleKeyup');
+  }
+
+  _simulatePendingKeyEvents(listName, handlerName) {
+    if (this[listName].length > 0) {
+      KeyEventCounter.incrementId();
+    }
+
+    this[listName].forEach(({ event, focusTreeId, componentId, options }) => {
+      this[handlerName](event, focusTreeId, componentId, options);
+    });
+
+    this[listName] = [];
+
+    /**
+     * If an event gets handled and causes a focus shift, then subsequent components
+     * will ignore the event (including the root component) and the conditions to
+     * reset the propagation state are never met - so we ensure that after we are done
+     * simulating the keypress event, the propagation state is reset
+     */
+    this._clearEventPropagationState();
+  }
+
+  /********************************************************************************
    * Matching and calling handlers
    ********************************************************************************/
 
@@ -676,7 +796,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * @private
    */
   _callHandlerIfActionNotHandled(event, keyName, eventBitmapIndex, componentId, focusTreeId) {
-    const eventName = describeKeyEvent(eventBitmapIndex);
+    const eventName = describeKeyEventType(eventBitmapIndex);
     const combinationName = this._describeCurrentKeyCombination();
 
     if (this.keyMapEventBitmap[eventBitmapIndex]) {

@@ -66,6 +66,7 @@ describe('Specifying key map using objects:', () => {
     });
 
     it('then calls the correct handler when a key is pressed that matches the keyMap', function() {
+      this.targetElement.keyDown(KeyCode.ENTER);
       this.targetElement.keyUp(KeyCode.ENTER);
 
       expect(this.handler).to.have.been.called;
@@ -98,6 +99,7 @@ describe('Specifying key map using objects:', () => {
     });
 
     it('then calls the correct handler when a key is pressed that matches the keyMap', function() {
+      this.targetElement.keyDown(KeyCode.A);
       this.targetElement.keyPress(KeyCode.A);
 
       expect(this.handler).to.have.been.called;

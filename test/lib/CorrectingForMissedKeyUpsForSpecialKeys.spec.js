@@ -1,4 +1,4 @@
-import {expect} from 'chai';
+import { expect } from 'chai';
 
 import Key from '../support/Key';
 import KeyEventManager from '../../src/lib/KeyEventManager';
@@ -27,7 +27,7 @@ describe('Correcting for missed keyup events for modifier keys:', function () {
         };
 
         this.componentId = this.eventStrategy.registerKeyMap({});
-        this.eventStrategy.enableHotKeys(this.componentId, {}, {}, {}, { ignoreEventsCondition: Configuration.option('ignoreEventsCondition')});
+        this.eventStrategy.enableHotKeys(this.componentId, {}, {}, {}, {ignoreEventsCondition: Configuration.option('ignoreEventsCondition')});
       });
 
       [
@@ -49,37 +49,46 @@ describe('Correcting for missed keyup events for modifier keys:', function () {
         }
       ].forEach(({key, eventAttribute}) => {
         context(`misses the keyup event for ${key}`, () => {
-          it('then its absence is correctly detected on the next key event and a new combination is created', function() {
-            this.eventStrategy.handleKeydown(new MockSyntheticEvent('keydown', {key}), 0, this.componentId, this.eventOptions);
+          it('then its absence is correctly detected on the next key event and a new combination is created', function () {
+            this.eventStrategy.handleKeydown(
+              new MockSyntheticEvent('keydown', {key}),
+              0,
+              this.componentId,
+              this.eventOptions
+            );
 
-            this.eventStrategy.handleKeydown(new MockSyntheticEvent('keydown', { key: Key.A, [eventAttribute]: false }), 0, this.componentId, this.eventOptions);
+            this.eventStrategy.handleKeydown(
+              new MockSyntheticEvent('keydown', {key: Key.A, [eventAttribute]: false}),
+              0,
+              this.componentId,
+              this.eventOptions
+            );
 
             expect(this.eventStrategy.keyCombinationHistory).to.eql([
               {
-                "keys": {
+                'keys': {
                   [key]: [
                     [true, true, false],
                     [true, true, true]
                   ]
                 },
-                "ids": [ key ],
-                "keyAliases": {}
+                'ids': [key],
+                'keyAliases': {}
               },
               {
-                "keys": {
-                  "a": [
+                'keys': {
+                  'a': [
                     [false, false, false],
                     [true, false, false]
                   ]
                 },
-                "ids": ['a'],
-                "keyAliases": {}
+                'ids': ['a'],
+                'keyAliases': {}
               }
             ]);
           });
-        })
-      })
-
+        });
+      });
     });
-  })
+  });
 });

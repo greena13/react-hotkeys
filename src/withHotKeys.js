@@ -4,7 +4,6 @@ import Configuration from './lib/Configuration';
 import KeyEventManager from './lib/KeyEventManager';
 import isEmpty from './utils/collection/isEmpty';
 import KeyCombinationSerializer from './lib/KeyCombinationSerializer';
-import GlobalHotKeys from './GlobalHotKeys';
 
 /**
  * Wraps a React component in a HotKeysEnabled component, which passes down the

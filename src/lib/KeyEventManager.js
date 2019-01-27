@@ -390,6 +390,10 @@ class KeyEventManager {
     this._focusOnlyEventStrategy.simulatePendingKeyPressEvents();
   }
 
+  simulatePendingKeyUpEvents() {
+    this._focusOnlyEventStrategy.simulatePendingKeyUpEvents();
+  }
+
   isGlobalListenersBound() {
     return this._globalEventStrategy.listenersBound;
   }

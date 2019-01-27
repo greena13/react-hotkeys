@@ -7,7 +7,7 @@ import indexFromEnd from '../../utils/array/indexFromEnd';
 import isObject from '../../utils/object/isObject';
 import isUndefined from '../../utils/isUndefined';
 import isEmpty from '../../utils/collection/isEmpty';
-import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
+import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import KeyEventSequenceIndex from '../../const/KeyEventSequenceIndex';
 import KeySequenceParser from '../KeySequenceParser';
 import printComponent from '../../helpers/logging/printComponent';
@@ -21,6 +21,7 @@ import resolveAltedAlias from '../../helpers/resolving-handlers/resolveAltedAlia
 import Configuration from '../Configuration';
 import ModifierFlagsDictionary from '../../const/ModifierFlagsDictionary';
 import without from '../../utils/collection/without';
+import hasKeyPressEvent from '../../helpers/resolving-handlers/hasKeyPressEvent';
 
 /**
  * Defines common behaviour for key event strategies
@@ -200,6 +201,10 @@ class AbstractKeyEventStrategy {
      * that the current combination is ending (and keys are being released)
      */
     this.keyCombinationIncludesKeyUp = false;
+
+    this.keypressEventsToSimulate = [];
+
+    this.keyupEventsToSimulate = [];
 
     if (!this.keyCombinationHistory || this.keyCombinationHistory.length < 1) {
       this.keyCombinationHistory = [];
@@ -611,7 +616,7 @@ class AbstractKeyEventStrategy {
 
   /**
    * Adds a new KeyCombinationRecord to the event history and resets the
-   * keystateIncludesKeyUp flag to false.
+   * keyCombinationIncludesKeyUp flag to false.
    * @param {ReactKeyName} keyName - Name of the keyboard key to add to the new
    *        KeyCombinationRecord
    * @param {KeyEventBitmapIndex} eventBitmapIndex - Index of bit to set to true in new
@@ -667,6 +672,31 @@ class AbstractKeyEventStrategy {
 
       return memo;
     }, {});
+  }
+
+  _shouldSimulate(eventType, keyName) {
+    const keyHasNativeKeypress = hasKeyPressEvent(keyName);
+
+    if (eventType === KeyEventBitmapIndex.keypress) {
+      return !keyHasNativeKeypress || (keyHasNativeKeypress && this._keyIsCurrentlyDown('Meta'));
+    } else if (eventType === KeyEventBitmapIndex.keyup) {
+      return (keyHasNativeKeypress && keyIsCurrentlyTriggeringEvent(
+        this._getCurrentKeyState('Meta'),
+        KeyEventBitmapIndex.keyup)
+      );
+    }
+
+    return false
+  }
+
+  _cloneAndMergeEvent(event, extra) {
+    const eventAttributes = Object.keys(ModifierFlagsDictionary).reduce((memo, eventAttribute) => {
+      memo[eventAttribute] = event[eventAttribute];
+
+      return memo;
+    }, {});
+
+    return { ...eventAttributes, ...extra };
   }
 
   /********************************************************************************
@@ -874,7 +904,7 @@ class AbstractKeyEventStrategy {
 
         this.logger.debug(
           this._logPrefix(componentSearchIndex),
-          `Doesn't define a handler for '${this._describeCurrentKeyCombination()}' ${describeKeyEvent(eventBitmapIndex)}.`
+          `Doesn't define a handler for '${this._describeCurrentKeyCombination()}' ${describeKeyEventType(eventBitmapIndex)}.`
         );
       } else {
         const { sequences, longestSequence } = keyMap;
@@ -944,7 +974,7 @@ class AbstractKeyEventStrategy {
           sequenceLengthCounter--;
         }
 
-        const eventName = describeKeyEvent(eventBitmapIndex);
+        const eventName = describeKeyEventType(eventBitmapIndex);
 
         this.logger.debug(
           this._logPrefix(componentSearchIndex),
@@ -982,7 +1012,9 @@ class AbstractKeyEventStrategy {
       'Stopping further event propagation.'
     );
 
-    event.stopPropagation();
+    if (!event.simulated) {
+      event.stopPropagation();
+    }
   }
 
   _describeCurrentKeyCombination() {
@@ -1077,8 +1109,7 @@ class AbstractKeyEventStrategy {
      * We update the key combination to match the modifier flags
      */
     Object.keys(ModifierFlagsDictionary).forEach((modifierKey) => {
-       const modifierKeyState = this._getCurrentKeyState(modifierKey);
-       const modifierStillPressed = modifierKeyState && !keyIsCurrentlyTriggeringEvent(modifierKeyState, KeyEventBitmapIndex.keyup);
+       const modifierStillPressed = this._keyIsCurrentlyDown(modifierKey);
 
        ModifierFlagsDictionary[modifierKey].forEach((attributeName) => {
          if (event[attributeName] === false && modifierStillPressed) {
@@ -1086,6 +1117,15 @@ class AbstractKeyEventStrategy {
          }
        });
      })
+  }
+
+  _keyIsCurrentlyDown(keyName) {
+    const keyState = this._getCurrentKeyState(keyName);
+
+    const keyIsDown = keyIsCurrentlyTriggeringEvent(keyState, KeyEventBitmapIndex.keypress) &&
+        !keyIsCurrentlyTriggeringEvent(keyState, KeyEventBitmapIndex.keyup);
+
+    return !!keyIsDown;
   }
 
   _getCurrentKeyState(keyName) {

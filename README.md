@@ -668,6 +668,17 @@ If this is not what you want for your application, you can modify the list of ta
 
 If you want an exception to the global ignore policy for a particular part of your app, then you can use the ObserveKeys component.
 
+### What it actually means to ignore an event
+
+When a keyboard event occurs, two things happen:
+
+* It's added to the record of the keys currently pressed (the current combination) and those were recently pressed (the current key sequence)
+* It's compared against the list of hotkeys you have defined
+
+When you ignore an event, if it's a keydown event (a new key is being pressed), it is not added to the key history and no attempt is made to match it against your hotkeys. If it's a keypress or a keyup event and the key already exists in the history, the event is recorded (the key is being released) but no attempt is made to find a corresponding hotkey.
+
+This effectively means, no new ignored keys are recorded and any keys that are already pressed are recorded as being released so they don't bleed into subsequent key combinations.
+
 ### IgnoreKeys component
 
 > You only need this component if you want to add extra key events to ignore, that are not already matched by `ignoreEventsCondition()`.

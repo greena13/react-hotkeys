@@ -89,7 +89,7 @@ describe('Matching hotkey sequences:', function () {
     })
   });
 
-  describe('when the actions are occur on the keypress event', function () {
+  describe('when the actions occur on the keypress event', function () {
     beforeEach(function () {
       this.keyMap = {
         'SEQUENCE': { sequence: 'a b', action: 'keypress' },
@@ -170,7 +170,7 @@ describe('Matching hotkey sequences:', function () {
     })
   });
 
-  describe('when the actions are occur on the keyup event', function () {
+  describe('when the actions occur on the keyup event', function () {
     beforeEach(function () {
       this.keyMap = {
         'SEQUENCE': { sequence: 'a b', action: 'keyup' },
@@ -191,7 +191,6 @@ describe('Matching hotkey sequences:', function () {
       this.targetElement = new FocusableElement(this.wrapper, '.childElement');
       this.targetElement.focus();
     });
-
 
     describe('after the keypress event for the first key in the sequence', function () {
       beforeEach(function () {
@@ -581,5 +580,4 @@ describe('Matching hotkey sequences:', function () {
       });
     });
   })
-
 });
