@@ -3,6 +3,7 @@ import FocusOnlyKeyEventStrategy from './strategies/FocusOnlyKeyEventStrategy';
 import GlobalKeyEventStrategy from './strategies/GlobalKeyEventStrategy';
 import isFromFocusOnlyComponent from '../helpers/resolving-handlers/isFromFocusOnlyComponent';
 import Configuration from './Configuration';
+import EventResponse from '../const/EventResponse';
 
 /**
  * Provides a registry for keyboard sequences and events, and the handlers that should
@@ -377,12 +378,14 @@ class KeyEventManager {
 
     if (currentEvent.key === key && currentEvent.type === type) {
       if (currentEvent.handled) {
-        return 'handled';
+        return EventResponse.handled;
+      } else if (currentEvent.ignored) {
+        return EventResponse.ignored;
       } else {
-        return 'seen';
+        return EventResponse.seen;
       }
     } else {
-      return 'unseen';
+      return EventResponse.unseen;
     }
   }
 

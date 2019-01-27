@@ -9,6 +9,7 @@ import isUndefined from '../../utils/isUndefined';
 import normalizeKeyName from '../../helpers/resolving-handlers/normalizeKeyName';
 import isCmdKey from '../../helpers/parsing-key-maps/isCmdKey';
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
+import EventResponse from '../../const/EventResponse';
 
 /**
  * Defines behaviour for dealing with key maps defined in focus-only HotKey components
@@ -61,7 +62,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
        */
       type: null,
 
-      handled: false
+      handled: false,
+
+      ignored: false,
     };
   }
 
@@ -287,14 +290,15 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       return true;
     }
 
-    const shouldHandleEvent = this._shouldHandleKeyDownEvent(event,
+    const responseAction = this._howToHandleKeyDownEvent(event,
       focusTreeId,
       componentId,
       _key,
-      options
+      options,
+      KeyEventBitmapIndex.keydown
     );
 
-    if (shouldHandleEvent) {
+    if (responseAction === EventResponse.handled) {
       const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
 
       if (keyInCurrentCombination || this.keyCombinationIncludesKeyUp) {
@@ -313,20 +317,20 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     return false;
   }
 
-  _shouldHandleKeyDownEvent(event, focusTreeId, componentId, key, options){
+  _howToHandleKeyDownEvent(event, focusTreeId, componentId, key, options, keyEventBitmapIndex){
     if (this._shouldIgnoreEvent()) {
       this.logger.debug(
         this._logPrefix(componentId),
-        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keydown)} event because ignoreEventsFilter rejected it.`
+        `Ignored ${describeKeyEvent(event, key, keyEventBitmapIndex)} event because ignoreEventsFilter rejected it.`
       );
 
       this._ignoreEvent(event, componentId);
 
-      return false;
+      return EventResponse.ignored;
     }
 
     if (this._isNewKeyEvent(componentId)) {
-      this._setNewEventParameters(event, KeyEventBitmapIndex.keydown);
+      this._setNewEventParameters(event, keyEventBitmapIndex);
 
       /**
        * We know that this is a new key event and not the same event bubbling up
@@ -339,23 +343,23 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       if (this._shouldIgnoreEvent()) {
         this.logger.debug(
           this._logPrefix(componentId),
-          `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keydown)} event because ignoreEventsFilter rejected it.`
+          `Ignored ${describeKeyEvent(event, key, keyEventBitmapIndex)} event because ignoreEventsFilter rejected it.`
         );
 
         this._ignoreEvent(event, componentId);
 
-        return false;
+        return EventResponse.ignored;
       }
 
       this.logger.debug(
         this._logPrefix(componentId),
-        `New ${describeKeyEvent(event, key, KeyEventBitmapIndex.keydown)} event.`
+        `New ${describeKeyEvent(event, key, keyEventBitmapIndex)} event.`
       );
 
       this._checkForModifierFlagDiscrepancies(event);
     }
 
-    return true;
+    return EventResponse.handled;
   }
 
   /**
@@ -385,8 +389,12 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      * We first decide if the keypress event should be handled (to ensure the correct
      * order of logging statements)
      */
-    const shouldHandleEvent = this._shouldHandleKeyPressEvent(
-      event, focusTreeId, componentId, _key, options
+    const responseAction = this._howToHandleKeyDownEvent(event,
+      focusTreeId,
+      componentId,
+      _key,
+      options,
+      KeyEventBitmapIndex.keypress
     );
 
     if (this._isNewKeyEvent(componentId) && this._getCurrentKeyState(_key)) {
@@ -402,7 +410,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      * We attempt to find a handler of the event, only if it has not already
      * been handled and should not be ignored
      */
-    if (shouldHandleEvent) {
+    if (responseAction === EventResponse.handled) {
       this._callHandlerIfActionNotHandled(
         event,
         _key,
@@ -416,61 +424,6 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     return shouldDiscardFocusTreeId;
   }
-
-  _shouldHandleKeyPressEvent(event, focusTreeId, componentId, key, options) {
-    if (focusTreeId !== this.focusTreeId) {
-      this.logger.debug(
-        this._logPrefix(componentId),
-        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event because it had an old focus tree id: ${focusTreeId}.`
-      );
-
-      this._ignoreEvent(event, componentId);
-
-      return false;
-    }
-
-    if (this._shouldIgnoreEvent()) {
-      this.logger.debug(
-        this._logPrefix(componentId),
-        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event because ignoreEventsFilter rejected it.`
-      );
-
-      this._ignoreEvent(event, componentId);
-
-      return false;
-    }
-
-    if (this._isNewKeyEvent(componentId)) {
-      this._setNewEventParameters(event, KeyEventBitmapIndex.keypress);
-
-      /**
-       * We know that this is a new key event and not the same event bubbling up
-       * the React render tree towards the document root, so perform actions specific
-       * to the first time an event is seen
-       */
-
-      this._setIgnoreEventFlag(event, options);
-
-      if (this._shouldIgnoreEvent()) {
-        this.logger.debug(
-          this._logPrefix(componentId),
-          `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event because ignoreEventsFilter rejected it.`
-        );
-
-        this._ignoreEvent(event, componentId);
-
-        return false;
-      }
-
-      this.logger.debug(
-        this._logPrefix(componentId),
-        `New ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event.`
-      );
-
-      return true;
-    }
-  }
-
 
   /**
    * Records a keyup keyboard event and matches it against the list of pre-registered
@@ -499,12 +452,12 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      * We first decide if the keyup event should be handled (to ensure the correct
      * order of logging statements)
      */
-    const shouldHandleKeyUp = this._shouldHandleKeyupEvent(
-      event,
+    const responseAction = this._howToHandleKeyDownEvent(event,
       focusTreeId,
       componentId,
       _key,
-      options
+      options,
+      KeyEventBitmapIndex.keyup
     );
 
     /**
@@ -526,7 +479,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      * We attempt to find a handler of the event, only if it has not already
      * been handled and should not be ignored
      */
-    if (shouldHandleKeyUp) {
+    if (responseAction === EventResponse.handled) {
       this._callHandlerIfActionNotHandled(event, _key, KeyEventBitmapIndex.keyup, componentId, focusTreeId);
     }
 
@@ -539,60 +492,6 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     this._updateEventPropagationHistory(componentId);
 
     return shouldDiscardFocusId;
-  }
-
-  _shouldHandleKeyupEvent(event, focusTreeId, componentId, key, options){
-    if (focusTreeId !== this.focusTreeId) {
-      this.logger.debug(
-        this._logPrefix(componentId),
-        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} because it had an old focus tree id: ${focusTreeId}.`
-      );
-
-      this._ignoreEvent(event, componentId);
-
-      return false;
-    }
-
-    if (this._shouldIgnoreEvent()) {
-      this.logger.debug(
-        this._logPrefix(componentId),
-        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} event because ignoreEventsFilter rejected it.`
-      );
-
-      this._ignoreEvent(event, componentId);
-
-      return false;
-    }
-
-    if (this._isNewKeyEvent(componentId)) {
-      this._setNewEventParameters(event, KeyEventBitmapIndex.keyup);
-
-      /**
-       * We know that this is a new key event and not the same event bubbling up
-       * the React render tree towards the document root, so perform actions specific
-       * to the first time an event is seen
-       */
-
-      this._setIgnoreEventFlag(event, options);
-
-      if (this._shouldIgnoreEvent()) {
-        this.logger.debug(
-          this._logPrefix(componentId),
-          `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} event because ignoreEventsFilter rejected it.`
-        );
-
-        this._ignoreEvent(event, componentId);
-
-        return false;
-      }
-
-      this.logger.debug(
-        this._logPrefix(componentId),
-        `New ${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} event.`
-      );
-
-      return true;
-    }
   }
 
   _simulateKeyPressesMissingFromBrowser(event, key, focusTreeId, componentId, options){
@@ -632,6 +531,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _ignoreEvent(event, componentId) {
+    this.currentEvent.ignored = true;
+
     if(this._stopEventPropagationAfterIgnoringIfEnabled(event, componentId)) {
       this._updateEventPropagationHistory(componentId, { forceReset: true });
     } else {
@@ -706,7 +607,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     this.currentEvent = {
       key: event.key,
       type,
-      handled: false
+      handled: false,
+      ignored: false,
     };
   }
 

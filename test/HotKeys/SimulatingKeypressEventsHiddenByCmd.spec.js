@@ -251,19 +251,19 @@ describe('Simulating keypress events hidden by cmd:', function () {
           }
         ]);
 
-        /**
-         * The global event strategy ignores the a key entirely, as it was handled
-         * by the React app
-         */
         expect(this.keyEventManager._globalEventStrategy.keyCombinationHistory).to.eql([
           {
             'keys': {
               'Meta': [
                 [true, false, false],
                 [true, true, false]
+              ],
+              'a': [
+                [true, false, false],
+                [true, true, false]
               ]
             },
-            'ids': ['Meta'],
+            'ids': ['Meta+a'],
             'keyAliases': {}
           }
         ]);
@@ -293,9 +293,13 @@ describe('Simulating keypress events hidden by cmd:', function () {
               'Meta': [
                 [true, true, false],
                 [true, true, true]
+              ],
+              'a': [
+                [true, true, false],
+                [true, true, true]
               ]
             },
-            'ids': ['Meta'],
+            'ids': ['Meta+a'],
             'keyAliases': {}
           }
         ]);

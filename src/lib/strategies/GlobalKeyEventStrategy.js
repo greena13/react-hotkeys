@@ -13,6 +13,8 @@ import normalizeKeyName from '../../helpers/resolving-handlers/normalizeKeyName'
 import Configuration from '../Configuration';
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 import isCmdKey from '../../helpers/parsing-key-maps/isCmdKey';
+import EventResponse from '../../const/EventResponse';
+import contains from '../../utils/collection/contains';
 
 /**
  * Defines behaviour for dealing with key maps defined in global HotKey components
@@ -248,9 +250,24 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     const _key = normalizeKeyName(getEventKey(event));
 
-    const shouldHandleEvent = this._shouldHandleKeyDownEvent(event, _key);
+    const reactAppResponse = this._howReactAppRespondedTo(
+      event,
+      _key,
+      KeyEventBitmapIndex.keydown
+    );
 
-    if (shouldHandleEvent) {
+    if (reactAppResponse === EventResponse.unseen &&
+          this.eventOptions.ignoreEventsCondition(event)) {
+
+      this.logger.debug(
+        this._logPrefix(),
+        `Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event because ignoreEventsFilter rejected it.`
+      );
+
+      return;
+    }
+
+    if (reactAppResponse !== EventResponse.ignored) {
       const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
 
       if (keyInCurrentCombination || this.keyCombinationIncludesKeyUp) {
@@ -258,51 +275,54 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       } else {
         this._addToAndLogCurrentKeyCombination(_key, KeyEventBitmapIndex.keydown);
       }
+    }
 
+    if (!contains([EventResponse.ignored, EventResponse.handled], reactAppResponse)) {
       this._callHandlerIfExists(event, _key, KeyEventBitmapIndex.keydown);
     }
 
     this._simulateKeyPressesMissingFromBrowser(event, _key);
   }
 
-  _shouldHandleKeyDownEvent(event, key) {
+  _howReactAppRespondedTo(event, key, eventBitmapIndex) {
     const reactAppHistoryWithEvent =
-      this.keyEventManager.reactAppHistoryWithEvent(key, KeyEventBitmapIndex.keydown);
+      this.keyEventManager.reactAppHistoryWithEvent(key, eventBitmapIndex);
 
-    if (reactAppHistoryWithEvent === 'handled') {
-      this.logger.debug(
-        this._logPrefix(),
-        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keydown)} event because React app has already handled it.`
-      );
-
-      return false;
-    } else {
-      if (reactAppHistoryWithEvent === 'seen') {
+    switch(reactAppHistoryWithEvent) {
+      case EventResponse.handled:
         this.logger.debug(
           this._logPrefix(),
-          `Received ${describeKeyEvent(event, key, KeyEventBitmapIndex.keydown)} event (that has already passed through React app).`
+          `Ignored ${describeKeyEvent(event, key, eventBitmapIndex)} event because React app has already handled it.`
         );
 
-      } else {
+        break;
+
+      case EventResponse.ignored:
+        this.logger.debug(
+          this._logPrefix(),
+          `Ignored ${describeKeyEvent(event, key, eventBitmapIndex)} event because React app has declared it should be ignored.`
+        );
+
+        break;
+
+      case EventResponse.seen:
+        this.logger.debug(
+          this._logPrefix(),
+          `Received ${describeKeyEvent(event, key, eventBitmapIndex)} event (that has already passed through React app).`
+        );
+
+        break;
+
+      default:
         KeyEventCounter.incrementId();
 
         this.logger.debug(
           this._logPrefix(),
-          `New ${describeKeyEvent(event, key, KeyEventBitmapIndex.keydown)} event (that has NOT passed through React app).`
+          `New ${describeKeyEvent(event, key, eventBitmapIndex)} event (that has NOT passed through React app).`
         );
-      }
-
-      if (this.eventOptions.ignoreEventsCondition(event)) {
-        this.logger.debug(
-          this._logPrefix(),
-          `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keydown)} event because ignoreEventsFilter rejected it.`
-        );
-
-        return false;
-      }
     }
 
-    return true;
+    return reactAppHistoryWithEvent;
   }
 
   /**
@@ -321,7 +341,11 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * We first decide if the keypress event should be handled (to ensure the correct
      * order of logging statements)
      */
-    const shouldHandleEvent = this._shouldHandleKeyPressEvent(event, key);
+    const reactAppResponse = this._howReactAppRespondedTo(
+      event,
+      key,
+      KeyEventBitmapIndex.keypress
+    );
 
     /**
      * Add new key event to key combination history
@@ -331,48 +355,19 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this._addToAndLogCurrentKeyCombination(key, KeyEventBitmapIndex.keypress);
     }
 
-    if (shouldHandleEvent) {
-      this._callHandlerIfExists(event, key, KeyEventBitmapIndex.keypress);
-    }
-  }
+    if (reactAppResponse === EventResponse.unseen &&
+      this.eventOptions.ignoreEventsCondition(event)) {
 
-  _shouldHandleKeyPressEvent(event, key) {
-    const reactAppHistoryWithEvent =
-      this.keyEventManager.reactAppHistoryWithEvent(key, KeyEventBitmapIndex.keypress);
-
-    if (reactAppHistoryWithEvent === 'handled') {
       this.logger.debug(
         this._logPrefix(),
-        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event because React app has already handled it.`
+        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event because ignoreEventsFilter rejected it.`
       );
 
-      return false;
-    } else {
-      if (reactAppHistoryWithEvent === 'seen') {
-        this.logger.debug(
-          this._logPrefix(),
-          `${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event (that has already passed through React app).`
-        );
+      return;
+    }
 
-      } else {
-        KeyEventCounter.incrementId();
-
-        this.logger.debug(
-          this._logPrefix(),
-          `New ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event (that has NOT passed through React app).`
-        );
-      }
-
-      if (this.eventOptions.ignoreEventsCondition(event)) {
-        this.logger.debug(
-          this._logPrefix(),
-          `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event because ignoreEventsFilter rejected it.`
-        );
-
-        return false;
-      }
-
-      return true;
+    if (!contains([EventResponse.ignored, EventResponse.handled], reactAppResponse)) {
+      this._callHandlerIfExists(event, key, KeyEventBitmapIndex.keypress);
     }
   }
 
@@ -392,7 +387,11 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * We first decide if the keyup event should be handled (to ensure the correct
      * order of logging statements)
      */
-    const shouldHandleEvent = this._shouldHandleKeyupEvent(event, key);
+    const reactAppResponse = this._howReactAppRespondedTo(
+      event,
+      key,
+      KeyEventBitmapIndex.keyup
+    );
 
     /**
      * We then add the keyup to our current combination - regardless of whether
@@ -404,12 +403,22 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this._addToAndLogCurrentKeyCombination(key, KeyEventBitmapIndex.keyup);
     }
 
-    /**
-     * We attempt to find a handler of the event, only if it has not already
-     * been handled and should not be ignored
-     */
-    if (shouldHandleEvent) {
-      this._callHandlerIfExists(event, key, KeyEventBitmapIndex.keyup);
+    if (reactAppResponse === EventResponse.unseen &&
+      this.eventOptions.ignoreEventsCondition(event)) {
+
+      this.logger.debug(
+        this._logPrefix(),
+        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} event because ignoreEventsFilter rejected it.`
+      );
+
+    } else {
+      /**
+       * We attempt to find a handler of the event, only if it has not already
+       * been handled and should not be ignored
+       */
+      if (!contains([EventResponse.ignored, EventResponse.handled], reactAppResponse)) {
+        this._callHandlerIfExists(event, key, KeyEventBitmapIndex.keyup);
+      }
     }
 
     /**
@@ -417,48 +426,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * of whether the event should be ignored or not
      */
     this._simulateKeyUpEventsHiddenByCmd(event, key);
-  }
-
-  _shouldHandleKeyupEvent(event, key) {
-    const reactAppHistoryWithEvent =
-      this.keyEventManager.reactAppHistoryWithEvent(key, KeyEventBitmapIndex.keyup);
-
-    if (reactAppHistoryWithEvent === 'handled') {
-      this.logger.debug(
-        this._logPrefix(),
-        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} event because React app has already handled it.`
-      );
-
-      return false;
-    } else {
-      if (reactAppHistoryWithEvent === 'seen') {
-        this.logger.debug(
-          this._logPrefix(),
-          `${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} event (that has already passed through React app).`
-        );
-
-        return true;
-
-      } else {
-        KeyEventCounter.incrementId();
-
-        this.logger.debug(
-          this._logPrefix(),
-          `New ${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} event (that has NOT passed through React app).`
-        );
-      }
-
-      if (this.eventOptions.ignoreEventsCondition(event)) {
-        this.logger.debug(
-          this._logPrefix(),
-          `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} event because ignoreEventsFilter rejected it.`
-        );
-
-        return false;
-      }
-
-      return true;
-    }
   }
 
   _simulateKeyPressesMissingFromBrowser(event, key) {
