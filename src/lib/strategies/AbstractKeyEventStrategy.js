@@ -1006,17 +1006,6 @@ class AbstractKeyEventStrategy {
     return false;
   }
 
-  _stopEventPropagation(event, componentId) {
-    this.logger.debug(
-      this._logPrefix(componentId),
-      'Stopping further event propagation.'
-    );
-
-    if (!event.simulated) {
-      event.stopPropagation();
-    }
-  }
-
   _describeCurrentKeyCombination() {
     return this._getCurrentKeyCombination().ids[0];
   }

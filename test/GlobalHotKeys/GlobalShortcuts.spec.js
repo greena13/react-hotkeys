@@ -52,7 +52,7 @@ describe('Global shortcuts:', () => {
 
       context('and the React application is in focus', () => {
         beforeEach(function () {
-          this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
+          this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: this.reactDiv });
           this.targetElement.focus();
         });
 
@@ -79,7 +79,7 @@ describe('Global shortcuts:', () => {
 
       context('and the React application is in NOT focus', () => {
         beforeEach(function () {
-          this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
+          this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: this.reactDiv });
         });
 
         context('a key is pressed that matches a GlobalHotKeys action', () => {
@@ -141,7 +141,7 @@ describe('Global shortcuts:', () => {
 
       context('and the HotKeys component is focused', () => {
         beforeEach(function () {
-          this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
+          this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: this.reactDiv });
           this.targetElement.focus();
         });
 
@@ -179,7 +179,7 @@ describe('Global shortcuts:', () => {
 
       context('and the HotKeys component is NOT in focus (but the React app still is)', () => {
         beforeEach(function () {
-          this.targetElement = new FocusableElement(this.wrapper, '.siblingElement', { nativeElement: true });
+          this.targetElement = new FocusableElement(this.wrapper, '.siblingElement', { nativeElement: this.reactDiv });
           this.targetElement.focus();
         });
 
@@ -217,7 +217,7 @@ describe('Global shortcuts:', () => {
 
       context('and the React app is NOT in focus', () => {
         beforeEach(function () {
-          this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
+          this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: this.reactDiv });
         });
 
         context('and a key that matches a GlobalHotKeys action is pressed', () => {
@@ -304,7 +304,7 @@ describe('Global shortcuts:', () => {
 
     context('and the GlobalHotKeys component is in focus', () => {
       beforeEach(function () {
-        this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
+        this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: this.reactDiv });
         this.targetElement.focus();
       });
 
@@ -342,7 +342,7 @@ describe('Global shortcuts:', () => {
 
     context('and the GlobalHotKeys is NOT in focus (but the React app still is)', () => {
       beforeEach(function () {
-        this.targetElement = new FocusableElement(this.wrapper, '.siblingElement', { nativeElement: true });
+        this.targetElement = new FocusableElement(this.wrapper, '.siblingElement', { nativeElement: this.reactDiv });
         this.targetElement.focus();
       });
 
@@ -380,7 +380,7 @@ describe('Global shortcuts:', () => {
 
     context('and the React app is NOT in focus', () => {
       beforeEach(function () {
-        this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
+        this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: this.reactDiv });
       });
 
       context('and a key that matches a GlobalHotKeys action is pressed', () => {

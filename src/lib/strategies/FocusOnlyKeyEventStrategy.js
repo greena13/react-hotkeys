@@ -1,6 +1,5 @@
 import AbstractKeyEventStrategy from './AbstractKeyEventStrategy';
 import KeyEventBitmapIndex from '../../const/KeyEventBitmapIndex';
-import KeyEventSequenceIndex from '../../const/KeyEventSequenceIndex';
 import KeyEventCounter from '../KeyEventCounter';
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import Configuration from '../Configuration';
@@ -123,6 +122,12 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
        * @type {Boolean}
        */
       forceObserveEvent: false,
+
+      /**
+       * Whether the strategy is in the process of stopping propagation and tidying
+       * up
+       */
+      stopping: false
     };
   }
 
@@ -282,10 +287,37 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       return true;
     }
 
+    const shouldHandleEvent = this._shouldHandleKeyDownEvent(event,
+      focusTreeId,
+      componentId,
+      _key,
+      options
+    );
+
+    if (shouldHandleEvent) {
+      const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
+
+      if (keyInCurrentCombination || this.keyCombinationIncludesKeyUp) {
+        this._startAndLogNewKeyCombination(_key, KeyEventBitmapIndex.keydown, focusTreeId, componentId);
+      } else {
+        this._addToAndLogCurrentKeyCombination(_key, KeyEventBitmapIndex.keydown, focusTreeId, componentId);
+      }
+
+      this._callHandlerIfActionNotHandled(event, _key, KeyEventBitmapIndex.keydown, componentId, focusTreeId);
+    }
+
+    this._simulateKeyPressesMissingFromBrowser(event, _key, focusTreeId, componentId, options);
+
+    this._updateEventPropagationHistory(componentId);
+
+    return false;
+  }
+
+  _shouldHandleKeyDownEvent(event, focusTreeId, componentId, key, options){
     if (this._shouldIgnoreEvent()) {
       this.logger.debug(
         this._logPrefix(componentId),
-        `Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event because ignoreEventsFilter rejected it.`
+        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keydown)} event because ignoreEventsFilter rejected it.`
       );
 
       this._ignoreEvent(event, componentId);
@@ -307,7 +339,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       if (this._shouldIgnoreEvent()) {
         this.logger.debug(
           this._logPrefix(componentId),
-          `Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event because ignoreEventsFilter rejected it.`
+          `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keydown)} event because ignoreEventsFilter rejected it.`
         );
 
         this._ignoreEvent(event, componentId);
@@ -317,27 +349,13 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
       this.logger.debug(
         this._logPrefix(componentId),
-        `New ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event.`
+        `New ${describeKeyEvent(event, key, KeyEventBitmapIndex.keydown)} event.`
       );
 
       this._checkForModifierFlagDiscrepancies(event);
-
-      const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
-
-      if (keyInCurrentCombination || this.keyCombinationIncludesKeyUp) {
-        this._startAndLogNewKeyCombination(_key, KeyEventBitmapIndex.keydown, focusTreeId, componentId);
-      } else {
-        this._addToAndLogCurrentKeyCombination(_key, KeyEventBitmapIndex.keydown, focusTreeId, componentId);
-      }
     }
 
-    this._callHandlerIfActionNotHandled(event, _key, KeyEventBitmapIndex.keydown, componentId, focusTreeId);
-
-    this._simulateKeyPressesMissingFromBrowser(event, _key, focusTreeId, componentId, options);
-
-    this._updateEventPropagationHistory(componentId);
-
-    return false;
+    return true;
   }
 
   /**
@@ -541,8 +559,6 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} event because ignoreEventsFilter rejected it.`
       );
 
-      this._simulateKeyUpEventsHiddenByCmd(event, key, focusTreeId, componentId, options);
-
       this._ignoreEvent(event, componentId);
 
       return false;
@@ -591,7 +607,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _simulateKeyUpEventsHiddenByCmd(event, key, focusTreeId, componentId, options) {
-    if (isCmdKey(key) && !event.simulated) {
+    if (isCmdKey(key)) {
       /**
        * When the command key is pressed down with other non-modifier keys, the browser
        * does not trigger the keyup event of those keys, so we simulate them when the
@@ -728,6 +744,21 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * Event simulation
    ********************************************************************************/
 
+  _stopEventPropagation(event, componentId) {
+    if (!this.eventPropagationState.stopping) {
+      this.eventPropagationState.stopping = true;
+
+      this.logger.debug(
+        this._logPrefix(componentId),
+        'Stopping further event propagation.'
+      );
+
+      if (!event.simulated) {
+        event.stopPropagation();
+      }
+    }
+  }
+
   _handleEventSimulation(listName, handlerName, shouldSimulate, {event, key, focusTreeId, componentId, options}) {
     if (shouldSimulate && Configuration.option('simulateMissingKeyPressEvents')) {
       /**
@@ -742,7 +773,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       });
     }
 
-    if (this._isFocusTreeRoot(componentId)) {
+    if (this._isFocusTreeRoot(componentId) || this.eventPropagationState.stopping) {
       if (!this.keyEventManager.isGlobalListenersBound()) {
         this[handlerName]();
       }

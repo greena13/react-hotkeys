@@ -248,39 +248,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     const _key = normalizeKeyName(getEventKey(event));
 
-    const reactAppHistoryWithEvent =
-      this.keyEventManager.reactAppHistoryWithEvent(_key, KeyEventBitmapIndex.keydown);
+    const shouldHandleEvent = this._shouldHandleKeyDownEvent(event, _key);
 
-    if (reactAppHistoryWithEvent === 'handled') {
-      this.logger.debug(
-        this._logPrefix(),
-        `Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event because React app has already handled it.`
-      );
-    } else {
-      if (reactAppHistoryWithEvent === 'seen') {
-        this.logger.debug(
-          this._logPrefix(),
-          `Received ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event (that has already passed through React app).`
-        );
-
-      } else {
-        KeyEventCounter.incrementId();
-
-        this.logger.debug(
-          this._logPrefix(),
-          `New ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event (that has NOT passed through React app).`
-        );
-      }
-
-      if (this.eventOptions.ignoreEventsCondition(event)) {
-        this.logger.debug(
-          this._logPrefix(),
-          `Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event because ignoreEventsFilter rejected it.`
-        );
-
-        return;
-      }
-
+    if (shouldHandleEvent) {
       const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
 
       if (keyInCurrentCombination || this.keyCombinationIncludesKeyUp) {
@@ -290,9 +260,49 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       }
 
       this._callHandlerIfExists(event, _key, KeyEventBitmapIndex.keydown);
-
-      this._simulateKeyPressesMissingFromBrowser(event, _key);
     }
+
+    this._simulateKeyPressesMissingFromBrowser(event, _key);
+  }
+
+  _shouldHandleKeyDownEvent(event, key) {
+    const reactAppHistoryWithEvent =
+      this.keyEventManager.reactAppHistoryWithEvent(key, KeyEventBitmapIndex.keydown);
+
+    if (reactAppHistoryWithEvent === 'handled') {
+      this.logger.debug(
+        this._logPrefix(),
+        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keydown)} event because React app has already handled it.`
+      );
+
+      return false;
+    } else {
+      if (reactAppHistoryWithEvent === 'seen') {
+        this.logger.debug(
+          this._logPrefix(),
+          `Received ${describeKeyEvent(event, key, KeyEventBitmapIndex.keydown)} event (that has already passed through React app).`
+        );
+
+      } else {
+        KeyEventCounter.incrementId();
+
+        this.logger.debug(
+          this._logPrefix(),
+          `New ${describeKeyEvent(event, key, KeyEventBitmapIndex.keydown)} event (that has NOT passed through React app).`
+        );
+      }
+
+      if (this.eventOptions.ignoreEventsCondition(event)) {
+        this.logger.debug(
+          this._logPrefix(),
+          `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keydown)} event because ignoreEventsFilter rejected it.`
+        );
+
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
@@ -305,24 +315,24 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {KeyboardEvent} event - Event containing the key name and state
    */
   handleKeypress(event) {
-    const _key = normalizeKeyName(getEventKey(event));
+    const key = normalizeKeyName(getEventKey(event));
 
     /**
      * We first decide if the keypress event should be handled (to ensure the correct
      * order of logging statements)
      */
-    const shouldHandleEvent = this._shouldHandleKeyPressEvent(event, _key);
+    const shouldHandleEvent = this._shouldHandleKeyPressEvent(event, key);
 
     /**
      * Add new key event to key combination history
      */
 
-    if (this._getCurrentKeyState(_key)) {
-      this._addToAndLogCurrentKeyCombination(_key, KeyEventBitmapIndex.keypress);
+    if (this._getCurrentKeyState(key)) {
+      this._addToAndLogCurrentKeyCombination(key, KeyEventBitmapIndex.keypress);
     }
 
     if (shouldHandleEvent) {
-      this._callHandlerIfExists(event, _key, KeyEventBitmapIndex.keypress);
+      this._callHandlerIfExists(event, key, KeyEventBitmapIndex.keypress);
     }
   }
 
@@ -376,13 +386,13 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {KeyboardEvent} event - Event containing the key name and state
    */
   handleKeyup(event) {
-    const _key = normalizeKeyName(getEventKey(event));
+    const key = normalizeKeyName(getEventKey(event));
 
     /**
      * We first decide if the keyup event should be handled (to ensure the correct
      * order of logging statements)
      */
-    const shouldHandleEvent = this._shouldHandleKeyupEvent(event, _key);
+    const shouldHandleEvent = this._shouldHandleKeyupEvent(event, key);
 
     /**
      * We then add the keyup to our current combination - regardless of whether
@@ -390,8 +400,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * function changes focus to a context that ignored events, the keyup event
      * is not lost (leaving react hotkeys thinking the key is still pressed).
      */
-    if (this._getCurrentKeyState(_key)) {
-      this._addToAndLogCurrentKeyCombination(_key, KeyEventBitmapIndex.keyup);
+    if (this._getCurrentKeyState(key)) {
+      this._addToAndLogCurrentKeyCombination(key, KeyEventBitmapIndex.keyup);
     }
 
     /**
@@ -399,24 +409,24 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * been handled and should not be ignored
      */
     if (shouldHandleEvent) {
-      this._callHandlerIfExists(event, _key, KeyEventBitmapIndex.keyup);
+      this._callHandlerIfExists(event, key, KeyEventBitmapIndex.keyup);
     }
 
     /**
      * We simulate any hidden keyup events hidden by the command key, regardless
      * of whether the event should be ignored or not
      */
-    this._simulateKeyUpEventsHiddenByCmd(event, _key);
+    this._simulateKeyUpEventsHiddenByCmd(event, key);
   }
 
-  _shouldHandleKeyupEvent(event, _key) {
+  _shouldHandleKeyupEvent(event, key) {
     const reactAppHistoryWithEvent =
-      this.keyEventManager.reactAppHistoryWithEvent(_key, KeyEventBitmapIndex.keyup);
+      this.keyEventManager.reactAppHistoryWithEvent(key, KeyEventBitmapIndex.keyup);
 
     if (reactAppHistoryWithEvent === 'handled') {
       this.logger.debug(
         this._logPrefix(),
-        `Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keyup)} event because React app has already handled it.`
+        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} event because React app has already handled it.`
       );
 
       return false;
@@ -424,7 +434,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       if (reactAppHistoryWithEvent === 'seen') {
         this.logger.debug(
           this._logPrefix(),
-          `${describeKeyEvent(event, _key, KeyEventBitmapIndex.keyup)} event (that has already passed through React app).`
+          `${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} event (that has already passed through React app).`
         );
 
         return true;
@@ -434,14 +444,14 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
         this.logger.debug(
           this._logPrefix(),
-          `New ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keyup)} event (that has NOT passed through React app).`
+          `New ${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} event (that has NOT passed through React app).`
         );
       }
 
       if (this.eventOptions.ignoreEventsCondition(event)) {
         this.logger.debug(
           this._logPrefix(),
-          `Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keyup)} event because ignoreEventsFilter rejected it.`
+          `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} event because ignoreEventsFilter rejected it.`
         );
 
         return false;
@@ -452,8 +462,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _simulateKeyPressesMissingFromBrowser(event, key) {
+    this.keyEventManager.simulatePendingKeyPressEvents();
+
     this._handleEventSimulation(
-      'simulatePendingKeyPressEvents',
       'handleKeypress',
       this._shouldSimulate(KeyEventBitmapIndex.keypress, key),
       {event, key}
@@ -462,13 +473,17 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
   _simulateKeyUpEventsHiddenByCmd(event, key) {
     if (isCmdKey(key)) {
+      /**
+       * We simulate pending key events in the React app before we do it globally
+       */
+      this.keyEventManager.simulatePendingKeyUpEvents();
+
       Object.keys(this._getCurrentKeyCombination().keys).forEach((keyName) => {
         if (isCmdKey(keyName)) {
           return;
         }
 
         this._handleEventSimulation(
-          'simulatePendingKeyUpEvents',
           'handleKeyup',
           this._shouldSimulate(KeyEventBitmapIndex.keyup, keyName),
           {event, key: keyName}
@@ -511,13 +526,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * Event simulation
    ********************************************************************************/
 
-  _handleEventSimulation(keyEventManagerHandlerName, handlerName, shouldSimulate, {event, key}) {
+  _handleEventSimulation(handlerName, shouldSimulate, {event, key}) {
     if (shouldSimulate && Configuration.option('simulateMissingKeyPressEvents')) {
-      /**
-       * We simulate pending key events in the React app before we do it globally
-       */
-      this.keyEventManager[keyEventManagerHandlerName]();
-
       /**
        * If a key does not have a keypress event, we simulate one immediately after
        * the keydown event, to keep the behaviour consistent across all keys
@@ -527,7 +537,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this[handlerName](_event);
     }
   }
-
 
   /********************************************************************************
    * Matching and calling handlers
@@ -584,6 +593,17 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
         return;
       }
+    }
+  }
+
+  _stopEventPropagation(event, componentId) {
+    this.logger.debug(
+      this._logPrefix(componentId),
+      'Stopping further event propagation.'
+    );
+
+    if (!event.simulated) {
+      event.stopPropagation();
     }
   }
 

@@ -109,7 +109,7 @@ describe('Nested GlobalHotKeys components:', () => {
         );
 
         this.targetElement =
-          new FocusableElement(this.wrapper, '.outerChildElement', { nativeElement: true });
+          new FocusableElement(this.wrapper, '.outerChildElement', { nativeElement: this.reactDiv });
       });
 
       context('when keys that match an action defined only in the outer component are pressed', () => {
@@ -179,7 +179,7 @@ describe('Nested GlobalHotKeys components:', () => {
       context('and the inner component is in focus', () => {
         beforeEach(function () {
           this.targetElement =
-            new FocusableElement(this.wrapper, '.innerChildElement', { nativeElement: true });
+            new FocusableElement(this.wrapper, '.innerChildElement', { nativeElement: this.reactDiv });
 
           this.targetElement.focus();
         });
@@ -215,7 +215,7 @@ describe('Nested GlobalHotKeys components:', () => {
       context('and the outer component is in focus', () => {
         beforeEach(function () {
           this.targetElement =
-            new FocusableElement(this.wrapper, '.outerChildElement', { nativeElement: true });
+            new FocusableElement(this.wrapper, '.outerChildElement', { nativeElement: this.reactDiv });
 
           this.targetElement.focus();
         });

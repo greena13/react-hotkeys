@@ -4,8 +4,9 @@ let focused = null;
 
 export default class FocusableElement {
   constructor(wrapper, selector, options = {}) {
+    this.wrapper = wrapper;
     this.element = wrapper.find(selector);
-    this.isNativeElement = options.nativeElement || false;
+    this.nativeElement = options.nativeElement || false;
   }
 
   focus() {
@@ -13,21 +14,13 @@ export default class FocusableElement {
       focused.blur();
     }
 
-    if (this.isNativeElement) {
-      simulant.fire(this.getInstance(), 'focus');
-    } else {
-      this.element.simulate('focus');
-    }
+    this.element.simulate('focus');
 
     focused = this;
   }
 
   blur() {
-    if (this.isNativeElement) {
-      simulant.fire(this.getInstance(), 'blur');
-    } else {
-      this.element.simulate('blur');
-    }
+    this.element.simulate('blur');
 
     if (focused === this) {
       focused = null;
@@ -37,24 +30,24 @@ export default class FocusableElement {
   keyDown(key, options = {}) {
     this.element.simulate('keyDown', {key});
 
-    if (this.isNativeElement) {
-      simulant.fire(this.getInstance(), 'keydown', {key});
+    if (this.nativeElement) {
+      simulant.fire(this.nativeElement, 'keydown', {key});
     }
   }
 
   keyPress(key, options = {}) {
     this.element.simulate('keyPress', {key});
 
-    if (this.isNativeElement) {
-      simulant.fire(this.getInstance(), 'keypress', {key});
+    if (this.nativeElement) {
+      simulant.fire(this.nativeElement, 'keypress', {key});
     }
   }
 
   keyUp(key, options = {}) {
     this.element.simulate('keyUp', {key});
 
-    if (this.isNativeElement) {
-      simulant.fire(this.getInstance(), 'keyup', {key});
+    if (this.nativeElement) {
+      simulant.fire(this.nativeElement, 'keyup', {key});
     }
   }
 
