@@ -22,7 +22,7 @@ export type KeyMap = { [key in ActionName]: KeySequence };
  */
 export interface HotKeysEnabled extends React.Component<HotKeysProps, {}> { }
 
-export interface HotKeysEnabledProps extends React.HTMLAttributes<HotKeys> {
+export interface GlobalHotKeysProps extends React.HTMLAttributes<HotKeys> {
   /**
    * A map from action names to Mousetrap or Browser key sequences
    */
@@ -34,6 +34,15 @@ export interface HotKeysEnabledProps extends React.HTMLAttributes<HotKeys> {
   handlers?: { [key: string]: (keyEvent?: KeyboardEvent) => void };
 
   /**
+   * Whether the keyMap or handlers are permitted to change after the
+   * component mounts. If false, changes to the keyMap and handlers
+   * props will be ignored
+   */
+  allowChanges?: boolean;
+}
+
+export interface HotKeysEnabledProps extends GlobalHotKeysProps {
+  /**
    * Function to call when this component gains focus in the browser
    */
   onFocus?: () => void;
@@ -42,13 +51,6 @@ export interface HotKeysEnabledProps extends React.HTMLAttributes<HotKeys> {
    * Function to call when this component loses focus in the browser
    */
   onBlur?: () => void;
-
-  /**
-   * Whether the keyMap or handlers are permitted to change after the
-   * component mounts. If false, changes to the keyMap and handlers
-   * props will be ignored
-   */
-  allowChanges?: boolean;
 }
 
 export interface HotKeysProps extends HotKeysEnabledProps {
@@ -66,7 +68,7 @@ export interface HotKeysProps extends HotKeysEnabledProps {
  */
 export class HotKeys extends React.Component<HotKeysProps, {}> { }
 
-export class GlobalHotKeys extends React.Component<HotKeysEnabled, {}> { }
+export class GlobalHotKeys extends React.Component<GlobalHotKeysProps, {}> { }
 
 /**
  * Wraps a React component in a HotKeysEnabled component, which passes down the
@@ -123,7 +125,7 @@ export class ObserveKeys extends React.Component<HotKeysOverrideProps, {}> { }
  * the wrapped component (e.g. div, span, input, etc) in order for the key events
  * to be recorded.
  */
-export declare function withHotKeysIgnore(Component: React.ComponentClass, hotKeysIgnoreOptions: HotKeysOverrideProps): HotKeysIgnored;
+export declare function withHotKeysIgnore(Component: React.ComponentClass, hotKeysIgnoreOptions: HotKeysOverrideProps): IgnoreKeys;
 
 export type ApplicationKeyMap = { [key in ActionName]: Array<MouseTrapKeySequence> };
 

@@ -23,18 +23,6 @@ class GlobalHotKeys extends Component {
     handlers: PropTypes.object,
 
     /**
-     * Function to call when this component gains focus in the browser
-     * @type {Function}
-     */
-    onFocus: PropTypes.func,
-
-    /**
-     * Function to call when this component loses focus in the browser
-     * @type {Function}
-     */
-    onBlur: PropTypes.func,
-
-    /**
      * Whether the keyMap or handlers are permitted to change after the
      * component mounts. If false, changes to the keyMap and handlers
      * props will be ignored
