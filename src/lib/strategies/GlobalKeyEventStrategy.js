@@ -284,9 +284,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
 
       if (keyInCurrentCombination || this.keyCombinationIncludesKeyUp) {
-        this._startNewKeyCombination(_key, KeyEventBitmapIndex.keydown);
+        this._startAndLogNewKeyCombination(_key, KeyEventBitmapIndex.keydown);
       } else {
-        this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keydown);
+        this._addToAndLogCurrentKeyCombination(_key, KeyEventBitmapIndex.keydown);
       }
 
       this._callHandlerIfExists(event, _key, KeyEventBitmapIndex.keydown);
@@ -318,7 +318,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      */
 
     if (this._getCurrentKeyState(_key)) {
-      this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keypress);
+      this._addToAndLogCurrentKeyCombination(_key, KeyEventBitmapIndex.keypress);
     }
 
     if (shouldHandleEvent) {
@@ -391,7 +391,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * is not lost (leaving react hotkeys thinking the key is still pressed).
      */
     if (this._getCurrentKeyState(_key)) {
-      this._addToCurrentKeyCombination(_key, KeyEventBitmapIndex.keyup);
+      this._addToAndLogCurrentKeyCombination(_key, KeyEventBitmapIndex.keyup);
     }
 
     /**
@@ -477,8 +477,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     }
   }
 
-  _startNewKeyCombination(keyName, eventBitmapIndex) {
-    super._startNewKeyCombination(keyName, eventBitmapIndex);
+  _startAndLogNewKeyCombination(keyName, eventBitmapIndex) {
+    this._startNewKeyCombination(keyName, eventBitmapIndex);
 
     this.logger.verbose(
       this._logPrefix(),
@@ -491,8 +491,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     );
   }
 
-  _addToCurrentKeyCombination(keyName, eventBitmapIndex) {
-    super._addToCurrentKeyCombination(keyName, eventBitmapIndex);
+  _addToAndLogCurrentKeyCombination(keyName, eventBitmapIndex) {
+    this._addToCurrentKeyCombination(keyName, eventBitmapIndex);
 
     if (eventBitmapIndex === KeyEventBitmapIndex.keydown) {
       this.logger.verbose(
