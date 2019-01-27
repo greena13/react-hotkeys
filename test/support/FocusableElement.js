@@ -35,9 +35,7 @@ export default class FocusableElement {
   }
 
   keyDown(key, options = {}) {
-    if (!this.isNativeElement || options.forceEnzymeEvent) {
-      this.element.simulate('keyDown', {key});
-    }
+    this.element.simulate('keyDown', {key});
 
     if (this.isNativeElement) {
       simulant.fire(this.getInstance(), 'keydown', {key});
@@ -45,9 +43,7 @@ export default class FocusableElement {
   }
 
   keyPress(key, options = {}) {
-    if (!this.isNativeElement || options.forceEnzymeEvent) {
-      this.element.simulate('keyPress', {key});
-    }
+    this.element.simulate('keyPress', {key});
 
     if (this.isNativeElement) {
       simulant.fire(this.getInstance(), 'keypress', {key});
@@ -55,9 +51,7 @@ export default class FocusableElement {
   }
 
   keyUp(key, options = {}) {
-    if (!this.isNativeElement || options.forceEnzymeEvent) {
-      this.element.simulate('keyUp', {key});
-    }
+    this.element.simulate('keyUp', {key});
 
     if (this.isNativeElement) {
       simulant.fire(this.getInstance(), 'keyup', {key});

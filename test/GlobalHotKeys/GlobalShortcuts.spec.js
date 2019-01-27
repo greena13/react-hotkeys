@@ -9,11 +9,11 @@ import KeyCode from '../support/Key';
 import FocusableElement from '../support/FocusableElement';
 import KeyEventManager from '../../src/lib/KeyEventManager';
 
-beforeEach(function() {
-  KeyEventManager.clear();
-});
-
 describe('Global shortcuts:', () => {
+  beforeEach(function() {
+    KeyEventManager.clear();
+  });
+
   before(function () {
     this.globalKeyMap = {
       'GLOBAL_ACTION': 'a',
@@ -21,7 +21,7 @@ describe('Global shortcuts:', () => {
     };
   });
 
-  context('when handlers are defined at the top of a React application', () => {
+  context('when GlobalHotKeys defines handlers at the root of a React application', () => {
     beforeEach(function () {
       this.globalHandler = sinon.spy();
 
@@ -36,7 +36,7 @@ describe('Global shortcuts:', () => {
       document.body.removeChild(this.parentDiv);
     });
 
-    context('and there is no other GlobalHotKeys component', () => {
+    context('and there are no other GlobalHotKeys component', () => {
       beforeEach(function () {
         const handlers = {
           'GLOBAL_ACTION': this.globalHandler,
@@ -56,16 +56,24 @@ describe('Global shortcuts:', () => {
           this.targetElement.focus();
         });
 
-        it('then calls the correct handler when a key is pressed that matches a handler', function() {
-          this.targetElement.keyDown(KeyCode.A, { forceEnzymeEvent: true });
+        context('and a key is pressed that matches a GlobalHotKeys action', function(){
+          beforeEach(function () {
+            this.targetElement.keyDown(KeyCode.A);
+          });
 
-          expect(this.globalHandler).to.have.been.called;
+          it('then calls the correct handler', function() {
+            expect(this.globalHandler).to.have.been.called;
+          });
         });
 
-        it('then does NOT call the handler when a key is pressed that does NOT match a handler', function() {
-          this.targetElement.keyDown(KeyCode.B, { forceEnzymeEvent: true });
+        context('and a key is pressed that does NOT match a GlobalHotKeys action', () => {
+          beforeEach(function () {
+            this.targetElement.keyDown(KeyCode.B);
+          });
 
-          expect(this.globalHandler).to.not.have.been.called;
+          it('then does NOT call the handler ', function() {
+            expect(this.globalHandler).to.not.have.been.called;
+          });
         });
       });
 
@@ -74,21 +82,30 @@ describe('Global shortcuts:', () => {
           this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
         });
 
-        it('then calls the correct handler when a key is pressed that matches the keyMap', function() {
-          this.targetElement.keyDown(KeyCode.A);
+        context('a key is pressed that matches a GlobalHotKeys action', () => {
+          beforeEach(function () {
+            this.targetElement.keyDown(KeyCode.A);
+          });
 
-          expect(this.globalHandler).to.have.been.called;
+          it('then calls the correct GlobalHotKeys handler', function() {
+            expect(this.globalHandler).to.have.been.called;
+          });
         });
 
-        it('then does NOT call the handler when a key is pressed that does NOT matches the keyMap', function() {
-          this.targetElement.keyDown(KeyCode.B);
 
-          expect(this.globalHandler).to.not.have.been.called;
+        context('and a key is pressed that does NOT match any GlobalHotKeys actions', () => {
+          beforeEach(function () {
+            this.targetElement.keyDown(KeyCode.B);
+          });
+
+          it('then does NOT call the handler', function() {
+            expect(this.globalHandler).to.not.have.been.called;
+          });
         });
       });
     });
 
-    context('and there is a focus GlobalHotKeys inside it', () => {
+    context('and there is a HotKeys component inside it', () => {
       beforeEach(function () {
         this.globalCommonActionHandler = sinon.spy();
 
@@ -122,86 +139,122 @@ describe('Global shortcuts:', () => {
         );
       });
 
-      context('and the focus GlobalHotKeys is in focus', () => {
+      context('and the HotKeys component is focused', () => {
         beforeEach(function () {
           this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
           this.targetElement.focus();
         });
 
-        it('then calls the handler when a matching key is pressed', function() {
-          this.targetElement.keyDown(KeyCode.A, { forceEnzymeEvent: true });
+        context('and a key that matches a GlobalHotKeys action is pressed', () => {
+          beforeEach(function () {
+            this.targetElement.keyDown(KeyCode.A);
+          });
 
-          expect(this.globalHandler).to.have.been.called;
+          it('then calls the correct GlobalHotKeys handler', function() {
+            expect(this.globalHandler).to.have.been.called;
+          });
         });
 
-        it('then calls the focus handler when a matching key is pressed', function() {
-          this.targetElement.keyDown(KeyCode.C, { forceEnzymeEvent: true });
+        context('and a key that matches a HotKeys action is pressed', () => {
+          beforeEach(function () {
+            this.targetElement.keyDown(KeyCode.C);
+          });
 
-          expect(this.focusActionHandler).to.have.been.called;
+          it('then calls the HotKeys handler', function() {
+            expect(this.focusActionHandler).to.have.been.called;
+          });
         });
 
-        it('then calls the closest focus handler (over the handler) when a matching key is pressed', function() {
-          this.targetElement.keyDown(KeyCode.B, { forceEnzymeEvent: true });
+        context('and a key that matches HotKeys and GlobalHotKeys actions is pressed', () => {
+          beforeEach(function () {
+            this.targetElement.keyDown(KeyCode.B);
+          });
 
-          expect(this.focusCommonActionHandler).to.have.been.called;
-          expect(this.globalCommonActionHandler).to.not.have.been.called;
+          it('then calls the closest HotKeys handler (over the GlobalHotKeys handler)', function() {
+            expect(this.focusCommonActionHandler).to.have.been.called;
+            expect(this.globalCommonActionHandler).to.not.have.been.called;
+          });
         });
       });
 
-      context('and the focus GlobalHotKeys is NOT in focus (but the React app still is)', () => {
+      context('and the HotKeys component is NOT in focus (but the React app still is)', () => {
         beforeEach(function () {
           this.targetElement = new FocusableElement(this.wrapper, '.siblingElement', { nativeElement: true });
           this.targetElement.focus();
         });
 
-        it('then calls the handler when a matching key is pressed', function() {
-          this.targetElement.keyDown(KeyCode.A, { forceEnzymeEvent: true });
+        context('and a key that matches a GlobalHotKeys action is pressed', () => {
+          beforeEach(function () {
+            this.targetElement.keyDown(KeyCode.A);
+          });
 
-          expect(this.globalHandler).to.have.been.called;
+          it('then calls the HotKeys handler', function() {
+            expect(this.globalHandler).to.have.been.called;
+          });
         });
 
-        it('then does NOT call the focus handler when a matching key is pressed', function() {
-          this.targetElement.keyDown(KeyCode.C, { forceEnzymeEvent: true });
+        context('and a key that matches a HotKeys action is pressed', () => {
+          beforeEach(function () {
+            this.targetElement.keyDown(KeyCode.C);
+          });
 
-          expect(this.focusActionHandler).to.not.have.been.called;
+          it('then does NOT call the HotKeys handler', function() {
+            expect(this.focusActionHandler).to.not.have.been.called;
+          });
         });
 
-        it('then calls the handler when a matching key is pressed', function() {
-          this.targetElement.keyDown(KeyCode.B, { forceEnzymeEvent: true });
+        context('and a key that matches both HotKeys and the GlobalHotKeys actions is pressed', () => {
+          beforeEach(function () {
+            this.targetElement.keyDown(KeyCode.B);
+          });
 
-          expect(this.globalCommonActionHandler).to.have.been.called;
-          expect(this.focusCommonActionHandler).to.not.have.been.called;
+          it('then calls the GlobalHotKeys handler', function() {
+            expect(this.globalCommonActionHandler).to.have.been.called;
+            expect(this.focusCommonActionHandler).to.not.have.been.called;
+          });
         });
       });
 
-      context('and the React app is not in focus', () => {
+      context('and the React app is NOT in focus', () => {
         beforeEach(function () {
           this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
         });
 
-        it('then calls the handler when a matching key is pressed', function() {
-          this.targetElement.keyDown(KeyCode.A);
+        context('and a key that matches a GlobalHotKeys action is pressed', () => {
+          beforeEach(function () {
+            this.targetElement.keyDown(KeyCode.A);
+          });
 
-          expect(this.globalHandler).to.have.been.called;
+          it('then calls the GlobalHotKeys handler', function() {
+            expect(this.globalHandler).to.have.been.called;
+          });
         });
 
-        it('then does NOT call the focus handler when a matching key is pressed', function() {
-          this.targetElement.keyDown(KeyCode.C);
+        context('and a key that matches a HotKeys action is pressed', () => {
+          beforeEach(function () {
+            this.targetElement.keyDown(KeyCode.C);
+          });
 
-          expect(this.focusActionHandler).to.not.have.been.called;
+          it('then does NOT call the HotKeys handler', function() {
+            expect(this.focusActionHandler).to.not.have.been.called;
+          });
         });
 
-        it('then calls the handler when a matching key is pressed', function() {
-          this.targetElement.keyDown(KeyCode.B);
+        context('and a key that matches both HotKeys and the GlobalHotKeys is pressed', () => {
+          beforeEach(function () {
+            this.targetElement.keyDown(KeyCode.B);
+          });
 
-          expect(this.globalCommonActionHandler).to.have.been.called;
-          expect(this.focusCommonActionHandler).to.not.have.been.called;
+          it('then calls the GlobalHotKeys handler', function() {
+            expect(this.globalCommonActionHandler).to.have.been.called;
+            expect(this.focusCommonActionHandler).to.not.have.been.called;
+          });
         });
       });
     });
   });
 
-  context('when GlobalHotKeys is nested inside a focus GlobalHotKeys', () => {
+  context('when a GlobalHotKeys component is nested inside a HotKeys component', () => {
     beforeEach(function () {
       this.globalHandler = sinon.spy();
 
@@ -249,80 +302,116 @@ describe('Global shortcuts:', () => {
       document.body.removeChild(this.parentDiv);
     });
 
-    context('and the GlobalHotKeys is in focus', () => {
+    context('and the GlobalHotKeys component is in focus', () => {
       beforeEach(function () {
         this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
         this.targetElement.focus();
       });
 
-      it('then calls the handler when a matching key is pressed', function() {
-        this.targetElement.keyDown(KeyCode.A, { forceEnzymeEvent: true });
+      context('and key that matches a GlobalHotKeys action is pressed', () => {
+        beforeEach(function () {
+          this.targetElement.keyDown(KeyCode.A);
+        });
 
-        expect(this.globalHandler).to.have.been.called;
+        it('then calls the GlobalHotKeys handler', function() {
+          expect(this.globalHandler).to.have.been.called;
+        });
       });
 
-      it('then calls the focus handler when a matching key is pressed', function() {
-        this.targetElement.keyDown(KeyCode.C, { forceEnzymeEvent: true });
+      context('and a key that matches a HotKeys action is pressed', () => {
+        beforeEach(function () {
+          this.targetElement.keyDown(KeyCode.C);
+        });
 
-        expect(this.focusActionHandler).to.have.been.called;
+        it('then calls the HotKeys handler', function() {
+          expect(this.focusActionHandler).to.have.been.called;
+        });
       });
 
-      it('then calls the closest focus handler (over the handler) when a matching key is pressed', function() {
-        this.targetElement.keyDown(KeyCode.B, { forceEnzymeEvent: true });
+      context('and a key matching both HotKeys and the GlobalHotKeys is pressed', () => {
+        beforeEach(function () {
+          this.targetElement.keyDown(KeyCode.B);
+        });
 
-        expect(this.focusCommonActionHandler).to.have.been.called;
-        expect(this.globalCommonActionHandler).to.not.have.been.called;
+        it('then calls the closest HotKeys handler (over the GlobalHotKeys handler)', function() {
+          expect(this.focusCommonActionHandler).to.have.been.called;
+          expect(this.globalCommonActionHandler).to.not.have.been.called;
+        });
       });
     });
 
-    context('and the focus GlobalHotKeys is NOT in focus (but the React app still is)', () => {
+    context('and the GlobalHotKeys is NOT in focus (but the React app still is)', () => {
       beforeEach(function () {
         this.targetElement = new FocusableElement(this.wrapper, '.siblingElement', { nativeElement: true });
         this.targetElement.focus();
       });
 
-      it('then calls the handler when a matching key is pressed', function() {
-        this.targetElement.keyDown(KeyCode.A, { forceEnzymeEvent: true });
+      context('and a key that matches a GlobalHotKeys action is pressed', () => {
+        beforeEach(function () {
+          this.targetElement.keyDown(KeyCode.A);
+        });
 
-        expect(this.globalHandler).to.have.been.called;
+        it('then calls the GlobalHotKeys handler', function() {
+          expect(this.globalHandler).to.have.been.called;
+        });
       });
 
-      it('then does NOT call the focus handler when a matching key is pressed', function() {
-        this.targetElement.keyDown(KeyCode.C, { forceEnzymeEvent: true });
+      context('and a key that matches a HotKeys action is pressed', () => {
+        beforeEach(function () {
+          this.targetElement.keyDown(KeyCode.C);
+        });
 
-        expect(this.focusActionHandler).to.not.have.been.called;
+        it('then does NOT call the HotKeys handler', function() {
+          expect(this.focusActionHandler).to.not.have.been.called;
+        });
       });
 
-      it('then calls the handler when a matching key is pressed', function() {
-        this.targetElement.keyDown(KeyCode.B, { forceEnzymeEvent: true });
+      context('and a key that matches both HotKeys and the GlobalHotKeys actions is pressed', () => {
+        beforeEach(function () {
+          this.targetElement.keyDown(KeyCode.B);
+        });
 
-        expect(this.globalCommonActionHandler).to.have.been.called;
-        expect(this.focusCommonActionHandler).to.not.have.been.called;
+        it('then calls the GlobalHotKeys handler', function() {
+          expect(this.globalCommonActionHandler).to.have.been.called;
+          expect(this.focusCommonActionHandler).to.not.have.been.called;
+        });
       });
     });
 
-    context('and the React app is not in focus', () => {
+    context('and the React app is NOT in focus', () => {
       beforeEach(function () {
         this.targetElement = new FocusableElement(this.wrapper, '.childElement', { nativeElement: true });
       });
 
-      it('then calls the handler when a matching key is pressed', function() {
-        this.targetElement.keyDown(KeyCode.A);
+      context('and a key that matches a GlobalHotKeys action is pressed', () => {
+        beforeEach(function () {
+          this.targetElement.keyDown(KeyCode.A);
+        });
 
-        expect(this.globalHandler).to.have.been.called;
+        it('then calls the GlobalHotKeys handler', function() {
+          expect(this.globalHandler).to.have.been.called;
+        });
       });
 
-      it('then does NOT call the focus handler when a matching key is pressed', function() {
-        this.targetElement.keyDown(KeyCode.C);
+      context('and a key that matches a HotKeys handles is pressed', () => {
+        beforeEach(function () {
+          this.targetElement.keyDown(KeyCode.C);
+        });
 
-        expect(this.focusActionHandler).to.not.have.been.called;
+        it('then does NOT call the HotKeys handler', function() {
+          expect(this.focusActionHandler).to.not.have.been.called;
+        });
       });
 
-      it('then calls the handler when a matching key is pressed', function() {
-        this.targetElement.keyDown(KeyCode.B);
+      context('and a key that matches both HotKeys and GlobalHotKeys actions is pressed', () => {
+        beforeEach(function () {
+          this.targetElement.keyDown(KeyCode.B);
+        });
 
-        expect(this.globalCommonActionHandler).to.have.been.called;
-        expect(this.focusCommonActionHandler).to.not.have.been.called;
+        it('then calls the GlobalHotKeys handler', function() {
+          expect(this.globalCommonActionHandler).to.have.been.called;
+          expect(this.focusCommonActionHandler).to.not.have.been.called;
+        });
       });
     });
 
