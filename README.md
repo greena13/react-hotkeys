@@ -840,12 +840,12 @@ By default, `<ObserveKeys />` will force all key events to be observed, but you 
 </ObserveKeys>
 ```
 
-### withHotKeysIgnore HoC API
+### withObserveKeys HoC API
 
 Similar to the `<HotKeys>`'s `withHotKeys()` function, there is a `withObserveKeys()` function for achieving the `<ObserveKeys>` functionality, without the need for rendering a surrounding DOM-mountable element.
 
 ```javascript
-import {withHotKeysAlwaysObserve} from 'react-hotkeys';
+import {withObserveKeys} from 'react-hotkeys';
 
 class MyComponent extends Component {
   render() {
@@ -865,7 +865,7 @@ class MyComponent extends Component {
   }
 }
 
-const MyHotKeysComponent = withHotKeysAlwaysObserve(MyComponent);
+const MyHotKeysComponent = withObserveKeys(MyComponent);
 
 <MyHotKeysComponent except={ 'Escape' }>
   <div>
@@ -877,7 +877,7 @@ const MyHotKeysComponent = withHotKeysAlwaysObserve(MyComponent);
 `withObserveKeys()` also accepts a second argument that becomes the default props of the component it returns:
 
 ```javascript
-import {withHotKeysAlwaysObserve} from 'react-hotkeys';
+import {withObserveKeys} from 'react-hotkeys';
 
 class MyComponent extends Component {
   render() {
@@ -897,7 +897,7 @@ class MyComponent extends Component {
   }
 }
 
-const MyHotKeysComponent = withHotKeysAlwaysObserve(MyComponent, { except: 'Escape' });
+const MyHotKeysComponent = withObserveKeys(MyComponent, { except: 'Escape' });
 
 <MyHotKeysComponent>
   <div>
