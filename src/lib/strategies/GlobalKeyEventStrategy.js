@@ -1,6 +1,5 @@
 import KeyEventBitmapManager from '../KeyEventBitmapManager';
 import KeyEventBitmapIndex from '../../const/KeyEventBitmapIndex';
-import KeyEventSequenceIndex from '../../const/KeyEventSequenceIndex';
 import AbstractKeyEventStrategy from './AbstractKeyEventStrategy';
 import capitalize from '../../utils/string/capitalize';
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
@@ -254,25 +253,29 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     if (reactAppHistoryWithEvent === 'handled') {
       this.logger.debug(
-        `${this._logPrefix()} Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event because React app has already handled it.`
+        this._logPrefix(),
+        `Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event because React app has already handled it.`
       );
     } else {
       if (reactAppHistoryWithEvent === 'seen') {
         this.logger.debug(
-          `${this._logPrefix()} Received ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event (that has already passed through React app).`
+          this._logPrefix(),
+          `Received ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event (that has already passed through React app).`
         );
 
       } else {
         KeyEventCounter.incrementId();
 
         this.logger.debug(
-          `${this._logPrefix()} New ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event (that has NOT passed through React app).`
+          this._logPrefix(),
+          `New ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event (that has NOT passed through React app).`
         );
       }
 
       if (this.eventOptions.ignoreEventsCondition(event)) {
         this.logger.debug(
-          `${this._logPrefix()} Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event because ignoreEventsFilter rejected it.`
+          this._logPrefix(),
+          `Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event because ignoreEventsFilter rejected it.`
         );
 
         return;
@@ -329,27 +332,31 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     if (reactAppHistoryWithEvent === 'handled') {
       this.logger.debug(
-        `${this._logPrefix()} Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event because React app has already handled it.`
+        this._logPrefix(),
+        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event because React app has already handled it.`
       );
 
       return false;
     } else {
       if (reactAppHistoryWithEvent === 'seen') {
         this.logger.debug(
-          `${this._logPrefix()} ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event (that has already passed through React app).`
+          this._logPrefix(),
+          `${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event (that has already passed through React app).`
         );
 
       } else {
         KeyEventCounter.incrementId();
 
         this.logger.debug(
-          `${this._logPrefix()} New ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event (that has NOT passed through React app).`
+          this._logPrefix(),
+          `New ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event (that has NOT passed through React app).`
         );
       }
 
       if (this.eventOptions.ignoreEventsCondition(event)) {
         this.logger.debug(
-          `${this._logPrefix()} Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event because ignoreEventsFilter rejected it.`
+          this._logPrefix(),
+          `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event because ignoreEventsFilter rejected it.`
         );
 
         return false;
@@ -408,14 +415,16 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     if (reactAppHistoryWithEvent === 'handled') {
       this.logger.debug(
-        `${this._logPrefix()} Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keyup)} event because React app has already handled it.`
+        this._logPrefix(),
+        `Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keyup)} event because React app has already handled it.`
       );
 
       return false;
     } else {
       if (reactAppHistoryWithEvent === 'seen') {
         this.logger.debug(
-          `${this._logPrefix()} ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keyup)} event (that has already passed through React app).`
+          this._logPrefix(),
+          `${describeKeyEvent(event, _key, KeyEventBitmapIndex.keyup)} event (that has already passed through React app).`
         );
 
         return true;
@@ -424,13 +433,15 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         KeyEventCounter.incrementId();
 
         this.logger.debug(
-          `${this._logPrefix()} New ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keyup)} event (that has NOT passed through React app).`
+          this._logPrefix(),
+          `New ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keyup)} event (that has NOT passed through React app).`
         );
       }
 
       if (this.eventOptions.ignoreEventsCondition(event)) {
         this.logger.debug(
-          `${this._logPrefix()} Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keyup)} event because ignoreEventsFilter rejected it.`
+          this._logPrefix(),
+          `Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keyup)} event because ignoreEventsFilter rejected it.`
         );
 
         return false;
@@ -470,11 +481,13 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     super._startNewKeyCombination(keyName, eventBitmapIndex);
 
     this.logger.verbose(
-      `${this._logPrefix()} Started a new combination with '${keyName}'.`
+      this._logPrefix(),
+      `Started a new combination with '${keyName}'.`
     );
 
     this.logger.verbose(
-      `${this._logPrefix()} Key history: ${printComponent(this.keyCombinationHistory)}.`
+      this._logPrefix(),
+      `Key history: ${printComponent(this.keyCombinationHistory)}.`
     );
   }
 
@@ -483,12 +496,14 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     if (eventBitmapIndex === KeyEventBitmapIndex.keydown) {
       this.logger.verbose(
-        `${this._logPrefix()} Added '${keyName}' to current combination: '${this._getCurrentKeyCombination().ids[0]}'.`
+        this._logPrefix(),
+        `Added '${keyName}' to current combination: '${this._getCurrentKeyCombination().ids[0]}'.`
       );
     }
 
     this.logger.verbose(
-      `${this._logPrefix()} Key history: ${printComponent(this.keyCombinationHistory)}.`
+      this._logPrefix(),
+      `Key history: ${printComponent(this.keyCombinationHistory)}.`
     );
   }
 
@@ -529,7 +544,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
        * key combination
        */
       this.logger.verbose(
-        `${this._logPrefix()} Attempting to find action matching '${combinationName}' ${eventName} . . .`
+        this._logPrefix(),
+        `Attempting to find action matching '${combinationName}' ${eventName} . . .`
       );
 
       this._callMatchingHandlerClosestToEventTarget(
@@ -544,7 +560,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
        * for the current key combination
        */
       this.logger.debug(
-        `${this._logPrefix()} Ignored '${combinationName}' ${eventName} because it doesn't have any ${eventName} handlers.`
+        this._logPrefix(),
+        `Ignored '${combinationName}' ${eventName} because it doesn't have any ${eventName} handlers.`
       );
     }
   }
@@ -561,7 +578,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
       if (matchFound) {
         this.logger.debug(
-          `${this._logPrefix()} Searching no further, as handler has been found (and called).`
+          this._logPrefix(),
+          `Searching no further, as handler has been found (and called).`
         );
 
         return;

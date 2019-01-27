@@ -273,7 +273,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     if (focusTreeId !== this.focusTreeId) {
       this.logger.debug(
-        `${this._logPrefix(componentId)}' Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event because it had an old focus tree id: ${focusTreeId}.`
+        this._logPrefix(componentId),
+        `Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event because it had an old focus tree id: ${focusTreeId}.`
       );
 
       this._ignoreEvent(event, componentId);
