@@ -3,8 +3,10 @@
  * across different keyboard layouts and operating systems - this builds on top
  * of what React already does.
  */
+import invertArrayDictionary from '../utils/invertArrayDictionary';
+
 const KeyOSAndLayoutAliasesDictionary = {
   'Backspace': [ 'Delete' ],
 };
 
-export default KeyOSAndLayoutAliasesDictionary;
+export default invertArrayDictionary(KeyOSAndLayoutAliasesDictionary, { includeOriginal: true });

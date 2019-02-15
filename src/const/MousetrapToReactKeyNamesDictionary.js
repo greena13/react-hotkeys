@@ -29,7 +29,7 @@ const MousetrapToReactKeyNamesDictionary = {
    * Mac
    */
   'return': 'Enter',
-  'del': 'Backspace',
+  'del': 'Delete',
   'command': 'Meta',
   'option': 'Alt',
 
