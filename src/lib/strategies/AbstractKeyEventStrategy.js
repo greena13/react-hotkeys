@@ -34,6 +34,18 @@ class AbstractKeyEventStrategy {
    ********************************************************************************/
 
   /**
+   * Returns a new, empty key combination
+   * @returns {KeyCombinationRecord} A new, empty key combination
+   */
+  static emptyKeyCombination() {
+    return {
+      keys: {},
+      ids: [ '' ],
+      keyAliases: {}
+    };
+  }
+
+  /**
    * Creates a new instance of a event strategy (this class is an abstract one and
    * not intended to be instantiated directly)
    * @param {Object} options Options for how event strategy should behave
@@ -225,7 +237,8 @@ class AbstractKeyEventStrategy {
       this.keyCombinationHistory = [
         {
           keys: keysStillPressed,
-          ids: KeyCombinationSerializer.serialize(keysStillPressed)
+          ids: KeyCombinationSerializer.serialize(keysStillPressed),
+
         }
       ]
     }
@@ -572,7 +585,7 @@ class AbstractKeyEventStrategy {
     if (this.keyCombinationHistory.length > 0) {
       return this.keyCombinationHistory[this.keyCombinationHistory.length - 1];
     } else {
-      return { keys: {}, ids: [ '' ], keyAliases: {} };
+      return this.constructor.emptyKeyCombination();
     }
   }
 
@@ -585,7 +598,7 @@ class AbstractKeyEventStrategy {
    */
   _addToCurrentKeyCombination(keyName, bitmapIndex) {
     if (this.keyCombinationHistory.length === 0) {
-      this.keyCombinationHistory.push({ keys: {}, ids: [ '' ], keyAliases: {} });
+      this.keyCombinationHistory.push(this.constructor.emptyKeyCombination());
     }
 
     const keyCombination = this._getCurrentKeyCombination();
