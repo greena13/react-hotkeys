@@ -91,7 +91,7 @@ class AbstractKeyEventStrategy {
     this.rootComponentId = null;
 
     this._reset();
-    this._resetKeyCombinationHistory();
+    this.resetKeyCombinationHistory();
   }
 
   /**
@@ -205,9 +205,11 @@ class AbstractKeyEventStrategy {
 
   /**
    * Reset the state values that record the current and recent state of key events
-   * @private
+   * @param {Object} options An options hash
+   * @param {Boolean} options.force Whether to force a hard reset of the key
+   *        combination history.
    */
-  _resetKeyCombinationHistory() {
+  resetKeyCombinationHistory(options = {}) {
     /**
      * Whether the current key combination includes at least one keyup event - indicating
      * that the current combination is ending (and keys are being released)
@@ -218,7 +220,7 @@ class AbstractKeyEventStrategy {
 
     this.keyupEventsToSimulate = [];
 
-    if (!this.keyCombinationHistory || this.keyCombinationHistory.length < 1) {
+    if (!this.keyCombinationHistory || this.keyCombinationHistory.length < 1 || options.force) {
       this.keyCombinationHistory = [];
     } else {
       const currentKeyCombination = this._getCurrentKeyCombination();

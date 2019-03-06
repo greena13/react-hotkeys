@@ -43,6 +43,8 @@ class KeyEventManager {
 
     this._globalEventStrategy =
       new GlobalKeyEventStrategy({ configuration, logger: this.logger }, this);
+
+    this.mountedComponentsCount = 0;
   }
 
   /********************************************************************************
@@ -94,7 +96,37 @@ class KeyEventManager {
    * @param {ComponentId} parentId - Id of the parent HotKeys component
    */
   registerComponentMount(componentId, parentId) {
+    this._incrementComponentCount();
+
     return this._focusOnlyEventStrategy.registerComponentMount(componentId, parentId);
+  }
+
+  registerComponentUnmount() {
+    this._decrementComponentCount();
+  }
+
+  _incrementComponentCount(){
+    const preMountedComponentCount = this.mountedComponentsCount;
+    this.mountedComponentsCount += 1;
+
+    if (preMountedComponentCount === 0 && this.mountedComponentsCount === 1) {
+      window.onblur = () => this._clearKeyHistory();
+    }
+  }
+
+  _decrementComponentCount(){
+    const preMountedComponentCount = this.mountedComponentsCount;
+    this.mountedComponentsCount -= 1;
+
+    if (preMountedComponentCount === 1 && this.mountedComponentsCount === 0) {
+      delete window.onblur;
+    }
+  }
+
+  _clearKeyHistory() {
+    this.logger.info('HotKeys: Window focused - clearing key history');
+    this._focusOnlyEventStrategy.resetKeyCombinationHistory({ force: true });
+    this._globalEventStrategy.resetKeyCombinationHistory({ force: true });
   }
 
   /**
@@ -108,6 +140,10 @@ class KeyEventManager {
     return this._globalEventStrategy.registerKeyMap(keyMap);
   }
 
+  registerGlobalComponentUnmount() {
+    this._decrementComponentCount();
+  }
+
   /**
    * Registers that a component has now mounted, and declares its parent GlobalHotKeys
    * component id so that actions may be properly resolved
@@ -115,6 +151,8 @@ class KeyEventManager {
    * @param {ComponentId} parentId - Id of the parent GlobalHotKeys component
    */
   registerGlobalComponentMount(componentId, parentId) {
+    this._incrementComponentCount();
+
     return this._globalEventStrategy.registerComponentMount(componentId, parentId);
   }
 

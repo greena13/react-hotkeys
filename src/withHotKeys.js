@@ -280,6 +280,8 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       const keyEventManager = KeyEventManager.getInstance();
 
       keyEventManager.deregisterKeyMap(this._id);
+      keyEventManager.registerComponentUnmount();
+
       this._handleBlur();
     }
 

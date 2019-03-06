@@ -89,6 +89,8 @@ class GlobalHotKeys extends Component {
 
     keyEventManager.deregisterGlobalKeyMap(this._id);
     keyEventManager.disableGlobalHotKeys(this._id);
+
+    keyEventManager.registerGlobalComponentUnmount();
   }
 
   _getComponentOptions() {
