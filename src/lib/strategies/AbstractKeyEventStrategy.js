@@ -238,7 +238,7 @@ class AbstractKeyEventStrategy {
         {
           keys: keysStillPressed,
           ids: KeyCombinationSerializer.serialize(keysStillPressed),
-
+          keyAliases: this._buildCombinationKeyAliases(keysStillPressed)
         }
       ]
     }
