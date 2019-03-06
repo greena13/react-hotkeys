@@ -53,12 +53,41 @@ export interface HotKeysEnabledProps extends GlobalHotKeysProps {
   onBlur?: () => void;
 }
 
+/**
+ * The props the DOM-mountable node rendered by component passed to HotKeys
+ * must accept
+ */
+export interface ComponentPropsBase {
+  /**
+   * Function to bind to root node, in order for react-hotkeys to work
+   */
+  onFocus: () => void;
+
+  /**
+   * Function to bind to root node, in order for react-hotkeys to work
+   */
+  onBlur: () => void;
+
+  /**
+   * The value of the HTML tabindex attribute the root node will have
+   */
+  tabIndex: string | number;
+}
+
+/**
+ * The props the component passed to HotKeys must accept, and pass down
+ * to a DOM-mountable child (preferably the root)
+ */
+export interface ComponentProps extends ComponentPropsBase {
+  ref?: React.forwardRef<React.ComponentClass, ComponentPropsBase>
+}
+
 export interface HotKeysProps extends HotKeysEnabledProps {
   /**
    * The React component that should be used in the DOM to wrap the FocusTrap's
    * children and have the internal key listeners bound to
    */
-  component?: React.ComponentClass | string;
+  component?: React.ComponentClass | string | React.SFC<ComponentProps>;
 
   innerRef?: React.RefObject<HTMLInputElement>;
 }
