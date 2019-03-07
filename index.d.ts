@@ -149,8 +149,6 @@ export interface HotKeysOverrideProps extends React.HTMLAttributes<HotKeys> {
  */
 export class IgnoreKeys extends React.Component<HotKeysOverrideProps, {}> { }
 
-export class ObserveKeys extends React.Component<HotKeysOverrideProps, {}> { }
-
 /**
  * Wraps a React component in a HotKeysIgnored component, which passes down the
  * callbacks and options necessary for React Hotkeys to work as a single prop value,
@@ -158,7 +156,24 @@ export class ObserveKeys extends React.Component<HotKeysOverrideProps, {}> { }
  * the wrapped component (e.g. div, span, input, etc) in order for the key events
  * to be recorded.
  */
-export declare function withHotKeysIgnore(Component: React.ComponentClass, hotKeysIgnoreOptions: HotKeysOverrideProps): IgnoreKeys;
+export declare function withIgnoreKeys(Component: React.ComponentClass, hotKeysIgnoreOptions: HotKeysOverrideProps): IgnoreKeys;
+
+/**
+ * A component that forces React Hotkeys to observe all matching key events
+ * triggered by its children, even if they are matched by Configuration.ignoreEventsCondition.
+ * By default, this is all key events, but you can use the only prop to provide a
+ * whitelist, or the except prop to pass a blacklist.
+ */
+export class ObserveKeys extends React.Component<HotKeysOverrideProps, {}> { }
+
+/**
+ * Wraps a React component in a ObserveKeys component, which passes down the
+ * callbacks and options necessary for React Hotkeys to work as a single prop value,
+ * hotkeys. These must be unwrapped and applied to a DOM-mountable element within
+ * the wrapped component (e.g. div, span, input, etc) in order for the key events
+ * to be recorded.
+ */
+export declare function withObserveKeys(Component: React.ComponentClass, hotKeysIgnoreOptions: HotKeysOverrideProps): ObserveKeys;
 
 export type ApplicationKeyMap = { [key in ActionName]: Array<MouseTrapKeySequence> };
 
