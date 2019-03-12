@@ -93,7 +93,7 @@ export interface HotKeysProps extends HotKeysEnabledProps {
    */
   component?: ReactComponent;
 
-  innerRef?: React.RefObject<HTMLInputElement>;
+  innerRef?: React.RefObject<HTMLElement>;
 }
 
 /**
