@@ -151,7 +151,7 @@ The Bower version of the package will **not** be supported going forward (includ
 
 > When a user presses the corresponding combination or sequence of keys, it is said they _match_ the hot keys, which causes an action to be _triggered_. `react-hotkeys` may then resolve an appropriate handler function to _handle_ the action.
 
-Key maps are Plain Old JavaScript Objects, where the keys are the action names and the values are usually a [Mousetrap-supported](https://craig.is/killing/mice) or [Browser Key Values](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values) sequence string (but can also be an [array](#Alternative-Hotkeys) or an [object](#Key-Combination-vs-Sequences)) that must be matched in order to trigger the action.
+Key maps are Plain Old JavaScript Objects, where the keys are the action names and the values are usually a [Mousetrap-supported](https://craig.is/killing/mice) or [Browser Key Values](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values) sequence string (but can also be an [array](#Alternative-Hotkeys) or an [object](#Key-Combinations-vs-Sequences)) that must be matched in order to trigger the action.
 
 ```javascript
 const keyMap = {
