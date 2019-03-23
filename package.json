@@ -69,19 +69,19 @@
     "react": ">= 0.14.0"
   },
   "scripts": {
-    "lint": "eslint .",
-    "tests": "mocha",
-    "watch-tests": "mocha --watch",
-    "prepublish": "npm run build-cjs && npm run build-es && npm run build-umd",
     "build-cjs": "rm -rf cjs && npm run build-development && npm run build-production",
-    "build-es": "rm -rf es && npm run build-es-development && npm run build-es-production",
-    "build-umd": "rm -rf umd && npm run build-umd-development && npm run build-umd-production",
     "build-development": "cross-env BABEL_ENV=development NODE_ENV=development babel src -d cjs",
-    "build-es-development": "cross-env BABEL_ENV=es-development NODE_ENV=development babel src -d es",
-    "build-umd-development": "cross-env BABEL_ENV=umd-development NODE_ENV=development rollup --format umd --name ReactHotkeys -c --file umd/react-hotkeys.js",
     "build-production": "cross-env BABEL_ENV=production NODE_ENV=production rollup --format cjs -c --file cjs/react-hotkeys.production.min.js",
+    "build-es": "rm -rf es && npm run build-es-development && npm run build-es-production",
+    "build-es-development": "cross-env BABEL_ENV=es-development NODE_ENV=development babel src -d es",
     "build-es-production": "cross-env BABEL_ENV=es-production NODE_ENV=production rollup --format es -c --file es/react-hotkeys.production.min.js",
-    "build-umd-production": "cross-env BABEL_ENV=production NODE_ENV=production rollup --format umd --name ReactHotkeys -c --file umd/react-hotkeys.min.js"
+    "build-umd": "rm -rf umd && npm run build-umd-development && npm run build-umd-production",
+    "build-umd-development": "cross-env BABEL_ENV=umd-development NODE_ENV=development rollup --format umd --name ReactHotkeys -c --file umd/react-hotkeys.js",
+    "build-umd-production": "cross-env BABEL_ENV=production NODE_ENV=production rollup --format umd --name ReactHotkeys -c --file umd/react-hotkeys.min.js",
+    "lint": "eslint .",
+    "prepublish": "npm run build-cjs && npm run build-es && npm run build-umd",
+    "test": "mocha",
+    "watch-tests": "mocha --watch"
   },
   "author": "Aleck Greenham",
   "contributors": [
