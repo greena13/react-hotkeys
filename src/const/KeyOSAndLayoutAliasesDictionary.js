@@ -6,7 +6,6 @@
 import invertArrayDictionary from '../utils/invertArrayDictionary';
 
 const KeyOSAndLayoutAliasesDictionary = {
-  'Backspace': [ 'Delete' ],
 };
 
 export default invertArrayDictionary(KeyOSAndLayoutAliasesDictionary, { includeOriginal: true });
