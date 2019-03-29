@@ -8,7 +8,7 @@ import { GlobalHotKeys } from '../../src/';
 
 ['backspace', 'BackSpace'].forEach(function(keyAlias) {
   describe(`When an action is defined using the combination '${keyAlias}':`, () => {
-    context(`and a Backspace event is triggered`, () => {
+    context('and a Backspace event is triggered', () => {
       beforeEach(function () {
         this.keyMap = {
           'ACTION1': keyAlias,
@@ -46,7 +46,7 @@ import { GlobalHotKeys } from '../../src/';
 
 ['del', 'Delete'].forEach(function(keyAlias) {
   describe(`When an action is defined using the combination '${keyAlias}':`, () => {
-    context(`and a Delete event is triggered`, () => {
+    context('and a Delete event is triggered', () => {
       beforeEach(function () {
         this.keyMap = {
           'ACTION1': keyAlias,

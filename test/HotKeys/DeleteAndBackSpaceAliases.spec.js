@@ -8,7 +8,7 @@ import FocusableElement from '../support/FocusableElement';
 
 ['backspace', 'BackSpace'].forEach(function(keyAlias) {
   describe(`When an action is defined using the combination '${keyAlias}':`, () => {
-    context(`and a BackSpace event is triggered`, () => {
+    context('and a BackSpace event is triggered', () => {
       beforeEach(function () {
         this.keyMap = {
           'ACTION1': keyAlias,
@@ -41,7 +41,7 @@ import FocusableElement from '../support/FocusableElement';
 
 ['del', 'Delete'].forEach(function(keyAlias) {
   describe(`When an action is defined using the combination '${keyAlias}':`, () => {
-    context(`and a Delete event is triggered`, () => {
+    context('and a Delete event is triggered', () => {
       beforeEach(function () {
         this.keyMap = {
           'ACTION1': keyAlias,
