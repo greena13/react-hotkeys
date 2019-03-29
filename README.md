@@ -73,7 +73,7 @@ export default MyNode;
 
 ## Licenses
 
-`react-hotkeys` is released under the [ISC License](/https://github.com/greena13/react-hotkeys/blob/master/LICENSE). 
+`react-hotkeys` is released under the [ISC License](/LICENSE). 
 
 However, please note: the source code found in the lib/vendor directory is under the MIT License - please see the license file for each directory for more information.
 
