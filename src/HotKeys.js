@@ -25,7 +25,7 @@ HotKeys.propTypes = {
   /**
    * A ref to add to the underlying DOM-mountable node
    */
-  innerRef: PropTypes.object
+  innerRef: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
 };
 
 export default HotKeys;
