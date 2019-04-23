@@ -409,6 +409,16 @@ You can retrieve the element that is currently focused using the following:
 document.activeElement;
 ```
 
+### Preventing default browser behaviour
+
+If you find that you want to bind to a key sequence that is already used by the browser, you can prevent the default behaviour by calling the `preventDefault` method on the event object:
+
+```javascript
+event.preventDefault();
+```
+
+It's generally not advised to do this, as it likely violates the [Principle of Least Surprise](https://en.wikipedia.org/wiki/Principle_of_least_astonishment).
+
 ## HotKeys component API
 
 The HotKeys component provides a declarative and native JSX syntax that is best for succinctly declaring hotkeys in a way that best maintains separation and encapsulation with regards to the rest of your code base.
