@@ -18,17 +18,17 @@ See the [upgrade notes](https://github.com/greena13/react-hotkeys/releases/tag/v
 
 ## Feature Overview
 
-- Offers a minimal declarative [JSX](#HotKeys-component-API) and [HoC](#withHotKeys-HoC-API) APIs
-- Supports [browser key names](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values) and [Mousetrap syntax](https://github.com/ccampbell/mousetrap)
-- Allows you to define [global](#GlobalHotKeys-component) and [in-focus](#HotKeys-component) hot keys
-- Allows you to easily [display a list of available hot keys to the user](#Displaying-a-list-of-available-hot-keys)
+- Minimal declarative [JSX](#HotKeys-component-API) and [HoC](#withHotKeys-HoC-API) APIs
+- [Browser key names](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values) and [Mousetrap syntax](https://github.com/ccampbell/mousetrap)
+- Define [global](#GlobalHotKeys-component) and [in-focus](#HotKeys-component) hot keys
+- [Display a list of available hot keys to the user](#Displaying-a-list-of-available-hot-keys)
 - Works with React's Synthetic KeyboardEvents and event delegation and provides [predictable and expected behaviour](#Interaction-with-React) to anyone familiar with React
-- It is optimized by default, but allows you to turn off different optimisation measures in a granular fashion
-- It's customizable through a simple [configuration API](#Configuration)
+- Optimized by default, but allows you to turn off different optimisation measures in a granular fashion
+- Customizable through a simple [configuration API](#Configuration)
 - [Optimized for larger applications](#Optimizations), with many hot keys active at once
 - Depends only on `prop-types` and a peer dependency of `react`
-- Uses rollup, Uglify and strips out comments and logging for a small production build
-- Has more than [1800 automated tests](https://github.com/greena13/react-hotkeys/tree/master/test)
+- Uses rollup and Uglify and strips out comments and logging for a small production build
+- More than [1800 automated tests](https://github.com/greena13/react-hotkeys/tree/master/test)
 
 ## Basic Usage
 
@@ -72,6 +72,75 @@ const MyNode = () => {
 
 export default MyNode;
 ```
+
+## Contents
+
+- [Licenses](#licenses)
+- [Install](#install)
+    - [CommonJS & ES6 Modules](#commonjs--es6-modules)
+        - [The latest pre-release](#the-latest-pre-release)
+    - [UMD](#umd)
+        - [Development build](#development-build)
+        - [Minified production build](#minified-production-build)
+    - [Bower](#bower)
+- [Defining key maps](#defining-key-maps)
+    - [Key Combinations vs Sequences](#key-combinations-vs-sequences)
+    - [Full Reference](#full-reference)
+    - [Alternative Hotkeys](#alternative-hotkeys)
+    - [Specifying key events (keydown, keypress, keyup)](#specifying-key-events-keydown-keypress-keyup)
+    - [Deciding which key map syntax to use](#deciding-which-key-map-syntax-to-use)
+- [Defining Handlers](#defining-handlers)
+    - [DEPRECATED: Hard Sequence Handlers](#deprecated-hard-sequence-handlers)
+- [Interaction with React](#interaction-with-react)
+- [HotKeys components](#hotkeys-components)
+    - [How action handlers are resolved](#how-action-handlers-are-resolved)
+    - [Managing focus in the browser](#managing-focus-in-the-browser)
+        - [Focusable elements](#focusable-elements)
+        - [Tab Index](#tab-index)
+        - [Autofocus](#autofocus)
+        - [Programmatically manage focus](#programmatically-manage-focus)
+        - [Get the element currently in focus](#get-the-element-currently-in-focus)
+- [HotKeys component API](#hotkeys-component-api)
+- [withHotKeys HoC API](#withhotkeys-hoc-api)
+    - [Simple use-case](#simple-use-case)
+    - [Pre-defining default prop values](#pre-defining-default-prop-values)
+- [GlobalHotKeys component](#globalhotkeys-component)
+    - [How actions and handlers are resolved](#how-actions-and-handlers-are-resolved)
+- [GlobalHotKeys component API](#globalhotkeys-component-api)
+- [Displaying a list of available hot keys](#displaying-a-list-of-available-hot-keys)
+- [Ignoring events](#ignoring-events)
+    - [What it actually means to ignore an event](#what-it-actually-means-to-ignore-an-event)
+    - [IgnoreKeys component](#ignorekeys-component)
+    - [IgnoreKeys component API](#ignorekeys-component-api)
+    - [withHotKeysIgnore HoC API](#withhotkeysignore-hoc-api)
+    - [ObserveKeys component](#observekeys-component)
+    - [ObserveKeys component API](#observekeys-component-api)
+    - [withObserveKeys HoC API](#withobservekeys-hoc-api)
+- [Allowing hotkeys and handlers props to change](#allowing-hotkeys-and-handlers-props-to-change)
+- [Configuration](#configuration)
+- [Troubleshooting & Gotchas](#troubleshooting--gotchas)
+    - [Hotkeys is wrapping my components in a div that is breaking my styling](#hotkeys-is-wrapping-my-components-in-a-div-that-is-breaking-my-styling)
+    - [Other keyboard event listeners are no longer being triggered](#other-keyboard-event-listeners-are-no-longer-being-triggered)
+    - [Actions aren't being triggered when using withHotKeys](#actions-arent-being-triggered-when-using-withhotkeys)
+    - [Actions aren't being triggered for HotKeys](#actions-arent-being-triggered-for-hotkeys)
+    - [Blue border appears around children of HotKeys](#blue-border-appears-around-children-of-hotkeys)
+- [Logging](#logging)
+- [Optimizations](#optimizations)
+    - [Code optimizations](#code-optimizations)
+    - [Production optimizations](#production-optimizations)
+- [Support](#support)
+- [Stability & Maintenance](#stability--maintenance)
+- [Contribute, please!](#contribute-please)
+    - [Using GitHub Issues](#using-github-issues)
+    - [Submitting a Pull Request](#submitting-a-pull-request)
+- [Build notes](#build-notes)
+    - [Build scripts](#build-scripts)
+    - [Development builds](#development-builds)
+    - [Production builds](#production-builds)
+    - [Build configuration](#build-configuration)
+- [Authorship](#authorship)
+
+
 
 ## Licenses
 
