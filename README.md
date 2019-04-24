@@ -94,12 +94,6 @@ export default MyNode;
 - [Interaction with React](#interaction-with-react)
 - [HotKeys components](#hotkeys-components)
     - [How action handlers are resolved](#how-action-handlers-are-resolved)
-    - [Managing focus in the browser](#managing-focus-in-the-browser)
-        - [Focusable elements](#focusable-elements)
-        - [Tab Index](#tab-index)
-        - [Autofocus](#autofocus)
-        - [Programmatically manage focus](#programmatically-manage-focus)
-        - [Get the element currently in focus](#get-the-element-currently-in-focus)
 - [HotKeys component API](#hotkeys-component-api)
 - [withHotKeys HoC API](#withhotkeys-hoc-api)
     - [Simple use-case](#simple-use-case)
@@ -108,6 +102,7 @@ export default MyNode;
     - [How actions and handlers are resolved](#how-actions-and-handlers-are-resolved)
 - [GlobalHotKeys component API](#globalhotkeys-component-api)
 - [Displaying a list of available hot keys](#displaying-a-list-of-available-hot-keys)
+- [Allowing hotkeys and handlers props to change](#allowing-hotkeys-and-handlers-props-to-change)
 - [Ignoring events](#ignoring-events)
     - [What it actually means to ignore an event](#what-it-actually-means-to-ignore-an-event)
     - [IgnoreKeys component](#ignorekeys-component)
@@ -116,18 +111,24 @@ export default MyNode;
     - [ObserveKeys component](#observekeys-component)
     - [ObserveKeys component API](#observekeys-component-api)
     - [withObserveKeys HoC API](#withobservekeys-hoc-api)
-- [Allowing hotkeys and handlers props to change](#allowing-hotkeys-and-handlers-props-to-change)
 - [Configuration](#configuration)
+- [Logging](#logging)
+- [Optimizations](#optimizations)
+    - [Code optimizations](#code-optimizations)
+    - [Production optimizations](#production-optimizations)
+- [Managing focus in the browser](#managing-focus-in-the-browser)
+    - [Focusable elements](#focusable-elements)
+    - [Tab Index](#tab-index)
+    - [Autofocus](#autofocus)
+    - [Programmatically manage focus](#programmatically-manage-focus)
+    - [Get the element currently in focus](#get-the-element-currently-in-focus)
+- [Preventing default browser behaviour](#preventing-default-browser-behaviour)
 - [Troubleshooting & Gotchas](#troubleshooting--gotchas)
     - [Hotkeys is wrapping my components in a div that is breaking my styling](#hotkeys-is-wrapping-my-components-in-a-div-that-is-breaking-my-styling)
     - [Other keyboard event listeners are no longer being triggered](#other-keyboard-event-listeners-are-no-longer-being-triggered)
     - [Actions aren't being triggered when using withHotKeys](#actions-arent-being-triggered-when-using-withhotkeys)
     - [Actions aren't being triggered for HotKeys](#actions-arent-being-triggered-for-hotkeys)
     - [Blue border appears around children of HotKeys](#blue-border-appears-around-children-of-hotkeys)
-- [Logging](#logging)
-- [Optimizations](#optimizations)
-    - [Code optimizations](#code-optimizations)
-    - [Production optimizations](#production-optimizations)
 - [Support](#support)
 - [Stability & Maintenance](#stability--maintenance)
 - [Contribute, please!](#contribute-please)
@@ -389,105 +390,6 @@ That is:
 
 A more exhaustive enumeration of `react-hotkeys` behaviour can be found by reviewing the [test suite](https://github.com/greena13/react-hotkeys/tree/master/test).
 
-### Managing focus in the browser
-
-#### Focusable elements
-
-HTML5 allows any element with a `tabindex` attribute to receive focus.
-
-If you wish to support HTML4 you are limited to the following focusable elements:
-
-- `<a>`
-- `<area>`
-- `<button>`
-- `<input>`
-- `<object>`
-- `<select>`
-- `<textarea>`
-
-#### Tab Index
-
-If no elements have a `tabindex` in a HTML document, the browser will tab between [focusable elements](#Focusable-elements) in the order that they appear in the DOM.
-
-If there are elements with `tabindex` values greater than zero, they are iterated over first, according their `tabindex` value (from smallest to largest). Then the browser tabs over the focusable elements with a `0` or unspecified `tabindex` in the order that they appear in the DOM.
-
-If any element is given a negative `tabindex`, it will be skipped when a user tabs through the document. However, a user may still click or touch on that element and it can be focused programmatically (see below).
-
-> By default, `<HotKeys>` render its children inside an element with a `tabindex` of `-1`. You can change this by passing a `tabIndex` prop to `<HotKeys>` or you can change the default `tabindex` value for all <HotKeys>`components using the`defaultTabIndex` option for the [Configuration API](#Configuration).
-
-#### Autofocus
-
-HTML5 supports a boolean `autofocus` attribute on the following input elements:
-
-- `<button>`
-- `<input>`
-- `<select>`
-- `<textarea>`
-
-It can be used to automatically focus parts of your React application, without the need to [programmatically manage focus](#Programmatically-manage-focus).
-
-Only one element in the document should have this attribute at any one time (the last element to mount with the attribute will take effect).
-
-#### Programmatically manage focus
-
-To programmatically focus a DOM element, it must meet two requirements:
-
-- It must be a [focusable elements](#Focusable-element)
-- You must have a reference to it
-
-You can get a reference to an element using React's `ref` property:
-
-```javascript
-class MyComponent extends Component {
-  componentDidUpdate(prevProps) {
-    if (!prevProps.isFocused && this.props.isFocused) {
-      this._container.focus();
-    }
-  }
-
-  render() {
-    return <div ref={c => (this._container = c)}>My focusable content</div>;
-  }
-}
-```
-
-To get a reference to the DOM-mountable node used as a wrapper by `<HotKeys />`, use the `innerRef` prop:
-
-```javascript
-class MyComponent extends Component {
-    componentDidMount() {
-        this._container.focus();
-    }
-
-    render() {
-        return (
-            <HotKeys innerRef={ (c) => this._container = c } >
-                My focusable content
-            </div>
-        )
-    }
-
-}
-```
-
-#### Get the element currently in focus
-
-You can retrieve the element that is currently focused using the following:
-
-```javascript
-document.activeElement;
-```
-
-### Preventing default browser behaviour
-
-If you find that you want to bind to a key sequence that is already used by the browser, you can prevent the default behaviour by calling the `preventDefault` method on the event object:
-
-```javascript
-event.preventDefault();
-```
-
-It's generally not advised to do this, as it likely violates the [Principle of Least Surprise](https://en.wikipedia.org/wiki/Principle_of_least_astonishment).
-
 ## HotKeys component API
 
 The HotKeys component provides a declarative and native JSX syntax that is best for succinctly declaring hotkeys in a way that best maintains separation and encapsulation with regards to the rest of your code base.
@@ -745,6 +647,15 @@ renderDialog() {
   }
 ```
 
+## Allowing hotkeys and handlers props to change
+
+For performance reasons, by default `react-hotkeys` takes the `keyMap` and `handlers` prop values when `<HotKeys>` components are focused and when `<GlobalHotKeys>` components are mounted. It ignores all subsequent updates
+to their values when these props change.
+
+If you need the ability to change them while `<HotKeys>` are still in focus, or while `<GlobalHotKeys>` are still mounted, then you can pass the `allowChanges` prop, permitting this behaviour for the particular component.
+
+If you need to do this for all your `<HotKeys>` and `<GlobalHotKeys>` components, you can use the `ignoreKeymapAndHandlerChangesByDefault` option for the [Configuration API](#Configuration). This should normally never be done, as it can have significant performance implications.
+
 ## Ignoring events
 
 By default, all key events that originate from `<input>`, `<select>` or `<textarea>`, or have a `isContentEditable` attribute of `true` are ignored by `react-hotkeys`.
@@ -991,15 +902,6 @@ const MyHotKeysComponent = withObserveKeys(MyComponent, { except: 'Escape' });
 </MyHotKeysComponent>
 ```
 
-## Allowing hotkeys and handlers props to change
-
-For performance reasons, by default `react-hotkeys` takes the `keyMap` and `handlers` prop values when `<HotKeys>` components are focused and when `<GlobalHotKeys>` components are mounted. It ignores all subsequent updates
-to their values when these props change.
-
-If you need the ability to change them while `<HotKeys>` are still in focus, or while `<GlobalHotKeys>` are still mounted, then you can passe the `allowChanges` prop, permitting this behaviour for the particular component.
-
-If you need to do this for all your `<HotKeys>` and `<GlobalHotKeys>` components, you can use the `ignoreKeymapAndHandlerChangesByDefault` option for the [Configuration API](#Configuration). This should normally never be done, as it can have significant performance implications.
-
 ## Configuration
 
 The default behaviour across all `<HotKeys>` components is configured using the `configure` method.
@@ -1097,46 +999,6 @@ configure({
 });
 ```
 
-## Troubleshooting & Gotchas
-
-#### Hotkeys is wrapping my components in a div that is breaking my styling
-
-You have 3 options:
-
-1. Use the [`component` prop](#HotKeys-component-API) to specify a `span` or some other alternative DOM-mountable component to wrap your component in, each time you render a component you don't want to wrap in a div element.
-1. Use the [`defaultComponent` configuration option](#Configuration) to specify a `span` or some other alternative DOM-mountable component to wrap _all_ `<HotKeys>` children in.
-1. Use the [withHotKeys HoC API](#withHotKeys-HoC-API) to avoid rendering a wrapping component at all.
-
-#### Other keyboard event listeners are no longer being triggered
-
-For improved performance, by default `react-hotkeys` calls `stopPropagation()` on all events that it handles. You can change this using the `stopEventPropagationAfterHandling` and `stopEventPropagationAfterIgnoring` [configuration options](#Configuration).
-
-#### Actions aren't being triggered when using withHotKeys
-
-Check that you are [correctly passing the hotKeys props to a DOM-mountable component](#Pre-defining-default-prop-values).
-
-#### Actions aren't being triggered for HotKeys
-
-Make sure you are focusing a descendant of the `<HotKeys>` component before you press the keys.
-
-Check that the `<HotKeys>` component that defines the handler is also an ancestor of the focused component, and is above (or _is_) the component that defines the `handlers`.
-
-Also make sure your React application is not calling `stopPropagation()` on the key events before they reach the `<HotKeys>` component that defines the `keyMap`.
-
-Finally, make sure your key event are not coming from one of the [tags ignored by react-hotkeys](#Ignoring-events).
-
-#### Blue border appears around children of HotKeys
-
-`react-hotkeys` adds a `<div />` around its children with a `tabindex="-1"` to allow them to be programmatically focused. This can result in browsers rendering a blue outline around them to visually indicate that they are the elements in the document that is currently in focus.
-
-This can be disabled using CSS similar to the following:
-
-```css
-div[tabindex="-1"]:focus {
-  outline: 0;
-}
-```
-
 ## Logging
 
 `react-hotkeys` provides comprehensive logging of all of its internal behaviour and allows setting one of 6 log levels.
@@ -1185,6 +1047,145 @@ Each id is also given a coloured emoticon, to make it easy to visually trace the
 
 - The production build strips out all comments and logging statements below a level of warning, before undergoing minification using Uglify.
 - An es6 version is also available, that allows for tree-shaking in compatible build setups.
+
+## Managing focus in the browser
+
+### Focusable elements
+
+HTML5 allows any element with a `tabindex` attribute to receive focus.
+
+If you wish to support HTML4 you are limited to the following focusable elements:
+
+- `<a>`
+- `<area>`
+- `<button>`
+- `<input>`
+- `<object>`
+- `<select>`
+- `<textarea>`
+
+### Tab Index
+
+If no elements have a `tabindex` in a HTML document, the browser will tab between [focusable elements](#Focusable-elements) in the order that they appear in the DOM.
+
+If there are elements with `tabindex` values greater than zero, they are iterated over first, according their `tabindex` value (from smallest to largest). Then the browser tabs over the focusable elements with a `0` or unspecified `tabindex` in the order that they appear in the DOM.
+
+If any element is given a negative `tabindex`, it will be skipped when a user tabs through the document. However, a user may still click or touch on that element and it can be focused programmatically (see below).
+
+> By default, `<HotKeys>` render its children inside an element with a `tabindex` of `-1`. You can change this by passing a `tabIndex` prop to `<HotKeys>` or you can change the default `tabindex` value for all <HotKeys>`components using the`defaultTabIndex` option for the [Configuration API](#Configuration).
+
+### Autofocus
+
+HTML5 supports a boolean `autofocus` attribute on the following input elements:
+
+- `<button>`
+- `<input>`
+- `<select>`
+- `<textarea>`
+
+It can be used to automatically focus parts of your React application, without the need to [programmatically manage focus](#Programmatically-manage-focus).
+
+Only one element in the document should have this attribute at any one time (the last element to mount with the attribute will take effect).
+
+### Programmatically manage focus
+
+To programmatically focus a DOM element, it must meet two requirements:
+
+- It must be a [focusable elements](#Focusable-element)
+- You must have a reference to it
+
+You can get a reference to an element using React's `ref` property:
+
+```javascript
+class MyComponent extends Component {
+  componentDidUpdate(prevProps) {
+    if (!prevProps.isFocused && this.props.isFocused) {
+      this._container.focus();
+    }
+  }
+
+  render() {
+    return <div ref={c => (this._container = c)}>My focusable content</div>;
+  }
+}
+```
+
+To get a reference to the DOM-mountable node used as a wrapper by `<HotKeys />`, use the `innerRef` prop:
+
+```javascript
+class MyComponent extends Component {
+    componentDidMount() {
+        this._container.focus();
+    }
+
+    render() {
+        return (
+            <HotKeys innerRef={ (c) => this._container = c } >
+                My focusable content
+            </div>
+        )
+    }
+
+}
+```
+
+### Get the element currently in focus
+
+You can retrieve the element that is currently focused using the following:
+
+```javascript
+document.activeElement;
+```
+
+## Preventing default browser behaviour
+
+If you find that you want to bind to a key sequence that is already used by the browser, you can prevent the default behaviour by calling the `preventDefault` method on the event object:
+
+```javascript
+event.preventDefault();
+```
+
+It's generally not advised to do this, as it likely violates the [Principle of Least Surprise](https://en.wikipedia.org/wiki/Principle_of_least_astonishment).
+
+## Troubleshooting & Gotchas
+
+#### Hotkeys is wrapping my components in a div that is breaking my styling
+
+You have 3 options:
+
+1. Use the [`component` prop](#HotKeys-component-API) to specify a `span` or some other alternative DOM-mountable component to wrap your component in, each time you render a component you don't want to wrap in a div element.
+1. Use the [`defaultComponent` configuration option](#Configuration) to specify a `span` or some other alternative DOM-mountable component to wrap _all_ `<HotKeys>` children in.
+1. Use the [withHotKeys HoC API](#withHotKeys-HoC-API) to avoid rendering a wrapping component at all.
+
+#### Other keyboard event listeners are no longer being triggered
+
+For improved performance, by default `react-hotkeys` calls `stopPropagation()` on all events that it handles. You can change this using the `stopEventPropagationAfterHandling` and `stopEventPropagationAfterIgnoring` [configuration options](#Configuration).
+
+#### Actions aren't being triggered when using withHotKeys
+
+Check that you are [correctly passing the hotKeys props to a DOM-mountable component](#Pre-defining-default-prop-values).
+
+#### Actions aren't being triggered for HotKeys
+
+Make sure you are focusing a descendant of the `<HotKeys>` component before you press the keys.
+
+Check that the `<HotKeys>` component that defines the handler is also an ancestor of the focused component, and is above (or _is_) the component that defines the `handlers`.
+
+Also make sure your React application is not calling `stopPropagation()` on the key events before they reach the `<HotKeys>` component that defines the `keyMap`.
+
+Finally, make sure your key event are not coming from one of the [tags ignored by react-hotkeys](#Ignoring-events).
+
+#### Blue border appears around children of HotKeys
+
+`react-hotkeys` adds a `<div />` around its children with a `tabindex="-1"` to allow them to be programmatically focused. This can result in browsers rendering a blue outline around them to visually indicate that they are the elements in the document that is currently in focus.
+
+This can be disabled using CSS similar to the following:
+
+```css
+div[tabindex="-1"]:focus {
+  outline: 0;
+}
+```
 
 ## Support
 
