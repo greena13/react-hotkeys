@@ -5,6 +5,8 @@ import KeyEventManager from './lib/KeyEventManager';
 import isEmpty from './utils/collection/isEmpty';
 import KeyCombinationSerializer from './lib/KeyCombinationSerializer';
 
+const ParentIdContext = React.createContext({ hotKeysParentId: undefined });
+
 /**
  * Wraps a React component in a HotKeysEnabled component, which passes down the
  * callbacks and options necessary for React Hotkeys to work as a single prop value,
@@ -114,13 +116,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       allowChanges: PropTypes.bool
     };
 
-     static contextTypes = {
-      hotKeysParentId: PropTypes.number,
-    };
-
-     static childContextTypes = {
-       hotKeysParentId: PropTypes.number,
-     };
+    static contextType = ParentIdContext;
 
     constructor(props) {
       super(props);
@@ -139,12 +135,6 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       this._componentIsFocused = this._componentIsFocused.bind(this);
 
       this._id = KeyEventManager.getInstance().registerKeyMap(props.keyMap);
-    }
-
-    getChildContext() {
-      return {
-        hotKeysParentId: this._id
-      };
     }
 
     render() {
@@ -172,10 +162,12 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       }
 
       return (
-        <Component
-          hotKeys={ hotKeys }
-          { ...props }
-        />
+        <ParentIdContext.Provider value={{ hotKeysParentId: this._id }}>
+          <Component
+            hotKeys={ hotKeys }
+            { ...props }
+          />
+        </ParentIdContext.Provider>
       );
     }
 
