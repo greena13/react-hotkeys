@@ -233,7 +233,7 @@ export interface ConfigurationOptions {
    * Hotkeys. By default, keyboard events originating elements with a tag name in
    * ignoreTags, or a isContentEditable property of true, are ignored.
    */
-  ignoreEventsCondition?: (KeyboardEvent) => boolean,
+  ignoreEventsCondition?: (keyEvent: KeyboardEvent) => boolean,
 
   /**
    * Whether React HotKeys should simulate keypress events for the keys that do not
