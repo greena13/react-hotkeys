@@ -4,8 +4,7 @@ import Configuration from './lib/Configuration';
 import KeyEventManager from './lib/KeyEventManager';
 import isEmpty from './utils/collection/isEmpty';
 import KeyCombinationSerializer from './lib/KeyCombinationSerializer';
-
-const ParentIdContext = React.createContext({ hotKeysParentId: undefined });
+import backwardsCompatibleContext from './utils/backwardsCompatibleContext';
 
 /**
  * Wraps a React component in a HotKeysEnabled component, which passes down the
@@ -41,7 +40,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
    * selectively triggers actions (that may be handled by handler functions) when a
    * sequence of events matches a list of pre-defined sequences or combinations
    */
-  return class HotKeysEnabled extends PureComponent {
+  class HotKeysEnabled extends PureComponent {
     static propTypes = {
       /**
        * A unique key to associate with KeyEventMatchers that allows associating handler
@@ -116,8 +115,6 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       allowChanges: PropTypes.bool
     };
 
-    static contextType = ParentIdContext;
-
     constructor(props) {
       super(props);
 
@@ -135,6 +132,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       this._componentIsFocused = this._componentIsFocused.bind(this);
 
       this._id = KeyEventManager.getInstance().registerKeyMap(props.keyMap);
+      this._childContext = { hotKeysParentId: this._id };
     }
 
     render() {
@@ -162,12 +160,10 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       }
 
       return (
-        <ParentIdContext.Provider value={{ hotKeysParentId: this._id }}>
-          <Component
-            hotKeys={ hotKeys }
-            { ...props }
-          />
-        </ParentIdContext.Provider>
+        <Component
+          hotKeys={ hotKeys }
+          { ...props }
+        />
       );
     }
 
@@ -365,6 +361,20 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       };
     }
   }
+
+  return backwardsCompatibleContext(HotKeysEnabled, {
+    deprecatedAPI: {
+      contextTypes: {
+        hotKeysParentId: PropTypes.number,
+      },
+      childContextTypes: {
+        hotKeysParentId: PropTypes.number,
+      },
+    },
+    newAPI: {
+      contextType: { hotKeysParentId: undefined },
+    }
+  });
 }
 
 export default withHotKeys;

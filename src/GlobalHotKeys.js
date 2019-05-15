@@ -2,8 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import Configuration from './lib/Configuration';
 import KeyEventManager from './lib/KeyEventManager';
-
-const ParentIdContext = React.createContext({ globalHotKeysParentId: undefined });
+import backwardsCompatibleContext from './utils/backwardsCompatibleContext';
 
 class GlobalHotKeys extends Component {
   static propTypes = {
@@ -32,26 +31,15 @@ class GlobalHotKeys extends Component {
     allowChanges: PropTypes.bool
   };
 
-  static contextType = ParentIdContext;
-
   constructor(props) {
     super(props);
 
     this._id = KeyEventManager.getInstance().registerGlobalKeyMap(props.keyMap);
+    this._childContext = { globalHotKeysParentId: this._id };
   }
 
   render() {
-    const { children } = this.props;
-
-    if (children) {
-      return (
-        <ParentIdContext.Provider value={{ globalHotKeysParentId: this._id }}>
-          {children}
-        </ParentIdContext.Provider>
-      );
-    } else {
-      return null;
-    }
+    return this.props.children || null;
   }
 
   componentDidUpdate() {
@@ -114,4 +102,16 @@ class GlobalHotKeys extends Component {
   }
 }
 
-export default GlobalHotKeys;
+export default backwardsCompatibleContext(GlobalHotKeys, {
+  deprecatedAPI: {
+    contextTypes: {
+      globalHotKeysParentId: PropTypes.number,
+    },
+    childContextTypes: {
+      globalHotKeysParentId: PropTypes.number,
+    },
+  },
+  newAPI: {
+    contextType: { globalHotKeysParentId: undefined },
+  }
+});
