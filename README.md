@@ -149,6 +149,12 @@ export default MyNode;
 
 However, please note: the source code found in the lib/vendor directory is under the MIT License - please see the license file for each directory for more information.
 
+## Support
+
+If you wish to support `react-hotkeys` by supporting its maintainer, consider checking out the [Patreon page](https://www.patreon.com/aleckgreenham). 
+
+More support options are coming soon. 
+
 ## Install
 
 ### CommonJS & ES6 Modules
