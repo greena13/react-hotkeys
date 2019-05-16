@@ -35,6 +35,16 @@ class GlobalHotKeys extends Component {
     super(props);
 
     this._id = KeyEventManager.getInstance().registerGlobalKeyMap(props.keyMap);
+
+    /**
+     * We maintain a separate instance variable to contain context that will be
+     * passed down to descendants of this component so we can have a consistent
+     * reference to the same object, rather than instantiating a new one on each
+     * render, causing unnecessary re-rendering of descendant components that
+     * consume the context.
+     *
+     * @see https://reactjs.org/docs/context.html#caveats
+     */
     this._childContext = { globalHotKeysParentId: this._id };
   }
 
