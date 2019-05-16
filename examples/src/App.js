@@ -1,5 +1,5 @@
 import { HotKeys, GlobalHotKeys, ObserveKeys, getApplicationKeyMap } from 'react-hotkeys';
-import React, { Fragment } from 'react';
+import React from 'react';
 
 import Node from './Node';
 import HOCWrappedNode from './HOCWrappedNode';
