@@ -81,7 +81,7 @@ export interface ComponentPropsBase {
  * to a DOM-mountable child (preferably the root)
  */
 export interface ComponentProps extends ComponentPropsBase {
-  ref?: React.forwardRef<React.ComponentClass, ComponentPropsBase>
+  ref?: React.MutableRefObject<React.ComponentClass>
 }
 
 export type ReactComponent = React.ComponentClass | string | React.SFC<ComponentProps>;
@@ -233,7 +233,7 @@ export interface ConfigurationOptions {
    * Hotkeys. By default, keyboard events originating elements with a tag name in
    * ignoreTags, or a isContentEditable property of true, are ignored.
    */
-  ignoreEventsCondition?: (KeyboardEvent) => boolean,
+  ignoreEventsCondition?: (keyEvent: KeyboardEvent) => boolean,
 
   /**
    * Whether React HotKeys should simulate keypress events for the keys that do not
