@@ -73,6 +73,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     this._updateDocumentHandlers();
 
+    this._initHandlerResolutionState();
+
     this.logger.debug(
       this._logPrefix(componentId, {eventId: false}),
       'Mounted.',
