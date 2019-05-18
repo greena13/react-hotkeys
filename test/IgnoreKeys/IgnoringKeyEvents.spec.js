@@ -114,6 +114,49 @@ describe('Ignoring key events using IgnoreKeys:', function () {
     });
   });
 
+  describe('when the except option is used with Backspace', () => {
+    beforeEach(function () {
+      this.keyMap = {
+        'ACTION_A': 'a',
+        'ACTION_B': 'Backspace'
+      };
+
+      this.handlerA = sinon.spy();
+      this.handlerB = sinon.spy();
+
+      this.handlers = {
+        'ACTION_A': this.handlerA,
+        'ACTION_B': this.handlerB,
+      };
+
+      this.wrapper = mount(
+        <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
+          <IgnoreKeys except={["Backspace"]}>
+            <div className="childElement" />
+          </IgnoreKeys>
+        </HotKeys>
+      );
+
+      this.targetElement = new FocusableElement(this.wrapper, '.childElement');
+      this.targetElement.focus();
+    });
+
+    it('then ignores all key events except Backspace \
+       (https://github.com/greena13/react-hotkeys/issues/172)', function() {
+      this.targetElement.keyDown(Key.A);
+      this.targetElement.keyPress(Key.A);
+      this.targetElement.keyUp(Key.A);
+
+      expect(this.handlerA).to.not.have.been.called;
+
+      this.targetElement.keyDown('Backspace');
+      this.targetElement.keyPress('Backspace');
+      this.targetElement.keyUp('Backspace');
+
+      expect(this.handlerB).to.have.been.called;
+    });
+  });
+
   describe('when the only and the except option are used', () => {
     beforeEach(function () {
       this.wrapper = mount(

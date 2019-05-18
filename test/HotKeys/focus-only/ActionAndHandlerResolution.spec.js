@@ -117,7 +117,5 @@ describe('Action and handler resolution:', function () {
         });
       });
     });
-
   });
-
 });

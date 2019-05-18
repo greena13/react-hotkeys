@@ -9,7 +9,7 @@ const SpecialKeysDictionary = {
   Enter: true,
   Tab: true,
   CapsLock: true,
-  BackSpace: true,
+  Backspace: true,
   Escape: true,
 };
 

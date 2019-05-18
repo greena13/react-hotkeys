@@ -8,7 +8,7 @@ const KeysWithoutPressEventDictionary = {
   Meta: true,
   Enter: true,
   Tab: true,
-  BackSpace: true,
+  Backspace: true,
   ArrowRight: true,
   ArrowLeft: true,
   ArrowUp: true,
