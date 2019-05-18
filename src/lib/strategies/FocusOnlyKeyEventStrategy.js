@@ -145,9 +145,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {HandlersMap} actionNameToHandlersMap - Map of actions to handler functions
    * @param {Object} options Hash of options that configure how the actions
    *        and handlers are associated and called.
-   * @returns {[FocusTreeId, ComponentId]} The current focus tree's ID and a unique
-   *         component ID to assign to the focused HotKeys component and passed back
-   *         when handling a key event
+   * @returns {FocusTreeId|undefined} The current focus tree's ID or undefined if the
+   *        the <tt>componentId</tt> has already been registered (shouldn't normally
+   *        occur).
    */
   enableHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
     if (this.resetOnNextFocus || this.keyMaps) {
@@ -159,6 +159,17 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
        */
       this._reset();
       this.resetOnNextFocus = false;
+    }
+
+    if (this._getComponent(componentId)) {
+      /**
+       * The <tt>componentId</tt> has already been registered - this occurs when the
+       * same component has somehow managed to be focused twice, without being blurred
+       * in between.
+       *
+       * @see https://github.com/greena13/react-hotkeys/issues/173
+       */
+      return undefined;
     }
 
     this._addComponentToList(

@@ -5,6 +5,7 @@ import KeyEventManager from './lib/KeyEventManager';
 import isEmpty from './utils/collection/isEmpty';
 import KeyCombinationSerializer from './lib/KeyCombinationSerializer';
 import backwardsCompatibleContext from './utils/backwardsCompatibleContext';
+import isUndefined from './utils/isUndefined';
 
 /**
  * Wraps a React component in a HotKeysEnabled component, which passes down the
@@ -269,7 +270,17 @@ function withHotKeys(Component, hotKeysOptions = {}) {
           this._getComponentOptions()
         );
 
-      this._focusTreeIdsPush(focusTreeId);
+      if (!isUndefined(focusTreeId)) {
+        /**
+         * focusTreeId should never normally be undefined, but this return state is
+         * used to indicate that a component with the same componentId has already
+         * registered as focused/enabled (again, a condition that should not normally
+         * occur, but apparently can for as-yet unknown reasons).
+         *
+         * @see https://github.com/greena13/react-hotkeys/issues/173
+         */
+        this._focusTreeIdsPush(focusTreeId);
+      }
 
       this._focused = true;
     }
