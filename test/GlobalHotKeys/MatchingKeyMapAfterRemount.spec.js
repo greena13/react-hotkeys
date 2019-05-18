@@ -54,7 +54,7 @@ describe('Matching key map after remount for a GlobalHotKeys component:', functi
     document.body.removeChild(this.reactDiv);
   });
 
-  describe.only('when two GlobalHotKeys components are mounted, unmounted and remounted', () => {
+  describe('when two GlobalHotKeys components are mounted, unmounted and remounted', () => {
     it('then both of their key maps work while they are mounted and not, when they aren\'t (BUG: https://github.com/greena13/react-hotkeys/issues/150)', function() {
       simulant.fire(this.reactDiv, 'keydown', { key: KeyCode.A });
       simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.A });

@@ -167,6 +167,14 @@ class AbstractKeyEventStrategy {
    * @protected
    */
   _initHandlerResolutionState() {
+    if (this.keyMaps === null) {
+      /**
+       * If this.keyMaps is already set to null, then the state has already been reset
+       * and we need not do it again
+       */
+      return;
+    }
+
     /**
      * List of mappings from key sequences to handlers that is constructed on-the-fly
      * as key events propagate up the render tree

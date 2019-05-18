@@ -73,6 +73,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     this._updateDocumentHandlers();
 
+    /**
+     * Reset handler resolution state
+     */
     this._initHandlerResolutionState();
 
     this.logger.debug(
