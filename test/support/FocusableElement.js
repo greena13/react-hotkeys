@@ -28,26 +28,26 @@ export default class FocusableElement {
   }
 
   keyDown(key, options = {}) {
-    this.element.simulate('keyDown', {key});
+    this.element.simulate('keyDown', {key, ...options});
 
     if (this.nativeElement) {
-      simulant.fire(this.nativeElement, 'keydown', {key});
+      simulant.fire(this.nativeElement, 'keydown', {key, ...options});
     }
   }
 
   keyPress(key, options = {}) {
-    this.element.simulate('keyPress', {key});
+    this.element.simulate('keyPress', {key, ...options});
 
     if (this.nativeElement) {
-      simulant.fire(this.nativeElement, 'keypress', {key});
+      simulant.fire(this.nativeElement, 'keypress', {key, ...options});
     }
   }
 
   keyUp(key, options = {}) {
-    this.element.simulate('keyUp', {key});
+    this.element.simulate('keyUp', {key, ...options});
 
     if (this.nativeElement) {
-      simulant.fire(this.nativeElement, 'keyup', {key});
+      simulant.fire(this.nativeElement, 'keyup', {key, ...options});
     }
   }
 
