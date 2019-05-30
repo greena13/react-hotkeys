@@ -134,6 +134,7 @@ export default MyNode;
 - [Contribute, please!](#contribute-please)
     - [Using GitHub Issues](#using-github-issues)
     - [Submitting a Pull Request](#submitting-a-pull-request)
+    - [Commit messages](#commit-messages)
 - [Build notes](#build-notes)
     - [Build scripts](#build-scripts)
     - [Development builds](#development-builds)
@@ -1223,6 +1224,10 @@ Collaboration is loosely being coordinated across [Gitter](https://gitter.im/Chr
 - Squash commits
 - Lint your code with eslint (config provided)
 - Include relevant test updates/additions
+
+### Commit messages
+
+This repository uses the [meaningful emoji commits](http://greena13.github.io/blog/2016/08/19/emojis-are-the-solution-to-useless-commit-messages/) convention to help atomise and label commits.
 
 ## Build notes
 
