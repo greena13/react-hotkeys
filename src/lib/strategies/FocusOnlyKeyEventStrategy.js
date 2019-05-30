@@ -301,7 +301,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       return true;
     }
 
-    const responseAction = this._howToHandleKeyDownEvent(event,
+    const responseAction = this._howToHandleKeyEvent(event,
       focusTreeId,
       componentId,
       _key,
@@ -328,7 +328,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     return false;
   }
 
-  _howToHandleKeyDownEvent(event, focusTreeId, componentId, key, options, keyEventBitmapIndex){
+  _howToHandleKeyEvent(event, focusTreeId, componentId, key, options, keyEventBitmapIndex){
     if (this._shouldIgnoreEvent()) {
       this.logger.debug(
         this._logPrefix(componentId),
@@ -400,7 +400,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      * We first decide if the keypress event should be handled (to ensure the correct
      * order of logging statements)
      */
-    const responseAction = this._howToHandleKeyDownEvent(event,
+    const responseAction = this._howToHandleKeyEvent(event,
       focusTreeId,
       componentId,
       _key,
@@ -463,7 +463,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      * We first decide if the keyup event should be handled (to ensure the correct
      * order of logging statements)
      */
-    const responseAction = this._howToHandleKeyDownEvent(event,
+    const responseAction = this._howToHandleKeyEvent(event,
       focusTreeId,
       componentId,
       _key,
