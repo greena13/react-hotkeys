@@ -367,7 +367,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         `New ${describeKeyEvent(event, key, keyEventBitmapIndex)} event.`
       );
 
-      this._checkForModifierFlagDiscrepancies(event);
+      this._checkForModifierFlagDiscrepancies(event, key, keyEventBitmapIndex);
     }
 
     return EventResponse.handled;

@@ -251,9 +251,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {KeyboardEvent} event - Event containing the key name and state
    */
   handleKeydown(event) {
-    this._checkForModifierFlagDiscrepancies(event);
-
     const _key = normalizeKeyName(getEventKey(event));
+
+    this._checkForModifierFlagDiscrepancies(event, _key, KeyEventBitmapIndex.keydown);
 
     const reactAppResponse = this._howReactAppRespondedTo(
       event,
