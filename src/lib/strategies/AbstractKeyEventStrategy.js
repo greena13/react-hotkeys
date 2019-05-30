@@ -1112,7 +1112,8 @@ class AbstractKeyEventStrategy {
    * on new key events
    * @param {KeyboardEvent} event - Event to check the modifier flags for
    * @param {String} key - Name of key that events relates to
-   * @param {KeyEventBitmapIndex} keyEventBitmapIndex - Index of event type
+   * @param {KeyEventBitmapIndex} keyEventBitmapIndex - The bitmap index of the current
+   *        key event type
    * @protected
    */
   _checkForModifierFlagDiscrepancies(event, key, keyEventBitmapIndex) {
@@ -1126,7 +1127,8 @@ class AbstractKeyEventStrategy {
       /**
        * When a modifier key is being released (keyup), it sets its own modifier flag
        * to false. (e.g. On the keyup event for Command, the metaKey attribute is false).
-       * If this the case, we want to handle it using the main algorithm.
+       * If this the case, we want to handle it using the main algorithm and skip the
+       * reconciliation algorithm.
        */
       if (key === modifierKey && keyEventBitmapIndex === KeyEventBitmapIndex.keyup) {
         return;

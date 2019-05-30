@@ -9,7 +9,7 @@ import { HotKeys } from '../../src';
 import FocusableElement from '../support/FocusableElement';
 
 describe('Binding to keys with simulated keypress events:', function () {
-  context('when HotKeys has actions for a the keydown and keyup event', () => {
+  context('when HotKeys has actions defined for the keydown and keyup event of the same key', () => {
     beforeEach(function () {
       this.keyMap = {
         'ACTION1': {sequence: 'command', action: 'keydown'},
@@ -36,7 +36,7 @@ describe('Binding to keys with simulated keypress events:', function () {
       this.targetElement.focus();
     });
 
-    it('then simulates the cmd keypress event and the non-modifier key\'s keypress event (https://github.com/greena13/react-hotkeys/issues/166)', function () {
+    it('then calls the handlers for both key events (https://github.com/greena13/react-hotkeys/issues/166)', function () {
       this.targetElement.keyDown(Key.COMMAND, { metaKey: true });
 
       expect(this.action1Handler).to.have.been.calledOnce;
