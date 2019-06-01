@@ -76,6 +76,7 @@ export default MyNode;
 ## Contents
 
 - [Licenses](#licenses)
+- [Support](#support)
 - [Install](#install)
     - [CommonJS & ES6 Modules](#commonjs--es6-modules)
         - [The latest pre-release](#the-latest-pre-release)
@@ -129,7 +130,6 @@ export default MyNode;
     - [Actions aren't being triggered when using withHotKeys](#actions-arent-being-triggered-when-using-withhotkeys)
     - [Actions aren't being triggered for HotKeys](#actions-arent-being-triggered-for-hotkeys)
     - [Blue border appears around children of HotKeys](#blue-border-appears-around-children-of-hotkeys)
-- [Support](#support)
 - [Stability & Maintenance](#stability--maintenance)
 - [Contribute, please!](#contribute-please)
     - [Using GitHub Issues](#using-github-issues)
@@ -152,9 +152,24 @@ However, please note: the source code found in the lib/vendor directory is under
 
 ## Support
 
-If you wish to support `react-hotkeys` by supporting its maintainer, consider checking out the [Patreon page](https://www.patreon.com/aleckgreenham). 
+If you use React Hotkeys and it has saved you time or money, please consider contributing.  You will be supporting `react-hotkeys` by supporting its maintainer.
 
-More support options are coming soon. 
+Please see my [Patreon Page](https://www.patreon.com/aleckgreenham) for details of why your support is needed, and how it will be used.
+ 
+For recurring and publicly acknowledged support:
+
+| Payment Option | Link/Address |
+|:---|:----|
+| Patreon | https://www.patreon.com/aleckgreenham |
+
+For one-off or irregular contributions:
+
+| Payment Option | Link/Address |
+|:---|:----|
+| Paypal | https://www.paypal.me/aleckgreenham |
+| Bitcoin | 1ETTdVEahUqBaGXRQaiEgMhVjYQU1jQKKT |
+| Ethereum | 0x6C9F9879f684e84314f5810f8F196bdB2c4e15c0 |
+| Stellar | GBJ5T7V7YVRN4D2PBZTOCWREJXYWWGNDIQGRFDGQAZNTYYIW7BMWDRYA |
 
 ## Install
 
