@@ -99,6 +99,13 @@ const _defaultConfiguration = {
    * any further through the Render tree).
    */
   stopEventPropagationAfterIgnoring: true,
+
+  /**
+   * Whether to allow combination submatches - e.g. if there is an action bound to
+   * cmd, pressing shift+cmd will *not* trigger that action when
+   * allowCombinationSubmatches is false.
+   */
+  allowCombinationSubmatches: false,
 };
 
 const _configuration = {

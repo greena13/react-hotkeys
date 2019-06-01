@@ -1085,7 +1085,7 @@ class AbstractKeyEventStrategy {
 
     let keyCompletesCombination = false;
 
-    const combinationMatchesKeysPressed = !Object.keys(combinationMatch.keyDictionary).some((candidateKeyName) => {
+    const combinationMatchesKeysPressed = Object.keys(combinationMatch.keyDictionary).every((candidateKeyName) => {
       const keyState = getKeyState(keyCombination, candidateKeyName);
 
       if (keyState) {
@@ -1095,12 +1095,12 @@ class AbstractKeyEventStrategy {
               !keyAlreadyTriggeredEvent(keyState, eventBitmapIndex);
           }
 
-          return false;
-        } else {
           return true;
+        } else {
+          return false;
         }
       } else {
-        return true;
+        return false;
       }
     });
 
