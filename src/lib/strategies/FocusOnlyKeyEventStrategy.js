@@ -8,6 +8,7 @@ import printComponent from '../../helpers/logging/printComponent';
 import isUndefined from '../../utils/isUndefined';
 import normalizeKeyName from '../../helpers/resolving-handlers/normalizeKeyName';
 import isCmdKey from '../../helpers/parsing-key-maps/isCmdKey';
+import keyIsCurrentlyTriggeringEvent from '../../helpers/parsing-key-maps/keyIsCurrentlyTriggeringEvent';
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 import EventResponse from '../../const/EventResponse';
 
@@ -527,6 +528,29 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     this._updateEventPropagationHistory(componentId, componentPosition);
 
     return shouldDiscardFocusId;
+  }
+
+  /**
+   * Closes any hanging key combinations that have not received the key event indicated
+   * by bitmapIndex.
+   * @param {KeyName} keyName The name of the key whose state should be updated if it
+   *        is currently set to keydown or keypress.
+   * @param {KeyEventBitmapIndex} bitmapIndex Index of key event to move the key state
+   *        up to.
+   */
+  closeHangingKeyCombination(keyName, bitmapIndex) {
+    const keyState = this._getCurrentKeyState(keyName);
+
+    if (keyIsCurrentlyTriggeringEvent(keyState, KeyEventBitmapIndex.keydown) &&
+      !keyIsCurrentlyTriggeringEvent(keyState, bitmapIndex)) {
+
+      /**
+       * If the key is in the current combination and recorded as still being pressed
+       * down (as either keydown or keypress), then we update the state
+       * to keypress or keyup (depending on the value of bitmapIndex).
+       */
+      this._addToCurrentKeyCombination(keyName, bitmapIndex);
+    }
   }
 
   _simulateKeyPressesMissingFromBrowser(event, key, focusTreeId, componentId, options){

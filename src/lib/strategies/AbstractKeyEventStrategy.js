@@ -22,6 +22,7 @@ import Configuration from '../Configuration';
 import ModifierFlagsDictionary from '../../const/ModifierFlagsDictionary';
 import without from '../../utils/collection/without';
 import hasKeyPressEvent from '../../helpers/resolving-handlers/hasKeyPressEvent';
+import keyIsCurrentlyTriggeringEvent from '../../helpers/parsing-key-maps/keyIsCurrentlyTriggeringEvent';
 import isMatchPossibleBasedOnNumberOfKeys from '../../helpers/resolving-handlers/isMatchPossibleBasedOnNumberOfKeys';
 
 /**
@@ -1233,10 +1234,6 @@ class AbstractKeyEventStrategy {
   _logPrefix() {
 
   }
-}
-
-function keyIsCurrentlyTriggeringEvent(keyState, eventBitmapIndex) {
-  return keyState && keyState[KeyEventSequenceIndex.current][eventBitmapIndex];
 }
 
 function getKeyAlias(keyCombination, keyName) {

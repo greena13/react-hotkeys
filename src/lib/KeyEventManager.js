@@ -411,6 +411,18 @@ class KeyEventManager {
     this._focusOnlyEventStrategy.forceObserveEvent(event);
   }
 
+  /**
+   * Closes any hanging key combinations that have not received the key event indicated
+   * by bitmapIndex.
+   * @param {KeyName} keyName The name of the key whose state should be updated if it
+   *        is currently set to keydown or keypress.
+   * @param {KeyEventBitmapIndex} bitmapIndex Index of key event to move the key state
+   *        up to.
+   */
+  closeHangingKeyCombination(keyName, bitmapIndex) {
+    this._focusOnlyEventStrategy.closeHangingKeyCombination(keyName, bitmapIndex);
+  }
+
   reactAppHistoryWithEvent(key, type) {
     const { currentEvent } = this._focusOnlyEventStrategy;
 

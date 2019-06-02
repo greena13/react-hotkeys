@@ -360,15 +360,23 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this._addToAndLogCurrentKeyCombination(key, KeyEventBitmapIndex.keypress);
     }
 
-    if (reactAppResponse === EventResponse.unseen &&
-      this.eventOptions.ignoreEventsCondition(event)) {
+    if (reactAppResponse === EventResponse.unseen) {
+      /**
+       * If the key event has not been seen by the React application, we ensure that
+       * it's not still waiting for it. This occurs when action handlers bound to keydown
+       * move the focus outside of the react app before it can record the keypress or
+       * keyup
+       */
+      this.keyEventManager.closeHangingKeyCombination(key, KeyEventBitmapIndex.keypress);
 
-      this.logger.debug(
-        this._logPrefix(),
-        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event because ignoreEventsFilter rejected it.`
-      );
+      if (this.eventOptions.ignoreEventsCondition(event)) {
+        this.logger.debug(
+          this._logPrefix(),
+          `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event because ignoreEventsFilter rejected it.`
+        );
 
-      return;
+        return;
+      }
     }
 
     if (!contains([EventResponse.ignored, EventResponse.handled], reactAppResponse)) {
@@ -408,14 +416,28 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this._addToAndLogCurrentKeyCombination(key, KeyEventBitmapIndex.keyup);
     }
 
-    if (reactAppResponse === EventResponse.unseen &&
-      this.eventOptions.ignoreEventsCondition(event)) {
+    if (reactAppResponse === EventResponse.unseen){
+      /**
+       * If the key event has not been seen by the React application, we ensure that
+       * it's not still waiting for it. This occurs when action handlers bound to keydown
+       * or keypress move the focus outside of the react app before it can record the keyup
+       */
+      this.keyEventManager.closeHangingKeyCombination(key, KeyEventBitmapIndex.keyup);
 
-      this.logger.debug(
-        this._logPrefix(),
-        `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} event because ignoreEventsFilter rejected it.`
-      );
-
+      if(this.eventOptions.ignoreEventsCondition(event)) {
+        this.logger.debug(
+          this._logPrefix(),
+          `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} event because ignoreEventsFilter rejected it.`
+        );
+      } else {
+        /**
+         * We attempt to find a handler of the event, only if it has not already
+         * been handled and should not be ignored
+         */
+        if (!contains([EventResponse.ignored, EventResponse.handled], reactAppResponse)) {
+          this._callHandlerIfExists(event, key, KeyEventBitmapIndex.keyup);
+        }
+      }
     } else {
       /**
        * We attempt to find a handler of the event, only if it has not already
