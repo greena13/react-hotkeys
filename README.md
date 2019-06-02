@@ -1237,6 +1237,8 @@ This can happen when you have an action handler that either unmounts the `<HotKe
 </HotKeys>
 ```
 
+Alternatively, you can add a `<GlobalHotKeys/>` component anywhere in your application and it will close key combinations left hanging by your `<HotKeys />` components due to missed `keypress` and `keyup` events.
+
 #### Blue border appears around children of HotKeys
 
 `react-hotkeys` adds a `<div />` around its children with a `tabindex="-1"` to allow them to be programmatically focused. This can result in browsers rendering a blue outline around them to visually indicate that they are the elements in the document that is currently in focus.
