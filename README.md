@@ -131,6 +131,7 @@ export default MyNode;
     - [Other keyboard event listeners are no longer being triggered](#other-keyboard-event-listeners-are-no-longer-being-triggered)
     - [Actions aren't being triggered when using withHotKeys](#actions-arent-being-triggered-when-using-withhotkeys)
     - [Actions aren't being triggered for HotKeys](#actions-arent-being-triggered-for-hotkeys)
+    - [React Hotkeys thinks I'm holding down a key I've released](#react-hotkeys-thinks-im-holding-down-a-key-ive-released)
     - [Blue border appears around children of HotKeys](#blue-border-appears-around-children-of-hotkeys)
 - [Stability & Maintenance](#stability--maintenance)
 - [Contribute, please!](#contribute-please)
@@ -453,6 +454,12 @@ However, it [does require that its children be wrapped in a DOM-mounted node](#H
    * to get a reference to the node, so you can call .focus() on it
    */
   innerRef: {undefined}
+  
+  /**
+   * Whether this is the root HotKeys node - this enables some special 
+   * behaviour
+   */
+  root={false}
   >
 
   /**
@@ -1219,6 +1226,16 @@ Check that the `<HotKeys>` component that defines the handler is also an ancesto
 Also make sure your React application is not calling `stopPropagation()` on the key events before they reach the `<HotKeys>` component that defines the `keyMap`.
 
 Finally, make sure your key event are not coming from one of the [tags ignored by react-hotkeys](#Ignoring-events).
+
+#### React Hotkeys thinks I'm holding down a key I've released
+
+This can happen when you have an action handler that either unmounts the `<HotKeys>` component, or focuses an area of the application where there is no parent `<HotKeys>`. The solution to this is to add a `<HotKeys root>` to the top of your application that renders it as children - or at least high enough to *not* be unmounted or unfocused by your action handler.
+
+```javascript
+<HotKeys root>
+  // The parts of your application that are re-rendered or unfocused here
+</HotKeys>
+```
 
 #### Blue border appears around children of HotKeys
 

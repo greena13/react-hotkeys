@@ -309,6 +309,14 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       KeyEventBitmapIndex.keydown
     );
 
+    /**
+     * We need to record the position of the component that is currently dealing with
+     * the event, in case the component defines a handler for that event that changes
+     * the focus or content in the render tree, causing the component to be de-registered
+     * and have its position lost
+     */
+    const componentPosition = this._getComponentPosition(componentId);
+
     if (responseAction === EventResponse.handled) {
       const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
 
@@ -323,7 +331,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     this._simulateKeyPressesMissingFromBrowser(event, _key, focusTreeId, componentId, options);
 
-    this._updateEventPropagationHistory(componentId);
+    this._updateEventPropagationHistory(componentId, componentPosition);
 
     return false;
   }
@@ -418,6 +426,14 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     }
 
     /**
+     * We need to record the position of the component that is currently dealing with
+     * the event, in case the component defines a handler for that event that changes
+     * the focus or content in the render tree, causing the component to be de-registered
+     * and have its position lost
+     */
+    const componentPosition = this._getComponentPosition(componentId);
+
+    /**
      * We attempt to find a handler of the event, only if it has not already
      * been handled and should not be ignored
      */
@@ -431,7 +447,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       );
     }
 
-    this._updateEventPropagationHistory(componentId);
+    this._updateEventPropagationHistory(componentId, componentPosition);
 
     return shouldDiscardFocusTreeId;
   }
@@ -487,6 +503,14 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     }
 
     /**
+     * We need to record the position of the component that is currently dealing with
+     * the event, in case the component defines a handler for that event that changes
+     * the focus or content in the render tree, causing the component to be de-registered
+     * and have its position lost
+     */
+    const componentPosition = this._getComponentPosition(componentId);
+
+    /**
      * We attempt to find a handler of the event, only if it has not already
      * been handled and should not be ignored
      */
@@ -500,7 +524,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      */
     this._simulateKeyUpEventsHiddenByCmd(event, _key, focusTreeId, componentId, options);
 
-    this._updateEventPropagationHistory(componentId);
+    this._updateEventPropagationHistory(componentId, componentPosition);
 
     return shouldDiscardFocusId;
   }
@@ -544,10 +568,12 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   _ignoreEvent(event, componentId) {
     this.currentEvent.ignored = true;
 
+    const componentPosition = this._getComponentPosition(componentId);
+
     if(this._stopEventPropagationAfterIgnoringIfEnabled(event, componentId)) {
-      this._updateEventPropagationHistory(componentId, { forceReset: true });
+      this._updateEventPropagationHistory(componentId, componentPosition, { forceReset: true });
     } else {
-      this._updateEventPropagationHistory(componentId);
+      this._updateEventPropagationHistory(componentId, componentPosition);
     }
   }
 
@@ -577,11 +603,11 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     return previousComponentPosition === -1 || previousComponentPosition >= this._getComponentPosition(componentId);
   }
 
-  _updateEventPropagationHistory(componentId, options = { forceReset: false }) {
+  _updateEventPropagationHistory(componentId, componentPosition, options = { forceReset: false }) {
     if (options.forceReset || this._isFocusTreeRoot(componentId)) {
       this._clearEventPropagationState();
     } else {
-      this.eventPropagationState.previousComponentPosition = this._getComponentPosition(componentId);
+      this.eventPropagationState.previousComponentPosition = componentPosition;
     }
   }
 

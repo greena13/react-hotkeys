@@ -53,6 +53,11 @@ export interface HotKeysEnabledProps extends GlobalHotKeysProps {
    * Function to call when this component loses focus in the browser
    */
   onBlur?: () => void;
+
+  /**
+   * Whether this is the root HotKeys node - this enables some special behaviour
+   */
+  root?: boolean;
 }
 
 /**

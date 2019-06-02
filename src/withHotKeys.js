@@ -113,7 +113,12 @@ function withHotKeys(Component, hotKeysOptions = {}) {
        * component mounts. If false, changes to the keyMap and handlers
        * props will be ignored
        */
-      allowChanges: PropTypes.bool
+      allowChanges: PropTypes.bool,
+
+      /**
+       * Whether this is the root HotKeys node - this enables some special behaviour
+       */
+      root: PropTypes.bool
     };
 
     constructor(props) {
@@ -152,7 +157,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
          * Props used by HotKeys that should not be passed down to its focus trap
          * component
          */
-        keyMap, handlers, allowChanges,
+        keyMap, handlers, allowChanges, root,
 
         ...props
       } = this.props;
@@ -181,7 +186,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
     _shouldBindKeyListeners() {
       const keyMap = getKeyMap(this.props);
 
-      return !isEmpty(keyMap) || (
+      return !isEmpty(keyMap) || this.props.root || (
         Configuration.option('enableHardSequences') && this._handlersIncludeHardSequences(keyMap, getHandlers(this.props))
       );
     }
