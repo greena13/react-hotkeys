@@ -1229,7 +1229,7 @@ Finally, make sure your key event are not coming from one of the [tags ignored b
 
 #### React Hotkeys thinks I'm holding down a key I've released
 
-This can happen when you have an action handler that either unmounts the `<HotKeys>` component, or focuses an area of the application where there is no parent `<HotKeys>`. The solution to this is to add a `<HotKeys root>` to the top of your application that renders it as children - or at least high enough to *not* be unmounted or unfocused by your action handler.
+This can happen when you have an action handler that either unmounts the `<HotKeys>` component, or focuses an area of the application where there is no ancestor `<HotKeys>`. The solution is to add a `<HotKeys>` component with the `root` prop to the top of your application - or at least high enough to *not* be unmounted or unfocused by your action handler.
 
 ```javascript
 <HotKeys root>
