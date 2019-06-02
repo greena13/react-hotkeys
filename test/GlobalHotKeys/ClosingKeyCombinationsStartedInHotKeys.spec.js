@@ -32,7 +32,7 @@ describe('HotKeys root prop:', function () {
 
       this.wrapper = mount(
         <div>
-          <GlobalHotKeys keyMap={this.keyMap} handlers={handlers} />
+          <GlobalHotKeys />
 
           <HotKeys keyMap={this.keyMap} handlers={handlers}>
             <div className='firstChildElement' />

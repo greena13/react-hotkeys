@@ -202,7 +202,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _updateDocumentHandlers(){
-    const listenersShouldBeBound = this.keyMapEventBitmap.some((eventType) => eventType);
+    const listenersShouldBeBound = this.componentList.length > 0;
 
     if (!this.listenersBound && listenersShouldBeBound) {
       for(let bitmapIndex = 0; bitmapIndex < this.keyMapEventBitmap.length; bitmapIndex++) {
