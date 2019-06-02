@@ -28,7 +28,7 @@ See the [upgrade notes](https://github.com/greena13/react-hotkeys/releases/tag/v
 - [Optimized for larger applications](#Optimizations), with many hot keys active at once
 - Depends only on `prop-types` and a peer dependency of `react`
 - Uses rollup and Uglify and strips out comments and logging for a small production build
-- More than [1800 automated tests](https://github.com/greena13/react-hotkeys/tree/master/test)
+- More than [2000 automated tests](https://github.com/greena13/react-hotkeys/tree/master/test)
 
 ## Basic Usage
 
@@ -94,14 +94,16 @@ export default MyNode;
     - [DEPRECATED: Hard Sequence Handlers](#deprecated-hard-sequence-handlers)
 - [Interaction with React](#interaction-with-react)
 - [HotKeys components](#hotkeys-components)
-    - [How action handlers are resolved](#how-action-handlers-are-resolved)
 - [HotKeys component API](#hotkeys-component-api)
 - [withHotKeys HoC API](#withhotkeys-hoc-api)
     - [Simple use-case](#simple-use-case)
     - [Pre-defining default prop values](#pre-defining-default-prop-values)
 - [GlobalHotKeys component](#globalhotkeys-component)
-    - [How actions and handlers are resolved](#how-actions-and-handlers-are-resolved)
 - [GlobalHotKeys component API](#globalhotkeys-component-api)
+- [How actions are resolved](#how-actions-are-resolved)
+    - [How nested key maps are matched](#how-nested-key-maps-are-matched)
+    - [How combinations and sequences are matched](#how-combinations-and-sequences-are-matched)
+- [How action handlers are resolved](#how-action-handlers-are-resolved)
 - [Displaying a list of available hot keys](#displaying-a-list-of-available-hot-keys)
 - [Allowing hotkeys and handlers props to change](#allowing-hotkeys-and-handlers-props-to-change)
 - [Ignoring events](#ignoring-events)
@@ -398,20 +400,6 @@ Rather than re-invent the wheel, `react-hotkeys` piggy-backs of the React Synthe
 
 This is the default type of `<HotKeys />` component, and should normally be your first choice for efficiency and clarity (the user generally expects keyboard input to affect the focused element in the browser).
 
-### How action handlers are resolved
-
-> If one of the DOM-mounted descendents of an `<HotKeys>` component are in focus (and it is listening to key events) AND those key events match a hot key in the component's key map, then the corresponding action is triggered.
-
-`react-hotkeys` starts at the `<HotKeys />` component closest to the event's target (the element that was in focus when the key was pressed) and works its way up through the component tree of focused `<HotKeys />` components, looking for a matching handler for the action. The handler closest to the event target AND a descendant of the `<HotKeys />` component that defines the action (or the component itself), is the one that is called.
-
-That is:
-
-- Unless one of the DOM-mounted descendents of a `<HotKeys>` component is in focus, the component's actions are not matched
-- Unless a `<HotKeys>` component is nested within the `<HotKeys />` component that defines the action (or is the same `<HotKeys />` component), its handler is not called
-- If a `<HotKeys />` component closer to the event target has defined a handler for the same action, a `<HotKeys />` component's handler won't be called (the closer component's handler will)
-
-A more exhaustive enumeration of `react-hotkeys` behaviour can be found by reviewing the [test suite](https://github.com/greena13/react-hotkeys/tree/master/test).
-
 ## HotKeys component API
 
 The HotKeys component provides a declarative and native JSX syntax that is best for succinctly declaring hotkeys in a way that best maintains separation and encapsulation with regards to the rest of your code base.
@@ -579,16 +567,6 @@ const handlers = { SHOW_ALL_HOTKEYS: this.showHotKeysDialog };
 
 `<GlobalHotKeys>` generally have no need for children, so should use a self-closing tag (as shown above). The only exception is when you are nesting other `<GlobalHotKeys>` components somewhere in the descendents (these are mounted before their parents, and so are generally matched first).
 
-### How actions and handlers are resolved
-
-Regardless of where `<GlobalHotKeys>` components appear in the render tree, they are matched with key events after the event has finished propagating through the React app (if the event originated in the React at all). This means if your React app is in focus and it handles a key event, it will be ignored by the `<GlobalHotKeys>` components.
-
-The order used for resolving actions and handlers amongst `<GlobalHotKeys>` components, is the order in which they mounted (those mounted first, are given the chance to handle an action first). When a `<GlobalHotKeys>` component is unmounted, it is removed from consideration. This can get less deterministic over the course of a long session using a React app as components mount and unmount, so it is best to define actions and handlers that are globally unique.
-
-It is recommended to use `<HotKeys>` components whenever possible for better performance and reliability.
-
-> You can use the [autofocus attributes](#Autofocus) or [programmatically manage focus](#Programmatically-manage-focus) to automatically focus your React app so the user doesn't have to select it in order for hot keys to take effect. It is common practice to place a `<HotKeys>` component towards the top of your application to match hot keys across your entire React application.
-
 ## GlobalHotKeys component API
 
 The GlobalHotKeys component provides a declarative and native JSX syntax for defining hotkeys that are applicable beyond you React application.
@@ -625,6 +603,44 @@ The GlobalHotKeys component provides a declarative and native JSX syntax for def
   {children}
 </GlobalHotKeys>
 ```
+
+## How actions are resolved
+
+### How nested key maps are matched
+
+For keymaps defined with `<HotKeys/>` components, how close your `<HotKeys/>` component is to the element currently focused in the DOM has the greatest affect on how actions are resolved. Whenever a key event occurs (`keydown`, `keypress` or `keyup`), `react-hotkeys` starts at the `<HotKeys/>` component closest to the event's target (the focused element in the browser) and searches up through the hierarchy of focused `<HotKeys/>` components, examining each `keyMap` for actions for which the current key completes the specified combination or sequence. 
+
+Regardless of where `<GlobalHotKeys>` components appear in the render tree, they are matched with key events after the event has finished propagating through the React app (if the event originated in the React at all). This means if your React app is in focus and it handles a key event, it will be ignored by the `<GlobalHotKeys>` components.
+
+The order used for resolving actions and handlers amongst `<GlobalHotKeys>` components, is the order in which they mounted (those mounted first, are given the chance to handle an action first). When a `<GlobalHotKeys>` component is unmounted, it is removed from consideration. This can get less deterministic over the course of a long session using a React app as components mount and unmount, so it is best to define actions and handlers that are globally unique.
+
+It is recommended to use `<HotKeys>` components whenever possible for better performance and reliability.
+
+> You can use the [autofocus attributes](#Autofocus) or [programmatically manage focus](#Programmatically-manage-focus) to automatically focus your React app so the user doesn't have to select it in order for hot keys to take effect. It is common practice to place a `<HotKeys>` component towards the top of your application to match hot keys across your entire React application.
+
+### How combinations and sequences are matched
+
+For key combinations, the action only matches if the key is the last one needed to complete the combination. For sequences, the action matches for the last key to complete the last combination in the sequence. 
+
+By default, sub-matches are disabled so if you have two actions bound to `cmd+a` and `a`, and you press the `cmd` key and then the `a` key (without releasing the `cmd` key), then the `cmd+a` combination is matched. This allows you to define longer, application-wide key combinations at the top of your app, without them being hidden by shorter context-dependent combinations in different parts of your app. However, it does depend on the order the keys are pressed: in the above example, if `a` was pressed first and then `cmd`, the `a` action would be matched. The trade-off for this behaviour is that combinations are not permitted to overlap: if you have two actions bound to `a` and `b` and the user presses `a` and then `b` without first releasing `a`, only the action associated with `a` will be called (because there are no actions associated with `a+b`). If you want allow sub-matches, you can use the [`allowCombinationSubmatches` configuration option](#configuration).
+
+The match occurs on the key event you have specified when defining your keymap (the default is `keydown` if you have not overridden the [`defaultKeyEvent` configuration option](#configuration)).   
+
+Once a matching action is found, `react-hotkeys` then searches for the corresponding action handler.
+
+## How action handlers are resolved
+
+> If one of the DOM-mounted descendents of an `<HotKeys>` component are in focus (and it is listening to key events) AND those key events match a hot key in the component's key map, then the corresponding action is triggered.
+
+`react-hotkeys` starts at the `<HotKeys/>` component closest to the event's target (the element that was in focus when the key was pressed) and works its way up through the component tree of focused `<HotKeys/>` components, looking for a matching handler for the action. The handler closest to the event target AND a descendant of the `<HotKeys/>` component that defines the action (or the component itself), is the one that is called.
+
+That is:
+
+- Unless one of the DOM-mounted descendents of a `<HotKeys>` component is in focus, the component's actions are not matched
+- Unless a `<HotKeys>` component is nested within the `<HotKeys/>` component that defines the action (or is the same `<HotKeys />` component), its handler is not called
+- If a `<HotKeys />` component closer to the event target has defined a handler for the same action, a `<HotKeys />` component's handler won't be called (the closer component's handler will)
+
+A more exhaustive enumeration of `react-hotkeys` behaviour can be found by reviewing the [test suite](https://github.com/greena13/react-hotkeys/tree/master/test).
 
 ## Displaying a list of available hot keys
 
@@ -1018,6 +1034,13 @@ configure({
    * allowed to propagate any further through the Render tree).
    */
    stopEventPropagationAfterIgnoring: true,
+   
+   /**
+   * Whether to allow combination submatches - e.g. if there is an action 
+   * bound to cmd, pressing shift+cmd will *not* trigger that action when
+   * allowCombinationSubmatches is false.
+   */
+  allowCombinationSubmatches: false,
 });
 ```
 

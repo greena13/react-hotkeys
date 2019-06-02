@@ -262,6 +262,13 @@ export interface ConfigurationOptions {
    * any further through the Render tree).
    */
   stopEventPropagationAfterIgnoring?: boolean,
+
+  /**
+   * Whether to allow combination submatches - e.g. if there is an action bound to
+   * cmd, pressing shift+cmd will *not* trigger that action when
+   * allowCombinationSubmatches is false.
+   */
+  allowCombinationSubmatches?: boolean,
 }
 
 /**

@@ -8,7 +8,7 @@ import FocusableElement from '../support/FocusableElement';
 import KeyCode from '../support/Key';
 import {HotKeys} from '../../src/';
 
-describe('Matching single hotkeys:', function () {
+describe('Matching single hotkeys when allowCombinationSubmatches is false:', function () {
   describe('when the actions are triggered by the keypress event', () => {
     beforeEach(function () {
       this.keyMap = {
@@ -133,7 +133,7 @@ describe('Matching single hotkeys:', function () {
 
     describe('when one hotkey is pressed down and then another', function () {
       describe('and the first hotkey is released and then the second', () => {
-        it('then the first hotkey\'s handler is called followed by the second hotkey\'s', function() {
+        it('then the first hotkey\'s handler is called but NOT the second hotkey\'s', function() {
           this.targetElement.keyDown(KeyCode.A);
           this.targetElement.keyPress(KeyCode.A);
 
@@ -144,18 +144,18 @@ describe('Matching single hotkeys:', function () {
           this.targetElement.keyPress(KeyCode.B);
 
           expect(this.action1Handler).to.have.been.calledOnce;
-          expect(this.action2Handler).to.have.been.calledOnce;
+          expect(this.action2Handler).to.not.have.been.called;
 
           this.targetElement.keyUp(KeyCode.A);
           this.targetElement.keyUp(KeyCode.B);
 
           expect(this.action1Handler).to.have.been.calledOnce;
-          expect(this.action2Handler).to.have.been.calledOnce;
+          expect(this.action2Handler).to.not.have.been.called;
         });
       });
 
       describe('and the second hotkey is released and then the first', () => {
-        it('then the first hotkey\'s handler is called followed by the second hotkey\'s', function() {
+        it('then the first hotkey\'s handler is called but NOT the second hotkey\'s', function() {
           this.targetElement.keyDown(KeyCode.A);
           this.targetElement.keyPress(KeyCode.A);
 
@@ -166,13 +166,13 @@ describe('Matching single hotkeys:', function () {
           this.targetElement.keyPress(KeyCode.B);
 
           expect(this.action1Handler).to.have.been.calledOnce;
-          expect(this.action2Handler).to.have.been.calledOnce;
+          expect(this.action2Handler).to.not.have.been.called;
 
           this.targetElement.keyUp(KeyCode.B);
           this.targetElement.keyUp(KeyCode.A);
 
           expect(this.action1Handler).to.have.been.calledOnce;
-          expect(this.action2Handler).to.have.been.calledOnce;
+          expect(this.action2Handler).to.not.have.been.called;
         });
       });
     });
@@ -352,7 +352,7 @@ describe('Matching single hotkeys:', function () {
 
     describe('when one hotkey is pressed down and then another', function () {
       describe('and the first hotkey is released and then the second', () => {
-        it('then the first hotkey\'s handler is called followed by the second hotkey\'s', function() {
+        it('then the first hotkey\'s handler is called but not the second hotkey\'s', function() {
           this.targetElement.keyDown(KeyCode.A);
           this.targetElement.keyPress(KeyCode.A);
 
@@ -363,18 +363,18 @@ describe('Matching single hotkeys:', function () {
           this.targetElement.keyPress(KeyCode.B);
 
           expect(this.action1Handler).to.have.been.calledOnce;
-          expect(this.action2Handler).to.have.been.calledOnce;
+          expect(this.action2Handler).to.not.have.been.called;
 
           this.targetElement.keyUp(KeyCode.A);
           this.targetElement.keyUp(KeyCode.B);
 
           expect(this.action1Handler).to.have.been.calledOnce;
-          expect(this.action2Handler).to.have.been.calledOnce;
+          expect(this.action2Handler).to.not.have.been.called;
         });
       });
 
       describe('and the second hotkey is released and then the first', () => {
-        it('then the first hotkey\'s handler is called followed by the second hotkey\'s', function() {
+        it('then the first hotkey\'s handler is called but NOT the second hotkey\'s', function() {
           this.targetElement.keyDown(KeyCode.A);
           this.targetElement.keyPress(KeyCode.A);
 
@@ -385,13 +385,13 @@ describe('Matching single hotkeys:', function () {
           this.targetElement.keyPress(KeyCode.B);
 
           expect(this.action1Handler).to.have.been.calledOnce;
-          expect(this.action2Handler).to.have.been.calledOnce;
+          expect(this.action2Handler).to.not.have.been.called;
 
           this.targetElement.keyUp(KeyCode.B);
           this.targetElement.keyUp(KeyCode.A);
 
           expect(this.action1Handler).to.have.been.calledOnce;
-          expect(this.action2Handler).to.have.been.calledOnce;
+          expect(this.action2Handler).to.not.have.been.called;
         });
       });
     });
@@ -569,7 +569,7 @@ describe('Matching single hotkeys:', function () {
 
     describe('when one hotkey is pressed down and then another', function () {
       describe('and the first hotkey is released and then the second', () => {
-        it('then the first hotkey\'s handler is called followed by the second hotkey\'s', function() {
+        it('then neither hotkeys\' handler is called', function() {
           this.targetElement.keyDown(KeyCode.A);
           this.targetElement.keyPress(KeyCode.A);
 
@@ -581,18 +581,18 @@ describe('Matching single hotkeys:', function () {
 
           this.targetElement.keyUp(KeyCode.A);
 
-          expect(this.action1Handler).to.have.been.calledOnce;
+          expect(this.action1Handler).to.not.have.been.called;
           expect(this.action2Handler).to.not.have.been.called;
 
           this.targetElement.keyUp(KeyCode.B);
 
-          expect(this.action1Handler).to.have.been.calledOnce;
-          expect(this.action2Handler).to.have.been.calledOnce;
+          expect(this.action1Handler).to.not.have.been.called;
+          expect(this.action2Handler).to.not.have.been.called;
         });
       });
 
       describe('and the second hotkey is released and then the first', () => {
-        it('then the second hotkey\'s handler is called followed by the first hotkey\'s', function() {
+        it('then neither hotkeys\' handler is called', function() {
           this.targetElement.keyDown(KeyCode.A);
           this.targetElement.keyPress(KeyCode.A);
 
@@ -604,20 +604,20 @@ describe('Matching single hotkeys:', function () {
 
           this.targetElement.keyUp(KeyCode.B);
 
-          expect(this.action2Handler).to.have.been.calledOnce;
+          expect(this.action2Handler).to.not.have.been.called;
           expect(this.action1Handler).to.not.have.been.called;
 
           this.targetElement.keyUp(KeyCode.A);
 
-          expect(this.action2Handler).to.have.been.calledOnce;
-          expect(this.action1Handler).to.have.been.calledOnce;
+          expect(this.action2Handler).to.not.have.been.called;
+          expect(this.action1Handler).to.not.have.been.called;
         });
       });
     });
 
     describe('when one hotkey is pressed down, followed by a non-hotkey', function () {
       describe('and the hotkey is released and then the non-hotkey', () => {
-        it('then the hotkey\'s handler is called', function() {
+        it('then the hotkey\'s handler is NOT called', function() {
           this.targetElement.keyDown(KeyCode.A);
           this.targetElement.keyPress(KeyCode.A);
 
@@ -628,18 +628,18 @@ describe('Matching single hotkeys:', function () {
 
           this.targetElement.keyUp(KeyCode.A);
 
-          expect(this.action1Handler).to.have.been.calledOnce;
+          expect(this.action1Handler).to.not.have.been.called;
           expect(this.action2Handler).to.not.have.been.called;
 
           this.targetElement.keyUp(KeyCode.ENTER);
 
-          expect(this.action1Handler).to.have.been.calledOnce;
+          expect(this.action1Handler).to.not.have.been.called;
           expect(this.action2Handler).to.not.have.been.called;
         });
       });
 
       describe('and the non-hotkey is released and then the hotkey', () => {
-        it('then the hotkey\'s handler is called', function() {
+        it('then the hotkey\'s handler is NOT called', function() {
           this.targetElement.keyDown(KeyCode.A);
           this.targetElement.keyPress(KeyCode.A);
 
@@ -651,7 +651,7 @@ describe('Matching single hotkeys:', function () {
 
           this.targetElement.keyUp(KeyCode.A);
 
-          expect(this.action1Handler).to.have.been.called;
+          expect(this.action1Handler).to.not.have.been.called;
           expect(this.action2Handler).to.not.have.been.called;
         });
       });

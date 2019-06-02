@@ -7,7 +7,7 @@ import simulant from 'simulant';
 import KeyCode from '../support/Key';
 import {GlobalHotKeys} from '../../src';
 
-describe('Matching hotkey combinations for GlobalHotKeys:', function () {
+describe('Matching hotkey combinations for GlobalHotKeys when allowCombinationSubmatches is false:', function () {
   beforeEach(function () {
     this.parentDiv = document.createElement('div');
     this.reactDiv = document.createElement('div');
@@ -335,11 +335,9 @@ describe('Matching hotkey combinations for GlobalHotKeys:', function () {
               simulant.fire(this.reactDiv, 'keyup', { key: KeyCode.C });
             });
 
-            it('then calls the shorter combination\'s handler followed by the longer combination\'s handler', function() {
-              expect(this.comboHandler).to.have.been.calledOnce;
+            it('then calls the longer combination\'s handler only', function() {
+              expect(this.comboHandler).to.not.have.been.called;
               expect(this.longerCombinationHandler).to.have.been.calledOnce;
-
-              expect(this.comboHandler).to.have.been.calledBefore(this.longerCombinationHandler);
             });
           });
 
@@ -541,5 +539,4 @@ describe('Matching hotkey combinations for GlobalHotKeys:', function () {
       });
     })
   });
-
 });

@@ -974,24 +974,36 @@ class AbstractKeyEventStrategy {
               const combinationId = combinationOrder[combinationIndex];
               const combinationMatcher = matchingSequence.combinations[combinationId];
 
-              if (this._combinationMatchesKeys(normalizedKeyName, currentKeyState, combinationMatcher, eventBitmapIndex)) {
-                const subMatchDescription = KeyCombinationSerializer.serialize(combinationMatcher.keyDictionary);
+              const sameNoOfKeysInCombinationAsKeyState =
+                Object.keys(currentKeyState.keys).length === Object.keys(combinationMatcher.keyDictionary).length;
 
-                this.logger.debug(
-                  this._logPrefix(componentSearchIndex),
-                  `Found action that matches '${this._describeCurrentKeyCombination()}' (sub-match: '${subMatchDescription}'): ${combinationMatcher.events[eventBitmapIndex].actionName}. Calling handler . . .`
-                );
+              if (sameNoOfKeysInCombinationAsKeyState || Configuration.option('allowCombinationSubmatches')) {
+                if (this._combinationMatchesKeys(normalizedKeyName, currentKeyState, combinationMatcher, eventBitmapIndex)) {
 
-                combinationMatcher.events[eventBitmapIndex].handler(event);
+                  if (Configuration.option('allowCombinationSubmatches')) {
+                    const subMatchDescription = KeyCombinationSerializer.serialize(combinationMatcher.keyDictionary);
 
-                this._stopEventPropagationAfterHandlingIfEnabled(event, componentSearchIndex);
+                    this.logger.debug(
+                      this._logPrefix(componentSearchIndex),
+                      `Found action that matches '${this._describeCurrentKeyCombination()}' (sub-match: '${subMatchDescription}'): ${combinationMatcher.events[eventBitmapIndex].actionName}. Calling handler . . .`
+                    );
+                  } else {
+                    this.logger.debug(
+                      this._logPrefix(componentSearchIndex),
+                      `Found action that matches '${this._describeCurrentKeyCombination()}': ${combinationMatcher.events[eventBitmapIndex].actionName}. Calling handler . . .`
+                    );
+                  }
 
-                return true;
+                  combinationMatcher.events[eventBitmapIndex].handler(event);
+
+                  this._stopEventPropagationAfterHandlingIfEnabled(event, componentSearchIndex);
+
+                  return true;
+                }
               }
 
               combinationIndex++;
             }
-
           }
 
           sequenceLengthCounter--;
@@ -1080,6 +1092,11 @@ class AbstractKeyEventStrategy {
       combinationMatch.events[eventBitmapIndex];
 
     if (!combinationHasHandlerForEventType) {
+      /**
+       * If the combination does not have any actions bound to the key event we are
+       * currently processing, we skip checking if it matches the current keys being
+       * pressed.
+       */
       return false;
     }
 

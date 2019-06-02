@@ -51,6 +51,7 @@ describe('Handlers that change focus:', function () {
       it('then focus is correctly managed', function() {
         this.firstElement.keyDown(KeyCode.A);
         this.firstElement.keyPress(KeyCode.A);
+        this.firstElement.keyUp(KeyCode.A);
 
         expect(this.nextHandler).to.have.been.calledOnce;
         expect(this.previousHandler).to.not.have.been.called;
@@ -59,6 +60,7 @@ describe('Handlers that change focus:', function () {
 
         this.firstElement.keyDown(KeyCode.B);
         this.firstElement.keyPress(KeyCode.B);
+        this.firstElement.keyUp(KeyCode.B);
 
         expect(this.nextHandler).to.have.been.calledOnce;
         expect(this.previousHandler).to.have.been.calledOnce;
@@ -67,5 +69,4 @@ describe('Handlers that change focus:', function () {
       });
     });
   });
-
 });

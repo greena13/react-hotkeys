@@ -40,10 +40,14 @@ describe('Changing keyMap and handlers after mount:', function () {
 
       it('then the new sequence is ignored', function() {
         this.targetElement.keyDown(KeyCode.B);
+        this.targetElement.keyPress(KeyCode.B);
+        this.targetElement.keyUp(KeyCode.B);
 
         expect(this.handler).to.not.have.been.called;
 
         this.targetElement.keyDown(KeyCode.A);
+        this.targetElement.keyPress(KeyCode.A);
+        this.targetElement.keyUp(KeyCode.A);
 
         expect(this.handler).to.have.been.calledOnce;
       });
