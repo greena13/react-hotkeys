@@ -8,10 +8,10 @@ import FocusableElement from '../support/FocusableElement';
 import KeyEventManager from '../../src/lib/KeyEventManager';
 import KeyCode from '../support/Key';
 
-import {HotKeys, GlobalHotKeys, configure} from '../../src';
+import {HotKeys, GlobalHotKeys} from '../../src';
 
-describe('HotKeys root prop:', function () {
-  describe('when a HotKeys component has a root prop value of true', function () {
+describe('ClosingHangingCombinationsInHotKeysComponents:', function () {
+  describe('when a HotKeys component has a handler on keydown that changes the focus to outside its descendants', function () {
     beforeEach(function () {
       this.keyMap = {
         'NEXT': 'a',
@@ -55,8 +55,8 @@ describe('HotKeys root prop:', function () {
       document.body.removeChild(this.reactDiv);
     });
 
-    describe('and nested HotKeys component has a handler that changes focus to another element bound to keydown', function () {
-      it('then the root HotKeys still records the keyup event', function() {
+    describe('and there is a GlobalHotKeys component also mounted', function () {
+      it('then the GlobalHotKeys component will close the hanging combination by reporting the missed keypress and keyup events to the HotKeys component', function() {
         this.firstElement.keyDown(KeyCode.A);
 
         expect(this.nextHandler).to.have.been.calledOnce;
