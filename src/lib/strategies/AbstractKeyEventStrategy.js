@@ -22,6 +22,7 @@ import Configuration from '../Configuration';
 import ModifierFlagsDictionary from '../../const/ModifierFlagsDictionary';
 import without from '../../utils/collection/without';
 import hasKeyPressEvent from '../../helpers/resolving-handlers/hasKeyPressEvent';
+import isMatchPossibleBasedOnNumberOfKeys from '../../helpers/resolving-handlers/isMatchPossibleBasedOnNumberOfKeys';
 
 /**
  * Defines common behaviour for key event strategies
@@ -974,10 +975,7 @@ class AbstractKeyEventStrategy {
               const combinationId = combinationOrder[combinationIndex];
               const combinationMatcher = matchingSequence.combinations[combinationId];
 
-              const sameNoOfKeysInCombinationAsKeyState =
-                Object.keys(currentKeyState.keys).length === Object.keys(combinationMatcher.keyDictionary).length;
-
-              if (sameNoOfKeysInCombinationAsKeyState || Configuration.option('allowCombinationSubmatches')) {
+              if (isMatchPossibleBasedOnNumberOfKeys(currentKeyState, combinationMatcher)) {
                 if (this._combinationMatchesKeys(normalizedKeyName, currentKeyState, combinationMatcher, eventBitmapIndex)) {
 
                   if (Configuration.option('allowCombinationSubmatches')) {
