@@ -682,15 +682,13 @@ A more exhaustive enumeration of `react-hotkeys` behaviour can be found by revie
 
 They are returned as an object, with the action names as keys, and the values are objects describing the key map.
 
-Regardless of which syntax you used to define the keymap, they always appear in the following syntax:
+Regardless of which syntax you used to define the keymap, they always appear in the following format:
 
 ```
 {
-  ...
   ACTION_NAME: {
     /**
      * Optional attributes - only present if you defined them
-     * 
      */
      
     name: 'name',
@@ -701,13 +699,14 @@ Regardless of which syntax you used to define the keymap, they always appear in 
      * Attributes always present
      * /
     sequences: [
-      ...
       {
         action: 'keydown',
         sequence: 'alt+s'
-      }
+      },
+      // ...
     ]
-  } 
+  },
+  // ... 
 }
 ```
 
