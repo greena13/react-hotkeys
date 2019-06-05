@@ -28,7 +28,7 @@ describe('Getting the application key map:', () => {
 
     it('generates the correct application key map', function() {
       expect(getApplicationKeyMap()).to.eql({
-        'ACTION1': ['enter']
+        'ACTION1': { sequences: [{ sequence: 'enter' }] }
       })
     });
   });
@@ -39,6 +39,9 @@ describe('Getting the application key map:', () => {
         'ACTION1': {
           sequence: 'enter',
           action: 'keydown',
+          name: 'NAME',
+          description: 'DESC',
+          group: 'GROUP'
         },
       };
 
@@ -57,7 +60,154 @@ describe('Getting the application key map:', () => {
 
     it('generates the correct application key map', function() {
       expect(getApplicationKeyMap()).to.eql({
-        'ACTION1': ['enter']
+        'ACTION1': {
+          sequences: [{ sequence: 'enter', action: 'keydown' }],
+          name: 'NAME',
+          description: 'DESC',
+          group: 'GROUP'
+        }
+      })
+    });
+  });
+
+  context('when a keydown keymap is specified as an array of strings', () => {
+    beforeEach(function () {
+      this.keyMap = {
+        'ACTION1': ['enter','shift'],
+      };
+
+      this.handler = sinon.spy();
+
+      this.handlers = {
+        'ACTION1': this.handler,
+      };
+
+      this.wrapper = mount(
+        <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
+          <div className="childElement" />
+        </HotKeys>
+      );
+    });
+
+    it('generates the correct application key map', function() {
+      expect(getApplicationKeyMap()).to.eql({
+        'ACTION1': { sequences: [{ sequence: 'enter' }, { sequence: 'shift' }] }
+      })
+    });
+  });
+
+  context('when a keydown keymap is specified as an array of objects', () => {
+    beforeEach(function () {
+      this.keyMap = {
+        'ACTION1': [{
+          sequence: 'enter',
+          action: 'keydown',
+        }, {
+          sequence: 'shift',
+          action: 'keydown',
+        }],
+      };
+
+      this.handler = sinon.spy();
+
+      this.handlers = {
+        'ACTION1': this.handler,
+      };
+
+      this.wrapper = mount(
+        <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
+          <div className="childElement" />
+        </HotKeys>
+      );
+    });
+
+    it('generates the correct application key map', function() {
+      expect(getApplicationKeyMap()).to.eql({
+        'ACTION1': { sequences: [
+          { sequence: 'enter', action: 'keydown' },
+          { sequence: 'shift', action: 'keydown' }]
+        }
+      })
+    });
+  });
+
+  context('when a keydown keymap is specified as object with sequences attribute of an array of strings', () => {
+    beforeEach(function () {
+      this.keyMap = {
+        'ACTION1': {
+          sequences: ['enter', 'shift'],
+          name: 'NAME',
+          description: 'DESC',
+          group: 'GROUP'
+        },
+      };
+
+      this.handler = sinon.spy();
+
+      this.handlers = {
+        'ACTION1': this.handler,
+      };
+
+      this.wrapper = mount(
+        <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
+          <div className="childElement" />
+        </HotKeys>
+      );
+    });
+
+    it('generates the correct application key map', function() {
+      expect(getApplicationKeyMap()).to.eql({
+        'ACTION1': {
+          sequences: [
+            { sequence: 'enter' },
+            { sequence: 'shift' }
+          ],
+          name: 'NAME',
+          description: 'DESC',
+          group: 'GROUP'
+        }
+      })
+    });
+  });
+
+  context('when a keydown keymap is specified as object with sequences attribute of an array of objects', () => {
+    beforeEach(function () {
+      this.keyMap = {
+        'ACTION1': {
+          sequences: [
+            {sequence: 'enter', action: 'keydown'},
+            {sequence: 'shift', action: 'keydown'}
+          ],
+          name: 'NAME',
+          description: 'DESC',
+          group: 'GROUP'
+        },
+      };
+
+      this.handler = sinon.spy();
+
+      this.handlers = {
+        'ACTION1': this.handler,
+      };
+
+      this.wrapper = mount(
+        <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
+          <div className="childElement" />
+        </HotKeys>
+      );
+    });
+
+    it('generates the correct application key map', function() {
+      expect(getApplicationKeyMap()).to.eql({
+        'ACTION1': {
+          sequences: [
+            { sequence: 'enter', action: 'keydown' },
+            { sequence: 'shift', action: 'keydown' }
+          ],
+          name: 'NAME',
+          description: 'DESC',
+          group: 'GROUP'
+        }
       })
     });
   });
@@ -77,7 +227,11 @@ describe('Getting the application key map:', () => {
 
     it('generates the correct application key map', function() {
       expect(getApplicationKeyMap()).to.eql({
-        'ACTION1': ['enter']
+        'ACTION1': {
+          sequences: [
+            { sequence: 'enter' }
+          ]
+        }
       })
     });
   });
@@ -114,8 +268,8 @@ describe('Getting the application key map:', () => {
 
     it('generates the correct application key map', function() {
       expect(getApplicationKeyMap()).to.eql({
-        'ACTION1': ['enter'],
-        'ACTION2': ['enter']
+        'ACTION1': { sequences: [{ sequence: 'enter' }] },
+        'ACTION2': { sequences: [{ sequence: 'enter' }] }
       })
     });
   });
@@ -132,9 +286,9 @@ describe('Getting the application key map:', () => {
 
     it('generates the correct application key map', function() {
       expect(getApplicationKeyMap()).to.eql({
-        'ACTION1': ['enter'],
-        'ACTION2': ['enter'],
-        'ACTION3': ['shift']
+        'ACTION1': { sequences: [{ sequence: 'enter' }] },
+        'ACTION2': { sequences: [{ sequence: 'enter' }] },
+        'ACTION3': { sequences: [{ sequence: 'shift' }] }
       })
     });
   });
@@ -153,10 +307,10 @@ describe('Getting the application key map:', () => {
 
     it('generates the correct application key map', function() {
       expect(getApplicationKeyMap()).to.eql({
-        'ACTION0': ['cmd'],
-        'ACTION1': ['enter'],
-        'ACTION2': ['enter'],
-        'ACTION3': ['shift']
+        'ACTION0': { sequences: [{ sequence: 'cmd' }] },
+        'ACTION1': { sequences: [{ sequence: 'enter' }] },
+        'ACTION2': { sequences: [{ sequence: 'enter' }] },
+        'ACTION3': { sequences: [{ sequence: 'shift' }] }
       })
     });
   });

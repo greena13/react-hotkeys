@@ -89,6 +89,7 @@ export default MyNode;
     - [Full Reference](#full-reference)
     - [Alternative Hotkeys](#alternative-hotkeys)
     - [Specifying key events (keydown, keypress, keyup)](#specifying-key-events-keydown-keypress-keyup)
+    - [Specifying key map display data](#specifying-key-map-display-data)
     - [Deciding which key map syntax to use](#deciding-which-key-map-syntax-to-use)
 - [Defining Handlers](#defining-handlers)
     - [DEPRECATED: Hard Sequence Handlers](#deprecated-hard-sequence-handlers)
@@ -311,14 +312,40 @@ If you want to change the default key event for all hotkeys, you can use the `de
 
 The full list of valid key events is: `keypress`, `keydown`, and `keyup`.
 
+#### Specifying key map display data
+
+You can specify data used to display the application's key maps using the object syntax and the `name`, `description` and `group` attributes (each are optional):
+
+```javascript
+  SHOW_DIALOG: { 
+    name: 'Display keyboard shortcuts', 
+    sequence: 'shift+?', 
+    action: 'keyup' 
+  }
+```
+
+If you want to also provide alternative key sequences for the same action, use the `sequences` attribute:
+
+```javascript
+  SHOW_DIALOG: { 
+    name: 'Display keyboard shortcuts', 
+    sequences: ['shift+?', { sequence: '`', action: 'keyup' }], 
+    action: 'keyup' 
+  }
+```
+
+
 #### Deciding which key map syntax to use
 
 As a general rule, you should use the syntax that is the most brief, but still allows you to express the configuration you want.
 
-| Question                                                                                  | Yes                                 | No                      |
-| :---------------------------------------------------------------------------------------- | :---------------------------------- | :---------------------- |
-| **Need to define alternative key sequences to trigger the same action?**                  | Use an array of strings or objects. | Use a string or object. |
-| **Need to explicitly define the key event to bind to (or some other additional option)?** | Use an object.                      | Use a string.           |
+| Syntax Type                  | Use when you ...                                                                                                    |
+| :--------------------------- | :------------------------------------------------------------------------------------------------------------------ |
+| String                       | Have a single key sequence and don't have any special requirements (Default case)                                   | 
+| Array of strings             | Need alternative key maps that trigger the same action, and are happy with them triggering on the default key event |
+| Array of objects             | Need alternative key maps that trigger the same action, and want to them to trigger on a different key event        | 
+| Object                       | Have a single key sequence and want to specify a different key event or display data                                | 
+| Object (sequences attribute) | Have multiple key sequences that trigger the same action, and want to specify a different key event or display data | 
 
 ## Defining Handlers
 
@@ -653,7 +680,36 @@ A more exhaustive enumeration of `react-hotkeys` behaviour can be found by revie
 
 `react-hotkeys` provides the `getApplicationKeyMap()` function for getting a mapping of all actions and key sequences that have been defined by components that are currently mounted.
 
-They are returned as an object, with the action names as keys (it is up to you to decide how to translate them to be displayed) and arrays of key sequences that trigger them, as keys.
+They are returned as an object, with the action names as keys, and the values are objects describing the key map.
+
+Regardless of which syntax you used to define the keymap, they always appear in the following syntax:
+
+```
+{
+  ...
+  ACTION_NAME: {
+    /**
+     * Optional attributes - only present if you defined them
+     * 
+     */
+     
+    name: 'name',
+    group: 'group',
+    description: 'description',
+    
+    /**
+     * Attributes always present
+     * /
+    sequences: [
+      ...
+      {
+        action: 'keydown',
+        sequence: 'alt+s'
+      }
+    ]
+  } 
+}
+```
 
 Below is how the example application renders a dialog of all available hot keys:
 
@@ -674,16 +730,21 @@ renderDialog() {
 
           <table>
             <tbody>
-            { Object.keys(keyMap).map((actionName) => (
-              <tr key={actionName}>
-                <td style={styles.KEYMAP_TABLE_CELL}>
-                  { actionName.replace('_', ' ') }
-                </td>
-                <td style={styles.KEYMAP_TABLE_CELL}>
-                  { keyMap[actionName].map((keySequence) => <span key={keySequence}>{keySequence}</span>) }
-                </td>
-              </tr>
-            )) }
+            { Object.keys(keyMap).reduce((memo, actionName) => {
+                const { sequences, name } = keyMap[actionName];
+                
+                memo.push(
+                  <tr key={name || actionName}>
+                    <td style={styles.KEYMAP_TABLE_CELL}>
+                      { name }
+                    </td>
+                    <td style={styles.KEYMAP_TABLE_CELL}>
+                      { sequences.map(({sequence}) => <span key={sequence}>{sequence}</span>) }
+                    </td>
+                  </tr>
+                )
+              }
+             }
             </tbody>
           </table>
         </div>

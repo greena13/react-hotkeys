@@ -11,7 +11,14 @@ export interface KeyMapOptions {
   action: KeyEventName;
 }
 
-export type KeySequence = MouseTrapKeySequence | KeyMapOptions | Array<MouseTrapKeySequence> | Array<KeyMapOptions>;
+export interface ExtendedKeyMapOptions extends KeyMapOptions {
+  sequences: Array<MouseTrapKeySequence> | Array<KeyMapOptions>;
+  name?: string;
+  group?: string;
+  description?: string;
+}
+
+export type KeySequence = MouseTrapKeySequence | KeyMapOptions | ExtendedKeyMapOptions | Array<MouseTrapKeySequence> | Array<KeyMapOptions>;
 
 export type KeyMap = { [key in ActionName]: KeySequence };
 
@@ -180,7 +187,14 @@ export class ObserveKeys extends React.Component<HotKeysOverrideProps, {}> { }
  */
 export declare function withObserveKeys(Component: React.ComponentClass, hotKeysIgnoreOptions: HotKeysOverrideProps): ObserveKeys;
 
-export type ApplicationKeyMap = { [key in ActionName]: Array<MouseTrapKeySequence> };
+export interface KeyMapDisplayOptions {
+  sequences: Array<KeyMapOptions>;
+  name?: string;
+  group?: string;
+  description?: string;
+}
+
+export type ApplicationKeyMap = { [key in ActionName]: KeyMapDisplayOptions };
 
 /**
  * Generates and returns the application's key map, including not only those

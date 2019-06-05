@@ -67,11 +67,16 @@ function withHotKeys(Component, hotKeysOptions = {}) {
        *           KeyEventDescription
        * @property {KeyEventName} action - The keyboard state required to satisfy a
        *           KeyEventDescription
+       * @property {String} name - The name of the action, to be displayed to the end user
+       * @property {String} description - A description of the action, to be displayed to
+       *           the end user
+       * @property {String} group - A group the action belongs to, to aid in showing similar
+       *           actions to the user
        */
 
       /**
        * A description of key sequence of one or more key combinations
-       * @typedef {MouseTrapKeySequence|KeyMapOptions|Array<MouseTrapKeySequence>} KeyEventDescription
+       * @typedef {MouseTrapKeySequence|KeyEventOptions|Array<MouseTrapKeySequence>} KeyEventDescription
        */
 
       /**

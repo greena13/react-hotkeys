@@ -24,6 +24,11 @@ import without from '../../utils/collection/without';
 import hasKeyPressEvent from '../../helpers/resolving-handlers/hasKeyPressEvent';
 import keyIsCurrentlyTriggeringEvent from '../../helpers/parsing-key-maps/keyIsCurrentlyTriggeringEvent';
 import isMatchPossibleBasedOnNumberOfKeys from '../../helpers/resolving-handlers/isMatchPossibleBasedOnNumberOfKeys';
+import copyAttributes from '../../utils/object/copyAttributes';
+import hasKey from '../../utils/object/hasKey';
+
+const SEQUENCE_ATTRIBUTES = ['sequence', 'action'];
+const KEYMAP_ATTRIBUTES = ['name', 'description', 'group'];
 
 /**
  * Defines common behaviour for key event strategies
@@ -281,26 +286,77 @@ class AbstractKeyEventStrategy {
 
       if (keyMap) {
         Object.keys(keyMap).forEach((actionName) => {
-          keyMapSummary[actionName] = [];
+          const keyMapConfig = keyMap[actionName];
 
-          arrayFrom(keyMap[actionName]).forEach((keySequenceOptions) => {
-            const sequence = function(){
-              if (isObject(keySequenceOptions)) {
-                return keySequenceOptions.sequence;
-              } else {
-                return keySequenceOptions;
-              }
-            }();
+          keyMapSummary[actionName] = {};
 
-            keyMapSummary[actionName].push(sequence);
-          })
-        })
+          if (isObject(keyMapConfig)) {
+            if (hasKey(keyMapConfig, 'sequences')) {
+              /**
+               * Support syntax:
+               *  {
+               *    sequences: [ {sequence: 'a+b', action: 'keyup' }],
+               *    name: 'My keymap',
+               *    description: 'Key to press for something special',
+               *    group: 'Vanity'
+               *  }
+               */
+              copyAttributes(
+                keyMapConfig,
+                keyMapSummary[actionName],
+                KEYMAP_ATTRIBUTES
+              );
+
+              keyMapSummary[actionName].sequences =
+                this._createSequenceFromConfig(keyMapConfig.sequences);
+            } else {
+              /**
+               * Support syntax:
+               * {
+               *   sequence: 'a+b', action: 'keyup',
+               *   name: 'My keymap',
+               *   description: 'Key to press for something special',
+               *   group: 'Vanity'
+               * }
+               */
+              copyAttributes(keyMapConfig, keyMapSummary[actionName], KEYMAP_ATTRIBUTES);
+
+              keyMapSummary[actionName].sequences = [
+                copyAttributes(keyMapConfig, {}, SEQUENCE_ATTRIBUTES)
+              ]
+            }
+          } else {
+            keyMapSummary[actionName].sequences =
+              this._createSequenceFromConfig(keyMapConfig)
+          }
+        });
       }
 
       this._buildApplicationKeyMap(component.childIds, keyMapSummary);
     });
 
     return keyMapSummary;
+  }
+
+  _createSequenceFromConfig(keyMapConfig) {
+    return arrayFrom(keyMapConfig).map((sequenceOrKeyMapOptions) => {
+      if (isObject(sequenceOrKeyMapOptions)) {
+        /**
+         * Support syntax:
+         * [
+         *   { sequence: 'a+b', action: 'keyup' },
+         *   { sequence: 'c' }
+         * ]
+         */
+        return copyAttributes(sequenceOrKeyMapOptions, {}, SEQUENCE_ATTRIBUTES);
+      } else {
+        /**
+         * Support syntax:
+         * 'a+b'
+         */
+        return { sequence: sequenceOrKeyMapOptions };
+      }
+    })
   }
 
   /********************************************************************************
@@ -523,7 +579,15 @@ class AbstractKeyEventStrategy {
    */
   _buildActionDictionary(actionNameToKeyMap, options, componentId) {
     return Object.keys(actionNameToKeyMap).reduce((keyMapMemo, actionName) => {
-      const keyMapOptions = arrayFrom(actionNameToKeyMap[actionName]);
+      const keyMapConfig = actionNameToKeyMap[actionName];
+
+      const keyMapOptions = function(){
+        if (isObject(keyMapConfig) && hasKey(keyMapConfig, 'sequences')) {
+          return arrayFrom(keyMapConfig.sequences)
+        } else {
+          return arrayFrom(keyMapConfig);
+        }
+      }();
 
       keyMapOptions.forEach((keyMapOption) => {
         const { keySequence, eventBitmapIndex } = function(){

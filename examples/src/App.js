@@ -5,20 +5,20 @@ import Node from './Node';
 import HOCWrappedNode from './HOCWrappedNode';
 
 const keyMap = {
-  DELETE: { sequence: 'backspace', action: 'keyup'},
-  EXPAND: 'alt+up',
-  CONTRACT: 'alt+down',
-  MOVE_UP: 'up',
-  MOVE_DOWN: 'down',
-  MOVE_LEFT: 'left',
-  MOVE_RIGHT: 'right'
+  DELETE: { name: 'Disable square', sequence: 'backspace', action: 'keyup'},
+  EXPAND: { name: 'Expand square area', sequence: 'alt+up' },
+  CONTRACT: { name: 'Reduce square area', sequence: 'alt+down' },
+  MOVE_UP: { name: 'Move square up', sequence: 'up' },
+  MOVE_DOWN: { name: 'Move square down', sequence: 'down' },
+  MOVE_LEFT: { name: 'Move square left', sequence: 'left' },
+  MOVE_RIGHT: { name: 'Move square right', sequence: 'right' }
 };
 
 const globalKeyMap = {
-  KONAMI: 'up up down down left right left right b a enter',
-  LOG_DOWN: {sequence: 'command', action: 'keydown'},
-  LOG_UP: {sequence: 'command', action: 'keyup'},
-  SHOW_DIALOG: { sequence: 'shift+?', action: 'keyup' },
+  KONAMI: { name: 'Konami code', sequence: 'up up down down left right left right b a enter' },
+  LOG_DOWN: { name: 'Log Cmd Down', sequence: 'command', action: 'keydown'},
+  LOG_UP: { name: 'Log Cmd Up', sequence: 'command', action: 'keyup'},
+  SHOW_DIALOG: { name: 'Display keyboard shortcuts', sequence: 'shift+?', action: 'keyup' },
 };
 
 const styles = {
@@ -93,13 +93,15 @@ class App extends React.Component {
               <tbody>
               { Object.keys(keyMap).reduce((memo, actionName) => {
                 if (filter.length === 0 || actionName.indexOf(_filter) !== -1) {
+                  const { sequences, name } = keyMap[actionName];
+
                   memo.push(
-                    <tr key={actionName}>
+                    <tr key={name || actionName}>
                       <td style={styles.KEYMAP_TABLE_CELL}>
-                        { actionName.replace('_', ' ') }
+                        { name }
                       </td>
                       <td style={styles.KEYMAP_TABLE_CELL}>
-                        { keyMap[actionName].map((keySequence) => <span key={keySequence}>{keySequence}</span>) }
+                        { sequences.map(({sequence}) => <span key={sequence}>{sequence}</span>) }
                       </td>
                     </tr>
                   )
