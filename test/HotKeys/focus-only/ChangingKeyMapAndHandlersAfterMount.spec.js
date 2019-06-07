@@ -33,7 +33,7 @@ describe('Changing keyMap and handlers after mount:', function () {
       this.targetElement.focus();
     });
 
-    describe('when a keyMap action\'s key sequence is changed', () => {
+    describe('and a keyMap action\'s key sequence is changed', () => {
       beforeEach(function () {
         this.wrapper.setProps({ keyMap: { 'ACTION': 'b' }, handlers: this.handlers })
       });
@@ -79,7 +79,7 @@ describe('Changing keyMap and handlers after mount:', function () {
 
     });
 
-    describe('when a keyMap action\'s key sequence is changed', () => {
+    describe('and a keyMap action\'s key sequence is changed', () => {
       beforeEach(function () {
         this.wrapper.setProps({ keyMap: { 'ACTION': 'b' }, handlers: this.handlers })
       });
@@ -92,7 +92,7 @@ describe('Changing keyMap and handlers after mount:', function () {
       });
     });
 
-    describe('when the action associated with a key sequence is changed', () => {
+    describe('and the action associated with a key sequence is changed', () => {
       beforeEach(function () {
         this.wrapper.setProps({ keyMap: { 'ACTION2': 'a' }, handlers: this.handlers })
       });
@@ -108,7 +108,7 @@ describe('Changing keyMap and handlers after mount:', function () {
       });
     });
 
-    describe('when the a new action is added to the keymap', () => {
+    describe('and the a new action is added to the keymap', () => {
       beforeEach(function () {
         this.wrapper.setProps({ keyMap: { ...this.keyMap, 'ACTION2': 'b' }, handlers: this.handlers })
       });
@@ -124,7 +124,7 @@ describe('Changing keyMap and handlers after mount:', function () {
       });
     });
 
-    describe('when the an action is removed from the keymap', () => {
+    describe('and the an action is removed from the keymap', () => {
       beforeEach(function () {
         this.wrapper.setProps({ keyMap: { }, handlers: this.handlers })
       });
@@ -136,8 +136,8 @@ describe('Changing keyMap and handlers after mount:', function () {
       });
     });
 
-    context('when no keys have been pressed yet', () => {
-      describe('when a keyMap\'s handler is changed', () => {
+    context('and no keys have been pressed yet', () => {
+      describe('and a keyMap\'s handler is changed', () => {
         beforeEach(function () {
           this.wrapper.setProps({ keyMap: this.keyMap, handlers: { 'ACTION': this.handler2 } })
         });
@@ -151,8 +151,8 @@ describe('Changing keyMap and handlers after mount:', function () {
       });
     });
 
-    context('when keys have been pressed (and handlers attempted to be resolved)', () => {
-      describe('when a keyMap\'s handler is changed', () => {
+    context('and keys have been pressed (and handlers attempted to be resolved)', () => {
+      describe('and a keyMap\'s handler is changed', () => {
         beforeEach(function () {
           this.targetElement.keyDown(KeyCode.A);
           expect(this.handler).to.have.been.calledOnce;
@@ -169,7 +169,7 @@ describe('Changing keyMap and handlers after mount:', function () {
       });
     });
 
-    describe('when a new handler is added to the keymap', () => {
+    describe('and a new handler is added to the keymap', () => {
       beforeEach(function () {
         this.handler3 = sinon.spy();
 
@@ -189,7 +189,7 @@ describe('Changing keyMap and handlers after mount:', function () {
       });
     });
 
-    describe('when a handler is removed from keymap', () => {
+    describe('and a handler is removed from keymap', () => {
       beforeEach(function () {
         this.handler3 = sinon.spy();
 
