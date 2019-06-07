@@ -136,17 +136,36 @@ describe('Changing keyMap and handlers after mount:', function () {
       });
     });
 
-    describe('when a keyMap\'s handler is changed', () => {
-      beforeEach(function () {
-        this.wrapper.setProps({ keyMap: this.keyMap, handlers: { 'ACTION': this.handler2 } })
+    context('when no keys have been pressed yet', () => {
+      describe('when a keyMap\'s handler is changed', () => {
+        beforeEach(function () {
+          this.wrapper.setProps({ keyMap: this.keyMap, handlers: { 'ACTION': this.handler2 } })
+        });
+
+        it('then the new handler is used', function() {
+          this.targetElement.keyDown(KeyCode.A);
+
+          expect(this.handler).to.not.have.been.called;
+          expect(this.handler2).to.have.been.calledOnce;
+        });
       });
+    });
 
-      it('then the new sequence is used', function() {
+    context('when keys have been pressed (and handlers attempted to be resolved)', () => {
+      describe('when a keyMap\'s handler is changed', () => {
+        beforeEach(function () {
+          this.targetElement.keyDown(KeyCode.A);
+          expect(this.handler).to.have.been.calledOnce;
 
-        this.targetElement.keyDown(KeyCode.A);
+          this.wrapper.setProps({ keyMap: this.keyMap, handlers: { 'ACTION': this.handler2 } })
+        });
 
-        expect(this.handler).to.not.have.been.called;
-        expect(this.handler2).to.have.been.calledOnce;
+        it('then the new handler is used (https://github.com/greena13/react-hotkeys/issues/182)', function() {
+          this.targetElement.keyDown(KeyCode.A);
+
+          expect(this.handler).to.have.been.calledOnce;
+          expect(this.handler2).to.have.been.calledOnce;
+        });
       });
     });
 

@@ -228,6 +228,11 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       'Received new props.',
     );
 
+    /**
+     * Reset handler resolution state
+     */
+    this._initHandlerResolutionState();
+
     const component = this._getComponent(componentId);
 
     this.logger.verbose(
