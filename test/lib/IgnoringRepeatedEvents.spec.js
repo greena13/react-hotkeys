@@ -31,7 +31,7 @@ describe('Ignoring repeated events:', function () {
           this.eventStrategy.enableHotKeys(this.componentId, {}, {}, {}, {ignoreEventsCondition: Configuration.option('ignoreEventsCondition')});
         });
 
-        it.only('then the repeated events are ignored', function () {
+        it('then the repeated events are ignored', function () {
           this.eventStrategy.handleKeydown(
             new MockSyntheticEvent('keydown', {key: 'Shift'}),
             0,

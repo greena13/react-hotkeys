@@ -422,7 +422,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
       this.logger.debug(
         this._logPrefix(componentId),
-        `Ignored repeated ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event.`
+        `Ignored repeated ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keypress)} event.`
       );
 
       this._ignoreEvent(event, componentId);

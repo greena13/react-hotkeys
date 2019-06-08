@@ -354,7 +354,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
       this.logger.debug(
         this._logPrefix(),
-        `Ignored repeated ${describeKeyEvent(event, key, KeyEventBitmapIndex.keydown)} event.`
+        `Ignored repeated ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event.`
       );
 
       return true;
