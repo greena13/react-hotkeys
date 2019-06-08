@@ -10,8 +10,8 @@ const KeysWithKeyupHiddenByCmd = {
   ArrowUp: true,
   ArrowDown: true,
   /**
-   * Caps lock is a strange case where it not only does not have a key press event,
-   * but it's keyup event is triggered when caps lock is toggled off
+   * Caps lock is a strange case where it not only fails to trigger a keyup event when,
+   * pressed with cmd, but it's keyup event is triggered when caps lock is toggled off
    */
   CapsLock: true,
 };
