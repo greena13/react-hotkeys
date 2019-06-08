@@ -435,9 +435,20 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const _key = normalizeKeyName(event.key);
 
     if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
+        this.logger.debug(
+          this._logPrefix(componentId),
+          `Ignored repeated ${describeKeyEvent(event, _key, KeyEventRecordIndex.keypress)} event.`
+        );
+
+        this._ignoreEvent(event, componentId);
+
+        return true;
+    }
+
+    if (this._alreadySimulatedEvent(KeyEventRecordIndex.keypress, _key)) {
       this.logger.debug(
         this._logPrefix(componentId),
-        `Ignored repeated ${describeKeyEvent(event, _key, KeyEventRecordIndex.keypress)} event.`
+        `Ignored ${describeKeyEvent(event, _key, KeyEventRecordIndex.keypress)} as it was not expected, and has already been simulated.`
       );
 
       this._ignoreEvent(event, componentId);
@@ -516,6 +527,17 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    */
   handleKeyup(event, focusTreeId, componentId, options) {
     const _key = normalizeKeyName(event.key);
+
+    if (this._alreadySimulatedEvent(KeyEventRecordIndex.keyup, _key)) {
+      this.logger.debug(
+        this._logPrefix(componentId),
+        `Ignored ${describeKeyEvent(event, _key, KeyEventRecordIndex.keyup)} as it was not expected, and has already been simulated.`
+      );
+
+      this._ignoreEvent(event, componentId);
+
+      return true;
+    }
 
     const shouldDiscardFocusId = focusTreeId !== this.focusTreeId;
 

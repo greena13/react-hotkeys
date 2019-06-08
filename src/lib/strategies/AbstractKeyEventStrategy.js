@@ -794,6 +794,12 @@ class AbstractKeyEventStrategy {
     return { ...eventAttributes, ...extra };
   }
 
+  _alreadySimulatedEvent(recordIndex, keyName) {
+    const keyState = this._getCurrentKeyState(keyName);
+
+    return keyIsCurrentlyTriggeringEvent(keyState, recordIndex) === KeyEventRecordState.simulated;
+  }
+
   /********************************************************************************
    * Matching and calling handlers
    ********************************************************************************/

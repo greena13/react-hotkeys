@@ -370,6 +370,15 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       return true;
     }
 
+    if (this._alreadySimulatedEvent(KeyEventRecordIndex.keypress, key)) {
+      this.logger.debug(
+        this._logPrefix(),
+        `Ignored ${describeKeyEvent(event, key, KeyEventRecordIndex.keypress)} as it was not expected, and has already been simulated.`
+      );
+
+      return true;
+    }
+
     /**
      * We first decide if the keypress event should be handled (to ensure the correct
      * order of logging statements)
@@ -427,6 +436,15 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    */
   handleKeyup(event) {
     const key = normalizeKeyName(getEventKey(event));
+
+    if (this._alreadySimulatedEvent(KeyEventRecordIndex.keyup, key)) {
+      this.logger.debug(
+        this._logPrefix(),
+        `Ignored ${describeKeyEvent(event, key, KeyEventRecordIndex.keyup)} as it was not expected, and has already been simulated.`
+      );
+
+      return true;
+    }
 
     /**
      * We first decide if the keyup event should be handled (to ensure the correct
