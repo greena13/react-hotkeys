@@ -1,5 +1,5 @@
-import KeyEventBitmapManager from '../KeyEventBitmapManager';
-import KeyEventBitmapIndex from '../../const/KeyEventBitmapIndex';
+import KeyEventRecordManager from '../KeyEventRecordManager';
+import KeyEventRecordIndex from '../../const/KeyEventRecordIndex';
 import Logger from '../Logger';
 import KeyCombinationSerializer from '../KeyCombinationSerializer';
 import arrayFrom from '../../utils/array/arrayFrom';
@@ -154,12 +154,12 @@ class AbstractKeyEventStrategy {
     this.longestSequenceComponentIndex = null;
 
     /**
-     * Bitmap to record whether there is at least one keymap bound to each event type
+     * Record to record whether there is at least one keymap bound to each event type
      * (keydown, keypress or keyup) so that we can skip trying to find a matching keymap
      * on events where we know there is none to find
-     * @type {KeyEventBitmap}
+     * @type {KeyEventRecord}
      */
-    this.keyMapEventBitmap = KeyEventBitmapManager.newBitmap();
+    this.keyMapEventRecord = KeyEventRecordManager.newRecord();
 
     /**
      * Set of ComponentOptions indexed by ComponentId to allow efficient retrieval
@@ -245,7 +245,7 @@ class AbstractKeyEventStrategy {
         const keyState = currentKeyCombination.keys[keyName];
         const currentKeyState = keyState[KeyEventSequenceIndex.current];
 
-        if (currentKeyState[KeyEventBitmapIndex.keydown] && !currentKeyState[KeyEventBitmapIndex.keyup]) {
+        if (currentKeyState[KeyEventRecordIndex.keydown] && !currentKeyState[KeyEventRecordIndex.keyup]) {
           memo[keyName] = keyState;
         }
 
@@ -559,7 +559,7 @@ class AbstractKeyEventStrategy {
    * @property {Number} size - Number of keys involved in the combination
    * @property {Object.<KeyName, Boolean>} keyDictionary - Dictionary of key names involved
    *           in the key combination
-   * @property {KeyEventBitmapIndex} eventBitmapIndex - Bitmap index for key event that
+   * @property {KeyEventRecordIndex} eventRecordIndex - Record index for key event that
    *          the matcher should match on
    */
 
@@ -591,23 +591,23 @@ class AbstractKeyEventStrategy {
       }();
 
       keyMapOptions.forEach((keyMapOption) => {
-        const { keySequence, eventBitmapIndex } = function(){
+        const { keySequence, eventRecordIndex } = function(){
           if (isObject(keyMapOption)) {
             const { sequence, action } = keyMapOption;
 
             return {
               keySequence: sequence,
-              eventBitmapIndex: isUndefined(action) ? KeyEventBitmapIndex[options.defaultKeyEvent] : KeyEventBitmapIndex[action]
+              eventRecordIndex: isUndefined(action) ? KeyEventRecordIndex[options.defaultKeyEvent] : KeyEventRecordIndex[action]
             };
           } else {
             return {
               keySequence: keyMapOption,
-              eventBitmapIndex: KeyEventBitmapIndex[options.defaultKeyEvent]
+              eventRecordIndex: KeyEventRecordIndex[options.defaultKeyEvent]
             }
           }
         }();
 
-        const { sequence, combination } = KeySequenceParser.parse(keySequence, { eventBitmapIndex });
+        const { sequence, combination } = KeySequenceParser.parse(keySequence, { eventRecordIndex });
 
         if (sequence.size > this.longestSequence) {
           this.longestSequence = sequence.size;
@@ -618,7 +618,7 @@ class AbstractKeyEventStrategy {
          * Record that there is at least one key sequence in the focus tree bound to
          * the keyboard event
          */
-        KeyEventBitmapManager.setBit(this.keyMapEventBitmap, eventBitmapIndex);
+        KeyEventRecordManager.setBit(this.keyMapEventRecord, eventRecordIndex);
 
         if (!keyMapMemo[actionName]) {
           keyMapMemo[actionName] = [];
@@ -643,7 +643,7 @@ class AbstractKeyEventStrategy {
   /**
    * Record of the combination of keys that are currently being pressed
    * @typedef {Object} KeyCombinationRecord
-   * @property {Object<ReactKeyName, KeyEventBitmap[]>} keys - A dictionary
+   * @property {Object<ReactKeyName, KeyEventRecord[]>} keys - A dictionary
    * of keys that have been pressed down at once. The keys of the map are the lowercase
    * names of the keyboard keys. May contain 1 or more keyboard keys.
    * @property {KeySequenceString} ids - Serialization of keys currently pressed in
@@ -670,10 +670,10 @@ class AbstractKeyEventStrategy {
    * Adds a key event to the current key combination (as opposed to starting a new
    * keyboard combination).
    * @param {ReactKeyName} keyName - Name of the key to add to the current combination
-   * @param {KeyEventBitmapIndex} bitmapIndex - Index in bitmap to set to true
+   * @param {KeyEventRecordIndex} recordIndex - Index in record to set to true
    * @protected
    */
-  _addToCurrentKeyCombination(keyName, bitmapIndex) {
+  _addToCurrentKeyCombination(keyName, recordIndex) {
     if (this.keyCombinationHistory.length === 0) {
       this.keyCombinationHistory.push(this.constructor.emptyKeyCombination());
     }
@@ -681,25 +681,25 @@ class AbstractKeyEventStrategy {
     const keyCombination = this._getCurrentKeyCombination();
     const keyAlias = getKeyAlias(keyCombination, keyName);
 
-    const existingBitmap = getKeyState(keyCombination, keyName);
+    const existingRecord = getKeyState(keyCombination, keyName);
 
-    if (!existingBitmap) {
+    if (!existingRecord) {
       keyCombination.keys[keyAlias] = [
-        KeyEventBitmapManager.newBitmap(),
-        KeyEventBitmapManager.newBitmap(bitmapIndex)
+        KeyEventRecordManager.newRecord(),
+        KeyEventRecordManager.newRecord(recordIndex)
       ];
 
     } else {
       keyCombination.keys[keyAlias] = [
-        KeyEventBitmapManager.clone(existingBitmap[1]),
-        KeyEventBitmapManager.newBitmap(bitmapIndex)
+        KeyEventRecordManager.clone(existingRecord[1]),
+        KeyEventRecordManager.newRecord(recordIndex)
       ];
     }
 
     keyCombination.ids = KeyCombinationSerializer.serialize(keyCombination.keys);
     keyCombination.keyAliases = this._buildCombinationKeyAliases(keyCombination.keys);
 
-    if (bitmapIndex === KeyEventBitmapIndex.keyup) {
+    if (recordIndex === KeyEventRecordIndex.keyup) {
       this.keyCombinationIncludesKeyUp = true;
     }
   }
@@ -709,11 +709,11 @@ class AbstractKeyEventStrategy {
    * keyCombinationIncludesKeyUp flag to false.
    * @param {ReactKeyName} keyName - Name of the keyboard key to add to the new
    *        KeyCombinationRecord
-   * @param {KeyEventBitmapIndex} eventBitmapIndex - Index of bit to set to true in new
-   *        KeyEventBitmap
+   * @param {KeyEventRecordIndex} eventRecordIndex - Index of bit to set to true in new
+   *        KeyEventRecord
    * @protected
    */
-  _startNewKeyCombination(keyName, eventBitmapIndex) {
+  _startNewKeyCombination(keyName, eventRecordIndex) {
     if (this.keyCombinationHistory.length > this.longestSequence) {
       /**
        * We know the longest key sequence registered for the currently focused
@@ -728,8 +728,8 @@ class AbstractKeyEventStrategy {
     const keys = {
       ...this._withoutKeyUps(lastKeyCombination),
       [keyName]: [
-        KeyEventBitmapManager.newBitmap(),
-        KeyEventBitmapManager.newBitmap(eventBitmapIndex)
+        KeyEventRecordManager.newRecord(),
+        KeyEventRecordManager.newRecord(eventRecordIndex)
       ]
     };
 
@@ -756,7 +756,7 @@ class AbstractKeyEventStrategy {
     return Object.keys(keyCombinationRecord.keys).reduce((memo, keyName) => {
       const keyState = keyCombinationRecord.keys[keyName];
 
-      if (!keyState[KeyEventSequenceIndex.current][KeyEventBitmapIndex.keyup]) {
+      if (!keyState[KeyEventSequenceIndex.current][KeyEventRecordIndex.keyup]) {
         memo[keyName] = keyState;
       }
 
@@ -767,12 +767,12 @@ class AbstractKeyEventStrategy {
   _shouldSimulate(eventType, keyName) {
     const keyHasNativeKeypress = hasKeyPressEvent(keyName);
 
-    if (eventType === KeyEventBitmapIndex.keypress) {
+    if (eventType === KeyEventRecordIndex.keypress) {
       return !keyHasNativeKeypress || (keyHasNativeKeypress && this._keyIsCurrentlyDown('Meta'));
-    } else if (eventType === KeyEventBitmapIndex.keyup) {
+    } else if (eventType === KeyEventRecordIndex.keyup) {
       return (keyupIsHiddenByCmd(keyName) && keyIsCurrentlyTriggeringEvent(
         this._getCurrentKeyState('Meta'),
-        KeyEventBitmapIndex.keyup)
+        KeyEventRecordIndex.keyup)
       );
     }
 
@@ -793,7 +793,7 @@ class AbstractKeyEventStrategy {
    * Matching and calling handlers
    ********************************************************************************/
 
-  _callMatchingHandlerClosestToEventTarget(event, keyName, eventBitmapIndex, componentPosition, componentSearchIndex) {
+  _callMatchingHandlerClosestToEventTarget(event, keyName, eventRecordIndex, componentPosition, componentSearchIndex) {
     if (!this.keyMaps || !this.unmatchedHandlerStatus) {
       this.keyMaps = [];
 
@@ -875,7 +875,7 @@ class AbstractKeyEventStrategy {
                 const closestSequenceHandlerAlreadyFound =
                   this.keySequencesDictionary[keySequence] &&
                   this.keySequencesDictionary[keySequence].some((dictEntry) => {
-                    return dictEntry[1] === keyMatcher.eventBitmapIndex
+                    return dictEntry[1] === keyMatcher.eventRecordIndex
                   });
 
                 if (closestSequenceHandlerAlreadyFound) {
@@ -892,7 +892,7 @@ class AbstractKeyEventStrategy {
 
                 const {
                   prefix, sequenceLength, id, keyDictionary, size,
-                  eventBitmapIndex: matcherEventBitmapIndex,
+                  eventRecordIndex: matcherEventRecordIndex,
                   actionName
                 } = keyMatcher;
 
@@ -903,8 +903,8 @@ class AbstractKeyEventStrategy {
                   keyMap.sequences[keyMatcher.prefix].combinations[keyMatcher.id] = {
                     prefix, sequenceLength, id, keyDictionary, size,
                     events: {
-                      [matcherEventBitmapIndex]: {
-                        actionName, eventBitmapIndex: matcherEventBitmapIndex, handler
+                      [matcherEventRecordIndex]: {
+                        actionName, eventRecordIndex: matcherEventRecordIndex, handler
                       }
                     }
                   };
@@ -913,22 +913,22 @@ class AbstractKeyEventStrategy {
                     ...combination,
                     events: {
                       ...combination.events,
-                      [matcherEventBitmapIndex]: {
-                        actionName, eventBitmapIndex: matcherEventBitmapIndex, handler
+                      [matcherEventRecordIndex]: {
+                        actionName, eventRecordIndex: matcherEventRecordIndex, handler
                       }
                     }
                   }
                 }
 
                 /**
-                 * Merge event bitmaps so we can quickly determine if a given component
+                 * Merge event records so we can quickly determine if a given component
                  * has any handlers bound to particular key events
                  */
-                if (!keyMap.eventBitmap) {
-                  keyMap.eventBitmap = KeyEventBitmapManager.newBitmap();
+                if (!keyMap.eventRecord) {
+                  keyMap.eventRecord = KeyEventRecordManager.newRecord();
                 }
 
-                KeyEventBitmapManager.setBit(keyMap.eventBitmap, keyMatcher.eventBitmapIndex);
+                KeyEventRecordManager.setBit(keyMap.eventRecord, keyMatcher.eventRecordIndex);
 
                 /**
                  * Record the longest sequence length so we know to only check for sequences
@@ -949,7 +949,7 @@ class AbstractKeyEventStrategy {
 
                 this.keySequencesDictionary[keySequence].push([
                   handlerComponentIndex,
-                  keyMatcher.eventBitmapIndex
+                  keyMatcher.eventRecordIndex
                 ]);
               });
 
@@ -987,14 +987,14 @@ class AbstractKeyEventStrategy {
         `${printComponent(keyMap)}`
       );
 
-      if (!keyMap || isEmpty(keyMap.sequences) || !keyMap.eventBitmap[eventBitmapIndex]) {
+      if (!keyMap || isEmpty(keyMap.sequences) || !keyMap.eventRecord[eventRecordIndex]) {
         /**
          * Component doesn't define any matchers for the current key event
          */
 
         this.logger.debug(
           this._logPrefix(componentSearchIndex),
-          `Doesn't define a handler for '${this._describeCurrentKeyCombination()}' ${describeKeyEventType(eventBitmapIndex)}.`
+          `Doesn't define a handler for '${this._describeCurrentKeyCombination()}' ${describeKeyEventType(eventRecordIndex)}.`
         );
       } else {
         const { sequences, longestSequence } = keyMap;
@@ -1042,23 +1042,23 @@ class AbstractKeyEventStrategy {
               const combinationMatcher = matchingSequence.combinations[combinationId];
 
               if (isMatchPossibleBasedOnNumberOfKeys(currentKeyState, combinationMatcher)) {
-                if (this._combinationMatchesKeys(normalizedKeyName, currentKeyState, combinationMatcher, eventBitmapIndex)) {
+                if (this._combinationMatchesKeys(normalizedKeyName, currentKeyState, combinationMatcher, eventRecordIndex)) {
 
                   if (Configuration.option('allowCombinationSubmatches')) {
                     const subMatchDescription = KeyCombinationSerializer.serialize(combinationMatcher.keyDictionary);
 
                     this.logger.debug(
                       this._logPrefix(componentSearchIndex),
-                      `Found action that matches '${this._describeCurrentKeyCombination()}' (sub-match: '${subMatchDescription}'): ${combinationMatcher.events[eventBitmapIndex].actionName}. Calling handler . . .`
+                      `Found action that matches '${this._describeCurrentKeyCombination()}' (sub-match: '${subMatchDescription}'): ${combinationMatcher.events[eventRecordIndex].actionName}. Calling handler . . .`
                     );
                   } else {
                     this.logger.debug(
                       this._logPrefix(componentSearchIndex),
-                      `Found action that matches '${this._describeCurrentKeyCombination()}': ${combinationMatcher.events[eventBitmapIndex].actionName}. Calling handler . . .`
+                      `Found action that matches '${this._describeCurrentKeyCombination()}': ${combinationMatcher.events[eventRecordIndex].actionName}. Calling handler . . .`
                     );
                   }
 
-                  combinationMatcher.events[eventBitmapIndex].handler(event);
+                  combinationMatcher.events[eventRecordIndex].handler(event);
 
                   this._stopEventPropagationAfterHandlingIfEnabled(event, componentSearchIndex);
 
@@ -1073,7 +1073,7 @@ class AbstractKeyEventStrategy {
           sequenceLengthCounter--;
         }
 
-        const eventName = describeKeyEventType(eventBitmapIndex);
+        const eventName = describeKeyEventType(eventRecordIndex);
 
         this.logger.debug(
           this._logPrefix(componentSearchIndex),
@@ -1151,9 +1151,9 @@ class AbstractKeyEventStrategy {
     }
   }
 
-  _combinationMatchesKeys(keyBeingPressed, keyCombination, combinationMatch, eventBitmapIndex) {
+  _combinationMatchesKeys(keyBeingPressed, keyCombination, combinationMatch, eventRecordIndex) {
     const combinationHasHandlerForEventType =
-      combinationMatch.events[eventBitmapIndex];
+      combinationMatch.events[eventRecordIndex];
 
     if (!combinationHasHandlerForEventType) {
       /**
@@ -1170,10 +1170,10 @@ class AbstractKeyEventStrategy {
       const keyState = getKeyState(keyCombination, candidateKeyName);
 
       if (keyState) {
-        if (keyIsCurrentlyTriggeringEvent(keyState, eventBitmapIndex)) {
+        if (keyIsCurrentlyTriggeringEvent(keyState, eventRecordIndex)) {
           if (keyBeingPressed && (keyBeingPressed === getKeyAlias(keyCombination, candidateKeyName))) {
             keyCompletesCombination =
-              !keyAlreadyTriggeredEvent(keyState, eventBitmapIndex);
+              !keyAlreadyTriggeredEvent(keyState, eventRecordIndex);
           }
 
           return true;
@@ -1193,11 +1193,11 @@ class AbstractKeyEventStrategy {
    * on new key events
    * @param {KeyboardEvent} event - Event to check the modifier flags for
    * @param {String} key - Name of key that events relates to
-   * @param {KeyEventBitmapIndex} keyEventBitmapIndex - The bitmap index of the current
+   * @param {KeyEventRecordIndex} keyEventRecordIndex - The record index of the current
    *        key event type
    * @protected
    */
-  _checkForModifierFlagDiscrepancies(event, key, keyEventBitmapIndex) {
+  _checkForModifierFlagDiscrepancies(event, key, keyEventRecordIndex) {
     /**
      * If a new key event is received with modifier key flags that contradict the
      * key combination history we are maintaining, we can surmise that some keyup events
@@ -1211,7 +1211,7 @@ class AbstractKeyEventStrategy {
        * If this the case, we want to handle it using the main algorithm and skip the
        * reconciliation algorithm.
        */
-      if (key === modifierKey && keyEventBitmapIndex === KeyEventBitmapIndex.keyup) {
+      if (key === modifierKey && keyEventRecordIndex === KeyEventRecordIndex.keyup) {
         return;
       }
 
@@ -1219,7 +1219,7 @@ class AbstractKeyEventStrategy {
 
        ModifierFlagsDictionary[modifierKey].forEach((attributeName) => {
          if (event[attributeName] === false && modifierStillPressed) {
-           this._addToCurrentKeyCombination(modifierKey, KeyEventBitmapIndex.keyup);
+           this._addToCurrentKeyCombination(modifierKey, KeyEventRecordIndex.keyup);
          }
        });
      })
@@ -1228,8 +1228,8 @@ class AbstractKeyEventStrategy {
   _keyIsCurrentlyDown(keyName) {
     const keyState = this._getCurrentKeyState(keyName);
 
-    const keyIsDown = keyIsCurrentlyTriggeringEvent(keyState, KeyEventBitmapIndex.keypress) &&
-        !keyIsCurrentlyTriggeringEvent(keyState, KeyEventBitmapIndex.keyup);
+    const keyIsDown = keyIsCurrentlyTriggeringEvent(keyState, KeyEventRecordIndex.keypress) &&
+        !keyIsCurrentlyTriggeringEvent(keyState, KeyEventRecordIndex.keyup);
 
     return !!keyIsDown;
   }
@@ -1339,8 +1339,8 @@ function newComponentRegistryItem() {
   };
 }
 
-function keyAlreadyTriggeredEvent(keyState, eventBitmapIndex) {
-  return keyState && keyState[KeyEventSequenceIndex.previous][eventBitmapIndex];
+function keyAlreadyTriggeredEvent(keyState, eventRecordIndex) {
+  return keyState && keyState[KeyEventSequenceIndex.previous][eventRecordIndex];
 }
 
 export default AbstractKeyEventStrategy;

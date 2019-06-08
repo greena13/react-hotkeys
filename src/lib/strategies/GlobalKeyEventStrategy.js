@@ -1,5 +1,5 @@
-import KeyEventBitmapManager from '../KeyEventBitmapManager';
-import KeyEventBitmapIndex from '../../const/KeyEventBitmapIndex';
+import KeyEventRecordManager from '../KeyEventRecordManager';
+import KeyEventRecordIndex from '../../const/KeyEventRecordIndex';
 import AbstractKeyEventStrategy from './AbstractKeyEventStrategy';
 import capitalize from '../../utils/string/capitalize';
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
@@ -148,7 +148,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {ComponentId} componentId - Index of component that is being unmounted
    */
   disableHotKeys(componentId) {
-    const [{ keyMapEventBitmap }, componentPosition ] =
+    const [{ keyMapEventRecord }, componentPosition ] =
       this._getComponentAndPosition(componentId);
 
     /**
@@ -165,8 +165,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this._updateComponentIndexDictFromList({ startingAt: componentPosition });
 
     this._updateDocumentHandlers(
-      keyMapEventBitmap,
-      KeyEventBitmapManager.newBitmap()
+      keyMapEventRecord,
+      KeyEventRecordManager.newRecord()
     );
 
     /**
@@ -205,8 +205,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     const listenersShouldBeBound = this.componentList.length > 0;
 
     if (!this.listenersBound && listenersShouldBeBound) {
-      for(let bitmapIndex = 0; bitmapIndex < this.keyMapEventBitmap.length; bitmapIndex++) {
-        const eventName = describeKeyEventType(bitmapIndex);
+      for(let recordIndex = 0; recordIndex < this.keyMapEventRecord.length; recordIndex++) {
+        const eventName = describeKeyEventType(recordIndex);
 
         document[`on${eventName}`] = (keyEvent) => {
           this.keyEventManager[`handleGlobal${capitalize(eventName)}`](keyEvent);
@@ -222,8 +222,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     } else if(this.listenersBound && !listenersShouldBeBound) {
 
-      for(let bitmapIndex = 0; bitmapIndex < this.keyMapEventBitmap.length; bitmapIndex++) {
-        const eventName = describeKeyEventType(bitmapIndex);
+      for(let recordIndex = 0; recordIndex < this.keyMapEventRecord.length; recordIndex++) {
+        const eventName = describeKeyEventType(recordIndex);
 
         delete document[`on${eventName}`];
 
@@ -256,18 +256,18 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
       this.logger.debug(
         this._logPrefix(),
-        `Ignored repeated ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event.`
+        `Ignored repeated ${describeKeyEvent(event, _key, KeyEventRecordIndex.keydown)} event.`
       );
 
       return true;
     }
 
-    this._checkForModifierFlagDiscrepancies(event, _key, KeyEventBitmapIndex.keydown);
+    this._checkForModifierFlagDiscrepancies(event, _key, KeyEventRecordIndex.keydown);
 
     const reactAppResponse = this._howReactAppRespondedTo(
       event,
       _key,
-      KeyEventBitmapIndex.keydown
+      KeyEventRecordIndex.keydown
     );
 
     if (reactAppResponse === EventResponse.unseen &&
@@ -275,7 +275,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
       this.logger.debug(
         this._logPrefix(),
-        `Ignored ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event because ignoreEventsFilter rejected it.`
+        `Ignored ${describeKeyEvent(event, _key, KeyEventRecordIndex.keydown)} event because ignoreEventsFilter rejected it.`
       );
 
       return;
@@ -285,28 +285,28 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
 
       if (keyInCurrentCombination || this.keyCombinationIncludesKeyUp) {
-        this._startAndLogNewKeyCombination(_key, KeyEventBitmapIndex.keydown);
+        this._startAndLogNewKeyCombination(_key, KeyEventRecordIndex.keydown);
       } else {
-        this._addToAndLogCurrentKeyCombination(_key, KeyEventBitmapIndex.keydown);
+        this._addToAndLogCurrentKeyCombination(_key, KeyEventRecordIndex.keydown);
       }
     }
 
     if (!contains([EventResponse.ignored, EventResponse.handled], reactAppResponse)) {
-      this._callHandlerIfExists(event, _key, KeyEventBitmapIndex.keydown);
+      this._callHandlerIfExists(event, _key, KeyEventRecordIndex.keydown);
     }
 
     this._simulateKeyPressesMissingFromBrowser(event, _key);
   }
 
-  _howReactAppRespondedTo(event, key, eventBitmapIndex) {
+  _howReactAppRespondedTo(event, key, eventRecordIndex) {
     const reactAppHistoryWithEvent =
-      this.keyEventManager.reactAppHistoryWithEvent(key, eventBitmapIndex);
+      this.keyEventManager.reactAppHistoryWithEvent(key, eventRecordIndex);
 
     switch(reactAppHistoryWithEvent) {
       case EventResponse.handled:
         this.logger.debug(
           this._logPrefix(),
-          `Ignored ${describeKeyEvent(event, key, eventBitmapIndex)} event because React app has already handled it.`
+          `Ignored ${describeKeyEvent(event, key, eventRecordIndex)} event because React app has already handled it.`
         );
 
         break;
@@ -314,7 +314,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       case EventResponse.ignored:
         this.logger.debug(
           this._logPrefix(),
-          `Ignored ${describeKeyEvent(event, key, eventBitmapIndex)} event because React app has declared it should be ignored.`
+          `Ignored ${describeKeyEvent(event, key, eventRecordIndex)} event because React app has declared it should be ignored.`
         );
 
         break;
@@ -322,7 +322,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       case EventResponse.seen:
         this.logger.debug(
           this._logPrefix(),
-          `Received ${describeKeyEvent(event, key, eventBitmapIndex)} event (that has already passed through React app).`
+          `Received ${describeKeyEvent(event, key, eventRecordIndex)} event (that has already passed through React app).`
         );
 
         break;
@@ -332,7 +332,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
         this.logger.debug(
           this._logPrefix(),
-          `New ${describeKeyEvent(event, key, eventBitmapIndex)} event (that has NOT passed through React app).`
+          `New ${describeKeyEvent(event, key, eventRecordIndex)} event (that has NOT passed through React app).`
         );
     }
 
@@ -354,7 +354,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
       this.logger.debug(
         this._logPrefix(),
-        `Ignored repeated ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event.`
+        `Ignored repeated ${describeKeyEvent(event, key, KeyEventRecordIndex.keypress)} event.`
       );
 
       return true;
@@ -367,7 +367,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     const reactAppResponse = this._howReactAppRespondedTo(
       event,
       key,
-      KeyEventBitmapIndex.keypress
+      KeyEventRecordIndex.keypress
     );
 
     /**
@@ -375,7 +375,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      */
 
     if (this._getCurrentKeyState(key)) {
-      this._addToAndLogCurrentKeyCombination(key, KeyEventBitmapIndex.keypress);
+      this._addToAndLogCurrentKeyCombination(key, KeyEventRecordIndex.keypress);
     }
 
     if (reactAppResponse === EventResponse.unseen) {
@@ -385,12 +385,12 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
        * move the focus outside of the react app before it can record the keypress or
        * keyup
        */
-      this.keyEventManager.closeHangingKeyCombination(key, KeyEventBitmapIndex.keypress);
+      this.keyEventManager.closeHangingKeyCombination(key, KeyEventRecordIndex.keypress);
 
       if (this.eventOptions.ignoreEventsCondition(event)) {
         this.logger.debug(
           this._logPrefix(),
-          `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keypress)} event because ignoreEventsFilter rejected it.`
+          `Ignored ${describeKeyEvent(event, key, KeyEventRecordIndex.keypress)} event because ignoreEventsFilter rejected it.`
         );
 
         return;
@@ -398,7 +398,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     }
 
     if (!contains([EventResponse.ignored, EventResponse.handled], reactAppResponse)) {
-      this._callHandlerIfExists(event, key, KeyEventBitmapIndex.keypress);
+      this._callHandlerIfExists(event, key, KeyEventRecordIndex.keypress);
     }
   }
 
@@ -421,7 +421,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     const reactAppResponse = this._howReactAppRespondedTo(
       event,
       key,
-      KeyEventBitmapIndex.keyup
+      KeyEventRecordIndex.keyup
     );
 
     /**
@@ -431,7 +431,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * is not lost (leaving react hotkeys thinking the key is still pressed).
      */
     if (this._getCurrentKeyState(key)) {
-      this._addToAndLogCurrentKeyCombination(key, KeyEventBitmapIndex.keyup);
+      this._addToAndLogCurrentKeyCombination(key, KeyEventRecordIndex.keyup);
     }
 
     if (reactAppResponse === EventResponse.unseen){
@@ -440,12 +440,12 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
        * it's not still waiting for it. This occurs when action handlers bound to keydown
        * or keypress move the focus outside of the react app before it can record the keyup
        */
-      this.keyEventManager.closeHangingKeyCombination(key, KeyEventBitmapIndex.keyup);
+      this.keyEventManager.closeHangingKeyCombination(key, KeyEventRecordIndex.keyup);
 
       if(this.eventOptions.ignoreEventsCondition(event)) {
         this.logger.debug(
           this._logPrefix(),
-          `Ignored ${describeKeyEvent(event, key, KeyEventBitmapIndex.keyup)} event because ignoreEventsFilter rejected it.`
+          `Ignored ${describeKeyEvent(event, key, KeyEventRecordIndex.keyup)} event because ignoreEventsFilter rejected it.`
         );
       } else {
         /**
@@ -453,7 +453,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
          * been handled and should not be ignored
          */
         if (!contains([EventResponse.ignored, EventResponse.handled], reactAppResponse)) {
-          this._callHandlerIfExists(event, key, KeyEventBitmapIndex.keyup);
+          this._callHandlerIfExists(event, key, KeyEventRecordIndex.keyup);
         }
       }
     } else {
@@ -462,7 +462,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
        * been handled and should not be ignored
        */
       if (!contains([EventResponse.ignored, EventResponse.handled], reactAppResponse)) {
-        this._callHandlerIfExists(event, key, KeyEventBitmapIndex.keyup);
+        this._callHandlerIfExists(event, key, KeyEventRecordIndex.keyup);
       }
     }
 
@@ -478,7 +478,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     this._handleEventSimulation(
       'handleKeypress',
-      this._shouldSimulate(KeyEventBitmapIndex.keypress, key),
+      this._shouldSimulate(KeyEventRecordIndex.keypress, key),
       {event, key}
     );
   }
@@ -497,15 +497,15 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
         this._handleEventSimulation(
           'handleKeyup',
-          this._shouldSimulate(KeyEventBitmapIndex.keyup, keyName),
+          this._shouldSimulate(KeyEventRecordIndex.keyup, keyName),
           {event, key: keyName}
         );
       });
     }
   }
 
-  _startAndLogNewKeyCombination(keyName, eventBitmapIndex) {
-    this._startNewKeyCombination(keyName, eventBitmapIndex);
+  _startAndLogNewKeyCombination(keyName, eventRecordIndex) {
+    this._startNewKeyCombination(keyName, eventRecordIndex);
 
     this.logger.verbose(
       this._logPrefix(),
@@ -518,10 +518,10 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     );
   }
 
-  _addToAndLogCurrentKeyCombination(keyName, eventBitmapIndex) {
-    this._addToCurrentKeyCombination(keyName, eventBitmapIndex);
+  _addToAndLogCurrentKeyCombination(keyName, eventRecordIndex) {
+    this._addToCurrentKeyCombination(keyName, eventRecordIndex);
 
-    if (eventBitmapIndex === KeyEventBitmapIndex.keydown) {
+    if (eventRecordIndex === KeyEventRecordIndex.keydown) {
       this.logger.verbose(
         this._logPrefix(),
         `Added '${keyName}' to current combination: '${this._getCurrentKeyCombination().ids[0]}'.`
@@ -554,11 +554,11 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * Matching and calling handlers
    ********************************************************************************/
 
-  _callHandlerIfExists(event, keyName, eventBitmapIndex) {
-    const eventName = describeKeyEventType(eventBitmapIndex);
+  _callHandlerIfExists(event, keyName, eventRecordIndex) {
+    const eventName = describeKeyEventType(eventRecordIndex);
     const combinationName = this._describeCurrentKeyCombination();
 
-    if (this.keyMapEventBitmap[eventBitmapIndex]) {
+    if (this.keyMapEventRecord[eventRecordIndex]) {
       /**
        * If there is at least one handler for the specified key event type (keydown,
        * keypress, keyup), then attempt to find a handler that matches the current
@@ -572,7 +572,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this._callMatchingHandlerClosestToEventTarget(
         event,
         keyName,
-        eventBitmapIndex
+        eventRecordIndex
       );
     } else {
       /**
@@ -587,12 +587,12 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     }
   }
 
-  _callMatchingHandlerClosestToEventTarget(event, keyName, eventBitmapIndex) {
+  _callMatchingHandlerClosestToEventTarget(event, keyName, eventRecordIndex) {
     for(let componentPosition = 0; componentPosition < this.componentList.length; componentPosition++) {
       const matchFound = super._callMatchingHandlerClosestToEventTarget(
         event,
         keyName,
-        eventBitmapIndex,
+        eventRecordIndex,
         componentPosition,
         0
       );

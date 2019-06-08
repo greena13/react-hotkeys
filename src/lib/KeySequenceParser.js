@@ -29,7 +29,7 @@ class KeySequenceParser {
    * @property {Number} size - Number of keys involved in the combination
    * @property {Object.<KeyName, Boolean>} keyDictionary - Dictionary of key names involved
    *           in the key combination
-   * @property {KeyEventBitmapIndex} eventBitmapIndex - Bitmap index for key event that
+   * @property {KeyEventRecordIndex} eventRecordIndex - Record index for key event that
    *          the matcher should match on
    */
 
@@ -61,7 +61,7 @@ class KeySequenceParser {
    * @property {BasicKeyCombination[]} sequence A list of key combinations involved in
    *            the sequence
    * @property {Number} size Number of key combinations in the key sequence
-   * @property {KeyEventBitmapIndex} eventBitmapIndex Index that matches key event type
+   * @property {KeyEventRecordIndex} eventRecordIndex Index that matches key event type
    * @property {ActionName} actionName Name of the action that should be triggered if a
    *           keyboard event matching the sequence and event type occur
    */
@@ -82,7 +82,7 @@ class KeySequenceParser {
    *        parse
    * @param {Object} options Configuration object describing how the KeySequenceString
    *        should be parsed.
-   * @param {KeyEventBitmapIndex} options.eventBitmapIndex Event bitmap index indicating
+   * @param {KeyEventRecordIndex} options.eventRecordIndex Event record index indicating
    *        what key event the sequence should match
    * @param {Boolean} options.ensureValidKeys Whether to throw an exception if an invalid
    *        key name is found in the key combination string.
@@ -111,7 +111,7 @@ class KeySequenceParser {
       const combination = {
         id: normalizedComboString,
         keyDictionary: keysInComboDict,
-        eventBitmapIndex: options.eventBitmapIndex,
+        eventRecordIndex: options.eventRecordIndex,
         size: Object.keys(keysInComboDict).length
       };
 
