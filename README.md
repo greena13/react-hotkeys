@@ -1074,6 +1074,12 @@ configure({
   ignoreKeymapAndHandlerChangesByDefault: true,
 
   /**
+   * Whether to ignore repeated keyboard events when a key is being held down
+   * @type {Boolean}
+   */
+  ignoreRepeatedEventsWhenKeyHeldDown: true,
+  
+  /**
    * Whether React HotKeys should simulate keypress events for the keys that do not
    * natively emit them.
    * @type {Boolean}

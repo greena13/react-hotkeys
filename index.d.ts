@@ -255,6 +255,11 @@ export interface ConfigurationOptions {
   ignoreEventsCondition?: (keyEvent: KeyboardEvent) => boolean,
 
   /**
+   * Whether to ignore repeated keyboard events when a key is being held down
+   */
+  ignoreRepeatedEventsWhenKeyHeldDown?: boolean,
+
+  /**
    * Whether React HotKeys should simulate keypress events for the keys that do not
    * natively emit them.
    */

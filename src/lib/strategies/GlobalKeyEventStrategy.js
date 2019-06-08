@@ -253,6 +253,15 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   handleKeydown(event) {
     const _key = normalizeKeyName(getEventKey(event));
 
+    if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
+      this.logger.debug(
+        this._logPrefix(),
+        `Ignored repeated ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event.`
+      );
+
+      return true;
+    }
+
     this._checkForModifierFlagDiscrepancies(event, _key, KeyEventBitmapIndex.keydown);
 
     const reactAppResponse = this._howReactAppRespondedTo(
@@ -341,6 +350,15 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    */
   handleKeypress(event) {
     const key = normalizeKeyName(getEventKey(event));
+
+    if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
+      this.logger.debug(
+        this._logPrefix(),
+        `Ignored repeated ${describeKeyEvent(event, key, KeyEventBitmapIndex.keydown)} event.`
+      );
+
+      return true;
+    }
 
     /**
      * We first decide if the keypress event should be handled (to ensure the correct

@@ -60,7 +60,7 @@ const _defaultConfiguration = {
    * @type {Function<KeyboardEvent>}
    */
   ignoreEventsCondition: (event) => {
-    const { target } = event;
+    const {target} = event;
 
     if (target && target.tagName) {
       const tagName = target.tagName.toLowerCase();
@@ -70,6 +70,12 @@ const _defaultConfiguration = {
       return false;
     }
   },
+
+  /**
+   * Whether to ignore repeated keyboard events when a key is being held down
+   * @type {Boolean}
+   */
+  ignoreRepeatedEventsWhenKeyHeldDown: true,
 
   /**
    * Whether React HotKeys should simulate keypress events for the keys that do not
@@ -128,23 +134,23 @@ class Configuration {
    * @see _configuration
    */
   static init(configuration) {
-    const { ignoreTags } = configuration;
+    const {ignoreTags} = configuration;
 
     if (ignoreTags) {
       configuration._ignoreTagsDict = dictionaryFrom(configuration.ignoreTags);
     }
 
-    if(process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'production') {
       if (['verbose', 'debug', 'info'].indexOf(configuration.logLevel) !== -1) {
         console.warn(
           `React HotKeys: You have requested log level '${configuration.logLevel}' but for performance reasons, logging below severity level 'warning' is disabled in production. Please use the development build for complete logs.`
-        )
+        );
       }
     }
 
     Object.keys(configuration).forEach((key) => {
-      this.set(key, configuration[key])
-    })
+      this.set(key, configuration[key]);
+    });
   }
 
   /**

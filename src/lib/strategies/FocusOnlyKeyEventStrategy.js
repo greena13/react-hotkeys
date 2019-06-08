@@ -296,6 +296,17 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   handleKeydown(event, focusTreeId, componentId, options = {}) {
     const _key = normalizeKeyName(event.key);
 
+    if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
+      this.logger.debug(
+        this._logPrefix(componentId),
+        `Ignored repeated ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event.`
+      );
+
+      this._ignoreEvent(event, componentId);
+
+      return true;
+    }
+
     if (focusTreeId !== this.focusTreeId) {
       this.logger.debug(
         this._logPrefix(componentId),
@@ -407,6 +418,17 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    */
   handleKeypress(event, focusTreeId, componentId, options) {
     const _key = normalizeKeyName(event.key);
+
+    if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
+      this.logger.debug(
+        this._logPrefix(componentId),
+        `Ignored repeated ${describeKeyEvent(event, _key, KeyEventBitmapIndex.keydown)} event.`
+      );
+
+      this._ignoreEvent(event, componentId);
+
+      return true;
+    }
 
     const shouldDiscardFocusTreeId = focusTreeId !== this.focusTreeId;
 
