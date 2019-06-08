@@ -11,6 +11,7 @@ import isCmdKey from '../../helpers/parsing-key-maps/isCmdKey';
 import keyIsCurrentlyTriggeringEvent from '../../helpers/parsing-key-maps/keyIsCurrentlyTriggeringEvent';
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 import EventResponse from '../../const/EventResponse';
+import KeyEventRecordState from '../../const/KeyEventRecordState';
 
 /**
  * Defines behaviour for dealing with key maps defined in focus-only HotKey components
@@ -337,10 +338,24 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     if (responseAction === EventResponse.handled) {
       const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
 
+      const keyEventState = this._stateFromEvent(event);
+
       if (keyInCurrentCombination || this.keyCombinationIncludesKeyUp) {
-        this._startAndLogNewKeyCombination(_key, KeyEventRecordIndex.keydown, focusTreeId, componentId);
+        this._startAndLogNewKeyCombination(
+          _key,
+          KeyEventRecordIndex.keydown,
+          focusTreeId,
+          componentId,
+          keyEventState
+        );
       } else {
-        this._addToAndLogCurrentKeyCombination(_key, KeyEventRecordIndex.keydown, focusTreeId, componentId);
+        this._addToAndLogCurrentKeyCombination(
+          _key,
+          KeyEventRecordIndex.keydown,
+          focusTreeId,
+          componentId,
+          keyEventState
+        );
       }
 
       this._callHandlerIfActionNotHandled(event, _key, KeyEventRecordIndex.keydown, componentId, focusTreeId);
@@ -449,7 +464,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         _key,
         KeyEventRecordIndex.keypress,
         focusTreeId,
-        componentId
+        componentId,
+        this._stateFromEvent(event)
       );
     }
 
@@ -526,7 +542,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         _key,
         KeyEventRecordIndex.keyup,
         focusTreeId,
-        componentId
+        componentId,
+        this._stateFromEvent(event)
       );
     }
 
@@ -576,7 +593,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
        * down (as either keydown or keypress), then we update the state
        * to keypress or keyup (depending on the value of recordIndex).
        */
-      this._addToCurrentKeyCombination(keyName, recordIndex);
+      this._addToCurrentKeyCombination(keyName, recordIndex, KeyEventRecordState.simulated);
     }
   }
 
@@ -700,8 +717,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     };
   }
 
-  _startAndLogNewKeyCombination(keyName, eventRecordIndex, focusTreeId, componentId) {
-    this._startNewKeyCombination(keyName, eventRecordIndex);
+  _startAndLogNewKeyCombination(keyName, eventRecordIndex, focusTreeId, componentId, keyEventState) {
+    this._startNewKeyCombination(keyName, eventRecordIndex, keyEventState);
 
     this.logger.verbose(
       this._logPrefix(componentId, {focusTreeId}),
@@ -714,8 +731,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     );
   }
 
-  _addToAndLogCurrentKeyCombination(keyName, eventRecordIndex, focusTreeId, componentId) {
-    this._addToCurrentKeyCombination(keyName, eventRecordIndex);
+  _addToAndLogCurrentKeyCombination(keyName, eventRecordIndex, focusTreeId, componentId, keyEventState) {
+    this._addToCurrentKeyCombination(keyName, eventRecordIndex, keyEventState);
 
     if (eventRecordIndex === KeyEventRecordIndex.keydown) {
       this.logger.verbose(

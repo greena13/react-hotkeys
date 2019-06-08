@@ -71,8 +71,8 @@ describe('ClosingHangingCombinationsInHotKeysComponents:', function () {
           {
             'keys': {
               'a': [
-                [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
+                [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.simulated]
               ]
             },
             'ids': ['a'],

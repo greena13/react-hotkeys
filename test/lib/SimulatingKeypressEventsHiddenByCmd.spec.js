@@ -45,7 +45,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
               'keys': {
                 'Meta': [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ]
               },
               'ids': ['Meta'],
@@ -65,11 +65,11 @@ describe('Simulating keypress events hidden by cmd:', function () {
               'keys': {
                 'Meta': [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ],
                 'a': [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ]
               },
               'ids': ['Meta+a'],
@@ -88,12 +88,12 @@ describe('Simulating keypress events hidden by cmd:', function () {
             {
               'keys': {
                 'Meta': [
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.seen]
                 ],
                 'a': [
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.simulated]
                 ]
               },
               'ids': ['Meta+a'],
@@ -130,7 +130,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
               'keys': {
                 'Meta': [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ]
               },
               'ids': ['Meta'],
@@ -150,11 +150,11 @@ describe('Simulating keypress events hidden by cmd:', function () {
               'keys': {
                 'Meta': [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ],
                 'a': [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ]
               },
               'ids': ['Meta+a'],
@@ -173,12 +173,12 @@ describe('Simulating keypress events hidden by cmd:', function () {
             {
               'keys': {
                 'Meta': [
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.seen]
                 ],
                 'a': [
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.simulated]
                 ]
               },
               'ids': ['Meta+a'],

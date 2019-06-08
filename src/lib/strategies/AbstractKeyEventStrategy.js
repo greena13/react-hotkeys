@@ -27,6 +27,7 @@ import isMatchPossibleBasedOnNumberOfKeys from '../../helpers/resolving-handlers
 import copyAttributes from '../../utils/object/copyAttributes';
 import hasKey from '../../utils/object/hasKey';
 import keyupIsHiddenByCmd from '../../helpers/resolving-handlers/keyupIsHiddenByCmd';
+import KeyEventRecordState from '../../const/KeyEventRecordState';
 
 const SEQUENCE_ATTRIBUTES = ['sequence', 'action'];
 const KEYMAP_ATTRIBUTES = ['name', 'description', 'group'];
@@ -618,7 +619,7 @@ class AbstractKeyEventStrategy {
          * Record that there is at least one key sequence in the focus tree bound to
          * the keyboard event
          */
-        KeyEventRecordManager.setBit(this.keyMapEventRecord, eventRecordIndex);
+        this.keyMapEventRecord[eventRecordIndex] = true;
 
         if (!keyMapMemo[actionName]) {
           keyMapMemo[actionName] = [];
@@ -671,9 +672,10 @@ class AbstractKeyEventStrategy {
    * keyboard combination).
    * @param {ReactKeyName} keyName - Name of the key to add to the current combination
    * @param {KeyEventRecordIndex} recordIndex - Index in record to set to true
+   * @param {KeyEventRecordState} keyEventState The state to set the key event to
    * @protected
    */
-  _addToCurrentKeyCombination(keyName, recordIndex) {
+  _addToCurrentKeyCombination(keyName, recordIndex, keyEventState) {
     if (this.keyCombinationHistory.length === 0) {
       this.keyCombinationHistory.push(this.constructor.emptyKeyCombination());
     }
@@ -686,14 +688,16 @@ class AbstractKeyEventStrategy {
     if (!existingRecord) {
       keyCombination.keys[keyAlias] = [
         KeyEventRecordManager.newRecord(),
-        KeyEventRecordManager.newRecord(recordIndex)
+        KeyEventRecordManager.newRecord(recordIndex, keyEventState)
       ];
 
     } else {
-      keyCombination.keys[keyAlias] = [
-        KeyEventRecordManager.clone(existingRecord[1]),
-        KeyEventRecordManager.newRecord(recordIndex)
-      ];
+      const previous = KeyEventRecordManager.clone(existingRecord[1]);
+      const current = KeyEventRecordManager.clone(previous);
+
+      KeyEventRecordManager.setBit(current, recordIndex, keyEventState);
+
+      keyCombination.keys[keyAlias] = [previous, current];
     }
 
     keyCombination.ids = KeyCombinationSerializer.serialize(keyCombination.keys);
@@ -711,9 +715,10 @@ class AbstractKeyEventStrategy {
    *        KeyCombinationRecord
    * @param {KeyEventRecordIndex} eventRecordIndex - Index of bit to set to true in new
    *        KeyEventRecord
+   * @param {KeyEventRecordState} keyEventState The state to set the key event to
    * @protected
    */
-  _startNewKeyCombination(keyName, eventRecordIndex) {
+  _startNewKeyCombination(keyName, eventRecordIndex, keyEventState) {
     if (this.keyCombinationHistory.length > this.longestSequence) {
       /**
        * We know the longest key sequence registered for the currently focused
@@ -729,7 +734,7 @@ class AbstractKeyEventStrategy {
       ...this._withoutKeyUps(lastKeyCombination),
       [keyName]: [
         KeyEventRecordManager.newRecord(),
-        KeyEventRecordManager.newRecord(eventRecordIndex)
+        KeyEventRecordManager.newRecord(eventRecordIndex, keyEventState)
       ]
     };
 
@@ -928,7 +933,11 @@ class AbstractKeyEventStrategy {
                   keyMap.eventRecord = KeyEventRecordManager.newRecord();
                 }
 
-                KeyEventRecordManager.setBit(keyMap.eventRecord, keyMatcher.eventRecordIndex);
+                KeyEventRecordManager.setBit(
+                  keyMap.eventRecord,
+                  keyMatcher.eventRecordIndex,
+                  this._stateFromEvent(event)
+                );
 
                 /**
                  * Record the longest sequence length so we know to only check for sequences
@@ -1085,6 +1094,10 @@ class AbstractKeyEventStrategy {
     }
   }
 
+  _stateFromEvent(event) {
+    return event.simulated ? KeyEventRecordState.simulated : KeyEventRecordState.seen;
+  }
+
   _stopEventPropagationAfterHandlingIfEnabled(event, componentId) {
     if (Configuration.option('stopEventPropagationAfterHandling')) {
       this._stopEventPropagation(event, componentId);
@@ -1219,7 +1232,11 @@ class AbstractKeyEventStrategy {
 
        ModifierFlagsDictionary[modifierKey].forEach((attributeName) => {
          if (event[attributeName] === false && modifierStillPressed) {
-           this._addToCurrentKeyCombination(modifierKey, KeyEventRecordIndex.keyup);
+           this._addToCurrentKeyCombination(
+             modifierKey,
+             KeyEventRecordIndex.keyup,
+             this._stateFromEvent(event)
+           );
          }
        });
      })

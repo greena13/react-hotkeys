@@ -45,7 +45,7 @@ describe('Ignoring repeated events:', function () {
               'keys': {
                 'Shift': [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ]
               },
               'ids': ['Shift'],
@@ -86,7 +86,7 @@ describe('Ignoring repeated events:', function () {
               'keys': {
                 'Shift': [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ],
                 'a': [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],

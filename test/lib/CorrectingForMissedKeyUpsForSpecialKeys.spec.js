@@ -69,8 +69,8 @@ describe('Correcting for missed keyup events for modifier keys:', function () {
               {
                 'keys': {
                   [key]: [
-                    [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                    [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                    [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
+                    [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.seen]
                   ]
                 },
                 'ids': [key],

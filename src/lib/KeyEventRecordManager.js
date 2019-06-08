@@ -20,9 +20,10 @@ class KeyEventRecordManager {
   /**
    * Makes a new KeyEventRecord with one of the bits set to true
    * @param {KeyEventRecordIndex=} eventRecordIndex Index of bit to set to true
+   * @param {KeyEventRecordState} keyEventState The state to set the key event to
    * @returns {KeyEventRecord} New key event record with bit set to true
    */
-  static newRecord(eventRecordIndex) {
+  static newRecord(eventRecordIndex, keyEventState) {
     const record = [
       KeyEventRecordState.unseen,
       KeyEventRecordState.unseen,
@@ -31,7 +32,7 @@ class KeyEventRecordManager {
 
     if (!isUndefined(eventRecordIndex)) {
       for(let i = 0; i <= eventRecordIndex; i++) {
-        record[i] = KeyEventRecordState.seen;
+        record[i] = keyEventState;
       }
     }
 
@@ -42,9 +43,10 @@ class KeyEventRecordManager {
    * Sets a bit in the map to true
    * @param {KeyEventRecord} record Map to set a bit to true
    * @param {KeyEventRecordIndex} index Index of bit to set
+   * @param {KeyEventRecordState} keyEventState The state to set the key event to
    */
-  static setBit(record, index) {
-    record[index] = KeyEventRecordState.seen;
+  static setBit(record, index, keyEventState) {
+    record[index] = keyEventState;
 
     return record;
   }

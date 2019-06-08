@@ -20,7 +20,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             "keys": {
               "Shift": [
                 [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
               ]
             },
             "ids": [
@@ -40,7 +40,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
               "keys": {
                 "Shift": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ],
                 "A": [
                   [KeyEventRecordState.unseen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
@@ -62,7 +62,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
               "keys": {
                 "Shift": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ],
                 "A": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
@@ -84,7 +84,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
               "keys": {
                 "Shift": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ],
                 "A": [
                   [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
@@ -105,8 +105,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             {
               "keys": {
                 "Shift": [
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.seen]
                 ],
                 "A": [
                   [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
@@ -132,7 +132,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
               "keys": {
                 "Shift": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ],
                 "A": [
                   [KeyEventRecordState.unseen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
@@ -154,7 +154,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
               "keys": {
                 "Shift": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ],
                 "A": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
@@ -175,8 +175,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             {
               "keys": {
                 "Shift": [
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.seen]
                 ],
                 "A": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
@@ -197,8 +197,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             {
               "keys": {
                 "Shift": [
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.seen]
                 ],
                 "A": [
                   [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
@@ -246,7 +246,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
               "keys": {
                 "Shift": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ],
                 "a": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
@@ -267,8 +267,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             {
               "keys": {
                 "Shift": [
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.seen]
                 ],
                 "a": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
@@ -289,8 +289,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             {
               "keys": {
                 "Shift": [
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.seen]
                 ],
                 "a": [
                   [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
@@ -316,7 +316,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
               "keys": {
                 "Shift": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ],
                 "a": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
@@ -338,7 +338,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
               "keys": {
                 "Shift": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ],
                 "a": [
                   [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
@@ -359,8 +359,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             {
               "keys": {
                 "Shift": [
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.seen]
                 ],
                 "a": [
                   [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
@@ -389,7 +389,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             "keys": {
               "Alt": [
                 [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
               ]
             },
             "ids": [
@@ -409,7 +409,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
               "keys": {
                 "Alt": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ],
                 "å": [
                   [KeyEventRecordState.unseen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
@@ -431,7 +431,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
               "keys": {
                 "Alt": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ],
                 "å": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
@@ -453,7 +453,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
               "keys": {
                 "Alt": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ],
                 "å": [
                   [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
@@ -474,8 +474,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             {
               "keys": {
                 "Alt": [
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.seen]
                 ],
                 "å": [
                   [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
@@ -501,7 +501,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
               "keys": {
                 "Alt": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ],
                 "å": [
                   [KeyEventRecordState.unseen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
@@ -523,7 +523,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
               "keys": {
                 "Alt": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ],
                 "å": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
@@ -544,8 +544,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             {
               "keys": {
                 "Alt": [
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.seen]
                 ],
                 "å": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
@@ -566,8 +566,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             {
               "keys": {
                 "Alt": [
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.seen]
                 ],
                 "å": [
                   [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
@@ -615,7 +615,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
               "keys": {
                 "Alt": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ],
                 "a": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
@@ -636,8 +636,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             {
               "keys": {
                 "Alt": [
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.seen]
                 ],
                 "a": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
@@ -658,8 +658,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             {
               "keys": {
                 "Alt": [
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.seen]
                 ],
                 "a": [
                   [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
@@ -685,7 +685,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
               "keys": {
                 "Alt": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ],
                 "a": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
@@ -707,7 +707,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
               "keys": {
                 "Alt": [
                   [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
                 ],
                 "a": [
                   [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
@@ -728,8 +728,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             {
               "keys": {
                 "Alt": [
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.seen]
                 ],
                 "a": [
                   [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],

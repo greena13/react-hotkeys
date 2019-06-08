@@ -15,6 +15,7 @@ import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 import isCmdKey from '../../helpers/parsing-key-maps/isCmdKey';
 import EventResponse from '../../const/EventResponse';
 import contains from '../../utils/collection/contains';
+import KeyEventRecordState from '../../const/KeyEventRecordState';
 
 /**
  * Defines behaviour for dealing with key maps defined in global HotKey components
@@ -283,11 +284,20 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     if (reactAppResponse !== EventResponse.ignored) {
       const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
+      const keyEventState = this._stateFromEvent(event);
 
       if (keyInCurrentCombination || this.keyCombinationIncludesKeyUp) {
-        this._startAndLogNewKeyCombination(_key, KeyEventRecordIndex.keydown);
+        this._startAndLogNewKeyCombination(
+          _key,
+          KeyEventRecordIndex.keydown,
+          keyEventState
+        );
       } else {
-        this._addToAndLogCurrentKeyCombination(_key, KeyEventRecordIndex.keydown);
+        this._addToAndLogCurrentKeyCombination(
+          _key,
+          KeyEventRecordIndex.keydown,
+          keyEventState
+        );
       }
     }
 
@@ -375,7 +385,11 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      */
 
     if (this._getCurrentKeyState(key)) {
-      this._addToAndLogCurrentKeyCombination(key, KeyEventRecordIndex.keypress);
+      this._addToAndLogCurrentKeyCombination(
+        key,
+        KeyEventRecordIndex.keypress,
+        this._stateFromEvent(event)
+      );
     }
 
     if (reactAppResponse === EventResponse.unseen) {
@@ -431,7 +445,11 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * is not lost (leaving react hotkeys thinking the key is still pressed).
      */
     if (this._getCurrentKeyState(key)) {
-      this._addToAndLogCurrentKeyCombination(key, KeyEventRecordIndex.keyup);
+      this._addToAndLogCurrentKeyCombination(
+        key,
+        KeyEventRecordIndex.keyup,
+        this._stateFromEvent(event)
+      );
     }
 
     if (reactAppResponse === EventResponse.unseen){
@@ -504,8 +522,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     }
   }
 
-  _startAndLogNewKeyCombination(keyName, eventRecordIndex) {
-    this._startNewKeyCombination(keyName, eventRecordIndex);
+  _startAndLogNewKeyCombination(keyName, eventRecordIndex, keyEventState) {
+    this._startNewKeyCombination(keyName, eventRecordIndex, keyEventState);
 
     this.logger.verbose(
       this._logPrefix(),
@@ -518,8 +536,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     );
   }
 
-  _addToAndLogCurrentKeyCombination(keyName, eventRecordIndex) {
-    this._addToCurrentKeyCombination(keyName, eventRecordIndex);
+  _addToAndLogCurrentKeyCombination(keyName, eventRecordIndex, keyEventState) {
+    this._addToCurrentKeyCombination(keyName, eventRecordIndex, keyEventState);
 
     if (eventRecordIndex === KeyEventRecordIndex.keydown) {
       this.logger.verbose(
