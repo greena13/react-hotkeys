@@ -5,6 +5,7 @@ import sinon from 'sinon';
 
 import FocusableElement from '../../support/FocusableElement';
 import KeyEventManager from '../../../src/lib/KeyEventManager';
+import KeyEventRecordState from '../../../src/const/KeyEventRecordState';
 import KeyCode from '../../support/Key';
 
 import {HotKeys} from '../../../src/';
@@ -59,8 +60,8 @@ describe('HotKeys root prop:', function () {
           {
             'keys': {
               'a': [
-                [true, true, false],
-                [true, true, true]
+                [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
+                [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
               ]
             },
             'ids': ['a'],

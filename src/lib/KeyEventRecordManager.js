@@ -1,15 +1,16 @@
 /**
- * @typedef {boolean[]} KeyEventRecord A record indicating which of the key events
+ * @typedef {KeyEventRecordState[]} KeyEventRecord A record indicating which of the key events
  * have been registered to a particular key. The first bit is for the keydown event,
  * the second keypress and the third is for keyup.
  *
  * @example: A record for an key that has seen the keydown and keypress event, but not
  * the keyup event
  *
- * [true,true,false]
+ * [1,1,0]
  */
 
 import isUndefined from '../utils/isUndefined';
+import KeyEventRecordState from '../const/KeyEventRecordState';
 
 /**
  * Creates and modifies KeyEventRecords
@@ -22,11 +23,15 @@ class KeyEventRecordManager {
    * @returns {KeyEventRecord} New key event record with bit set to true
    */
   static newRecord(eventRecordIndex) {
-    const record = [ false, false, false ];
+    const record = [
+      KeyEventRecordState.unseen,
+      KeyEventRecordState.unseen,
+      KeyEventRecordState.unseen
+    ];
 
     if (!isUndefined(eventRecordIndex)) {
       for(let i = 0; i <= eventRecordIndex; i++) {
-        record[i] = true;
+        record[i] = KeyEventRecordState.seen;
       }
     }
 
@@ -39,7 +44,7 @@ class KeyEventRecordManager {
    * @param {KeyEventRecordIndex} index Index of bit to set
    */
   static setBit(record, index) {
-    record[index] = true;
+    record[index] = KeyEventRecordState.seen;
 
     return record;
   }
@@ -57,16 +62,6 @@ class KeyEventRecordManager {
     }
 
     return record;
-  }
-
-  static and(record1, record2) {
-    const newRecord = [];
-
-    for(let i = 0; i < record1.length; i++) {
-      newRecord[i] = record1[i] & record2[i];
-    }
-
-    return newRecord;
   }
 }
 

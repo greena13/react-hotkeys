@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import Key from '../support/Key';
 import KeyEventManager from '../../src/lib/KeyEventManager';
 import Configuration from '../../src/lib/Configuration';
+import KeyEventRecordState from '../../src/const/KeyEventRecordState';
 import MockSyntheticEvent from '../support/MockSyntheticEvent';
 
 describe('Correcting for missed keyup events for modifier keys:', function () {
@@ -68,8 +69,8 @@ describe('Correcting for missed keyup events for modifier keys:', function () {
               {
                 'keys': {
                   [key]: [
-                    [true, true, false],
-                    [true, true, true]
+                    [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
+                    [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
                   ]
                 },
                 'ids': [key],
@@ -78,8 +79,8 @@ describe('Correcting for missed keyup events for modifier keys:', function () {
               {
                 'keys': {
                   'a': [
-                    [false, false, false],
-                    [true, false, false]
+                    [KeyEventRecordState.unseen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
+                    [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen]
                   ]
                 },
                 'ids': ['a'],

@@ -6,6 +6,7 @@ import simulant from 'simulant';
 
 import FocusableElement from '../support/FocusableElement';
 import KeyEventManager from '../../src/lib/KeyEventManager';
+import KeyEventRecordState from '../../src/const/KeyEventRecordState';
 import KeyCode from '../support/Key';
 
 import {HotKeys, GlobalHotKeys} from '../../src';
@@ -70,8 +71,8 @@ describe('ClosingHangingCombinationsInHotKeysComponents:', function () {
           {
             'keys': {
               'a': [
-                [true, true, false],
-                [true, true, true]
+                [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
+                [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
               ]
             },
             'ids': ['a'],

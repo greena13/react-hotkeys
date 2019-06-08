@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 
 import KeyEventManager from '../../../src/lib/KeyEventManager';
+import KeyEventRecordState from '../../../src/const/KeyEventRecordState';
 import MockSyntheticEvent from '../../support/MockSyntheticEvent';
 
 describe('Handling ignored events:', function () {
@@ -47,8 +48,8 @@ describe('Handling ignored events:', function () {
             {
               'keys': {
                 'a': [
-                  [false, false, false],
-                  [true, false, false]
+                  [KeyEventRecordState.unseen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen]
                 ]
               },
               'ids': ['a'],
@@ -65,7 +66,7 @@ describe('Handling ignored events:', function () {
       context('that is ignored', () => {
         beforeEach(function () {
           this.eventOptions = {
-            ignoreEventsCondition: () => true
+            ignoreEventsCondition: () => KeyEventRecordState.seen
           };
 
           this.eventStrategy.enableHotKeys(
@@ -136,8 +137,8 @@ describe('Handling ignored events:', function () {
               {
                 'keys': {
                   'a': [
-                    [true, false, false],
-                    [true, true, false]
+                    [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
+                    [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
                   ]
                 },
                 'ids': ['a'],
@@ -208,8 +209,8 @@ describe('Handling ignored events:', function () {
               {
                 'keys': {
                   'a': [
-                    [true, false, false],
-                    [true, true, false]
+                    [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
+                    [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
                   ]
                 },
                 'ids': ['a'],
@@ -293,8 +294,8 @@ describe('Handling ignored events:', function () {
               {
                 'keys': {
                   'a': [
-                    [true, true, false],
-                    [true, true, true]
+                    [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
+                    [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
                   ]
                 },
                 'ids': ['a'],
@@ -372,8 +373,8 @@ describe('Handling ignored events:', function () {
               {
                 'keys': {
                   'a': [
-                    [true, true, false],
-                    [true, true, true]
+                    [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
+                    [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
                   ]
                 },
                 'ids': ['a'],

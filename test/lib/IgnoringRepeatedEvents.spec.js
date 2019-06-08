@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import Key from '../support/Key';
 import KeyEventManager from '../../src/lib/KeyEventManager';
 import Configuration from '../../src/lib/Configuration';
+import KeyEventRecordState from '../../src/const/KeyEventRecordState';
 import MockSyntheticEvent from '../support/MockSyntheticEvent';
 
 describe('Ignoring repeated events:', function () {
@@ -43,8 +44,8 @@ describe('Ignoring repeated events:', function () {
             {
               'keys': {
                 'Shift': [
-                  [true, false, false],
-                  [true, true, false]
+                  [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
                 ]
               },
               'ids': ['Shift'],
@@ -84,12 +85,12 @@ describe('Ignoring repeated events:', function () {
             {
               'keys': {
                 'Shift': [
-                  [true, false, false],
-                  [true, true, false]
+                  [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
                 ],
                 'a': [
-                  [true, false, false],
-                  [true, true, false]
+                  [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
+                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
                 ]
               },
               'ids': ['Shift+a', 'A+Shift'],
