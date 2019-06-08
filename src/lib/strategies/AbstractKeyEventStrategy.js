@@ -26,6 +26,7 @@ import keyIsCurrentlyTriggeringEvent from '../../helpers/parsing-key-maps/keyIsC
 import isMatchPossibleBasedOnNumberOfKeys from '../../helpers/resolving-handlers/isMatchPossibleBasedOnNumberOfKeys';
 import copyAttributes from '../../utils/object/copyAttributes';
 import hasKey from '../../utils/object/hasKey';
+import keyupIsHiddenByCmd from '../../helpers/resolving-handlers/keyupIsHiddenByCmd';
 
 const SEQUENCE_ATTRIBUTES = ['sequence', 'action'];
 const KEYMAP_ATTRIBUTES = ['name', 'description', 'group'];
@@ -769,7 +770,7 @@ class AbstractKeyEventStrategy {
     if (eventType === KeyEventBitmapIndex.keypress) {
       return !keyHasNativeKeypress || (keyHasNativeKeypress && this._keyIsCurrentlyDown('Meta'));
     } else if (eventType === KeyEventBitmapIndex.keyup) {
-      return (keyHasNativeKeypress && keyIsCurrentlyTriggeringEvent(
+      return (keyupIsHiddenByCmd(keyName) && keyIsCurrentlyTriggeringEvent(
         this._getCurrentKeyState('Meta'),
         KeyEventBitmapIndex.keyup)
       );

@@ -21,7 +21,7 @@ class KeyEventBitmapManager {
    * @param {KeyEventBitmapIndex=} eventBitmapIndex Index of bit to set to true
    * @returns {KeyEventBitmap} New key event bitmap with bit set to true
    */
-  static newBitmap(eventBitmapIndex ) {
+  static newBitmap(eventBitmapIndex) {
     const bitmap = [ false, false, false ];
 
     if (!isUndefined(eventBitmapIndex)) {
