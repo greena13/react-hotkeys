@@ -6,7 +6,7 @@ import Configuration from '../Configuration';
 import Logger from '../Logger';
 import printComponent from '../../helpers/logging/printComponent';
 import isUndefined from '../../utils/isUndefined';
-import normalizeKeyName from '../../helpers/resolving-handlers/normalizeKeyName';
+import getKeyName from '../../helpers/resolving-handlers/getKeyName';
 import isCmdKey from '../../helpers/parsing-key-maps/isCmdKey';
 import keyIsCurrentlyTriggeringEvent from '../../helpers/parsing-key-maps/keyIsCurrentlyTriggeringEvent';
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
@@ -295,7 +295,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * @returns Whether the event was discarded because it was part of an old focus tree
    */
   handleKeydown(event, focusTreeId, componentId, options = {}) {
-    const _key = normalizeKeyName(event.key);
+    const _key = getKeyName(event);
 
     if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
       this.logger.debug(
@@ -432,7 +432,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *        tree Id, because it belongs to an old focus tree.
    */
   handleKeypress(event, focusTreeId, componentId, options) {
-    const _key = normalizeKeyName(event.key);
+    const _key = getKeyName(event);
 
     if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
         this.logger.debug(
@@ -526,7 +526,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *        because it's stale (part of an old focus tree)
    */
   handleKeyup(event, focusTreeId, componentId, options) {
-    const _key = normalizeKeyName(event.key);
+    const _key = getKeyName(event);
 
     if (this._alreadySimulatedEvent(KeyEventRecordIndex.keyup, _key)) {
       this.logger.debug(

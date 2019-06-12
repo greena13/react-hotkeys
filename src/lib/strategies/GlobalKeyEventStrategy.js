@@ -7,15 +7,13 @@ import KeyEventCounter from '../KeyEventCounter';
 import Logger from '../Logger';
 import removeAtIndex from '../../utils/array/removeAtIndex';
 import isUndefined from '../../utils/isUndefined';
-import getEventKey from '../../vendor/react-dom/getEventKey';
 import printComponent from '../../helpers/logging/printComponent';
-import normalizeKeyName from '../../helpers/resolving-handlers/normalizeKeyName';
+import getKeyName from '../../helpers/resolving-handlers/getKeyName';
 import Configuration from '../Configuration';
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 import isCmdKey from '../../helpers/parsing-key-maps/isCmdKey';
 import EventResponse from '../../const/EventResponse';
 import contains from '../../utils/collection/contains';
-import KeyEventRecordState from '../../const/KeyEventRecordState';
 
 /**
  * Defines behaviour for dealing with key maps defined in global HotKey components
@@ -252,7 +250,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {KeyboardEvent} event - Event containing the key name and state
    */
   handleKeydown(event) {
-    const _key = normalizeKeyName(getEventKey(event));
+    const _key = getKeyName(event);
 
     if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
       this.logger.debug(
@@ -359,7 +357,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {KeyboardEvent} event - Event containing the key name and state
    */
   handleKeypress(event) {
-    const key = normalizeKeyName(getEventKey(event));
+    const key = getKeyName(event);
 
     if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
       this.logger.debug(
@@ -435,7 +433,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {KeyboardEvent} event - Event containing the key name and state
    */
   handleKeyup(event) {
-    const key = normalizeKeyName(getEventKey(event));
+    const key = getKeyName(event);
 
     if (this._alreadySimulatedEvent(KeyEventRecordIndex.keyup, key)) {
       this.logger.debug(
