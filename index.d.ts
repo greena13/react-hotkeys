@@ -293,6 +293,11 @@ export interface ConfigurationOptions {
    * allowCombinationSubmatches is false.
    */
   allowCombinationSubmatches?: boolean,
+
+  /**
+   * A mapping of custom key codes to key names
+   */
+  customKeyCodes?: { [key: number]: string },
 }
 
 /**

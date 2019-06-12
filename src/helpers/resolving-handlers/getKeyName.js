@@ -4,6 +4,8 @@
  */
 
 import reactsGetEventKey from '../../vendor/react-dom/reactsGetEventKey';
+import Configuration from '../../lib/Configuration';
+import hasKey from '../../utils/object/hasKey';
 
 /**
  * Returns normalized name of key
@@ -12,6 +14,13 @@ import reactsGetEventKey from '../../vendor/react-dom/reactsGetEventKey';
  */
 function getKeyName(event) {
   const keyName = function(){
+    const customKeyCodes = Configuration.option('customKeyCodes');
+    const keyCode = event.keyCode || event.charCode;
+
+    if (hasKey(customKeyCodes, keyCode)) {
+      return customKeyCodes[keyCode];
+    }
+
     if (event.nativeEvent) {
       return event.key;
     } else {

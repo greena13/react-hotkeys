@@ -22,6 +22,7 @@ See the [upgrade notes](https://github.com/greena13/react-hotkeys/releases/tag/v
 - [Browser key names](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values) and [Mousetrap syntax](https://github.com/ccampbell/mousetrap)
 - Define [global](#GlobalHotKeys-component) and [in-focus](#HotKeys-component) hot keys
 - [Display a list of available hot keys to the user](#Displaying-a-list-of-available-hot-keys)
+- [Defining custom key codes](#defining-custom-key-codes) for WebOS and other environments
 - Works with React's Synthetic KeyboardEvents and event delegation and provides [predictable and expected behaviour](#Interaction-with-React) to anyone familiar with React
 - Optimized by default, but allows you to turn off different optimisation measures in a granular fashion
 - Customizable through a simple [configuration API](#Configuration)
@@ -91,6 +92,7 @@ export default MyNode;
     - [Specifying key events (keydown, keypress, keyup)](#specifying-key-events-keydown-keypress-keyup)
     - [Specifying key map display data](#specifying-key-map-display-data)
     - [Deciding which key map syntax to use](#deciding-which-key-map-syntax-to-use)
+    - [Defining custom key codes](#defining-custom-key-codes)
 - [Defining Handlers](#defining-handlers)
     - [DEPRECATED: Hard Sequence Handlers](#deprecated-hard-sequence-handlers)
 - [Interaction with React](#interaction-with-react)
@@ -346,6 +348,29 @@ As a general rule, you should use the syntax that is the most brief, but still a
 | Array of objects             | Need alternative key maps that trigger the same action, and want to them to trigger on a different key event        | 
 | Object                       | Have a single key sequence and want to specify a different key event or display data                                | 
 | Object (sequences attribute) | Have multiple key sequences that trigger the same action, and want to specify a different key event or display data | 
+
+#### Defining custom key codes
+
+When you are working in a WebOS environment, or a similar, you may have need to define custom key codes. You can do so using the `customKeyCodes` [Configuration option](#configuration):
+
+```javascript
+
+import {configure} from 'react-hotkeys';
+
+configure({
+  customKeyCodes: {
+    10009: 'BackTV'    
+  }
+})
+```
+
+Once defined, you are then able to use the key names in you action sequences:
+
+```javascript
+const keyMap = {
+  MY_ACTION: 'BackTV',
+};
+```
 
 ## Defining Handlers
 
@@ -1058,7 +1083,7 @@ configure({
    */
   ignoreEventsCondition: function,
 
-/**
+  /**
    * Whether to allow hard sequences, or the binding of handlers to actions
    * that have names that are valid key sequences, which implicitly define
    * actions that are triggered by that key sequence
@@ -1114,6 +1139,12 @@ configure({
    * allowCombinationSubmatches is false.
    */
   allowCombinationSubmatches: false,
+  
+  /**
+   * A mapping of custom key codes to key names that you can then use in your
+   * key sequences
+   */
+  customKeyCodes: {},
 });
 ```
 

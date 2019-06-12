@@ -92,6 +92,7 @@ const _defaultConfiguration = {
    * This does not affect the behaviour of React Hotkeys, but rather what happens to
    * the event once React Hotkeys is done with it (whether it's allowed to propagate
    * any further through the Render tree).
+   * @type {Boolean}
    */
   stopEventPropagationAfterHandling: true,
 
@@ -103,6 +104,7 @@ const _defaultConfiguration = {
    * This does not affect the behaviour of React Hotkeys, but rather what happens to
    * the event once React Hotkeys is done with it (whether it's allowed to propagate
    * any further through the Render tree).
+   * @type {Boolean}
    */
   stopEventPropagationAfterIgnoring: true,
 
@@ -110,8 +112,16 @@ const _defaultConfiguration = {
    * Whether to allow combination submatches - e.g. if there is an action bound to
    * cmd, pressing shift+cmd will *not* trigger that action when
    * allowCombinationSubmatches is false.
+   * @type {Boolean}
    */
   allowCombinationSubmatches: false,
+
+  /**
+   * A mapping of custom key codes to key names that you can then use in your
+   * key sequences
+   * @type {Object<Number, KeyName>}
+   */
+  customKeyCodes: {},
 };
 
 const _configuration = {
