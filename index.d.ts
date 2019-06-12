@@ -295,7 +295,8 @@ export interface ConfigurationOptions {
   allowCombinationSubmatches?: boolean,
 
   /**
-   * A mapping of custom key codes to key names
+   * A mapping of custom key codes to key names that you can then use in your
+   * key sequences
    */
   customKeyCodes?: { [key: number]: string },
 }

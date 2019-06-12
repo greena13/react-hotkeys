@@ -8,8 +8,8 @@ import Configuration from '../../lib/Configuration';
 import hasKey from '../../utils/object/hasKey';
 
 /**
- * Returns normalized name of key
- * @param {KeyboardEvent} event - Event containing the key name and state
+ * Returns key name from native or React keyboard event
+ * @param {KeyboardEvent} event - Event containing the key name
  * @returns {NormalizedKeyName} Normalized name of the key
  */
 function getKeyName(event) {
