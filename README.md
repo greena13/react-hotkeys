@@ -22,7 +22,8 @@ See the [upgrade notes](https://github.com/greena13/react-hotkeys/releases/tag/v
 - [Browser key names](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values) and [Mousetrap syntax](https://github.com/ccampbell/mousetrap)
 - Define [global](#GlobalHotKeys-component) and [in-focus](#HotKeys-component) hot keys
 - [Display a list of available hot keys to the user](#Displaying-a-list-of-available-hot-keys)
-- [Defining custom key codes](#defining-custom-key-codes) for WebOS and other environments
+- [Define custom key codes](#defining-custom-key-codes) for WebOS and other environments
+- Allow users to [set their own keyboard shortcuts](#setting-dynamic-hotkeys)
 - Works with React's Synthetic KeyboardEvents and event delegation and provides [predictable and expected behaviour](#Interaction-with-React) to anyone familiar with React
 - Optimized by default, but allows you to turn off different optimisation measures in a granular fashion
 - Customizable through a simple [configuration API](#Configuration)
@@ -93,6 +94,7 @@ export default MyNode;
     - [Specifying key map display data](#specifying-key-map-display-data)
     - [Deciding which key map syntax to use](#deciding-which-key-map-syntax-to-use)
     - [Defining custom key codes](#defining-custom-key-codes)
+    - [Setting dynamic hotkeys](#setting-dynamic-hotkeys)
 - [Defining Handlers](#defining-handlers)
     - [DEPRECATED: Hard Sequence Handlers](#deprecated-hard-sequence-handlers)
 - [Interaction with React](#interaction-with-react)
@@ -371,6 +373,119 @@ const keyMap = {
   MY_ACTION: 'BackTV',
 };
 ```
+
+#### Setting dynamic hotkeys
+
+`react-hotkeys` has basic support for setting dynamic hotkeys - i.e. letting the user set their own keyboard shortcuts. In your app, you can set up the necessary UI for [viewing the current keyboard shortcuts](#displaying-a-list-of-available-hot-keys), and opting to change them. You can then use the `recordKeyCombination` function to capture the keys the user wishes to use.
+
+`recordKeyCombination` accepts a callback function that will be called on the last `keyup` of the next key combination - immediately after the user has pressed the key combination they wish to assign. The callback then unbinds itself, so you do not have to worry about tidying up after it.
+
+`recordKeyCombination` returns a function you can call at any time after binding the listener, to cancel listening without waiting for the key combination to complete. 
+
+The callback function receives a single argument with the following schema:
+
+```javascript
+{
+  /**
+   * Id of combination that could be used to define a keymap
+   */
+  id: '',
+  /**
+   * Dictionary of keys involved in the combination
+   */
+  keys: { keyName: true }
+}
+```
+ 
+A basic example is:
+
+```javascript
+import { recordKeyCombination } from 'react-hotkeys';
+
+renderDialog(){
+  if (this.state.showShortcutsDialog) {
+    const keyMap = getApplicationKeyMap();
+
+    return (
+      <div style={styles.DIALOG}>
+        <h2>
+          Keyboard shortcuts
+        </h2>
+
+        <table>
+          <tbody>
+          { 
+            Object.keys(keyMap).reduce((memo, actionName) => {
+              const { sequences, name } = keyMap[actionName];
+              
+              memo.push(
+                <tr key={name || actionName}>
+                  <td style={styles.KEYMAP_TABLE_CELL}>
+                    { name }
+                  </td>
+                  <td style={styles.KEYMAP_TABLE_CELL}>
+                    { sequences.map(({sequence}) => <span key={sequence}>{sequence}</span>) }
+                  </td>
+                  <td style={styles.KEYMAP_TABLE_CELL}>
+                    <button onClick={ () => this.showChangeShortcutDialog(actionName) }>
+                      Change
+                    </button>
+                  </td>
+                </tr>
+              )
+            }
+          }
+          </tbody>
+        </table>
+      </div>
+    );
+  } else if (this.state.changingActionShortcut) {
+    const { cancel } = this.state.changingActionShortcut;
+    
+    const keyMap = getApplicationKeyMap();
+    const { name } = keyMap[this.state.changingActionShortcut];
+    
+    return (
+      <div style={styles.DIALOG}>
+        Press the keys you would like to bind to #{name}.
+        
+        <button onClick={cancel}>
+          Cancel
+        </button>
+      </div>       
+    );
+  }
+}
+
+showChangeShortcutDialog(actionName) {
+  const cancelListening = recordKeyCombination(({id}) => {
+      this.setState({
+        showShortcutsDialog: true,
+        changingActionShortcut: null,
+        keyMap: {
+          ...this.state.keyMap,
+          [actionName]: id      
+        }
+      }); 
+  });
+  
+  this.setState({
+    showShortcutsDialog: false,
+    changingActionShortcut: {
+      cancel: () => {
+        cancelListening();
+        
+        this.setState({
+          showShortcutsDialog: true,
+          changingActionShortcut: null
+        }); 
+      }
+    }
+  });    
+}
+```
+
+If you are updating hotkeys without changing focus or remounting the component that defines them, you will need to make sure you use the [`allowChanges` prop](#hotkeys-component-api) to ensure the new keymaps are honoured immediately.
 
 ## Defining Handlers
 
@@ -742,39 +857,39 @@ import { getApplicationKeyMap } from 'react-hotkeys';
 
 // ...
 
-renderDialog() {
-    if (this.state.showDialog) {
-      const keyMap = getApplicationKeyMap();
+renderDialog(){
+  if (this.state.showDialog) {
+    const keyMap = getApplicationKeyMap();
 
-      return (
-        <div style={styles.DIALOG}>
-          <h2>
-            Keyboard shortcuts
-          </h2>
+    return (
+      <div style={styles.DIALOG}>
+        <h2>
+          Keyboard shortcuts
+        </h2>
 
-          <table>
-            <tbody>
-            { Object.keys(keyMap).reduce((memo, actionName) => {
-                const { sequences, name } = keyMap[actionName];
-                
-                memo.push(
-                  <tr key={name || actionName}>
-                    <td style={styles.KEYMAP_TABLE_CELL}>
-                      { name }
-                    </td>
-                    <td style={styles.KEYMAP_TABLE_CELL}>
-                      { sequences.map(({sequence}) => <span key={sequence}>{sequence}</span>) }
-                    </td>
-                  </tr>
-                )
-              }
-             }
-            </tbody>
-          </table>
-        </div>
-      );
-    }
+        <table>
+          <tbody>
+          { Object.keys(keyMap).reduce((memo, actionName) => {
+              const { sequences, name } = keyMap[actionName];
+              
+              memo.push(
+                <tr key={name || actionName}>
+                  <td style={styles.KEYMAP_TABLE_CELL}>
+                    { name }
+                  </td>
+                  <td style={styles.KEYMAP_TABLE_CELL}>
+                    { sequences.map(({sequence}) => <span key={sequence}>{sequence}</span>) }
+                  </td>
+                </tr>
+              )
+            }
+           }
+          </tbody>
+        </table>
+      </div>
+    );
   }
+}
 ```
 
 ## Allowing hotkeys and handlers props to change

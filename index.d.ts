@@ -3,6 +3,7 @@ import * as React from 'react';
 export type MouseTrapKeySequence = string | Array<string>;
 
 export type ActionName = string;
+export type KeyName = string;
 
 export type KeyEventName = 'keyup' | 'keydown' | 'keypress';
 
@@ -202,6 +203,33 @@ export type ApplicationKeyMap = { [key in ActionName]: KeyMapDisplayOptions };
  * HotKeys and GlobalHotKeys components that are currently mounted
  */
 export declare function getApplicationKeyMap(): ApplicationKeyMap;
+
+/**
+ * Description of key combination passed to the callback registered with
+ * the recordKeyCombination function
+ */
+export interface KeyCombination {
+  /**
+   * Id of combination that could be used to define a keymap
+   */
+  id: MouseTrapKeySequence;
+  /**
+   * Dictionary of keys involved in the combination
+   */
+  keys: { [key in KeyName]: true };
+}
+
+/**
+ * Function to call to cancel listening to the next key combination
+ */
+declare type cancelKeyCombinationListener = () => void;
+
+/**
+ * Adds a listener function that will be called the next time a key combination completes
+ * Returns a function to cancel listening.
+ */
+export declare function recordKeyCombination(callbackFunction: (keyCombination: KeyCombination) => void): cancelKeyCombinationListener;
+
 
 export interface ConfigurationOptions {
   /**

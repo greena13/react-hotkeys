@@ -748,6 +748,19 @@ class AbstractKeyEventStrategy {
   }
 
   /**
+   * Whether there are any keys in the current combination still being pressed
+   * @protected
+   * @return {Boolean} True if all keys in the current combination are released
+   */
+  _allKeysAreReleased() {
+    const currentCombination = this._getCurrentKeyCombination();
+
+    return Object.keys(currentCombination.keys).every((keyName) => {
+      return !this._keyIsCurrentlyDown(keyName);
+    });
+  }
+
+  /**
    * Returns a new KeyCombinationRecord without the keys that have been
    * released (had the keyup event recorded). Essentially, the keys that are
    * currently still pressed down at the time a key event is being handled.

@@ -11,7 +11,7 @@ import KeyCode from '../support/Key';
 
 import {HotKeys, GlobalHotKeys} from '../../src';
 
-describe('ClosingHangingCombinationsInHotKeysComponents:', function () {
+describe('Closing hanging combinations in HotKeys Components:', function () {
   describe('when a HotKeys component has a handler on keydown that changes the focus to outside its descendants', function () {
     beforeEach(function () {
       this.keyMap = {

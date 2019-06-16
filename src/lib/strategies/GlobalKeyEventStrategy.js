@@ -14,6 +14,7 @@ import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 import isCmdKey from '../../helpers/parsing-key-maps/isCmdKey';
 import EventResponse from '../../const/EventResponse';
 import contains from '../../utils/collection/contains';
+import dictionaryFrom from '../../utils/object/dictionaryFrom';
 
 /**
  * Defines behaviour for dealing with key maps defined in global HotKey components
@@ -45,6 +46,12 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this.eventOptions = {
       ignoreEventsCondition: Configuration.option('ignoreEventsCondition')
     };
+
+    /**
+     * Dictionary of listener functions - currently only intended to house
+     * keyCombinationListener
+     */
+    this.listeners = {};
   }
 
   /********************************************************************************
@@ -201,7 +208,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _updateDocumentHandlers(){
-    const listenersShouldBeBound = this.componentList.length > 0;
+    const listenersShouldBeBound = this._listenersShouldBeBound();
 
     if (!this.listenersBound && listenersShouldBeBound) {
       for(let recordIndex = 0; recordIndex < this.keyMapEventRecord.length; recordIndex++) {
@@ -234,6 +241,10 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
       this.listenersBound = false;
     }
+  }
+
+  _listenersShouldBeBound() {
+    return this.componentList.length > 0 || this.listeners.keyCombination;
   }
 
   /********************************************************************************
@@ -505,6 +516,15 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * of whether the event should be ignored or not
      */
     this._simulateKeyUpEventsHiddenByCmd(event, key);
+
+    if (this.listeners.keyCombination && this._allKeysAreReleased()) {
+      const {keys,ids} = this._getCurrentKeyCombination();
+
+      this.listeners.keyCombination({
+        keys: dictionaryFrom(Object.keys(keys), true),
+        id: ids[0]
+      });
+    }
   }
 
   _simulateKeyPressesMissingFromBrowser(event, key) {
@@ -651,6 +671,33 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     if (!event.simulated) {
       event.stopPropagation();
     }
+  }
+
+  /********************************************************************************
+   * Recording key combination
+   ********************************************************************************/
+
+  /**
+   * Add a new key combination listener function to be called the next time a key
+   * combination completes (assuming the cancel function is not called).
+   * @param {keyCombinationListener} callbackFunction Function to call with the next
+   *        completed key combination
+   * @returns {function} Function to call to cancel listening for the next key
+   *        combination
+   */
+  addKeyCombinationListener(callbackFunction) {
+    const cancel = () => {
+      delete this.listeners.keyCombination;
+    };
+
+    this.listeners.keyCombination = (keyCombination) => {
+      callbackFunction(keyCombination);
+      cancel();
+    };
+
+    this._updateDocumentHandlers();
+
+    return cancel;
   }
 
   /********************************************************************************

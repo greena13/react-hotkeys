@@ -9,4 +9,5 @@ export {default as withObserveKeys} from './withObserveKeys';
 export {default as configure} from './configure';
 
 export {default as getApplicationKeyMap} from './getApplicationKeyMap';
+export {default as recordKeyCombination} from './recordKeyCombination';
 

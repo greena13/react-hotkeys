@@ -174,6 +174,13 @@ class KeyEventManager {
   }
 
   /********************************************************************************
+   * Recording key combination
+   ********************************************************************************/
+  addKeyCombinationListener(callbackFunction) {
+    return this._globalEventStrategy.addKeyCombinationListener(callbackFunction);
+  }
+
+  /********************************************************************************
    * Focus key events
    ********************************************************************************/
 
