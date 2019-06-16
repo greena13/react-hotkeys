@@ -1,4 +1,4 @@
-import KeysWithoutPressEventDictionary from '../../const/KeysWithoutPressEventDictionary';
+import NonPrintableKeysDictionary from '../../const/NonPrintableKeysDictionary';
 
 /**
  * Whether the specified key name is for a key that has a native keypress event
@@ -6,7 +6,7 @@ import KeysWithoutPressEventDictionary from '../../const/KeysWithoutPressEventDi
  * @returns {Boolean} Whether the key has a native keypress event
  */
 function hasKeyPressEvent(keyName) {
-  return !KeysWithoutPressEventDictionary[keyName];
+  return !NonPrintableKeysDictionary[keyName];
 }
 
 export default hasKeyPressEvent;

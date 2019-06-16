@@ -321,7 +321,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this._callHandlerIfExists(event, _key, KeyEventRecordIndex.keydown);
     }
 
-    this._simulateKeyPressesMissingFromBrowser(event, _key);
+    this._simulateKeypressForNonPrintableKeys(event, _key);
   }
 
   _howReactAppRespondedTo(event, key, eventRecordIndex) {
@@ -534,7 +534,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     }
   }
 
-  _simulateKeyPressesMissingFromBrowser(event, key) {
+  _simulateKeypressForNonPrintableKeys(event, key) {
     this.keyEventManager.simulatePendingKeyPressEvents();
 
     this._handleEventSimulation(

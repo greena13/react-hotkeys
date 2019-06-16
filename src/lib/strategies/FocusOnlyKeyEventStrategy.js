@@ -361,7 +361,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this._callHandlerIfActionNotHandled(event, _key, KeyEventRecordIndex.keydown, componentId, focusTreeId);
     }
 
-    this._simulateKeyPressesMissingFromBrowser(event, _key, focusTreeId, componentId, options);
+    this._simulateKeypressForNonPrintableKeys(event, _key, focusTreeId, componentId, options);
 
     this._updateEventPropagationHistory(componentId, componentPosition);
 
@@ -619,7 +619,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     }
   }
 
-  _simulateKeyPressesMissingFromBrowser(event, key, focusTreeId, componentId, options){
+  _simulateKeypressForNonPrintableKeys(event, key, focusTreeId, componentId, options){
     this._handleEventSimulation(
       'keypressEventsToSimulate',
       'simulatePendingKeyPressEvents',

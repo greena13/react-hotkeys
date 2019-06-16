@@ -97,6 +97,7 @@ function reactsGetEventKey(nativeEvent) {
     // thus be captured by `keypress`, no other non-printable key should.
     return charCode === 13 ? 'Enter' : String.fromCharCode(charCode);
   }
+
   if (nativeEvent.type === 'keydown' || nativeEvent.type === 'keyup') {
     // While user keyboard layout determines the actual meaning of each
     // `keyCode` value, almost all function keys have a universal value.

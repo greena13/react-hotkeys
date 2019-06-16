@@ -1,7 +1,7 @@
 /**
  * Dictionary of keys that do not natively have a keypress event
  */
-const KeysWithoutPressEventDictionary = {
+const NonPrintableKeysDictionary = {
   Shift: true,
   Control: true,
   Alt: true,
@@ -21,7 +21,7 @@ const KeysWithoutPressEventDictionary = {
 };
 
 for(let i = 1; i < 13; i++) {
-  KeysWithoutPressEventDictionary[`F${i}`] = true;
+  NonPrintableKeysDictionary[`F${i}`] = true;
 }
 
-export default KeysWithoutPressEventDictionary;
+export default NonPrintableKeysDictionary;
