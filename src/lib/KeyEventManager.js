@@ -176,6 +176,12 @@ class KeyEventManager {
   /********************************************************************************
    * Recording key combination
    ********************************************************************************/
+
+  /**
+   * Adds a listener function that will be called the next time a key combination completes
+   * @param {keyCombinationListener} callbackFunction Listener function to be called
+   * @returns {function} Function to call to cancel listening to the next key combination
+   */
   addKeyCombinationListener(callbackFunction) {
     return this._globalEventStrategy.addKeyCombinationListener(callbackFunction);
   }

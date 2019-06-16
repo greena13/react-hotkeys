@@ -23,7 +23,7 @@ See the [upgrade notes](https://github.com/greena13/react-hotkeys/releases/tag/v
 - Define [global](#GlobalHotKeys-component) and [in-focus](#HotKeys-component) hot keys
 - [Display a list of available hot keys to the user](#Displaying-a-list-of-available-hot-keys)
 - [Define custom key codes](#defining-custom-key-codes) for WebOS and other environments
-- Allow users to [set their own keyboard shortcuts](#setting-dynamic-hotkeys)
+- Allow users to [set their own keyboard shortcuts](#setting-dynamic-hotkeys-at-runtime)
 - Works with React's Synthetic KeyboardEvents and event delegation and provides [predictable and expected behaviour](#Interaction-with-React) to anyone familiar with React
 - Optimized by default, but allows you to turn off different optimisation measures in a granular fashion
 - Customizable through a simple [configuration API](#Configuration)
@@ -94,7 +94,7 @@ export default MyNode;
     - [Specifying key map display data](#specifying-key-map-display-data)
     - [Deciding which key map syntax to use](#deciding-which-key-map-syntax-to-use)
     - [Defining custom key codes](#defining-custom-key-codes)
-    - [Setting dynamic hotkeys](#setting-dynamic-hotkeys)
+    - [Setting dynamic hotkeys at runtime](#setting-dynamic-hotkeys-at-runtime)
 - [Defining Handlers](#defining-handlers)
     - [DEPRECATED: Hard Sequence Handlers](#deprecated-hard-sequence-handlers)
 - [Interaction with React](#interaction-with-react)
@@ -374,9 +374,9 @@ const keyMap = {
 };
 ```
 
-#### Setting dynamic hotkeys
+#### Setting dynamic hotkeys at runtime
 
-`react-hotkeys` has basic support for setting dynamic hotkeys - i.e. letting the user set their own keyboard shortcuts. In your app, you can set up the necessary UI for [viewing the current keyboard shortcuts](#displaying-a-list-of-available-hot-keys), and opting to change them. You can then use the `recordKeyCombination` function to capture the keys the user wishes to use.
+`react-hotkeys` has basic support for setting dynamic hotkeys - i.e. letting the user set their own keyboard shortcuts at runtime. Once you have set up the necessary UI for [viewing the current keyboard shortcuts](#displaying-a-list-of-available-hot-keys) (and opting to change them), you can then use the `recordKeyCombination` function to capture the keys the user wishes to use.
 
 `recordKeyCombination` accepts a callback function that will be called on the last `keyup` of the next key combination - immediately after the user has pressed the key combination they wish to assign. The callback then unbinds itself, so you do not have to worry about tidying up after it.
 
@@ -387,7 +387,8 @@ The callback function receives a single argument with the following schema:
 ```javascript
 {
   /**
-   * Id of combination that could be used to define a keymap
+   * Combination ID that can be passed to the keyMap prop to (re)define an
+   * action's key sequence 
    */
   id: '',
   /**
@@ -395,9 +396,21 @@ The callback function receives a single argument with the following schema:
    */
   keys: { keyName: true }
 }
+
+// Example:
+
+{
+  id: 'a', 
+  keys: { a: true }
+}
 ```
+
+If you are updating hotkeys without changing focus or remounting the component that defines them, you will need to make sure you use the [`allowChanges` prop](#hotkeys-component-api) to ensure the new keymaps are honoured immediately.
  
-A basic example is:
+An example, rendering two dialogs: 
+
+* One for displaying the application's key maps using the [getApplicationKeyMap](#displaying-a-list-of-available-hot-keys) function
+* Another for telling the user when to press the keys they want to bind to an action, meanwhile listening with `recordKeyCombination()` 
 
 ```javascript
 import { recordKeyCombination } from 'react-hotkeys';
@@ -484,8 +497,6 @@ showChangeShortcutDialog(actionName) {
   });    
 }
 ```
-
-If you are updating hotkeys without changing focus or remounting the component that defines them, you will need to make sure you use the [`allowChanges` prop](#hotkeys-component-api) to ensure the new keymaps are honoured immediately.
 
 ## Defining Handlers
 

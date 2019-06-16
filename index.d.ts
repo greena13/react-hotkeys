@@ -222,7 +222,7 @@ export interface KeyCombination {
 /**
  * Function to call to cancel listening to the next key combination
  */
-declare type cancelKeyCombinationListener = () => void;
+export declare type cancelKeyCombinationListener = () => void;
 
 /**
  * Adds a listener function that will be called the next time a key combination completes

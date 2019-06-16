@@ -243,6 +243,13 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     }
   }
 
+  /**
+   * Whether the document listeners should be bound, to record key events. Basically a check
+   * to see if there are any global key maps, or whether the user is currently rebinding to
+   * a new key combination.
+   * @returns {boolean} True if the document listeners should be bound
+   * @private
+   */
   _listenersShouldBeBound() {
     return this.componentList.length > 0 || this.listeners.keyCombination;
   }

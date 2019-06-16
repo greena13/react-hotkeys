@@ -749,8 +749,8 @@ class AbstractKeyEventStrategy {
 
   /**
    * Whether there are any keys in the current combination still being pressed
-   * @protected
    * @return {Boolean} True if all keys in the current combination are released
+   * @protected
    */
   _allKeysAreReleased() {
     const currentCombination = this._getCurrentKeyCombination();
