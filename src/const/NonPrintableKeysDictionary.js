@@ -1,27 +1,10 @@
 /**
- * Dictionary of keys that do not natively have a keypress event
+ * Dictionary of keys whose name is not a single symbol or character
  */
-const NonPrintableKeysDictionary = {
-  Shift: true,
-  Control: true,
-  Alt: true,
-  Meta: true,
-  Enter: true,
-  Tab: true,
-  Backspace: true,
-  ArrowRight: true,
-  ArrowLeft: true,
-  ArrowUp: true,
-  ArrowDown: true,
-  /**
-   * Caps lock is a strange case where it not only does not have a key press event,
-   * but it's keyup event is triggered when caps lock is toggled off
-   */
-  CapsLock: true,
-};
+import dictionaryFrom from '../utils/object/dictionaryFrom';
+import translateToKey from '../vendor/react-dom/translateToKey';
 
-for(let i = 1; i < 13; i++) {
-  NonPrintableKeysDictionary[`F${i}`] = true;
-}
+const NonPrintableKeysDictionary =
+  dictionaryFrom(Object.values(translateToKey), true);
 
 export default NonPrintableKeysDictionary;
