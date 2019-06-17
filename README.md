@@ -6,6 +6,7 @@
 [![npm](https://img.shields.io/npm/dm/react-hotkeys.svg)]()
 [![Build Status](https://travis-ci.org/greena13/react-hotkeys.svg)](https://travis-ci.org/greena13/react-hotkeys)
 [![GitHub license](https://img.shields.io/github/license/greena13/react-hotkeys.svg)](https://github.com/greena13/react-hotkeys/blob/master/LICENSE)
+[![Maintainability](https://api.codeclimate.com/v1/badges/9eff94c396c9e8dd5d7b/maintainability)](https://codeclimate.com/github/greena13/react-hotkeys/maintainability)
 [![Gitter](https://img.shields.io/gitter/room/chrisui/react-hotkeys.svg)](https://gitter.im/chrisui/react-hotkeys)
 
 A declarative library for handling hotkeys and focus areas in React applications.
