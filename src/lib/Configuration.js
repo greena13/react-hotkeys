@@ -144,10 +144,14 @@ class Configuration {
    * @see _configuration
    */
   static init(configuration) {
-    const {ignoreTags} = configuration;
+    const {ignoreTags, customKeyCodes } = configuration;
 
     if (ignoreTags) {
       configuration._ignoreTagsDict = dictionaryFrom(configuration.ignoreTags);
+    }
+
+    if (customKeyCodes) {
+      configuration._customKeyNamesDict = dictionaryFrom(Object.values(configuration.customKeyCodes));
     }
 
     if (process.env.NODE_ENV === 'production') {

@@ -1,10 +1,10 @@
 import isNonPrintableKeyName from './isNonPrintableKeyName';
-import Configuration from '../../lib/Configuration';
+import isCustomKeyName from './isCustomKeyName';
 
 function isValidKey(keyName) {
   return isNonPrintableKeyName(keyName) ||
     String.fromCharCode(keyName.charCodeAt(0)) === keyName ||
-    Configuration.option('customKeyCodes')[keyName];
+    isCustomKeyName(keyName)
 }
 
 export class InvalidKeyNameError extends Error {

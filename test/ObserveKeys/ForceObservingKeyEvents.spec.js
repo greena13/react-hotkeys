@@ -5,7 +5,7 @@ import sinon from 'sinon';
 
 import FocusableElement from '../support/FocusableElement';
 
-import {HotKeys, ObserveKeys} from '../../src/';
+import { configure, HotKeys, ObserveKeys } from '../../src/';
 import Key from '../support/Key';
 
 describe('Forcing observing key events using ObserveKeys:', function () {
@@ -85,31 +85,84 @@ describe('Forcing observing key events using ObserveKeys:', function () {
     });
 
     describe('and the only option is used', () => {
-      beforeEach(function () {
-        this.wrapper = mount(
-          <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
-            <ObserveKeys only={'a'}>
-              <input className="inputElement" />
-            </ObserveKeys>
-          </HotKeys>
-        );
+      context('with a standard key', () => {
+        beforeEach(function () {
+          this.wrapper = mount(
+            <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
+              <ObserveKeys only={'a'}>
+                <input className="inputElement" />
+              </ObserveKeys>
+            </HotKeys>
+          );
 
-        this.targetElement = new FocusableElement(this.wrapper, '.inputElement');
-        this.targetElement.focus();
+          this.targetElement = new FocusableElement(this.wrapper, '.inputElement');
+          this.targetElement.focus();
+        });
+
+        it('then observes all key events that match keys in the only option', function() {
+          this.targetElement.keyDown(Key.A);
+          this.targetElement.keyPress(Key.A);
+          this.targetElement.keyUp(Key.A);
+
+          expect(this.handlerA).to.have.been.called;
+
+          this.targetElement.keyDown(Key.B);
+          this.targetElement.keyPress(Key.B);
+          this.targetElement.keyUp(Key.B);
+
+          expect(this.handlerB).to.not.have.been.called;
+        });
       });
 
-      it('then observes all key events that match keys in the only option', function() {
-        this.targetElement.keyDown(Key.A);
-        this.targetElement.keyPress(Key.A);
-        this.targetElement.keyUp(Key.A);
+      context('with a custom key', () => {
+        beforeEach(function () {
+          configure({ customKeyCodes: { 10009: 'MyKey' }});
 
-        expect(this.handlerA).to.have.been.called;
+          this.keyMap = {
+            'ACTION_A': 'MyKey',
+            'ACTION_B': 'b',
+            'ACTION_C': 'c',
+          };
 
-        this.targetElement.keyDown(Key.B);
-        this.targetElement.keyPress(Key.B);
-        this.targetElement.keyUp(Key.B);
+          this.handlerA = sinon.spy();
+          this.handlerB = sinon.spy();
+          this.handlerC = sinon.spy();
 
-        expect(this.handlerB).to.not.have.been.called;
+          this.handlers = {
+            'ACTION_A': this.handlerA,
+            'ACTION_B': this.handlerB,
+            'ACTION_C': this.handlerC,
+          };
+
+          this.wrapper = mount(
+            <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
+              <ObserveKeys only={'MyKey'}>
+                <input className="inputElement" />
+              </ObserveKeys>
+            </HotKeys>
+          );
+
+          this.targetElement = new FocusableElement(this.wrapper, '.inputElement');
+          this.targetElement.focus();
+        });
+
+        afterEach(function(){
+          configure({ customKeyCodes: {} });
+        });
+
+        it('then observes all key events that match keys in the only option', function() {
+          this.targetElement.keyDown('MyKey');
+          this.targetElement.keyPress('MyKey');
+          this.targetElement.keyUp('MyKey');
+
+          expect(this.handlerA).to.have.been.called;
+
+          this.targetElement.keyDown(Key.B);
+          this.targetElement.keyPress(Key.B);
+          this.targetElement.keyUp(Key.B);
+
+          expect(this.handlerB).to.not.have.been.called;
+        });
       });
     });
 
