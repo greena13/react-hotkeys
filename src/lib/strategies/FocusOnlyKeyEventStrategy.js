@@ -615,7 +615,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
        * down (as either keydown or keypress), then we update the state
        * to keypress or keyup (depending on the value of recordIndex).
        */
-      this._addToCurrentKeyCombination(keyName, recordIndex, KeyEventRecordState.simulated);
+      this.keyHistory.addKeyToCurrentCombination(keyName, recordIndex, KeyEventRecordState.simulated);
     }
   }
 
@@ -638,7 +638,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
        * command key is released
        */
 
-      Object.keys(this._getCurrentKeyCombination().keys).forEach((keyName) => {
+      this.keyHistory.forEachCurrentKey((keyName) => {
         if (isCmdKey(keyName)) {
           return;
         }
@@ -740,7 +740,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _startAndLogNewKeyCombination(keyName, eventRecordIndex, focusTreeId, componentId, keyEventState) {
-    this._startNewKeyCombination(keyName, eventRecordIndex, keyEventState);
+    this.keyHistory.startNewKeyCombination(keyName, eventRecordIndex, keyEventState);
 
     this.logger.verbose(
       this._logPrefix(componentId, {focusTreeId}),
@@ -754,12 +754,12 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _addToAndLogCurrentKeyCombination(keyName, eventRecordIndex, focusTreeId, componentId, keyEventState) {
-    this._addToCurrentKeyCombination(keyName, eventRecordIndex, keyEventState);
+    this.keyHistory.addKeyToCurrentCombination(keyName, eventRecordIndex, keyEventState);
 
     if (eventRecordIndex === KeyEventRecordIndex.keydown) {
       this.logger.verbose(
         this._logPrefix(componentId, {focusTreeId}),
-        `Added '${keyName}' to current combination: '${this._getCurrentKeyCombination().ids[0]}'.`
+        `Added '${keyName}' to current combination: '${this.keyHistory.describeCurrentKeyCombination()}'.`
       );
     }
 
@@ -858,7 +858,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    */
   _callHandlerIfActionNotHandled(event, keyName, eventRecordIndex, componentId, focusTreeId) {
     const eventName = describeKeyEventType(eventRecordIndex);
-    const combinationName = this._describeCurrentKeyCombination();
+    const combinationName = this.keyHistory.describeCurrentKeyCombination();
 
     if (this.keyMapEventRecord[eventRecordIndex]) {
       if (this.eventPropagationState.actionHandled) {
