@@ -28,6 +28,7 @@ import copyAttributes from '../../utils/object/copyAttributes';
 import hasKey from '../../utils/object/hasKey';
 import keyupIsHiddenByCmd from '../../helpers/resolving-handlers/keyupIsHiddenByCmd';
 import KeyEventRecordState from '../../const/KeyEventRecordState';
+import KeyCombinationHistory from '../KeyCombinationHistory';
 
 const SEQUENCE_ATTRIBUTES = ['sequence', 'action'];
 const KEYMAP_ATTRIBUTES = ['name', 'description', 'group'];
@@ -41,18 +42,6 @@ class AbstractKeyEventStrategy {
   /********************************************************************************
    * Init & Reset
    ********************************************************************************/
-
-  /**
-   * Returns a new, empty key combination
-   * @returns {KeyCombinationRecord} A new, empty key combination
-   */
-  static emptyKeyCombination() {
-    return {
-      keys: {},
-      ids: [ '' ],
-      keyAliases: {}
-    };
-  }
 
   /**
    * Creates a new instance of a event strategy (this class is an abstract one and
@@ -227,19 +216,13 @@ class AbstractKeyEventStrategy {
    *        combination history.
    */
   resetKeyCombinationHistory(options = {}) {
-    /**
-     * Whether the current key combination includes at least one keyup event - indicating
-     * that the current combination is ending (and keys are being released)
-     */
-    this.keyCombinationIncludesKeyUp = false;
-
     this.keypressEventsToSimulate = [];
 
     this.keyupEventsToSimulate = [];
 
-    if (!this.keyCombinationHistory || this.keyCombinationHistory.length < 1 || options.force) {
-      this.keyCombinationHistory = [];
-    } else {
+    const newKeyHistory = new KeyCombinationHistory();
+
+    if (this.keyHistory && this.keyHistory.any() && !options.force) {
       const currentKeyCombination = this._getCurrentKeyCombination();
 
       const keysStillPressed = Object.keys(currentKeyCombination.keys).reduce((memo, keyName) => {
@@ -253,14 +236,16 @@ class AbstractKeyEventStrategy {
         return memo;
       }, {});
 
-      this.keyCombinationHistory = [
+      newKeyHistory.push(
         {
           keys: keysStillPressed,
           ids: KeyCombinationSerializer.serialize(keysStillPressed),
           keyAliases: this._buildCombinationKeyAliases(keysStillPressed)
         }
-      ]
+      );
     }
+
+    this.keyHistory = newKeyHistory;
   }
 
   /********************************************************************************
@@ -660,11 +645,7 @@ class AbstractKeyEventStrategy {
    * @protected
    */
   _getCurrentKeyCombination() {
-    if (this.keyCombinationHistory.length > 0) {
-      return this.keyCombinationHistory[this.keyCombinationHistory.length - 1];
-    } else {
-      return this.constructor.emptyKeyCombination();
-    }
+    return this.keyHistory.getCurrentCombination();
   }
 
   /**
@@ -676,9 +657,7 @@ class AbstractKeyEventStrategy {
    * @protected
    */
   _addToCurrentKeyCombination(keyName, recordIndex, keyEventState) {
-    if (this.keyCombinationHistory.length === 0) {
-      this.keyCombinationHistory.push(this.constructor.emptyKeyCombination());
-    }
+    this.keyHistory.init();
 
     const keyCombination = this._getCurrentKeyCombination();
     const keyAlias = getKeyAlias(keyCombination, keyName);
@@ -704,13 +683,13 @@ class AbstractKeyEventStrategy {
     keyCombination.keyAliases = this._buildCombinationKeyAliases(keyCombination.keys);
 
     if (recordIndex === KeyEventRecordIndex.keyup) {
-      this.keyCombinationIncludesKeyUp = true;
+      this.keyHistory.includesKeyup = true;
     }
   }
 
   /**
-   * Adds a new KeyCombinationRecord to the event history and resets the
-   * keyCombinationIncludesKeyUp flag to false.
+   * Adds a new KeyCombinationRecord to the event history and resets the includesKeyup
+   * flag to false.
    * @param {ReactKeyName} keyName - Name of the keyboard key to add to the new
    *        KeyCombinationRecord
    * @param {KeyEventRecordIndex} eventRecordIndex - Index of bit to set to true in new
@@ -719,13 +698,13 @@ class AbstractKeyEventStrategy {
    * @protected
    */
   _startNewKeyCombination(keyName, eventRecordIndex, keyEventState) {
-    if (this.keyCombinationHistory.length > this.longestSequence) {
+    if (this.keyHistory.length() > this.longestSequence) {
       /**
        * We know the longest key sequence registered for the currently focused
        * components, so we don't need to keep a record of history longer than
        * that
        */
-      this.keyCombinationHistory.shift();
+      this.keyHistory.shift();
     }
 
     const lastKeyCombination = this._getCurrentKeyCombination();
@@ -738,13 +717,13 @@ class AbstractKeyEventStrategy {
       ]
     };
 
-    this.keyCombinationHistory.push({
+    this.keyHistory.push({
       keys,
       ids: KeyCombinationSerializer.serialize(keys),
       keyAliases: this._buildCombinationKeyAliases(keys)
     });
 
-    this.keyCombinationIncludesKeyUp = false;
+    this.keyHistory.includesKeyup = false;
   }
 
   /**
@@ -1033,7 +1012,7 @@ class AbstractKeyEventStrategy {
         let sequenceLengthCounter = longestSequence;
 
         while(sequenceLengthCounter >= 0) {
-          const sequenceHistory = this.keyCombinationHistory.slice(-sequenceLengthCounter, -1);
+          const sequenceHistory = this.keyHistory.slice(-sequenceLengthCounter, -1);
           const sequenceHistoryIds = sequenceHistory.map(({ ids }) => ids );
 
           const matchingSequence = this._tryMatchSequenceWithKeyAliases(sequences, sequenceHistoryIds);

@@ -40,7 +40,7 @@ describe('Ignoring repeated events:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.keyCombinationHistory).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Shift': [
@@ -81,7 +81,7 @@ describe('Ignoring repeated events:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.keyCombinationHistory).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Shift': [

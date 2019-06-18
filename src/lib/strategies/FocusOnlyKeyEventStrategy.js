@@ -340,7 +340,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
       const keyEventState = this._stateFromEvent(event);
 
-      if (keyInCurrentCombination || this.keyCombinationIncludesKeyUp) {
+      if (keyInCurrentCombination || this.keyHistory.includesKeyup) {
         this._startAndLogNewKeyCombination(
           _key,
           KeyEventRecordIndex.keydown,
@@ -749,7 +749,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     this.logger.verbose(
       this._logPrefix(componentId, {focusTreeId}),
-      `Key history: ${printComponent(this.keyCombinationHistory)}.`
+      `Key history: ${printComponent(this.keyHistory.toJSON())}.`
     );
   }
 
@@ -765,7 +765,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     this.logger.verbose(
       this._logPrefix(componentId, {focusTreeId}),
-      `Key history: ${printComponent(this.keyCombinationHistory)}.`
+      `Key history: ${printComponent(this.keyHistory.toJSON())}.`
     );
   }
 

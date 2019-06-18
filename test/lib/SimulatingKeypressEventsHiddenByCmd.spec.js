@@ -40,7 +40,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.keyCombinationHistory).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Meta': [
@@ -60,7 +60,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.keyCombinationHistory).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Meta': [
@@ -84,7 +84,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.keyCombinationHistory).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Meta': [
@@ -125,7 +125,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.keyCombinationHistory).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Meta': [
@@ -145,7 +145,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.keyCombinationHistory).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Meta': [
@@ -169,7 +169,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.keyCombinationHistory).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Meta': [

@@ -302,7 +302,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
       const keyEventState = this._stateFromEvent(event);
 
-      if (keyInCurrentCombination || this.keyCombinationIncludesKeyUp) {
+      if (keyInCurrentCombination || this.keyHistory.includesKeyup) {
         this._startAndLogNewKeyCombination(
           _key,
           KeyEventRecordIndex.keydown,
@@ -575,7 +575,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     this.logger.verbose(
       this._logPrefix(),
-      `Key history: ${printComponent(this.keyCombinationHistory)}.`
+      `Key history: ${printComponent(this.keyHistory.toJSON())}.`
     );
   }
 
@@ -591,7 +591,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     this.logger.verbose(
       this._logPrefix(),
-      `Key history: ${printComponent(this.keyCombinationHistory)}.`
+      `Key history: ${printComponent(this.keyHistory.toJSON())}.`
     );
   }
 
