@@ -302,10 +302,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
       const keyEventState = this._stateFromEvent(event);
 
-      if (keyInCurrentCombination || this.keyHistory.includesKeyup) {
+      if (keyInCurrentCombination || this.keyHistory.getCurrentCombination().isEnding()) {
         this._startAndLogNewKeyCombination(
           _key,
-          KeyEventRecordIndex.keydown,
           keyEventState
         );
       } else {
@@ -525,11 +524,11 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this._simulateKeyUpEventsHiddenByCmd(event, key);
 
     if (this.listeners.keyCombination && this._allKeysAreReleased()) {
-      const {keys,ids} = this.keyHistory.getCurrentCombination();
+      const currentCombination = this.keyHistory.getCurrentCombination();
 
       this.listeners.keyCombination({
-        keys: dictionaryFrom(Object.keys(keys), true),
-        id: ids[0]
+        keys: dictionaryFrom(Object.keys(currentCombination.getKeyStates()), true),
+        id: currentCombination.describe()
       });
     }
   }
@@ -551,7 +550,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
        */
       this.keyEventManager.simulatePendingKeyUpEvents();
 
-      this.keyHistory.forEachCurrentKey((keyName) => {
+      this.keyHistory.getCurrentCombination().forEachKey((keyName) => {
         if (isCmdKey(keyName)) {
           return;
         }
@@ -565,8 +564,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     }
   }
 
-  _startAndLogNewKeyCombination(keyName, eventRecordIndex, keyEventState) {
-    this.keyHistory.startNewKeyCombination(keyName, eventRecordIndex, keyEventState);
+  _startAndLogNewKeyCombination(keyName, keyEventState) {
+    this.keyHistory.startNewKeyCombination(keyName, keyEventState);
 
     this.logger.verbose(
       this._logPrefix(),
@@ -585,7 +584,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     if (eventRecordIndex === KeyEventRecordIndex.keydown) {
       this.logger.verbose(
         this._logPrefix(),
-        `Added '${keyName}' to current combination: '${this.keyHistory.describeCurrentKeyCombination()}'.`
+        `Added '${keyName}' to current combination: '${this.keyHistory.getCurrentCombination().describe()}'.`
       );
     }
 
@@ -617,7 +616,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
   _callHandlerIfExists(event, keyName, eventRecordIndex) {
     const eventName = describeKeyEventType(eventRecordIndex);
-    const combinationName = this.keyHistory.describeCurrentKeyCombination();
+    const combinationName = this.keyHistory.getCurrentCombination().describe();
 
     if (this.keyMapEventRecord[eventRecordIndex]) {
       /**

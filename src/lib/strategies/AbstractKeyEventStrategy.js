@@ -21,6 +21,7 @@ import hasKey from '../../utils/object/hasKey';
 import keyupIsHiddenByCmd from '../../helpers/resolving-handlers/keyupIsHiddenByCmd';
 import KeyEventRecordState from '../../const/KeyEventRecordState';
 import KeyCombinationHistory from '../KeyCombinationHistory';
+import KeyCombinationRecord from '../KeyCombinationRecord';
 
 const SEQUENCE_ATTRIBUTES = ['sequence', 'action'];
 const KEYMAP_ATTRIBUTES = ['name', 'description', 'group'];
@@ -164,7 +165,7 @@ class AbstractKeyEventStrategy {
     this.longestSequence = length;
 
     if (this.keyHistory) {
-      this.keyHistory.updateMaxLength(length);
+      this.keyHistory.setMaxLength(length);
     }
   }
 
@@ -229,10 +230,15 @@ class AbstractKeyEventStrategy {
 
     this.keyupEventsToSimulate = [];
 
-    if (this.keyHistory.any() && !options.force) {
-      this.keyHistory = KeyCombinationHistory.newFrom(this.keyHistory);
-    } else {
-      this._newKeyHistory();
+    const prevHistoryNonEmpty = this.keyHistory.any();
+    const keyCombinationRecord = this.keyHistory.getCurrentCombination();
+
+    this._newKeyHistory();
+
+    if (prevHistoryNonEmpty && !options.force) {
+      this.keyHistory.push(
+        new KeyCombinationRecord(keyCombinationRecord.keysStillPressedDict())
+      );
     }
   }
 
@@ -620,7 +626,7 @@ class AbstractKeyEventStrategy {
    * @protected
    */
   _allKeysAreReleased() {
-    return this.keyHistory.allKeysAreReleased();
+    return this.keyHistory.getCurrentCombination().hasEnded();
   }
 
   _shouldSimulate(eventType, keyName) {
@@ -863,18 +869,18 @@ class AbstractKeyEventStrategy {
 
         this.logger.debug(
           this._logPrefix(componentSearchIndex),
-          `Doesn't define a handler for '${this.keyHistory.describeCurrentKeyCombination()}' ${describeKeyEventType(eventRecordIndex)}.`
+          `Doesn't define a handler for '${this.keyHistory.getCurrentCombination().describe()}' ${describeKeyEventType(eventRecordIndex)}.`
         );
       } else {
         const { sequences, longestSequence } = keyMap;
 
-        const normalizedKeyName = this._getCurrentKeyAlias(keyName);
+        const normalizedKeyName = this.keyHistory.getCurrentCombination().getNormalizedKeyName(keyName);
 
         let sequenceLengthCounter = longestSequence;
 
         while(sequenceLengthCounter >= 0) {
           const sequenceHistory = this.keyHistory.slice(-sequenceLengthCounter, -1);
-          const sequenceHistoryIds = sequenceHistory.map(({ ids }) => ids );
+          const sequenceHistoryIds = sequenceHistory.map((keyCombinationRecord) => keyCombinationRecord.getIds() );
 
           const matchingSequence = this._tryMatchSequenceWithKeyAliases(sequences, sequenceHistoryIds);
 
@@ -909,7 +915,7 @@ class AbstractKeyEventStrategy {
               const combinationId = combinationOrder[combinationIndex];
               const combinationMatcher = matchingSequence.combinations[combinationId];
 
-              if (this.keyHistory.canBeMatchedBasedOnNumberOfKeys(combinationMatcher)) {
+              if (this.keyHistory.getCurrentCombination().isMatchableBy(combinationMatcher)) {
                 if (this._combinationMatchesKeys(normalizedKeyName, combinationMatcher, eventRecordIndex)) {
 
                   if (Configuration.option('allowCombinationSubmatches')) {
@@ -917,12 +923,12 @@ class AbstractKeyEventStrategy {
 
                     this.logger.debug(
                       this._logPrefix(componentSearchIndex),
-                      `Found action that matches '${this.keyHistory.describeCurrentKeyCombination()}' (sub-match: '${subMatchDescription}'): ${combinationMatcher.events[eventRecordIndex].actionName}. Calling handler . . .`
+                      `Found action that matches '${this.keyHistory.getCurrentCombination().describe()}' (sub-match: '${subMatchDescription}'): ${combinationMatcher.events[eventRecordIndex].actionName}. Calling handler . . .`
                     );
                   } else {
                     this.logger.debug(
                       this._logPrefix(componentSearchIndex),
-                      `Found action that matches '${this.keyHistory.describeCurrentKeyCombination()}': ${combinationMatcher.events[eventRecordIndex].actionName}. Calling handler . . .`
+                      `Found action that matches '${this.keyHistory.getCurrentCombination().describe()}': ${combinationMatcher.events[eventRecordIndex].actionName}. Calling handler . . .`
                     );
                   }
 
@@ -945,7 +951,7 @@ class AbstractKeyEventStrategy {
 
         this.logger.debug(
           this._logPrefix(componentSearchIndex),
-          `No matching actions found for '${this.keyHistory.describeCurrentKeyCombination()}' ${eventName}.`
+          `No matching actions found for '${this.keyHistory.getCurrentCombination().describe()}' ${eventName}.`
         );
       }
 
@@ -1035,11 +1041,11 @@ class AbstractKeyEventStrategy {
     let keyCompletesCombination = false;
 
     const combinationMatchesKeysPressed = Object.keys(combinationMatch.keyDictionary).every((candidateKeyName) => {
-      const keyState = this.keyHistory.getCurrentCombinationKeyState(candidateKeyName);
+      const keyState = this.keyHistory.getCurrentCombination().getKeyState(candidateKeyName);
 
       if (keyState) {
         if (keyIsCurrentlyTriggeringEvent(keyState, eventRecordIndex)) {
-          if (keyBeingPressed && (keyBeingPressed === this.keyHistory.getCurrentCombinationKeyAlias(candidateKeyName))) {
+          if (keyBeingPressed && (keyBeingPressed === this.keyHistory.getCurrentCombination().getNormalizedKeyName(candidateKeyName))) {
             keyCompletesCombination =
               !keyAlreadyTriggeredEvent(keyState, eventRecordIndex);
           }
@@ -1087,7 +1093,7 @@ class AbstractKeyEventStrategy {
 
        ModifierFlagsDictionary[modifierKey].forEach((attributeName) => {
          if (event[attributeName] === false && modifierStillPressed) {
-           this.keyHistory.addKeyToCurrentCombination(
+           this.keyHistory.getCurrentCombination().setKeyState(
              modifierKey,
              KeyEventRecordIndex.keyup,
              this._stateFromEvent(event)
@@ -1107,11 +1113,7 @@ class AbstractKeyEventStrategy {
   }
 
   _getCurrentKeyState(keyName) {
-    return this.keyHistory.getCurrentCombinationKeyState(keyName);
-  }
-
-  _getCurrentKeyAlias(keyName) {
-    return this.keyHistory.getCurrentCombinationKeyAlias(keyName);
+    return this.keyHistory.getCurrentCombination().getKeyState(keyName);
   }
 
   _setComponentPosition(componentId, position) {

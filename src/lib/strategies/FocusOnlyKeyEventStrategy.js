@@ -340,10 +340,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
       const keyEventState = this._stateFromEvent(event);
 
-      if (keyInCurrentCombination || this.keyHistory.includesKeyup) {
+      if (keyInCurrentCombination || this.keyHistory.getCurrentCombination().isEnding()) {
         this._startAndLogNewKeyCombination(
           _key,
-          KeyEventRecordIndex.keydown,
           focusTreeId,
           componentId,
           keyEventState
@@ -615,7 +614,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
        * down (as either keydown or keypress), then we update the state
        * to keypress or keyup (depending on the value of recordIndex).
        */
-      this.keyHistory.addKeyToCurrentCombination(keyName, recordIndex, KeyEventRecordState.simulated);
+      this.keyHistory.getCurrentCombination().setKeyState(keyName, recordIndex, KeyEventRecordState.simulated);
     }
   }
 
@@ -632,13 +631,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
   _simulateKeyUpEventsHiddenByCmd(event, key, focusTreeId, componentId, options) {
     if (isCmdKey(key)) {
-      /**
-       * When the command key is pressed down with other non-modifier keys, the browser
-       * does not trigger the keyup event of those keys, so we simulate them when the
-       * command key is released
-       */
-
-      this.keyHistory.forEachCurrentKey((keyName) => {
+      this.keyHistory.getCurrentCombination().forEachKey((keyName) => {
         if (isCmdKey(keyName)) {
           return;
         }
@@ -651,7 +644,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
             event, key: keyName, focusTreeId, componentId, options
           }
         );
-      })
+      });
     }
   }
 
@@ -739,8 +732,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     };
   }
 
-  _startAndLogNewKeyCombination(keyName, eventRecordIndex, focusTreeId, componentId, keyEventState) {
-    this.keyHistory.startNewKeyCombination(keyName, eventRecordIndex, keyEventState);
+  _startAndLogNewKeyCombination(keyName, focusTreeId, componentId, keyEventState) {
+    this.keyHistory.startNewKeyCombination(keyName, keyEventState);
 
     this.logger.verbose(
       this._logPrefix(componentId, {focusTreeId}),
@@ -759,7 +752,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     if (eventRecordIndex === KeyEventRecordIndex.keydown) {
       this.logger.verbose(
         this._logPrefix(componentId, {focusTreeId}),
-        `Added '${keyName}' to current combination: '${this.keyHistory.describeCurrentKeyCombination()}'.`
+        `Added '${keyName}' to current combination: '${this.keyHistory.getCurrentCombination().describe()}'.`
       );
     }
 
@@ -858,7 +851,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    */
   _callHandlerIfActionNotHandled(event, keyName, eventRecordIndex, componentId, focusTreeId) {
     const eventName = describeKeyEventType(eventRecordIndex);
-    const combinationName = this.keyHistory.describeCurrentKeyCombination();
+    const combinationName = this.keyHistory.getCurrentCombination().describe();
 
     if (this.keyMapEventRecord[eventRecordIndex]) {
       if (this.eventPropagationState.actionHandled) {
