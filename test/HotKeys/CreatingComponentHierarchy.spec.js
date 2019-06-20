@@ -30,7 +30,7 @@ describe('Creating component hierarchy for HotKeys:', () => {
     });
 
     it('then builds the correct component registry', function() {
-      expect(KeyEventManager.getInstance()._focusOnlyEventStrategy.componentRegistry).to.eql({
+      expect(KeyEventManager.getInstance()._focusOnlyEventStrategy.componentRegistry.toJSON()).to.eql({
         0: {
           parentId: null,
           childIds: [1]
@@ -60,7 +60,7 @@ describe('Creating component hierarchy for HotKeys:', () => {
     });
 
     it('then builds the correct component registry', function() {
-      expect(KeyEventManager.getInstance()._focusOnlyEventStrategy.componentRegistry).to.eql({
+      expect(KeyEventManager.getInstance()._focusOnlyEventStrategy.componentRegistry.toJSON()).to.eql({
         0: {
           parentId: null,
           childIds: [1]
@@ -91,7 +91,7 @@ describe('Creating component hierarchy for HotKeys:', () => {
     });
 
     it('then builds the correct component registry', function() {
-      expect(KeyEventManager.getInstance()._focusOnlyEventStrategy.componentRegistry).to.eql({
+      expect(KeyEventManager.getInstance()._focusOnlyEventStrategy.componentRegistry.toJSON()).to.eql({
         0: {
           parentId: null,
           childIds: [1, 2]
@@ -131,7 +131,7 @@ describe('Creating component hierarchy for HotKeys:', () => {
     });
 
     it('then builds the correct component registry', function() {
-      expect(KeyEventManager.getInstance()._focusOnlyEventStrategy.componentRegistry).to.eql({
+      expect(KeyEventManager.getInstance()._focusOnlyEventStrategy.componentRegistry.toJSON()).to.eql({
         0: {
           parentId: null,
           childIds: [1, 4, 6]
@@ -199,7 +199,7 @@ describe('Creating component hierarchy for HotKeys:', () => {
       });
 
       it('then builds the correct component registry', function() {
-        expect(KeyEventManager.getInstance()._focusOnlyEventStrategy.componentRegistry).to.eql({
+        expect(KeyEventManager.getInstance()._focusOnlyEventStrategy.componentRegistry.toJSON()).to.eql({
           0: {
             parentId: null,
             childIds: [3]
@@ -233,7 +233,7 @@ describe('Creating component hierarchy for HotKeys:', () => {
       });
 
       it('then builds the correct component registry', function() {
-        expect(KeyEventManager.getInstance()._focusOnlyEventStrategy.componentRegistry).to.eql({
+        expect(KeyEventManager.getInstance()._focusOnlyEventStrategy.componentRegistry.toJSON()).to.eql({
           0: {
             parentId: null,
             childIds: [1]
@@ -265,7 +265,7 @@ describe('Creating component hierarchy for HotKeys:', () => {
       });
 
       it('then builds the correct component registry', function() {
-        expect(KeyEventManager.getInstance()._focusOnlyEventStrategy.componentRegistry).to.eql({
+        expect(KeyEventManager.getInstance()._focusOnlyEventStrategy.componentRegistry.toJSON()).to.eql({
           0: {
             parentId: null,
             childIds: [1]

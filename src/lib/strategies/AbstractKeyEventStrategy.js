@@ -13,7 +13,6 @@ import KeySequenceParser from '../KeySequenceParser';
 import printComponent from '../../helpers/logging/printComponent';
 import Configuration from '../Configuration';
 import ModifierFlagsDictionary from '../../const/ModifierFlagsDictionary';
-import without from '../../utils/collection/without';
 import hasKeyPressEvent from '../../helpers/resolving-handlers/hasKeyPressEvent';
 import keyIsCurrentlyTriggeringEvent from '../../helpers/parsing-key-maps/keyIsCurrentlyTriggeringEvent';
 import copyAttributes from '../../utils/object/copyAttributes';
@@ -24,6 +23,7 @@ import KeyCombinationHistory from '../KeyCombinationHistory';
 import KeyCombinationRecord from '../KeyCombinationRecord';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 import Registry from '../Registry';
+import ComponentRegistry from '../ComponentRegistry';
 
 const SEQUENCE_ATTRIBUTES = ['sequence', 'action'];
 const KEYMAP_ATTRIBUTES = ['name', 'description', 'group'];
@@ -79,7 +79,7 @@ class AbstractKeyEventStrategy {
 
     this.keyMapRegistry = new Registry();
 
-    this.componentRegistry = {};
+    this.componentRegistry = new ComponentRegistry();
 
     this.rootComponentId = null;
 
@@ -265,7 +265,7 @@ class AbstractKeyEventStrategy {
 
   _buildApplicationKeyMap(componentIds, keyMapSummary) {
     componentIds.forEach((componentId) => {
-      const component = this.componentRegistry[componentId];
+      const component = this.componentRegistry.get(componentId);
       const keyMap = this.keyMapRegistry.get(componentId);
 
       if (keyMap) {
@@ -365,12 +365,12 @@ class AbstractKeyEventStrategy {
       `${printComponent(keyMap)}`
     );
 
-    this.componentRegistry[this.componentId] = newComponentRegistryItem();
+    this.componentRegistry.add(this.componentId);
 
     this.logger.verbose(
       this._logPrefix(this.componentId),
       'Registered component:\n',
-      `${printComponent(this.componentRegistry[this.componentId])}`
+      `${printComponent(this.componentRegistry.get(this.componentId))}`
     );
 
     return this.componentId;
@@ -393,8 +393,7 @@ class AbstractKeyEventStrategy {
    */
   registerComponentMount(componentId, parentId) {
     if (!isUndefined(parentId)) {
-      this.componentRegistry[componentId].parentId = parentId;
-      this.componentRegistry[parentId].childIds.push(componentId);
+      this.componentRegistry.setParent(componentId, parentId);
     } else {
       this.rootComponentId = componentId;
     }
@@ -402,7 +401,7 @@ class AbstractKeyEventStrategy {
     this.logger.verbose(
       this._logPrefix(componentId),
       'Registered component mount:\n',
-      `${printComponent(this.componentRegistry[componentId])}`
+      `${printComponent(this.componentRegistry.get(componentId))}`
     );
   }
 
@@ -412,19 +411,12 @@ class AbstractKeyEventStrategy {
    *        belongs to
    */
   deregisterKeyMap(componentId) {
-    const parentId = this.componentRegistry[componentId].parentId;
-    const parent = this.componentRegistry[parentId];
-
-    if (parent) {
-      parent.childIds = without(parent.childIds, componentId);
-    }
-
-    delete this.componentRegistry[componentId];
+    this.componentRegistry.remove(componentId);
 
     this.logger.verbose(
       this._logPrefix(componentId),
       'De-registered component. Remaining component Registry:\n',
-      `${printComponent(this.componentRegistry)}`
+      `${printComponent(this.componentRegistry.toJSON())}`
     );
 
     this.keyMapRegistry.remove(componentId);
@@ -1149,13 +1141,6 @@ class AbstractKeyEventStrategy {
   _logPrefix() {
 
   }
-}
-
-function newComponentRegistryItem() {
-  return {
-    childIds: [],
-    parentId: null
-  };
 }
 
 function keyAlreadyTriggeredEvent(keyState, eventRecordIndex) {
