@@ -23,7 +23,7 @@ import KeyEventRecordState from '../../const/KeyEventRecordState';
 import KeyCombinationHistory from '../KeyCombinationHistory';
 import KeyCombinationRecord from '../KeyCombinationRecord';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
-import KeyMapRegistry from '../KeyMapRegistry';
+import Registry from '../Registry';
 
 const SEQUENCE_ATTRIBUTES = ['sequence', 'action'];
 const KEYMAP_ATTRIBUTES = ['name', 'description', 'group'];
@@ -77,7 +77,7 @@ class AbstractKeyEventStrategy {
      */
     this.keyEventManager = keyEventManager;
 
-    this.keyMapRegistry = new KeyMapRegistry();
+    this.keyMapRegistry = new Registry();
 
     this.componentRegistry = {};
 
@@ -266,7 +266,7 @@ class AbstractKeyEventStrategy {
   _buildApplicationKeyMap(componentIds, keyMapSummary) {
     componentIds.forEach((componentId) => {
       const component = this.componentRegistry[componentId];
-      const keyMap = this.keyMapRegistry.getKeyMap(componentId);
+      const keyMap = this.keyMapRegistry.get(componentId);
 
       if (keyMap) {
         Object.keys(keyMap).forEach((actionName) => {
@@ -357,7 +357,7 @@ class AbstractKeyEventStrategy {
   registerKeyMap(keyMap) {
     this.componentId += 1;
 
-    this.keyMapRegistry.addKeyMap(this.componentId, keyMap);
+    this.keyMapRegistry.set(this.componentId, keyMap);
 
     this.logger.verbose(
       this._logPrefix(this.componentId),
@@ -382,7 +382,7 @@ class AbstractKeyEventStrategy {
    * @param {KeyMap} keyMap - Map of actions to key expressions
    */
   reregisterKeyMap(componentId, keyMap) {
-    this.keyMapRegistry.addKeyMap(componentId, keyMap);
+    this.keyMapRegistry.set(componentId, keyMap);
   }
 
   /**
@@ -427,7 +427,7 @@ class AbstractKeyEventStrategy {
       `${printComponent(this.componentRegistry)}`
     );
 
-    this.keyMapRegistry.removeKeyMap(componentId);
+    this.keyMapRegistry.remove(componentId);
 
     this.logger.verbose(
       this._logPrefix(componentId),

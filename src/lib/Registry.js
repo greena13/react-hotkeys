@@ -1,17 +1,17 @@
-class KeyMapRegistry {
+class Registry {
   constructor() {
     this._registry = {};
   }
 
-  getKeyMap(id) {
+  get(id) {
     return this._registry[id];
   }
 
-  addKeyMap(id, keyMap) {
-    this._registry[id] = keyMap;
+  set(id, item) {
+    this._registry[id] = item;
   }
 
-  removeKeyMap(id) {
+  remove(id) {
     delete this._registry[id];
   }
 
@@ -20,4 +20,4 @@ class KeyMapRegistry {
   }
 }
 
-export default KeyMapRegistry;
+export default Registry;
