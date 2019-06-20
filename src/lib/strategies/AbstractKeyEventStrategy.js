@@ -85,6 +85,7 @@ class AbstractKeyEventStrategy {
     this._reset();
 
     this._newKeyHistory();
+    this.keyHistory.init();
 
     this.resetKeyCombinationHistory();
   }

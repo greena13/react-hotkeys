@@ -7,6 +7,14 @@ class KeyCombinationHistory {
     this.maxLength = maxLength;
   }
 
+  init(record = null) {
+    if (record) {
+      this.push(record);
+    } else if (this.isEmpty()) {
+      this.push(new KeyCombinationRecord())
+    }
+  }
+
   push(record) {
     if (this.getLength() > this.maxLength) {
       /**
@@ -41,11 +49,7 @@ class KeyCombinationHistory {
   }
 
   getCurrentCombination() {
-    if (this.any()) {
-      return this.records[this.getLength() - 1];
-    } else {
-      return new KeyCombinationRecord();
-    }
+    return this.records[this.getLength() - 1];
   }
 
   toJSON() {
