@@ -15,6 +15,7 @@ import isCmdKey from '../../helpers/parsing-key-maps/isCmdKey';
 import EventResponse from '../../const/EventResponse';
 import contains from '../../utils/collection/contains';
 import dictionaryFrom from '../../utils/object/dictionaryFrom';
+import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 
 /**
  * Defines behaviour for dealing with key maps defined in global HotKey components
@@ -300,9 +301,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     if (reactAppResponse !== EventResponse.ignored) {
       const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
-      const keyEventState = this._stateFromEvent(event);
+      const keyEventState = stateFromEvent(event);
 
-      if (keyInCurrentCombination || this.keyHistory.getCurrentCombination().isEnding()) {
+      if (keyInCurrentCombination || this.getCurrentCombination().isEnding()) {
         this._startAndLogNewKeyCombination(
           _key,
           keyEventState
@@ -412,7 +413,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this._addToAndLogCurrentKeyCombination(
         key,
         KeyEventRecordIndex.keypress,
-        this._stateFromEvent(event)
+        stateFromEvent(event)
       );
     }
 
@@ -481,7 +482,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this._addToAndLogCurrentKeyCombination(
         key,
         KeyEventRecordIndex.keyup,
-        this._stateFromEvent(event)
+        stateFromEvent(event)
       );
     }
 
@@ -524,7 +525,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this._simulateKeyUpEventsHiddenByCmd(event, key);
 
     if (this.listeners.keyCombination && this._allKeysAreReleased()) {
-      const currentCombination = this.keyHistory.getCurrentCombination();
+      const currentCombination = this.getCurrentCombination();
 
       this.listeners.keyCombination({
         keys: dictionaryFrom(Object.keys(currentCombination.getKeyStates()), true),
@@ -550,7 +551,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
        */
       this.keyEventManager.simulatePendingKeyUpEvents();
 
-      this.keyHistory.getCurrentCombination().forEachKey((keyName) => {
+      this.getCurrentCombination().forEachKey((keyName) => {
         if (isCmdKey(keyName)) {
           return;
         }
@@ -584,7 +585,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     if (eventRecordIndex === KeyEventRecordIndex.keydown) {
       this.logger.verbose(
         this._logPrefix(),
-        `Added '${keyName}' to current combination: '${this.keyHistory.getCurrentCombination().describe()}'.`
+        `Added '${keyName}' to current combination: '${this.getCurrentCombination().describe()}'.`
       );
     }
 
@@ -616,7 +617,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
   _callHandlerIfExists(event, keyName, eventRecordIndex) {
     const eventName = describeKeyEventType(eventRecordIndex);
-    const combinationName = this.keyHistory.getCurrentCombination().describe();
+    const combinationName = this.getCurrentCombination().describe();
 
     if (this.keyMapEventRecord[eventRecordIndex]) {
       /**

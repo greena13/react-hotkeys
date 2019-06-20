@@ -8,10 +8,6 @@ import isEmpty from '../utils/collection/isEmpty';
 import Configuration from './Configuration';
 
 class KeyCombinationRecord {
-  static createFromRemainingKeys(otherRecord){
-    return new KeyCombinationRecord(otherRecord.keysStillPressedDict());
-  }
-
   constructor(keys = {}) {
     this._keys = keys;
     this._includesKeyup = false;
@@ -167,6 +163,10 @@ class KeyCombinationRecord {
       return keyStateKeysNo === combinationKeysNo;
     }
   }
+
+  /********************************************************************************
+   * Presentation
+   *********************************************************************************/
 
   describe() {
     return this.getIds()[0];

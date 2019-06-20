@@ -80,7 +80,7 @@ class KeyCombinationHistory {
     this._ensureInitialKeyCombination();
 
     const newCombinationRecord =
-      KeyCombinationRecord.createFromRemainingKeys(this.getCurrentCombination());
+      new KeyCombinationRecord(this.getCurrentCombination().keysStillPressedDict());
 
     newCombinationRecord.addKey(keyName, keyEventState);
 

@@ -12,6 +12,7 @@ import keyIsCurrentlyTriggeringEvent from '../../helpers/parsing-key-maps/keyIsC
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 import EventResponse from '../../const/EventResponse';
 import KeyEventRecordState from '../../const/KeyEventRecordState';
+import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 
 /**
  * Defines behaviour for dealing with key maps defined in focus-only HotKey components
@@ -338,9 +339,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     if (responseAction === EventResponse.handled) {
       const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
 
-      const keyEventState = this._stateFromEvent(event);
+      const keyEventState = stateFromEvent(event);
 
-      if (keyInCurrentCombination || this.keyHistory.getCurrentCombination().isEnding()) {
+      if (keyInCurrentCombination || this.getCurrentCombination().isEnding()) {
         this._startAndLogNewKeyCombination(
           _key,
           focusTreeId,
@@ -475,7 +476,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         KeyEventRecordIndex.keypress,
         focusTreeId,
         componentId,
-        this._stateFromEvent(event)
+        stateFromEvent(event)
       );
     }
 
@@ -564,7 +565,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         KeyEventRecordIndex.keyup,
         focusTreeId,
         componentId,
-        this._stateFromEvent(event)
+        stateFromEvent(event)
       );
     }
 
@@ -614,7 +615,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
        * down (as either keydown or keypress), then we update the state
        * to keypress or keyup (depending on the value of recordIndex).
        */
-      this.keyHistory.getCurrentCombination().setKeyState(keyName, recordIndex, KeyEventRecordState.simulated);
+      this.getCurrentCombination().setKeyState(keyName, recordIndex, KeyEventRecordState.simulated);
     }
   }
 
@@ -631,7 +632,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
   _simulateKeyUpEventsHiddenByCmd(event, key, focusTreeId, componentId, options) {
     if (isCmdKey(key)) {
-      this.keyHistory.getCurrentCombination().forEachKey((keyName) => {
+      this.getCurrentCombination().forEachKey((keyName) => {
         if (isCmdKey(keyName)) {
           return;
         }
@@ -752,7 +753,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     if (eventRecordIndex === KeyEventRecordIndex.keydown) {
       this.logger.verbose(
         this._logPrefix(componentId, {focusTreeId}),
-        `Added '${keyName}' to current combination: '${this.keyHistory.getCurrentCombination().describe()}'.`
+        `Added '${keyName}' to current combination: '${this.getCurrentCombination().describe()}'.`
       );
     }
 
@@ -851,7 +852,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    */
   _callHandlerIfActionNotHandled(event, keyName, eventRecordIndex, componentId, focusTreeId) {
     const eventName = describeKeyEventType(eventRecordIndex);
-    const combinationName = this.keyHistory.getCurrentCombination().describe();
+    const combinationName = this.getCurrentCombination().describe();
 
     if (this.keyMapEventRecord[eventRecordIndex]) {
       if (this.eventPropagationState.actionHandled) {
