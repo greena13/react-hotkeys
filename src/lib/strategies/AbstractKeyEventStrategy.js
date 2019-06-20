@@ -23,6 +23,7 @@ import KeyEventRecordState from '../../const/KeyEventRecordState';
 import KeyCombinationHistory from '../KeyCombinationHistory';
 import KeyCombinationRecord from '../KeyCombinationRecord';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
+import KeyMapRegistry from '../KeyMapRegistry';
 
 const SEQUENCE_ATTRIBUTES = ['sequence', 'action'];
 const KEYMAP_ATTRIBUTES = ['name', 'description', 'group'];
@@ -76,7 +77,7 @@ class AbstractKeyEventStrategy {
      */
     this.keyEventManager = keyEventManager;
 
-    this.keyMapRegistry = {};
+    this.keyMapRegistry = new KeyMapRegistry();
 
     this.componentRegistry = {};
 
@@ -265,7 +266,7 @@ class AbstractKeyEventStrategy {
   _buildApplicationKeyMap(componentIds, keyMapSummary) {
     componentIds.forEach((componentId) => {
       const component = this.componentRegistry[componentId];
-      const keyMap = this.keyMapRegistry[componentId];
+      const keyMap = this.keyMapRegistry.getKeyMap(componentId);
 
       if (keyMap) {
         Object.keys(keyMap).forEach((actionName) => {
@@ -356,7 +357,7 @@ class AbstractKeyEventStrategy {
   registerKeyMap(keyMap) {
     this.componentId += 1;
 
-    this.keyMapRegistry[this.componentId] = keyMap;
+    this.keyMapRegistry.addKeyMap(this.componentId, keyMap);
 
     this.logger.verbose(
       this._logPrefix(this.componentId),
@@ -381,7 +382,7 @@ class AbstractKeyEventStrategy {
    * @param {KeyMap} keyMap - Map of actions to key expressions
    */
   reregisterKeyMap(componentId, keyMap) {
-    this.keyMapRegistry[componentId] = keyMap;
+    this.keyMapRegistry.addKeyMap(componentId, keyMap);
   }
 
   /**
@@ -426,12 +427,12 @@ class AbstractKeyEventStrategy {
       `${printComponent(this.componentRegistry)}`
     );
 
-    delete this.keyMapRegistry[componentId];
+    this.keyMapRegistry.removeKeyMap(componentId);
 
     this.logger.verbose(
       this._logPrefix(componentId),
       'De-registered key map. Remaining key map Registry:\n',
-      `${printComponent(this.keyMapRegistry)}`
+      `${printComponent(this.keyMapRegistry.toJSON())}`
     );
 
     if (componentId === this.rootComponentId) {
