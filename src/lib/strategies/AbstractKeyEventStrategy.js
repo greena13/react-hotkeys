@@ -24,6 +24,7 @@ import KeyCombinationRecord from '../KeyCombinationRecord';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 import Registry from '../Registry';
 import ComponentRegistry from '../ComponentRegistry';
+import ComponentList from '../ComponentList';
 
 const SEQUENCE_ATTRIBUTES = ['sequence', 'action'];
 const KEYMAP_ATTRIBUTES = ['name', 'description', 'group'];
@@ -114,23 +115,7 @@ class AbstractKeyEventStrategy {
    * the _buildKeyMatcherMap() method and this method should not be called.
    */
   _initRegisteredKeyMapsState() {
-    /**
-     * Object containing a component's defined key maps and handlers
-     * @typedef {Object} ComponentOptions
-     * @property {ActionDictionary} actions - Dictionary of actions the component
-     *          has defined in its keymap
-     * @property {HandlersMap} handlers - Dictionary of handler functions the
-     *          component has defined
-     * @property {ComponentId} componentId - Index of the component the options
-     *          correspond with
-     */
-
-    /**
-     * List of actions and handlers registered by each component currently in focus.
-     * The component closest to the element in focus is last in the list.
-     * @type {ComponentOptions[]}
-     */
-    this.componentList = [];
+    this.componentList = new ComponentList();
 
     /**
      * Counter for the longest sequence registered by the HotKeys components currently
@@ -454,9 +439,7 @@ class AbstractKeyEventStrategy {
       options
     );
 
-    this.componentList.push(componentOptions);
-
-    this._setComponentPosition(componentId, this.componentList.length - 1);
+    this.componentList.add(componentId, componentOptions);
   }
 
   /**
@@ -687,8 +670,8 @@ class AbstractKeyEventStrategy {
          * sequence.
          */
 
-        while (this.handlerResolutionSearchIndex < this.componentList.length && unmatchedHandlersCount > 0) {
-          const { handlers, actions } = this.componentList[this.handlerResolutionSearchIndex];
+        while (this.handlerResolutionSearchIndex < this.componentList.getLength() && unmatchedHandlersCount > 0) {
+          const { handlers, actions } = this.componentList.getAtIndex(this.handlerResolutionSearchIndex);
 
           /**
            * Add current component's handlers to the handlersDictionary so we know
@@ -717,7 +700,7 @@ class AbstractKeyEventStrategy {
               const handlerComponentIndex = handlerComponentIndexArray[0];
 
               const handler =
-                this.componentList[handlerComponentIndex].handlers[actionName];
+                this.componentList.getAtIndex(handlerComponentIndex).handlers[actionName];
 
               /**
                * Get key map that corresponds with the component that defines the handler
@@ -1113,24 +1096,6 @@ class AbstractKeyEventStrategy {
 
   _getCurrentKeyState(keyName) {
     return this.getCurrentCombination().getKeyState(keyName);
-  }
-
-  _setComponentPosition(componentId, position) {
-    this.componentIdDict[componentId] = position;
-  }
-
-  _getComponentPosition(componentId){
-    return this.componentIdDict[componentId];
-  }
-
-  _getComponent(componentId){
-    const componentPosition = this._getComponentPosition(componentId);
-    return this.componentList[componentPosition];
-  }
-
-  _getComponentAndPosition(componentId){
-    const componentPosition = this._getComponentPosition(componentId);
-    return [ this.componentList[componentPosition], componentPosition ];
   }
 
   /**

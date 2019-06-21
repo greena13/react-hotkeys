@@ -164,7 +164,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this.resetOnNextFocus = false;
     }
 
-    if (this._getComponent(componentId)) {
+    if (this.componentList.containsId(componentId)) {
       /**
        * The <tt>componentId</tt> has already been registered - this occurs when the
        * same component has somehow managed to be focused twice, without being blurred
@@ -187,12 +187,10 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       'Focused. \n'
     );
 
-    const component = this._getComponent(componentId);
-
     this.logger.verbose(
       this._logPrefix(componentId, { eventId: false }),
       'Component options:\n',
-      printComponent(component)
+      printComponent(this.componentList.get(componentId))
     );
 
     return this.focusTreeId;
@@ -212,18 +210,16 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *        and handlers are associated and called.
    */
   updateEnabledHotKeys(focusTreeId, componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
-    const componentPosition = this._getComponentPosition(componentId);
-
-    if (focusTreeId !== this.focusTreeId || isUndefined(componentPosition)) {
+    if (focusTreeId !== this.focusTreeId || !this.componentList.containsId(componentId)) {
       return;
     }
 
-    this.componentList[componentPosition] = this._buildComponentOptions(
+    this.componentList.update(componentId, this._buildComponentOptions(
       componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options
-    );
+    ));
 
     this.logger.debug(
       this._logPrefix(componentId, {focusTreeId, eventId: false}),
@@ -235,12 +231,10 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      */
     this._initHandlerResolutionState();
 
-    const component = this._getComponent(componentId);
-
     this.logger.verbose(
       this._logPrefix(componentId, {focusTreeId, eventId: false}),
       'Component options:\n',
-      printComponent(component)
+      printComponent(this.componentList.get(componentId))
     );
   }
 
@@ -257,10 +251,13 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this.resetOnNextFocus = true;
     }
 
-    const componentPosition = this._getComponentPosition(componentId);
+    const componentPosition = this.componentList.getIndexById(componentId);
 
-    const previousComponentPosition = this.eventPropagationState.previousComponentPosition;
-    const outstandingEventPropagation = previousComponentPosition !== -1 && (previousComponentPosition + 1) < componentPosition;
+    const previousComponentPosition =
+      this.eventPropagationState.previousComponentPosition;
+
+    const outstandingEventPropagation =
+      previousComponentPosition !== -1 && (previousComponentPosition + 1) < componentPosition;
 
     this.logger.debug(
       `${this._logPrefix(componentId, {focusTreeId, eventId: false})}`,
@@ -334,7 +331,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      * the focus or content in the render tree, causing the component to be de-registered
      * and have its position lost
      */
-    const componentPosition = this._getComponentPosition(componentId);
+    const componentPosition = this.componentList.getIndexById(componentId);
 
     if (responseAction === EventResponse.handled) {
       const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
@@ -486,7 +483,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      * the focus or content in the render tree, causing the component to be de-registered
      * and have its position lost
      */
-    const componentPosition = this._getComponentPosition(componentId);
+    const componentPosition = this.componentList.getIndexById(componentId);
 
     /**
      * We attempt to find a handler of the event, only if it has not already
@@ -575,7 +572,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      * the focus or content in the render tree, causing the component to be de-registered
      * and have its position lost
      */
-    const componentPosition = this._getComponentPosition(componentId);
+    const componentPosition = this.componentList.getIndexById(componentId);
 
     /**
      * We attempt to find a handler of the event, only if it has not already
@@ -652,7 +649,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   _ignoreEvent(event, componentId) {
     this.currentEvent.ignored = true;
 
-    const componentPosition = this._getComponentPosition(componentId);
+    const componentPosition = this.componentList.getIndexById(componentId);
 
     if(this._stopEventPropagationAfterIgnoringIfEnabled(event, componentId)) {
       this._updateEventPropagationHistory(componentId, componentPosition, { forceReset: true });
@@ -684,7 +681,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   _isNewKeyEvent(componentId) {
     const { previousComponentPosition } = this.eventPropagationState;
 
-    return previousComponentPosition === -1 || previousComponentPosition >= this._getComponentPosition(componentId);
+    return previousComponentPosition === -1 || previousComponentPosition >= this.componentList.getIndexById(componentId);
   }
 
   _updateEventPropagationHistory(componentId, componentPosition, options = { forceReset: false }) {
@@ -719,7 +716,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _isFocusTreeRoot(componentId) {
-    return this._getComponentPosition(componentId) >= this.componentList.length - 1;
+    return this.componentList.getIndexById(componentId) >= this.componentList.getLength() - 1;
   }
 
   _setNewEventParameters(event, type) {
@@ -868,7 +865,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
         const { previousComponentPosition } = this.eventPropagationState;
 
-        const componentPosition = this._getComponentPosition(componentId);
+        const componentPosition = this.componentList.getIndexById(componentId);
 
         const handlerWasCalled =
           this._callMatchingHandlerClosestToEventTarget(
@@ -916,7 +913,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     base += `C${componentId}${componentIcons[componentId % componentIcons.length]}`;
 
-    const position = this._getComponentPosition(componentId);
+    const position = this.componentList.getIndexById(componentId);
 
     if (!isUndefined(position)) {
       base += `-P${position}${componentIcons[position % componentIcons.length]}:`

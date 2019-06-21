@@ -5,7 +5,6 @@ import capitalize from '../../utils/string/capitalize';
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import KeyEventCounter from '../KeyEventCounter';
 import Logger from '../Logger';
-import removeAtIndex from '../../utils/array/removeAtIndex';
 import isUndefined from '../../utils/isUndefined';
 import printComponent from '../../helpers/logging/printComponent';
 import getKeyName from '../../helpers/resolving-handlers/getKeyName';
@@ -93,7 +92,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this.logger.verbose(
       this._logPrefix(componentId, {eventId: false}),
       'Component options: \n',
-      printComponent(this._getComponent(componentId))
+      printComponent(this.componentList.get(componentId))
     );
   }
 
@@ -111,19 +110,17 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   updateEnabledHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
     this.eventOptions = eventOptions;
 
-    const componentPosition = this._getComponentPosition(componentId);
-
     /**
      * Manually update the registered key map state, usually reset using
      * _resetRegisteredKeyMapsState() method
      */
 
-    this.componentList[componentPosition] = this._buildComponentOptions(
+    this.componentList.update(componentId, this._buildComponentOptions(
       componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options
-    );
+    ));
 
     this._updateLongestKeySequenceIfNecessary(componentId);
 
@@ -146,7 +143,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this.logger.verbose(
       this._logPrefix(componentId, {eventId: false}),
       'Component options: \n',
-      printComponent(this._getComponent(componentId))
+      printComponent(this.componentList.get(componentId))
     );
   }
 
@@ -155,21 +152,15 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {ComponentId} componentId - Index of component that is being unmounted
    */
   disableHotKeys(componentId) {
-    const [{ keyMapEventRecord }, componentPosition ] =
-      this._getComponentAndPosition(componentId);
+    const { keyMapEventRecord } = this.componentList.get(componentId);
 
     /**
      * Manually update the registered key map state, usually reset using
      * _resetRegisteredKeyMapsState() method
      */
-    this.componentList = removeAtIndex(this.componentList, componentPosition);
+    this.componentList.remove(componentId);
 
     this._updateLongestKeySequenceIfNecessary(componentId);
-
-    /**
-     * Reset strategy state specific to the global strategy
-     */
-    this._updateComponentIndexDictFromList({ startingAt: componentPosition });
 
     this._updateDocumentHandlers(
       keyMapEventRecord,
@@ -196,15 +187,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
           this.longestSequence = longestSequence;
         }
       });
-    }
-  }
-
-  _updateComponentIndexDictFromList(options = { startingAt: 0 }) {
-    let counter = options.startingAt;
-
-    while(counter < this.componentList.length) {
-      this._setComponentPosition(this.componentList[counter].componentId, counter);
-      counter++;
     }
   }
 
@@ -252,7 +234,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * @private
    */
   _listenersShouldBeBound() {
-    return this.componentList.length > 0 || this.listeners.keyCombination;
+    return this.componentList.getLength() > 0 || this.listeners.keyCombination;
   }
 
   /********************************************************************************
@@ -649,7 +631,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _callMatchingHandlerClosestToEventTarget(event, keyName, eventRecordIndex) {
-    for(let componentPosition = 0; componentPosition < this.componentList.length; componentPosition++) {
+    for(let componentPosition = 0; componentPosition < this.componentList.getLength(); componentPosition++) {
       const matchFound = super._callMatchingHandlerClosestToEventTarget(
         event,
         keyName,
