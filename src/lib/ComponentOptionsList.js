@@ -1,6 +1,6 @@
 import removeAtIndex from '../utils/array/removeAtIndex';
 
-class ComponentList {
+class ComponentOptionsList {
   constructor() {
     /**
      * Object containing a component's defined key maps and handlers
@@ -20,6 +20,11 @@ class ComponentList {
      */
     this._list = [];
 
+    /**
+     * Set of ComponentOptions indexed by ComponentId to allow efficient retrieval
+     * when components need to be updated or unmounted by their ComponentId
+     * @type {Object<ComponentId, ComponentOptions>}
+     */
     this._idToIndex = {};
   }
 
@@ -85,4 +90,4 @@ class ComponentList {
   }
 }
 
-export default ComponentList;
+export default ComponentOptionsList;

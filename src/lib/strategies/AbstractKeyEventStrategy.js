@@ -24,7 +24,7 @@ import KeyCombinationRecord from '../KeyCombinationRecord';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 import Registry from '../Registry';
 import ComponentRegistry from '../ComponentRegistry';
-import ComponentList from '../ComponentList';
+import ComponentOptionsList from '../ComponentOptionsList';
 
 const SEQUENCE_ATTRIBUTES = ['sequence', 'action'];
 const KEYMAP_ATTRIBUTES = ['name', 'description', 'group'];
@@ -115,7 +115,7 @@ class AbstractKeyEventStrategy {
    * the _buildKeyMatcherMap() method and this method should not be called.
    */
   _initRegisteredKeyMapsState() {
-    this.componentList = new ComponentList();
+    this.componentList = new ComponentOptionsList();
 
     /**
      * Counter for the longest sequence registered by the HotKeys components currently
@@ -140,13 +140,6 @@ class AbstractKeyEventStrategy {
      * @type {KeyEventRecord}
      */
     this.keyMapEventRecord = KeyEventRecordManager.newRecord();
-
-    /**
-     * Set of ComponentOptions indexed by ComponentId to allow efficient retrieval
-     * when components need to be updated or unmounted by their ComponentId
-     * @type {Object<ComponentId, ComponentOptions>}
-     */
-    this.componentIdDict = {};
   }
 
   _updateLongestSequence(length) {
