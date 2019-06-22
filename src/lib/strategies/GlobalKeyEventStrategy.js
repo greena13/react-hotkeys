@@ -1,4 +1,3 @@
-import KeyEventRecordManager from '../KeyEventRecordManager';
 import KeyEventRecordIndex from '../../const/KeyEventRecordIndex';
 import AbstractKeyEventStrategy from './AbstractKeyEventStrategy';
 import capitalize from '../../utils/string/capitalize';
@@ -110,24 +109,18 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   updateEnabledHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
     this.eventOptions = eventOptions;
 
-    /**
-     * Manually update the registered key map state, usually reset using
-     * _resetRegisteredKeyMapsState() method
-     */
-
-    this.componentList.update(componentId, this._buildComponentOptions(
+    this.componentList.update(
       componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options
-    ));
+    );
 
-    this._updateLongestKeySequenceIfNecessary(componentId);
+    this.getKeyHistory().setMaxLength(this.componentList.getLongestSequence());
 
     /**
      * Reset strategy state specific to the global strategy
      */
-
     this._updateDocumentHandlers();
 
     /**
@@ -152,7 +145,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {ComponentId} componentId - Index of component that is being unmounted
    */
   disableHotKeys(componentId) {
-    const { keyMapEventRecord } = this.componentList.get(componentId);
 
     /**
      * Manually update the registered key map state, usually reset using
@@ -160,12 +152,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      */
     this.componentList.remove(componentId);
 
-    this._updateLongestKeySequenceIfNecessary(componentId);
+    this.getKeyHistory().setMaxLength(this.componentList.getLongestSequence());
 
-    this._updateDocumentHandlers(
-      keyMapEventRecord,
-      KeyEventRecordManager.newRecord()
-    );
+    this._updateDocumentHandlers();
 
     /**
      * Reset handler resolution state
@@ -178,23 +167,11 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     );
   }
 
-  _updateLongestKeySequenceIfNecessary(componentId) {
-    if (componentId === this.longestSequenceComponentIndex) {
-      this.longestSequence = 1;
-
-      this.componentList.forEach(({longestSequence}) => {
-        if(longestSequence > this.longestSequence) {
-          this.longestSequence = longestSequence;
-        }
-      });
-    }
-  }
-
   _updateDocumentHandlers(){
     const listenersShouldBeBound = this._listenersShouldBeBound();
 
     if (!this.listenersBound && listenersShouldBeBound) {
-      for(let recordIndex = 0; recordIndex < this.keyMapEventRecord.length; recordIndex++) {
+      this.componentList.forEachKeyEventType((recordIndex) => {
         const eventName = describeKeyEventType(recordIndex);
 
         document[`on${eventName}`] = (keyEvent) => {
@@ -205,13 +182,13 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
           this._logPrefix(this.componentId, {eventId: false}),
           `Bound handler handleGlobal${capitalize(eventName)}() to document.on${eventName}()`
         );
-      }
+      });
 
       this.listenersBound = true;
 
     } else if(this.listenersBound && !listenersShouldBeBound) {
 
-      for(let recordIndex = 0; recordIndex < this.keyMapEventRecord.length; recordIndex++) {
+      this.componentList.forEachKeyEventType((recordIndex) => {
         const eventName = describeKeyEventType(recordIndex);
 
         delete document[`on${eventName}`];
@@ -220,7 +197,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
           this._logPrefix(this.componentId, {eventId: false}),
           `Removed handler handleGlobal${capitalize(eventName)}() from document.on${eventName}()`
         );
-      }
+      });
 
       this.listenersBound = false;
     }
@@ -234,7 +211,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * @private
    */
   _listenersShouldBeBound() {
-    return this.componentList.getLength() > 0 || this.listeners.keyCombination;
+    return this.componentList.any() || this.listeners.keyCombination;
   }
 
   /********************************************************************************
@@ -548,7 +525,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _startAndLogNewKeyCombination(keyName, keyEventState) {
-    this.keyHistory.startNewKeyCombination(keyName, keyEventState);
+    this.getKeyHistory().startNewKeyCombination(keyName, keyEventState);
 
     this.logger.verbose(
       this._logPrefix(),
@@ -557,12 +534,12 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     this.logger.verbose(
       this._logPrefix(),
-      `Key history: ${printComponent(this.keyHistory.toJSON())}.`
+      `Key history: ${printComponent(this.getKeyHistory().toJSON())}.`
     );
   }
 
   _addToAndLogCurrentKeyCombination(keyName, eventRecordIndex, keyEventState) {
-    this.keyHistory.addKeyToCurrentCombination(keyName, eventRecordIndex, keyEventState);
+    this.getKeyHistory().addKeyToCurrentCombination(keyName, eventRecordIndex, keyEventState);
 
     if (eventRecordIndex === KeyEventRecordIndex.keydown) {
       this.logger.verbose(
@@ -573,7 +550,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     this.logger.verbose(
       this._logPrefix(),
-      `Key history: ${printComponent(this.keyHistory.toJSON())}.`
+      `Key history: ${printComponent(this.getKeyHistory().toJSON())}.`
     );
   }
 
@@ -601,7 +578,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     const eventName = describeKeyEventType(eventRecordIndex);
     const combinationName = this.getCurrentCombination().describe();
 
-    if (this.keyMapEventRecord[eventRecordIndex]) {
+    if (this.componentList.isAtLeastOneActionBoundToEvent(eventRecordIndex)) {
       /**
        * If there is at least one handler for the specified key event type (keydown,
        * keypress, keyup), then attempt to find a handler that matches the current

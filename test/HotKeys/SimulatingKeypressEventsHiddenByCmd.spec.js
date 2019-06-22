@@ -59,7 +59,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
       it('then simulates the cmd keypress event and the non-modifier key\'s keypress event', function () {
         this.targetElement.keyDown(Key.COMMAND);
 
-        expect(this.keyEventManager._focusOnlyEventStrategy.keyHistory.toJSON()).to.eql([
+        expect(this.keyEventManager._focusOnlyEventStrategy.getKeyHistory().toJSON()).to.eql([
           {
             'keys': {
               'Meta': [
@@ -72,7 +72,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
           }
         ]);
 
-        expect(this.keyEventManager._globalEventStrategy.keyHistory.toJSON()).to.eql([
+        expect(this.keyEventManager._globalEventStrategy.getKeyHistory().toJSON()).to.eql([
           {
             'keys': {
               'Meta': [
@@ -87,7 +87,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
 
         this.targetElement.keyDown(Key.A);
 
-        expect(this.keyEventManager._focusOnlyEventStrategy.keyHistory.toJSON()).to.eql([
+        expect(this.keyEventManager._focusOnlyEventStrategy.getKeyHistory().toJSON()).to.eql([
           {
             'keys': {
               'Meta': [
@@ -104,7 +104,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
           }
         ]);
 
-        expect(this.keyEventManager._globalEventStrategy.keyHistory.toJSON()).to.eql([
+        expect(this.keyEventManager._globalEventStrategy.getKeyHistory().toJSON()).to.eql([
           {
             'keys': {
               'Meta': [
@@ -123,7 +123,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
 
         this.targetElement.keyUp(Key.COMMAND);
 
-        expect(this.keyEventManager._focusOnlyEventStrategy.keyHistory.toJSON()).to.eql([
+        expect(this.keyEventManager._focusOnlyEventStrategy.getKeyHistory().toJSON()).to.eql([
           {
             'keys': {
               'Meta': [
@@ -140,7 +140,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
           }
         ]);
 
-        expect(this.keyEventManager._globalEventStrategy.keyHistory.toJSON()).to.eql([
+        expect(this.keyEventManager._globalEventStrategy.getKeyHistory().toJSON()).to.eql([
           {
             'keys': {
               'Meta': [
@@ -207,7 +207,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
       it('then simulates the cmd keypress event and the non-modifier key\'s keypress event', function () {
         this.targetElement.keyDown(Key.COMMAND);
 
-        expect(this.keyEventManager._focusOnlyEventStrategy.keyHistory.toJSON()).to.eql([
+        expect(this.keyEventManager._focusOnlyEventStrategy.getKeyHistory().toJSON()).to.eql([
           {
             'keys': {
               'Meta': [
@@ -220,7 +220,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
           }
         ]);
 
-        expect(this.keyEventManager._globalEventStrategy.keyHistory.toJSON()).to.eql([
+        expect(this.keyEventManager._globalEventStrategy.getKeyHistory().toJSON()).to.eql([
           {
             'keys': {
               'Meta': [
@@ -235,7 +235,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
 
         this.targetElement.keyDown(Key.A);
 
-        expect(this.keyEventManager._focusOnlyEventStrategy.keyHistory.toJSON()).to.eql([
+        expect(this.keyEventManager._focusOnlyEventStrategy.getKeyHistory().toJSON()).to.eql([
           {
             'keys': {
               'Meta': [
@@ -252,7 +252,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
           }
         ]);
 
-        expect(this.keyEventManager._globalEventStrategy.keyHistory.toJSON()).to.eql([
+        expect(this.keyEventManager._globalEventStrategy.getKeyHistory().toJSON()).to.eql([
           {
             'keys': {
               'Meta': [
@@ -271,7 +271,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
 
         this.targetElement.keyUp(Key.COMMAND);
 
-        expect(this.keyEventManager._focusOnlyEventStrategy.keyHistory.toJSON()).to.eql([
+        expect(this.keyEventManager._focusOnlyEventStrategy.getKeyHistory().toJSON()).to.eql([
           {
             'keys': {
               'Meta': [
@@ -288,7 +288,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
           }
         ]);
 
-        expect(this.keyEventManager._globalEventStrategy.keyHistory.toJSON()).to.eql([
+        expect(this.keyEventManager._globalEventStrategy.getKeyHistory().toJSON()).to.eql([
           {
             'keys': {
               'Meta': [

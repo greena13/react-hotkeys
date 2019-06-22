@@ -65,7 +65,7 @@ describe('Correcting for missed keyup events for modifier keys:', function () {
               this.eventOptions
             );
 
-            expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
+            expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
               {
                 'keys': {
                   [key]: [

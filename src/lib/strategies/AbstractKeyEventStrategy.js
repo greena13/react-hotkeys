@@ -9,7 +9,6 @@ import isUndefined from '../../utils/isUndefined';
 import isEmpty from '../../utils/collection/isEmpty';
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import KeyEventSequenceIndex from '../../const/KeyEventSequenceIndex';
-import KeySequenceParser from '../KeySequenceParser';
 import printComponent from '../../helpers/logging/printComponent';
 import Configuration from '../Configuration';
 import ModifierFlagsDictionary from '../../const/ModifierFlagsDictionary';
@@ -86,9 +85,6 @@ class AbstractKeyEventStrategy {
 
     this._reset();
 
-    this._newKeyHistory();
-    this.keyHistory.init();
-
     this.resetKeyCombinationHistory();
   }
 
@@ -97,57 +93,29 @@ class AbstractKeyEventStrategy {
    * @protected
    */
   _reset() {
-    this._initRegisteredKeyMapsState();
+    this.componentList = new ComponentOptionsList();
+
     this._initHandlerResolutionState();
   }
 
   _newKeyHistory() {
-    this.keyHistory = new KeyCombinationHistory({
-      maxLength: this.longestSequence
+    const keyHistory = new KeyCombinationHistory({
+      maxLength: this.componentList.getLongestSequence()
     });
+
+    keyHistory.init();
+
+    return keyHistory;
   }
 
-  /**
-   * Resets all state used to record information about the keymaps that HotKey
-   * components have registered.
-   *
-   * After initialization, this state is generally maintained manually by
-   * the _buildKeyMatcherMap() method and this method should not be called.
-   */
-  _initRegisteredKeyMapsState() {
-    this.componentList = new ComponentOptionsList();
-
-    /**
-     * Counter for the longest sequence registered by the HotKeys components currently
-     * in focus. Allows setting an upper bound on the length of the key event history
-     * that must be kept.
-     * @type {Number}
-     */
-    this.longestSequence = 1;
-
-    /**
-     * The component index of the component that defines the longest key sequence, so
-     * we can quickly determine if the longest sequence needs to be re-calculated when
-     * that component is updated or removed.
-     * @type {ComponentId}
-     */
-    this.longestSequenceComponentIndex = null;
-
-    /**
-     * Record to record whether there is at least one keymap bound to each event type
-     * (keydown, keypress or keyup) so that we can skip trying to find a matching keymap
-     * on events where we know there is none to find
-     * @type {KeyEventRecord}
-     */
-    this.keyMapEventRecord = KeyEventRecordManager.newRecord();
-  }
-
-  _updateLongestSequence(length) {
-    this.longestSequence = length;
-
-    if (this.keyHistory) {
-      this.keyHistory.setMaxLength(length);
+  getKeyHistory() {
+    if (this._keyHistory) {
+      return this._keyHistory;
+    } else {
+      this._keyHistory = this._newKeyHistory();
     }
+
+    return this._keyHistory;
   }
 
   /**
@@ -211,13 +179,14 @@ class AbstractKeyEventStrategy {
 
     this.keyupEventsToSimulate = [];
 
-    const prevHistoryNonEmpty = this.keyHistory.any();
+    const keyHistory = this.getKeyHistory();
+    const prevHistoryNonEmpty = keyHistory.any();
     const keyCombinationRecord = this.getCurrentCombination();
 
-    this._newKeyHistory();
+    this._keyHistory = this._newKeyHistory();
 
     if (prevHistoryNonEmpty && !options.force) {
-      this.keyHistory.push(
+      keyHistory.push(
         new KeyCombinationRecord(keyCombinationRecord.keysStillPressedDict())
       );
     }
@@ -425,166 +394,13 @@ class AbstractKeyEventStrategy {
    * @protected
    */
   _addComponentToList(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
-    const componentOptions = this._buildComponentOptions(
-      componentId,
+    this.componentList.add(componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options
     );
 
-    this.componentList.add(componentId, componentOptions);
-  }
-
-  /**
-   * Builds the internal representation that described the options passed to a HotKeys
-   * component
-   * @param {ComponentId} componentId - Index of the component
-   * @param {KeyMap} actionNameToKeyMap - Definition of actions and key maps defined
-   *        in the HotKeys component
-   * @param {HandlersMap} actionNameToHandlersMap - Map of ActionNames to handlers
-   *        defined in the HotKeys component
-   * @param {Object} options - Hash of options that configure how the key map is built.
-   * @param {String} options.defaultKeyEvent - The default key event to use for any
-   *        action that does not explicitly define one.
-   * @returns {ComponentOptions} Options for the specified component
-   * @protected
-   */
-  _buildComponentOptions(componentId, actionNameToKeyMap, actionNameToHandlersMap, options) {
-    const { keyMap: hardSequenceKeyMap, handlers: includingHardSequenceHandlers } =
-      this._applyHardSequences(actionNameToKeyMap, actionNameToHandlersMap);
-
-    return {
-      actions: this._buildActionDictionary(
-        {
-          ...actionNameToKeyMap,
-          ...hardSequenceKeyMap
-        },
-        options,
-        componentId
-      ),
-      handlers: includingHardSequenceHandlers,
-      componentId,
-      options
-    };
-  }
-
-  /**
-   * Applies hard sequences (handlers attached to actions with names that are valid
-   * KeySequenceStrings) that implicitly define a corresponding action name.
-   * @param {KeyMap} actionNameToKeyMap - KeyMap specified by HotKeys component
-   * @param {HandlersMap} actionNameToHandlersMap - HandlersMap specified by HotKeys
-   *        component
-   * @returns {{keyMap: {}, handlers: {}}} Object containing keymap and handlers map
-   *        with the hard sequence actions applied
-   * @private
-   */
-  _applyHardSequences(actionNameToKeyMap, actionNameToHandlersMap) {
-    if (Configuration.option('enableHardSequences')) {
-      return Object.keys(actionNameToHandlersMap).reduce((memo, actionNameOrKeyExpression) => {
-        const actionNameIsInKeyMap = !!actionNameToKeyMap[actionNameOrKeyExpression];
-
-        if (!actionNameIsInKeyMap && KeyCombinationSerializer.isValidKeySerialization(actionNameOrKeyExpression)) {
-          memo.keyMap[actionNameOrKeyExpression] = actionNameOrKeyExpression;
-        }
-
-        memo.handlers[actionNameOrKeyExpression] =
-          actionNameToHandlersMap[actionNameOrKeyExpression];
-
-        return memo;
-      }, {keyMap: {}, handlers: {}});
-    } else {
-      return { keyMap: actionNameToKeyMap, handlers: actionNameToHandlersMap };
-    }
-  }
-
-  /**
-   * Object containing all the information required to match a key event to an action
-   * @typedef {Object} ActionConfiguration
-   * @property {KeyCombinationString} id - String description of keys involved in the
-   *          final key combination in the sequence
-   * @property {ActionName} actionName - Name of the action associated with the key map
-   * @property {NormalizedKeySequenceId} prefix - String describing sequence of key
-   *          combinations involved key map, before the final key combination
-   * @property {Number} sequenceLength - Number of combinations involved in the
-   *           sequence
-   * @property {Number} size - Number of keys involved in the combination
-   * @property {Object.<KeyName, Boolean>} keyDictionary - Dictionary of key names involved
-   *           in the key combination
-   * @property {KeyEventRecordIndex} eventRecordIndex - Record index for key event that
-   *          the matcher should match on
-   */
-
-  /**
-   * A mapping between ActionNames and FullKeyEventOptions
-   * @typedef {Object<ActionName,ActionConfiguration>} ActionDictionary
-   */
-
-  /**
-   * Returns a mapping between ActionNames and FullKeyEventOptions
-   * @param {KeyMap} actionNameToKeyMap - Mapping of ActionNames to key sequences.
-   * @param {Object} options - Hash of options that configure how the key map is built.
-   * @param {String} options.defaultKeyEvent - The default key event to use for any
-   *        action that does not explicitly define one.
-   * @param {ComponentId} componentId Index of the component the matcher belongs to
-   * @return {ActionDictionary} Map from ActionNames to FullKeyEventOptions
-   * @private
-   */
-  _buildActionDictionary(actionNameToKeyMap, options, componentId) {
-    return Object.keys(actionNameToKeyMap).reduce((keyMapMemo, actionName) => {
-      const keyMapConfig = actionNameToKeyMap[actionName];
-
-      const keyMapOptions = function(){
-        if (isObject(keyMapConfig) && hasKey(keyMapConfig, 'sequences')) {
-          return arrayFrom(keyMapConfig.sequences)
-        } else {
-          return arrayFrom(keyMapConfig);
-        }
-      }();
-
-      keyMapOptions.forEach((keyMapOption) => {
-        const { keySequence, eventRecordIndex } = function(){
-          if (isObject(keyMapOption)) {
-            const { sequence, action } = keyMapOption;
-
-            return {
-              keySequence: sequence,
-              eventRecordIndex: isUndefined(action) ? KeyEventRecordIndex[options.defaultKeyEvent] : KeyEventRecordIndex[action]
-            };
-          } else {
-            return {
-              keySequence: keyMapOption,
-              eventRecordIndex: KeyEventRecordIndex[options.defaultKeyEvent]
-            }
-          }
-        }();
-
-        const { sequence, combination } = KeySequenceParser.parse(keySequence, { eventRecordIndex });
-
-        if (sequence.size > this.longestSequence) {
-          this._updateLongestSequence(sequence.size);
-          this.longestSequenceComponentIndex = componentId;
-        }
-
-        /**
-         * Record that there is at least one key sequence in the focus tree bound to
-         * the keyboard event
-         */
-        this.keyMapEventRecord[eventRecordIndex] = true;
-
-        if (!keyMapMemo[actionName]) {
-          keyMapMemo[actionName] = [];
-        }
-
-        keyMapMemo[actionName].push({
-          prefix: sequence.prefix,
-          actionName,
-          sequenceLength: sequence.size,
-          ...combination,
-        });
-      });
-
-      return keyMapMemo;
-    }, {});
+    this.getKeyHistory().setMaxLength(this.componentList.getLongestSequence());
   }
 
   /********************************************************************************
@@ -601,7 +417,7 @@ class AbstractKeyEventStrategy {
   }
 
   getCurrentCombination() {
-    return this.keyHistory.getCurrentCombination();
+    return this.getKeyHistory().getCurrentCombination();
   }
 
   _shouldSimulate(eventType, keyName) {
@@ -854,7 +670,7 @@ class AbstractKeyEventStrategy {
         let sequenceLengthCounter = longestSequence;
 
         while(sequenceLengthCounter >= 0) {
-          const sequenceHistory = this.keyHistory.slice(-sequenceLengthCounter, -1);
+          const sequenceHistory = this.getKeyHistory().slice(-sequenceLengthCounter, -1);
           const sequenceHistoryIds = sequenceHistory.map((keyCombinationRecord) => keyCombinationRecord.getIds() );
 
           const matchingSequence = this._tryMatchSequenceWithKeyAliases(sequences, sequenceHistoryIds);

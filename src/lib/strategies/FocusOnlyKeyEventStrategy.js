@@ -214,12 +214,13 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       return;
     }
 
-    this.componentList.update(componentId, this._buildComponentOptions(
-      componentId,
+    this.componentList.update(componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options
-    ));
+    );
+
+    this.getKeyHistory().setMaxLength(this.componentList.getLongestSequence());
 
     this.logger.debug(
       this._logPrefix(componentId, {focusTreeId, eventId: false}),
@@ -731,7 +732,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _startAndLogNewKeyCombination(keyName, focusTreeId, componentId, keyEventState) {
-    this.keyHistory.startNewKeyCombination(keyName, keyEventState);
+    this.getKeyHistory().startNewKeyCombination(keyName, keyEventState);
 
     this.logger.verbose(
       this._logPrefix(componentId, {focusTreeId}),
@@ -740,12 +741,12 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     this.logger.verbose(
       this._logPrefix(componentId, {focusTreeId}),
-      `Key history: ${printComponent(this.keyHistory.toJSON())}.`
+      `Key history: ${printComponent(this.getKeyHistory().toJSON())}.`
     );
   }
 
   _addToAndLogCurrentKeyCombination(keyName, eventRecordIndex, focusTreeId, componentId, keyEventState) {
-    this.keyHistory.addKeyToCurrentCombination(keyName, eventRecordIndex, keyEventState);
+    this.getKeyHistory().addKeyToCurrentCombination(keyName, eventRecordIndex, keyEventState);
 
     if (eventRecordIndex === KeyEventRecordIndex.keydown) {
       this.logger.verbose(
@@ -756,7 +757,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     this.logger.verbose(
       this._logPrefix(componentId, {focusTreeId}),
-      `Key history: ${printComponent(this.keyHistory.toJSON())}.`
+      `Key history: ${printComponent(this.getKeyHistory().toJSON())}.`
     );
   }
 
@@ -851,7 +852,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const eventName = describeKeyEventType(eventRecordIndex);
     const combinationName = this.getCurrentCombination().describe();
 
-    if (this.keyMapEventRecord[eventRecordIndex]) {
+    if (this.componentList.isAtLeastOneActionBoundToEvent(eventRecordIndex)) {
       if (this.eventPropagationState.actionHandled) {
         this.logger.debug(
           this._logPrefix(componentId, {focusTreeId}),
