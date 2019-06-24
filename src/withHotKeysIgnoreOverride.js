@@ -11,6 +11,7 @@ import resolveShiftedAlias from './helpers/resolving-handlers/resolveShiftedAlia
 import resolveUnshiftedAlias from './helpers/resolving-handlers/resolveUnshiftedAlias';
 import resolveAltedAlias from './helpers/resolving-handlers/resolveAltedAlias';
 import resolveUnaltedAlias from './helpers/resolving-handlers/resolveUnaltedAlias';
+import hasKey from './utils/object/hasKey';
 
 /**
  * Wraps a React component in a HotKeysIgnoreOverride component, which passes down the
@@ -95,13 +96,13 @@ function withHotKeysIgnoreOverride(Component, hotKeysIgnoreOptions = { only: [],
         if (isEmpty(this._exceptDict)) {
           return true;
         } else {
-          return !this._exceptDict[key];
+          return !hasKey(this._exceptDict,key);
         }
       } else {
         if (isEmpty(this._exceptDict)) {
-          return this._onlyDict[key];
+          return hasKey(this._onlyDict,key);
         } else {
-          return this._onlyDict[key] && !this._exceptDict[key];
+          return hasKey(this._onlyDict,key) && !hasKey(this._exceptDict,key);
         }
       }
     }

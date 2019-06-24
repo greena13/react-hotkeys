@@ -69,7 +69,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   enableHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
     this.eventOptions = eventOptions;
 
-    this._addComponentToList(
+    this._addComponent(
       componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,

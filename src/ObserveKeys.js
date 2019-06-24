@@ -22,5 +22,5 @@ class ObserveKeys extends Component {
   }
 }
 
-export default withHotKeysIgnoreOverride(ObserveKeys, {}, 'forceObserveEvent');
+export default withHotKeysIgnoreOverride(ObserveKeys, {}, 'observeIgnoredEvents');
 

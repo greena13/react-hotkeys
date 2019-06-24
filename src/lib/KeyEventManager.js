@@ -125,8 +125,8 @@ class KeyEventManager {
 
   _clearKeyHistory() {
     this.logger.info('HotKeys: Window focused - clearing key history');
-    this._focusOnlyEventStrategy.resetKeyCombinationHistory({ force: true });
-    this._globalEventStrategy.resetKeyCombinationHistory({ force: true });
+    this._focusOnlyEventStrategy.resetKeyHistory({ force: true });
+    this._globalEventStrategy.resetKeyHistory({ force: true });
   }
 
   /**
@@ -411,7 +411,7 @@ class KeyEventManager {
    * @see Configuration.ignoreEventsCondition
    */
   ignoreEvent(event) {
-    this._focusOnlyEventStrategy.ignoreEvent(event);
+    this._focusOnlyEventStrategy.getEventPropagator().ignoreEvent(event);
   }
 
   /**
@@ -420,8 +420,8 @@ class KeyEventManager {
    * @param {KeyboardEvent} event keyboard event to force the observation of
    * @see Configuration.ignoreEventsCondition
    */
-  forceObserveEvent(event) {
-    this._focusOnlyEventStrategy.forceObserveEvent(event);
+  observeIgnoredEvents(event) {
+    this._focusOnlyEventStrategy.getEventPropagator().observeIgnoredEvents(event);
   }
 
   /**
@@ -437,12 +437,13 @@ class KeyEventManager {
   }
 
   reactAppHistoryWithEvent(key, type) {
-    const { currentEvent } = this._focusOnlyEventStrategy;
+    const previousPropagation =
+      this._focusOnlyEventStrategy.eventPropagator.getPreviousPropagation();
 
-    if (currentEvent.key === key && currentEvent.type === type) {
-      if (currentEvent.handled) {
+    if (previousPropagation && previousPropagation.getKey() === key && previousPropagation.getEventType() === type) {
+      if (previousPropagation.isHandled()) {
         return EventResponse.handled;
-      } else if (currentEvent.ignored) {
+      } else if (previousPropagation.isIgnoringEvent()) {
         return EventResponse.ignored;
       } else {
         return EventResponse.seen;

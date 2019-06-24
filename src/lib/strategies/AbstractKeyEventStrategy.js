@@ -83,9 +83,11 @@ class AbstractKeyEventStrategy {
 
     this.rootComponentId = null;
 
+    this.componentList = new ComponentOptionsList();
+
     this._reset();
 
-    this.resetKeyCombinationHistory();
+    this.resetKeyHistory();
   }
 
   /**
@@ -93,8 +95,7 @@ class AbstractKeyEventStrategy {
    * @protected
    */
   _reset() {
-    this.componentList = new ComponentOptionsList();
-
+    this.componentList.clear();
     this._initHandlerResolutionState();
   }
 
@@ -174,7 +175,7 @@ class AbstractKeyEventStrategy {
    * @param {Boolean} options.force Whether to force a hard reset of the key
    *        combination history.
    */
-  resetKeyCombinationHistory(options = {}) {
+  resetKeyHistory(options = {}) {
     this.keypressEventsToSimulate = [];
 
     this.keyupEventsToSimulate = [];
@@ -393,7 +394,7 @@ class AbstractKeyEventStrategy {
    * @param {Object} options - Hash of options that configure how the key map is built.
    * @protected
    */
-  _addComponentToList(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
+  _addComponent(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
     this.componentList.add(componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
@@ -752,16 +753,6 @@ class AbstractKeyEventStrategy {
 
   _stopEventPropagationAfterHandlingIfEnabled(event, componentId) {
     if (Configuration.option('stopEventPropagationAfterHandling')) {
-      this._stopEventPropagation(event, componentId);
-
-      return true;
-    }
-
-    return false;
-  }
-
-  _stopEventPropagationAfterIgnoringIfEnabled(event, componentId) {
-    if (Configuration.option('stopEventPropagationAfterIgnoring')) {
       this._stopEventPropagation(event, componentId);
 
       return true;

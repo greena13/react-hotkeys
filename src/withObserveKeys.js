@@ -8,7 +8,7 @@ import withHotKeysIgnoreOverride from './withHotKeysIgnoreOverride';
  * to be recorded.
  */
 function withObserveKeys(Component, hotKeysIgnoreOptions = { only: [], except: [] }) {
-  return withHotKeysIgnoreOverride(Component, hotKeysIgnoreOptions, 'forceObserveEvent');
+  return withHotKeysIgnoreOverride(Component, hotKeysIgnoreOptions, 'observeIgnoredEvents');
 }
 
 export default withObserveKeys;

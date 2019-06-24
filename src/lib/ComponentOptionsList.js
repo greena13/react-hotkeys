@@ -21,7 +21,10 @@ class ComponentOptionsList {
      * @property {ComponentId} componentId - Index of the component the options
      *          correspond with
      */
+    this.clear();
+  }
 
+  clear() {
     /**
      * List of actions and handlers registered by each component currently in focus.
      * The component closest to the element in focus is last in the list.
@@ -187,6 +190,10 @@ class ComponentOptionsList {
 
   any() {
     return this.getLength() !== 0;
+  }
+
+  isRoot(id) {
+    return this.getIndexById(id) >= this.getLength() - 1;
   }
 
   /**

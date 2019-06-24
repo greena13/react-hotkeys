@@ -13,6 +13,7 @@ import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 import EventResponse from '../../const/EventResponse';
 import KeyEventRecordState from '../../const/KeyEventRecordState';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
+import EventPropagator from '../EventPropagator';
 
 /**
  * Defines behaviour for dealing with key maps defined in focus-only HotKey components
@@ -44,31 +45,6 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      * @type {FocusTreeId}
      */
     this.focusTreeId = 0;
-
-    /**
-     * Record of the event currently bubbling up through the React application (and
-     * beyond). This state is *not* cleared when the event propagation is finished
-     * or when the component focus tree changes. It persists until it is overridden
-     * by a new event, so that the global strategy is able to inspect the last
-     * event seen by the React application, even after focus is lost.
-     */
-    this.currentEvent = {
-      /**
-       * The name of the key the event belongs to
-       * @type {ReactKeyName}
-       */
-      key: null,
-
-      /**
-       * The event record index of the type of key event
-       * @type {KeyEventRecordIndex}
-       */
-      type: null,
-
-      handled: false,
-
-      ignored: false,
-    };
   }
 
   /**
@@ -87,54 +63,10 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      */
     this.focusTreeId += 1;
 
-    this._clearEventPropagationState();
-  }
-
-  /**
-   * Clears the history that is maintained for the duration of a single keyboard event's
-   * propagation up the React component tree towards the root component, so that the
-   * next keyboard event starts with a clean state.
-   * @private
-   */
-  _clearEventPropagationState() {
-    /**
-     * Object containing state of a key events propagation up the render tree towards
-     * the document root
-     * @type {{previousComponentPosition: number, actionHandled: boolean}}}
-     */
-    this.eventPropagationState = {
-      /**
-       * Index of the component last seen to be handling a key event
-       * @type {ComponentId}
-       */
-      previousComponentPosition: -1,
-
-      /**
-       * Whether the keyboard event currently being handled has already matched a
-       * handler function that has been called
-       * @type {Boolean}
-       */
-      actionHandled: false,
-
-      /**
-       * Whether the keyboard event current being handled should be ignored
-       * @type {Boolean}
-       */
-      ignoreEvent: false,
-
-      /**
-       * Whether the keyboard event current being handled should be observed, even
-       * if matches the ignoreEventCondition
-       * @type {Boolean}
-       */
-      forceObserveEvent: false,
-
-      /**
-       * Whether the strategy is in the process of stopping propagation and tidying
-       * up
-       */
-      stopping: false
-    };
+    this.eventPropagator = new EventPropagator(this.componentList, {
+      logger: this.logger,
+      logPrefix: this._logPrefix.bind(this)
+    });
   }
 
   /********************************************************************************
@@ -175,7 +107,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       return undefined;
     }
 
-    this._addComponentToList(
+    this._addComponent(
       componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
@@ -252,13 +184,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this.resetOnNextFocus = true;
     }
 
-    const componentPosition = this.componentList.getIndexById(componentId);
-
-    const previousComponentPosition =
-      this.eventPropagationState.previousComponentPosition;
-
-    const outstandingEventPropagation =
-      previousComponentPosition !== -1 && (previousComponentPosition + 1) < componentPosition;
+    const outstandingEventPropagation = this.eventPropagator.isPendingPropagation();
 
     this.logger.debug(
       `${this._logPrefix(componentId, {focusTreeId, eventId: false})}`,
@@ -294,61 +220,54 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * @returns Whether the event was discarded because it was part of an old focus tree
    */
   handleKeydown(event, focusTreeId, componentId, options = {}) {
-    const _key = getKeyName(event);
-
-    if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
-      this.logger.debug(
-        this._logPrefix(componentId),
-        `Ignored repeated ${describeKeyEvent(event, _key, KeyEventRecordIndex.keydown)} event.`
-      );
-
-      this._ignoreEvent(event, componentId);
-
-      return true;
-    }
+    const key = getKeyName(event);
 
     if (focusTreeId !== this.focusTreeId) {
       this.logger.debug(
         this._logPrefix(componentId),
-        `Ignored ${describeKeyEvent(event, _key, KeyEventRecordIndex.keydown)} event because it had an old focus tree id: ${focusTreeId}.`
+        `Ignored ${describeKeyEvent(event, key, KeyEventRecordIndex.keydown)} event because it had an old focus tree id: ${focusTreeId}.`
       );
 
-      this._ignoreEvent(event, componentId);
+      this.eventPropagator.ignoreEvent(event);
 
+      return true;
+    }
+
+    const started = this.eventPropagator.startNewPropagationStep(
+      componentId,
+      event,
+      key,
+      KeyEventRecordIndex.keydown,
+      options
+    );
+
+    if (!started) {
       return true;
     }
 
     const responseAction = this._howToHandleKeyEvent(event,
       focusTreeId,
       componentId,
-      _key,
+      key,
       options,
       KeyEventRecordIndex.keydown
     );
 
-    /**
-     * We need to record the position of the component that is currently dealing with
-     * the event, in case the component defines a handler for that event that changes
-     * the focus or content in the render tree, causing the component to be de-registered
-     * and have its position lost
-     */
-    const componentPosition = this.componentList.getIndexById(componentId);
-
     if (responseAction === EventResponse.handled) {
-      const keyInCurrentCombination = !!this._getCurrentKeyState(_key);
+      const keyInCurrentCombination = !!this._getCurrentKeyState(key);
 
       const keyEventState = stateFromEvent(event);
 
       if (keyInCurrentCombination || this.getCurrentCombination().isEnding()) {
         this._startAndLogNewKeyCombination(
-          _key,
+          key,
           focusTreeId,
           componentId,
           keyEventState
         );
       } else {
         this._addToAndLogCurrentKeyCombination(
-          _key,
+          key,
           KeyEventRecordIndex.keydown,
           focusTreeId,
           componentId,
@@ -356,48 +275,20 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         );
       }
 
-      this._callHandlerIfActionNotHandled(event, _key, KeyEventRecordIndex.keydown, componentId, focusTreeId);
+      this._callHandlerIfActionNotHandled(event, key, KeyEventRecordIndex.keydown, componentId, focusTreeId);
     }
 
-    this._simulateKeypressForNonPrintableKeys(event, _key, focusTreeId, componentId, options);
+    this._simulateKeypressForNonPrintableKeys(event, key, focusTreeId, componentId, options);
 
-    this._updateEventPropagationHistory(componentId, componentPosition);
+    this.eventPropagator.finishPropagationStep();
 
     return false;
   }
 
   _howToHandleKeyEvent(event, focusTreeId, componentId, key, options, keyEventRecordIndex){
-    if (this._shouldIgnoreEvent()) {
-      this.logger.debug(
-        this._logPrefix(componentId),
-        `Ignored ${describeKeyEvent(event, key, keyEventRecordIndex)} event because ignoreEventsFilter rejected it.`
-      );
-
-      this._ignoreEvent(event, componentId);
-
-      return EventResponse.ignored;
-    }
-
-    if (this._isNewKeyEvent(componentId)) {
-      this._setNewEventParameters(event, keyEventRecordIndex);
-
-      /**
-       * We know that this is a new key event and not the same event bubbling up
-       * the React render tree towards the document root, so perform actions specific
-       * to the first time an event is seen
-       */
-
-      this._setIgnoreEventFlag(event, options);
-
-      if (this._shouldIgnoreEvent()) {
-        this.logger.debug(
-          this._logPrefix(componentId),
-          `Ignored ${describeKeyEvent(event, key, keyEventRecordIndex)} event because ignoreEventsFilter rejected it.`
-        );
-
-        this._ignoreEvent(event, componentId);
-
-        return EventResponse.ignored;
+    if (this.eventPropagator.isFirstPropagationStep()) {
+      if (options.ignoreEventsCondition(event) && this.eventPropagator.ignoreEvent(event)) {
+        return this._eventIsToBeIgnored(event, componentId, key, keyEventRecordIndex);
       }
 
       this.logger.debug(
@@ -406,8 +297,24 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       );
 
       this._checkForModifierFlagDiscrepancies(event, key, keyEventRecordIndex);
+
+    } else if (this.eventPropagator.isIgnoringEvent()) {
+      return this._eventIsToBeIgnored(event, componentId, key, keyEventRecordIndex);
     }
 
+    return this._eventIsToBeHandled();
+  }
+
+  _eventIsToBeIgnored(event, componentId, key, keyEventRecordIndex){
+    this.logger.debug(
+      this._logPrefix(componentId),
+      `Ignored ${describeKeyEvent(event, key, keyEventRecordIndex)} event because ignoreEventsFilter rejected it.`
+    );
+
+    return EventResponse.ignored;
+  }
+
+  _eventIsToBeHandled() {
     return EventResponse.handled;
   }
 
@@ -430,27 +337,28 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *        tree Id, because it belongs to an old focus tree.
    */
   handleKeypress(event, focusTreeId, componentId, options) {
-    const _key = getKeyName(event);
+    const key = getKeyName(event);
 
-    if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
-        this.logger.debug(
-          this._logPrefix(componentId),
-          `Ignored repeated ${describeKeyEvent(event, _key, KeyEventRecordIndex.keypress)} event.`
-        );
-
-        this._ignoreEvent(event, componentId);
-
-        return true;
-    }
-
-    if (this._alreadySimulatedEvent(KeyEventRecordIndex.keypress, _key)) {
+    if (this._alreadySimulatedEvent(KeyEventRecordIndex.keypress, key)) {
       this.logger.debug(
         this._logPrefix(componentId),
-        `Ignored ${describeKeyEvent(event, _key, KeyEventRecordIndex.keypress)} as it was not expected, and has already been simulated.`
+        `Ignored ${describeKeyEvent(event, key, KeyEventRecordIndex.keypress)} as it was not expected, and has already been simulated.`
       );
 
-      this._ignoreEvent(event, componentId);
+      this.eventPropagator.ignoreEvent(event);
 
+      return true;
+    }
+
+    const started = this.eventPropagator.startNewPropagationStep(
+      componentId,
+      event,
+      key,
+      KeyEventRecordIndex.keypress,
+      options
+    );
+
+    if (!started) {
       return true;
     }
 
@@ -463,14 +371,14 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const responseAction = this._howToHandleKeyEvent(event,
       focusTreeId,
       componentId,
-      _key,
+      key,
       options,
       KeyEventRecordIndex.keypress
     );
 
-    if (this._isNewKeyEvent(componentId) && this._getCurrentKeyState(_key)) {
+    if (this.eventPropagator.isFirstPropagationStep(componentId) && this._getCurrentKeyState(key)) {
       this._addToAndLogCurrentKeyCombination(
-        _key,
+        key,
         KeyEventRecordIndex.keypress,
         focusTreeId,
         componentId,
@@ -479,28 +387,20 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     }
 
     /**
-     * We need to record the position of the component that is currently dealing with
-     * the event, in case the component defines a handler for that event that changes
-     * the focus or content in the render tree, causing the component to be de-registered
-     * and have its position lost
-     */
-    const componentPosition = this.componentList.getIndexById(componentId);
-
-    /**
      * We attempt to find a handler of the event, only if it has not already
      * been handled and should not be ignored
      */
     if (responseAction === EventResponse.handled) {
       this._callHandlerIfActionNotHandled(
         event,
-        _key,
+        key,
         KeyEventRecordIndex.keypress,
         componentId,
         focusTreeId
       );
     }
 
-    this._updateEventPropagationHistory(componentId, componentPosition);
+    this.eventPropagator.finishPropagationStep();
 
     return shouldDiscardFocusTreeId;
   }
@@ -524,16 +424,28 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *        because it's stale (part of an old focus tree)
    */
   handleKeyup(event, focusTreeId, componentId, options) {
-    const _key = getKeyName(event);
+    const key = getKeyName(event);
 
-    if (this._alreadySimulatedEvent(KeyEventRecordIndex.keyup, _key)) {
+    if (this._alreadySimulatedEvent(KeyEventRecordIndex.keyup, key)) {
       this.logger.debug(
         this._logPrefix(componentId),
-        `Ignored ${describeKeyEvent(event, _key, KeyEventRecordIndex.keyup)} as it was not expected, and has already been simulated.`
+        `Ignored ${describeKeyEvent(event, key, KeyEventRecordIndex.keyup)} as it was not expected, and has already been simulated.`
       );
 
-      this._ignoreEvent(event, componentId);
+      this.eventPropagator.ignoreEvent(event);
 
+      return true;
+    }
+
+    const started = this.eventPropagator.startNewPropagationStep(
+      componentId,
+      event,
+      key,
+      KeyEventRecordIndex.keyup,
+      options
+    );
+
+    if (!started) {
       return true;
     }
 
@@ -546,7 +458,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const responseAction = this._howToHandleKeyEvent(event,
       focusTreeId,
       componentId,
-      _key,
+      key,
       options,
       KeyEventRecordIndex.keyup
     );
@@ -557,9 +469,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      * function changes focus to a context that ignored events, the keyup event
      * is not lost (leaving react hotkeys thinking the key is still pressed).
      */
-    if (this._isNewKeyEvent(componentId) && this._getCurrentKeyState(_key)) {
+    if (this.eventPropagator.isFirstPropagationStep(componentId) && this._getCurrentKeyState(key)) {
       this._addToAndLogCurrentKeyCombination(
-        _key,
+        key,
         KeyEventRecordIndex.keyup,
         focusTreeId,
         componentId,
@@ -568,28 +480,20 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     }
 
     /**
-     * We need to record the position of the component that is currently dealing with
-     * the event, in case the component defines a handler for that event that changes
-     * the focus or content in the render tree, causing the component to be de-registered
-     * and have its position lost
-     */
-    const componentPosition = this.componentList.getIndexById(componentId);
-
-    /**
      * We attempt to find a handler of the event, only if it has not already
      * been handled and should not be ignored
      */
     if (responseAction === EventResponse.handled) {
-      this._callHandlerIfActionNotHandled(event, _key, KeyEventRecordIndex.keyup, componentId, focusTreeId);
+      this._callHandlerIfActionNotHandled(event, key, KeyEventRecordIndex.keyup, componentId, focusTreeId);
     }
 
     /**
      * We simulate any hidden keyup events hidden by the command key, regardless
      * of whether the event should be ignored or not
      */
-    this._simulateKeyUpEventsHiddenByCmd(event, _key, focusTreeId, componentId, options);
+    this._simulateKeyUpEventsHiddenByCmd(event, key, focusTreeId, componentId, options);
 
-    this._updateEventPropagationHistory(componentId, componentPosition);
+    this.eventPropagator.finishPropagationStep();
 
     return shouldDiscardFocusId;
   }
@@ -647,88 +551,17 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     }
   }
 
-  _ignoreEvent(event, componentId) {
-    this.currentEvent.ignored = true;
-
-    const componentPosition = this.componentList.getIndexById(componentId);
-
-    if(this._stopEventPropagationAfterIgnoringIfEnabled(event, componentId)) {
-      this._updateEventPropagationHistory(componentId, componentPosition, { forceReset: true });
-    } else {
-      this._updateEventPropagationHistory(componentId, componentPosition);
+  _stopEventPropagation(event, componentId) {
+    if (this.eventPropagator.stop(event)) {
+      this.logger.debug(
+        this._logPrefix(componentId),
+        'Stopping further event propagation.'
+      );
     }
   }
 
-  /**
-   * Whether KeyEventManager should ignore the event that is currently being handled
-   * @returns {Boolean} Whether to ignore the event
-   *
-   * Do not override this method. Use setIgnoreEventsCondition() instead.
-   * @private
-   */
-  _shouldIgnoreEvent() {
-    const { ignoreEvent, forceObserveEvent } = this.eventPropagationState;
-    return !forceObserveEvent && ignoreEvent;
-  }
-
-  /**
-   * Returns whether this is a previously seen event bubbling up to render tree towards
-   * the document root, or whether it is a new event that has not previously been seen.
-   * @param {ComponentId} componentId Index of the component currently handling
-   *        the keyboard event
-   * @return {Boolean} If the event has been seen before
-   * @private
-   */
-  _isNewKeyEvent(componentId) {
-    const { previousComponentPosition } = this.eventPropagationState;
-
-    return previousComponentPosition === -1 || previousComponentPosition >= this.componentList.getIndexById(componentId);
-  }
-
-  _updateEventPropagationHistory(componentId, componentPosition, options = { forceReset: false }) {
-    if (options.forceReset || this._isFocusTreeRoot(componentId)) {
-      this._clearEventPropagationState();
-    } else {
-      this.eventPropagationState.previousComponentPosition = componentPosition;
-    }
-  }
-
-  /**
-   * Sets the ignoreEvent flag so that subsequent handlers of the same event
-   * do not have to re-evaluate whether to ignore the event or not as it bubbles
-   * up towards the document root
-   * @param {KeyboardEvent} event The event to decide whether to ignore
-   * @param {Object} options Options containing the function to use
-   *        to set the ignoreEvent flag
-   * @param {Function} options.ignoreEventsCondition Function used to for setting
-   *        the ignoreEvent flag
-   * @private
-   */
-  _setIgnoreEventFlag(event, options) {
-    this.eventPropagationState.ignoreEvent = options.ignoreEventsCondition(event);
-  }
-
-  ignoreEvent() {
-    this.eventPropagationState.ignoreEvent = true;
-  }
-
-  forceObserveEvent() {
-    this.eventPropagationState.forceObserveEvent = true;
-  }
-
-  _isFocusTreeRoot(componentId) {
-    return this.componentList.getIndexById(componentId) >= this.componentList.getLength() - 1;
-  }
-
-  _setNewEventParameters(event, type) {
-    KeyEventCounter.incrementId();
-
-    this.currentEvent = {
-      key: event.key,
-      type,
-      handled: false,
-      ignored: false,
-    };
+  getEventPropagator() {
+    return this.eventPropagator;
   }
 
   _startAndLogNewKeyCombination(keyName, focusTreeId, componentId, keyEventState) {
@@ -765,21 +598,6 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * Event simulation
    ********************************************************************************/
 
-  _stopEventPropagation(event, componentId) {
-    if (!this.eventPropagationState.stopping) {
-      this.eventPropagationState.stopping = true;
-
-      this.logger.debug(
-        this._logPrefix(componentId),
-        'Stopping further event propagation.'
-      );
-
-      if (!event.simulated) {
-        event.stopPropagation();
-      }
-    }
-  }
-
   _handleEventSimulation(listName, handlerName, shouldSimulate, {event, key, focusTreeId, componentId, options}) {
     if (shouldSimulate && Configuration.option('simulateMissingKeyPressEvents')) {
       /**
@@ -794,7 +612,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       });
     }
 
-    if (this._isFocusTreeRoot(componentId) || this.eventPropagationState.stopping) {
+    if (this.componentList.isRoot(componentId) || this.eventPropagator.isStopped()) {
       if (!this.keyEventManager.isGlobalListenersBound()) {
         this[handlerName]();
       }
@@ -823,14 +641,6 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     });
 
     this[listName] = [];
-
-    /**
-     * If an event gets handled and causes a focus shift, then subsequent components
-     * will ignore the event (including the root component) and the conditions to
-     * reset the propagation state are never met - so we ensure that after we are done
-     * simulating the keypress event, the propagation state is reset
-     */
-    this._clearEventPropagationState();
   }
 
   /********************************************************************************
@@ -853,7 +663,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const combinationName = this.getCurrentCombination().describe();
 
     if (this.componentList.isAtLeastOneActionBoundToEvent(eventRecordIndex)) {
-      if (this.eventPropagationState.actionHandled) {
+      if (this.eventPropagator.isHandled()) {
         this.logger.debug(
           this._logPrefix(componentId, {focusTreeId}),
           `Ignored '${combinationName}' ${eventName} as it has already been handled.`
@@ -864,7 +674,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
           `Attempting to find action matching '${combinationName}' ${eventName} . . .`
         );
 
-        const { previousComponentPosition } = this.eventPropagationState;
+        const previousComponentPosition = this.eventPropagator.getPreviousPosition();
 
         const componentPosition = this.componentList.getIndexById(componentId);
 
@@ -878,8 +688,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
           );
 
         if (handlerWasCalled) {
-          this.eventPropagationState.actionHandled = true;
-          this.currentEvent.handled = true;
+          this.eventPropagator.setHandled();
         }
       }
     } else {
