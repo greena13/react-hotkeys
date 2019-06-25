@@ -142,14 +142,14 @@ export interface HotKeysOverrideProps extends React.HTMLAttributes<HotKeys> {
    * The whitelist of keys that keyevents should be ignored. i.e. if you place
    * a key in this list, all events related to it will be ignored by react hotkeys
    */
-  only: ListOfKeys,
+  only?: ListOfKeys,
 
   /**
    * The blacklist of keys that keyevents should be not ignored. i.e. if you place
    * a key in this list, all events related to it will be still be observed by react
    * hotkeys
    */
-  except: ListOfKeys
+  except?: ListOfKeys
 }
 
 /**
