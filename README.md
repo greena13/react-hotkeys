@@ -584,7 +584,7 @@ This is the default type of `<HotKeys />` component, and should normally be your
 
 The HotKeys component provides a declarative and native JSX syntax that is best for succinctly declaring hotkeys in a way that best maintains separation and encapsulation with regards to the rest of your code base.
 
-However, it [does require that its children be wrapped in a DOM-mounted node](#Hotkeys-is-rendering-a-div-that-is-breaking-my-styling), which can break styling and add extra levels to your render tree.
+However, it [does require that its children be wrapped in a DOM-mounted node](#hotkeys-is-wrapping-my-components-in-a-div-that-is-breaking-my-styling), which can break styling and add extra levels to your render tree.
 
 ```javascript
 
