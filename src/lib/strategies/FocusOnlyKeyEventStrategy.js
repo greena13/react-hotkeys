@@ -254,11 +254,11 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     );
 
     if (responseAction === EventResponse.handled) {
-      const keyInCurrentCombination = !!this._getCurrentKeyState(key);
-
       const keyEventState = stateFromEvent(event);
 
-      if (keyInCurrentCombination || this.getCurrentCombination().isEnding()) {
+      const currentCombination = this.getCurrentCombination();
+
+      if (currentCombination.isKeyIncluded(key) || currentCombination.isEnding()) {
         this._startAndLogNewKeyCombination(
           key,
           focusTreeId,

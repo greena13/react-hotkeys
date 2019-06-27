@@ -258,7 +258,7 @@ class ComponentOptionsList {
    * @private
    */
   _buildActionDictionary(actionNameToKeyMap, options, componentId) {
-    return Object.keys(actionNameToKeyMap).reduce((keyMapMemo, actionName) => {
+    return Object.keys(actionNameToKeyMap).reduce((memo, actionName) => {
       const keyMapConfig = actionNameToKeyMap[actionName];
 
       const keyMapOptions = function(){
@@ -299,11 +299,11 @@ class ComponentOptionsList {
          */
         this._keyMapEventRecord[eventRecordIndex] = true;
 
-        if (!keyMapMemo[actionName]) {
-          keyMapMemo[actionName] = [];
+        if (!memo[actionName]) {
+          memo[actionName] = [];
         }
 
-        keyMapMemo[actionName].push({
+        memo[actionName].push({
           prefix: sequence.prefix,
           actionName,
           sequenceLength: sequence.size,
@@ -311,7 +311,7 @@ class ComponentOptionsList {
         });
       });
 
-      return keyMapMemo;
+      return memo;
     }, {});
   }
 

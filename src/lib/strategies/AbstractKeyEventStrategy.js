@@ -1,29 +1,32 @@
-import KeyEventRecordManager from '../KeyEventRecordManager';
 import KeyEventRecordIndex from '../../const/KeyEventRecordIndex';
+import ModifierFlagsDictionary from '../../const/ModifierFlagsDictionary';
+import KeyEventRecordState from '../../const/KeyEventRecordState';
+
 import Logger from '../Logger';
 import KeyCombinationSerializer from '../KeyCombinationSerializer';
+import Configuration from '../Configuration';
+import KeyCombinationHistory from '../KeyCombinationHistory';
+import KeyCombinationRecord from '../KeyCombinationRecord';
+import Registry from '../Registry';
+import ComponentRegistry from '../ComponentRegistry';
+import ComponentOptionsList from '../ComponentOptionsList';
+import ActionResolver from '../ActionResolver';
+
 import arrayFrom from '../../utils/array/arrayFrom';
 import indexFromEnd from '../../utils/array/indexFromEnd';
 import isObject from '../../utils/object/isObject';
 import isUndefined from '../../utils/isUndefined';
 import isEmpty from '../../utils/collection/isEmpty';
+import copyAttributes from '../../utils/object/copyAttributes';
+import hasKey from '../../utils/object/hasKey';
+
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import KeyEventSequenceIndex from '../../const/KeyEventSequenceIndex';
 import printComponent from '../../helpers/logging/printComponent';
-import Configuration from '../Configuration';
-import ModifierFlagsDictionary from '../../const/ModifierFlagsDictionary';
 import hasKeyPressEvent from '../../helpers/resolving-handlers/hasKeyPressEvent';
 import keyIsCurrentlyTriggeringEvent from '../../helpers/parsing-key-maps/keyIsCurrentlyTriggeringEvent';
-import copyAttributes from '../../utils/object/copyAttributes';
-import hasKey from '../../utils/object/hasKey';
 import keyupIsHiddenByCmd from '../../helpers/resolving-handlers/keyupIsHiddenByCmd';
-import KeyEventRecordState from '../../const/KeyEventRecordState';
-import KeyCombinationHistory from '../KeyCombinationHistory';
-import KeyCombinationRecord from '../KeyCombinationRecord';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
-import Registry from '../Registry';
-import ComponentRegistry from '../ComponentRegistry';
-import ComponentOptionsList from '../ComponentOptionsList';
 
 const SEQUENCE_ATTRIBUTES = ['sequence', 'action'];
 const KEYMAP_ATTRIBUTES = ['name', 'description', 'group'];
@@ -125,48 +128,11 @@ class AbstractKeyEventStrategy {
    * @protected
    */
   _initHandlerResolutionState() {
-    if (this.keyMaps === null) {
-      /**
-       * If this.keyMaps is already set to null, then the state has already been reset
-       * and we need not do it again
-       */
+    if (this.actionResolver && this.actionResolver.isKeyMapsEmpty()) {
       return;
     }
 
-    /**
-     * List of mappings from key sequences to handlers that is constructed on-the-fly
-     * as key events propagate up the render tree
-     */
-    this.keyMaps = null;
-
-    /**
-     * Index marking the number of places from the end of componentList for which the
-     * keyMaps have been matched with event handlers. Used to build this.keyMaps as
-     * key events propagate up the React tree.
-     * @type {Number}
-     */
-    this.handlerResolutionSearchIndex =  0;
-
-    /**
-     * Array of counters - one for each component - to keep track of how many handlers
-     * for that component still need actions assigned to them
-     * @type {Number[]}
-     */
-    this.unmatchedHandlerStatus = null;
-
-    /**
-     * A dictionary of handlers to the components that register them. This is populated
-     * as this.handlerResolutionSearchIndex increases, moving from the end of this.componentList to the
-     * front, populating this.keyMaps as needed
-     * @type {Object<ActionName, ComponentId>}
-     */
-    this.handlersDictionary = {};
-
-    /**
-     * A dictionary of sequences already encountered in the process of building the
-     * list of keyMaps on the fly, as key events propagate up the component tree
-     */
-    this.keySequencesDictionary = {};
+    this.actionResolver = new ActionResolver();
   }
 
   /**
@@ -457,196 +423,10 @@ class AbstractKeyEventStrategy {
    ********************************************************************************/
 
   _callMatchingHandlerClosestToEventTarget(event, keyName, eventRecordIndex, componentPosition, componentSearchIndex) {
-    if (!this.keyMaps || !this.unmatchedHandlerStatus) {
-      this.keyMaps = [];
-
-      this.unmatchedHandlerStatus = [];
-
-      this.componentList.forEach(({ handlers }) => {
-        this.unmatchedHandlerStatus.push( [ Object.keys(handlers).length, {} ]);
-        this.keyMaps.push({});
-      });
-    }
-
     while (componentSearchIndex <= componentPosition) {
-      const unmatchedHandlersStatus = this.unmatchedHandlerStatus[componentSearchIndex];
-      let unmatchedHandlersCount = unmatchedHandlersStatus[0];
+      this.actionResolver.matchHandlersToActions(this.componentList, { upTo: componentSearchIndex, event });
 
-      if (unmatchedHandlersCount > 0) {
-        /**
-         * Component currently handling key event has handlers that have not yet been
-         * associated with a key sequence. We need to continue walking up the component
-         * tree in search of the matching actions that describe the applicable key
-         * sequence.
-         */
-
-        while (this.handlerResolutionSearchIndex < this.componentList.getLength() && unmatchedHandlersCount > 0) {
-          const { handlers, actions } = this.componentList.getAtIndex(this.handlerResolutionSearchIndex);
-
-          /**
-           * Add current component's handlers to the handlersDictionary so we know
-           * which component has defined them
-           */
-          Object.keys(handlers).forEach((actionName) => {
-            if (!this.handlersDictionary[actionName]) {
-              this.handlersDictionary[actionName] = [];
-            }
-
-            this.handlersDictionary[actionName].push(this.handlerResolutionSearchIndex);
-          });
-
-          /**
-           * Iterate over the actions of a component (starting with the current component
-           * and working through its ancestors), matching them to the current component's
-           * handlers
-           */
-          Object.keys(actions).forEach((actionName) => {
-            const handlerComponentIndexArray = this.handlersDictionary[actionName];
-
-            if (handlerComponentIndexArray) {
-              /**
-               * Get action handler closest to the event target
-               */
-              const handlerComponentIndex = handlerComponentIndexArray[0];
-
-              const handler =
-                this.componentList.getAtIndex(handlerComponentIndex).handlers[actionName];
-
-              /**
-               * Get key map that corresponds with the component that defines the handler
-               * closest to the event target
-               */
-              const keyMap = this.keyMaps[handlerComponentIndex];
-
-              /**
-               * Store the key sequence with the handler that it should call at
-               * a given component level
-               */
-              if (!keyMap.sequences) {
-                keyMap.sequences = {};
-              }
-
-              /**
-               * At least one child HotKeys component (or the component itself) has
-               * defined a handler for the action, so now we need to associate them
-               */
-              const keyMatchers = actions[actionName];
-
-              keyMatchers.forEach((keyMatcher) => {
-                const keySequence = [keyMatcher.prefix, keyMatcher.id].join(' ');
-
-                const closestSequenceHandlerAlreadyFound =
-                  this.keySequencesDictionary[keySequence] &&
-                  this.keySequencesDictionary[keySequence].some((dictEntry) => {
-                    return dictEntry[1] === keyMatcher.eventRecordIndex
-                  });
-
-                if (closestSequenceHandlerAlreadyFound) {
-                  /**
-                   * Return if there is already a component with handlers for the current
-                   * key sequence closer to the event target
-                   */
-                  return;
-                }
-
-                if (!keyMap.sequences[keyMatcher.prefix]) {
-                  keyMap.sequences[keyMatcher.prefix] = { combinations: {} };
-                }
-
-                const {
-                  prefix, sequenceLength, id, keyDictionary, size,
-                  eventRecordIndex: matcherEventRecordIndex,
-                  actionName
-                } = keyMatcher;
-
-                const combination =
-                  keyMap.sequences[keyMatcher.prefix].combinations[keyMatcher.id];
-
-                if (!combination) {
-                  keyMap.sequences[keyMatcher.prefix].combinations[keyMatcher.id] = {
-                    prefix, sequenceLength, id, keyDictionary, size,
-                    events: {
-                      [matcherEventRecordIndex]: {
-                        actionName, eventRecordIndex: matcherEventRecordIndex, handler
-                      }
-                    }
-                  };
-                } else {
-                  keyMap.sequences[keyMatcher.prefix].combinations[keyMatcher.id] = {
-                    ...combination,
-                    events: {
-                      ...combination.events,
-                      [matcherEventRecordIndex]: {
-                        actionName, eventRecordIndex: matcherEventRecordIndex, handler
-                      }
-                    }
-                  }
-                }
-
-                /**
-                 * Merge event records so we can quickly determine if a given component
-                 * has any handlers bound to particular key events
-                 */
-                if (!keyMap.eventRecord) {
-                  keyMap.eventRecord = KeyEventRecordManager.newRecord();
-                }
-
-                KeyEventRecordManager.setBit(
-                  keyMap.eventRecord,
-                  keyMatcher.eventRecordIndex,
-                  stateFromEvent(event)
-                );
-
-                /**
-                 * Record the longest sequence length so we know to only check for sequences
-                 * of that length or shorter for a particular component
-                 */
-                if (!keyMap.longestSequence || keyMap.longestSequence < keyMatcher.sequenceLength) {
-                  keyMap.longestSequence = keyMatcher.sequenceLength;
-                }
-
-                /**
-                 * Record that we have already found a handler for the current action so
-                 * that we do not override handlers for an action closest to the event target
-                 * with handlers further up the tree
-                 */
-                if (!this.keySequencesDictionary[keySequence]) {
-                  this.keySequencesDictionary[keySequence] = [];
-                }
-
-                this.keySequencesDictionary[keySequence].push([
-                  handlerComponentIndex,
-                  keyMatcher.eventRecordIndex
-                ]);
-              });
-
-              handlerComponentIndexArray.forEach((handlerComponentIndex) => {
-                const handlerComponentStatus = this.unmatchedHandlerStatus[handlerComponentIndex];
-
-                if (!handlerComponentStatus[1][actionName]) {
-                  handlerComponentStatus[1][actionName] = true;
-
-                  /**
-                   * Decrement the number of remaining unmatched handlers for the
-                   * component currently handling the propagating key event, so we know
-                   * when all handlers have been matched to sequences and we can move on
-                   * to matching them against the current key event
-                   */
-                  handlerComponentStatus[0]--;
-                }
-              });
-            }
-          });
-
-          /**
-           * Search next component up in the hierarchy for actions that match outstanding
-           * handlers
-           */
-          this.handlerResolutionSearchIndex++;
-        }
-      }
-
-      const keyMap = this.keyMaps[componentSearchIndex];
+      const keyMap = this.actionResolver.getKeyMap(componentSearchIndex);
 
       this.logger.verbose(
         this._logPrefix(componentSearchIndex),
