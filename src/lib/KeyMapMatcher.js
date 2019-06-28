@@ -1,0 +1,112 @@
+import KeyEventRecordManager from './KeyEventRecordManager';
+import stateFromEvent from '../helpers/parsing-key-maps/stateFromEvent';
+import indexFromEnd from '../utils/array/indexFromEnd';
+import KeySequenceMatcher from './KeySequenceMatcher';
+
+class KeyMapMatcher {
+  constructor() {
+    this._sequenceMatchers = {};
+
+    this._eventRecord = KeyEventRecordManager.newRecord();
+  }
+
+  getOrCreateSequenceMatcher(prefix) {
+    if (!this._sequenceMatchers[prefix]) {
+      this._sequenceMatchers[prefix] = new KeySequenceMatcher();
+    }
+
+    return this._sequenceMatchers[prefix];
+  }
+
+  addSequenceMatcher(keyCombinationSchema, handler, event) {
+    const sequenceMatcher = this.getOrCreateSequenceMatcher(keyCombinationSchema.prefix);
+    sequenceMatcher.addCombination(keyCombinationSchema, handler);
+
+    /**
+     * Merge event records so we can quickly determine if a given component
+     * has any handlers bound to particular key events
+     */
+    KeyEventRecordManager.setBit(
+      this._eventRecord,
+      keyCombinationSchema.eventRecordIndex,
+      stateFromEvent(event)
+    );
+
+    /**
+     * Record the longest sequence length so we know to only check for sequences
+     * of that length or shorter for a particular component
+     */
+    if (!this._longestSequence || this._longestSequence < keyCombinationSchema.sequenceLength) {
+      this._longestSequence = keyCombinationSchema.sequenceLength;
+    }
+  }
+
+  findMatch(keyCombinationHistory, key, eventRecordIndex) {
+    const sequenceMatcher = this._findSequenceMatcher(keyCombinationHistory);
+
+    if (sequenceMatcher) {
+      return sequenceMatcher.findMatch(
+        keyCombinationHistory.getCurrentCombination(),
+        key,
+        eventRecordIndex
+      )
+    }
+
+    return null;
+  }
+
+  _findSequenceMatcher(keyCombinationHistory) {
+    const sequenceHistory = keyCombinationHistory.slice(-this.getLongestSequence(), -1);
+    const sequenceIds = sequenceHistory.map((keyCombinationRecord) => keyCombinationRecord.getIds() );
+
+    if (sequenceIds.length === 0) {
+      return this._sequenceMatchers[''];
+    }
+
+    const idSizes = sequenceIds.map((ids) => ids.length);
+    const indexCounters = sequenceIds.map(() => 0);
+
+    let triedAllPossiblePermutations = false;
+
+    while (!triedAllPossiblePermutations) {
+      const sequenceIdPermutation = indexCounters.map((sequenceIdIndex, index) => {
+        return sequenceIds[index][sequenceIdIndex];
+      });
+
+      const candidateId = sequenceIdPermutation.join(' ');
+
+      if (this._sequenceMatchers[candidateId]) {
+        return this._sequenceMatchers[candidateId];
+      }
+
+      let incrementer = 0;
+      let carry = true;
+
+      while (carry && incrementer < indexCounters.length) {
+        const count = indexFromEnd(indexCounters, incrementer);
+
+        const newIndex = (count + 1) % (indexFromEnd(idSizes, incrementer) || 1);
+
+        indexCounters[indexCounters.length - (incrementer + 1)] = newIndex;
+
+        carry = newIndex === 0;
+
+        if (carry) {
+          incrementer++;
+        }
+      }
+
+      triedAllPossiblePermutations = incrementer === indexCounters.length;
+    }
+  }
+
+  hasMatchesForEventType(eventIndex) {
+    return !!this._eventRecord[eventIndex];
+  }
+
+  getLongestSequence() {
+    return this._longestSequence;
+  }
+}
+
+export default KeyMapMatcher;

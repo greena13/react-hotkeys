@@ -6,6 +6,7 @@ import applicableAliasFunctions from '../helpers/resolving-handlers/applicableAl
 import KeyEventRecordManager from './KeyEventRecordManager';
 import isEmpty from '../utils/collection/isEmpty';
 import Configuration from './Configuration';
+import size from '../utils/collection/size';
 
 class KeyCombinationRecord {
   constructor(keys = {}) {
@@ -148,20 +149,8 @@ class KeyCombinationRecord {
     }
   }
 
-  isMatchableBy(combinationMatcher) {
-    const keyStateKeysNo = Object.keys(this._keys).length;
-    const combinationKeysNo = Object.keys(combinationMatcher.keyDictionary).length;
-
-    if (Configuration.option('allowCombinationSubmatches')) {
-      return keyStateKeysNo >= combinationKeysNo;
-    } else {
-      /**
-       * If sub-matches are not allow, the number of keys in the key state and the
-       * number of keys in the combination we are attempting to match, must be
-       * exactly the same
-       */
-      return keyStateKeysNo === combinationKeysNo;
-    }
+  getNumberOfKeys() {
+    return size(this._keys);
   }
 
   /********************************************************************************

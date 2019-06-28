@@ -13,15 +13,12 @@ import ComponentOptionsList from '../ComponentOptionsList';
 import ActionResolver from '../ActionResolver';
 
 import arrayFrom from '../../utils/array/arrayFrom';
-import indexFromEnd from '../../utils/array/indexFromEnd';
 import isObject from '../../utils/object/isObject';
 import isUndefined from '../../utils/isUndefined';
-import isEmpty from '../../utils/collection/isEmpty';
 import copyAttributes from '../../utils/object/copyAttributes';
 import hasKey from '../../utils/object/hasKey';
 
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
-import KeyEventSequenceIndex from '../../const/KeyEventSequenceIndex';
 import printComponent from '../../helpers/logging/printComponent';
 import hasKeyPressEvent from '../../helpers/resolving-handlers/hasKeyPressEvent';
 import keyIsCurrentlyTriggeringEvent from '../../helpers/parsing-key-maps/keyIsCurrentlyTriggeringEvent';
@@ -426,94 +423,48 @@ class AbstractKeyEventStrategy {
     while (componentSearchIndex <= componentPosition) {
       this.actionResolver.matchHandlersToActions(this.componentList, { upTo: componentSearchIndex, event });
 
-      const keyMap = this.actionResolver.getKeyMap(componentSearchIndex);
+      const keyMapMatcher = this.actionResolver.getKeyMapMatcher(componentSearchIndex);
 
       this.logger.verbose(
         this._logPrefix(componentSearchIndex),
         'Internal key mapping:\n',
-        `${printComponent(keyMap)}`
+        `${printComponent(keyMapMatcher)}`
       );
 
-      if (!keyMap || isEmpty(keyMap.sequences) || !keyMap.eventRecord[eventRecordIndex]) {
-        /**
-         * Component doesn't define any matchers for the current key event
-         */
-
-        this.logger.debug(
-          this._logPrefix(componentSearchIndex),
-          `Doesn't define a handler for '${this.getCurrentCombination().describe()}' ${describeKeyEventType(eventRecordIndex)}.`
-        );
-      } else {
-        const { sequences, longestSequence } = keyMap;
-
+      if (keyMapMatcher && keyMapMatcher.hasMatchesForEventType(eventRecordIndex)) {
         const normalizedKeyName = this.getCurrentCombination().getNormalizedKeyName(keyName);
 
-        let sequenceLengthCounter = longestSequence;
+        let sequenceLengthCounter = keyMapMatcher.getLongestSequence();
 
-        while(sequenceLengthCounter >= 0) {
-          const sequenceHistory = this.getKeyHistory().slice(-sequenceLengthCounter, -1);
-          const sequenceHistoryIds = sequenceHistory.map((keyCombinationRecord) => keyCombinationRecord.getIds() );
+        while (sequenceLengthCounter >= 0) {
+          const combinationSchema = keyMapMatcher.findMatch(
+            this.getKeyHistory(),
+            normalizedKeyName,
+            eventRecordIndex
+          );
 
-          const matchingSequence = this._tryMatchSequenceWithKeyAliases(sequences, sequenceHistoryIds);
+          if (combinationSchema) {
+            const eventSchema = combinationSchema.events[eventRecordIndex];
 
-          if (matchingSequence) {
-            if (!matchingSequence.order) {
-              /**
-               * The first time the component that is currently handling the key event has
-               * its handlers searched for a match, order the combinations based on their
-               * size so that they may be applied in the correct priority order
-               */
+            if (Configuration.option('allowCombinationSubmatches')) {
+              const subMatchDescription = KeyCombinationSerializer.serialize(combinationSchema.keyDictionary);
 
-              const combinationsPartitionedBySize = Object.values(matchingSequence.combinations).reduce((memo, { id, size }) => {
-                if (!memo[size]) {
-                  memo[size] = [];
-                }
-
-                memo[size].push(id);
-
-                return memo;
-              }, {});
-
-              matchingSequence.order = Object.keys(combinationsPartitionedBySize).sort((a, b) => b-a ).reduce((memo, key) => {
-                return memo.concat(combinationsPartitionedBySize[key]);
-              }, []);
+              this.logger.debug(
+                this._logPrefix(componentSearchIndex),
+                `Found action that matches '${this.getCurrentCombination().describe()}' (sub-match: '${subMatchDescription}'): ${eventSchema.actionName}. Calling handler . . .`
+              );
+            } else {
+              this.logger.debug(
+                this._logPrefix(componentSearchIndex),
+                `Found action that matches '${this.getCurrentCombination().describe()}': ${eventSchema.actionName}. Calling handler . . .`
+              );
             }
 
-            const combinationOrder = matchingSequence.order;
+            eventSchema.handler(event);
 
-            let combinationIndex = 0;
+            this._stopEventPropagationAfterHandlingIfEnabled(event, componentSearchIndex);
 
-            while(combinationIndex < combinationOrder.length) {
-              const combinationId = combinationOrder[combinationIndex];
-              const combinationMatcher = matchingSequence.combinations[combinationId];
-
-              if (this.getCurrentCombination().isMatchableBy(combinationMatcher)) {
-                if (this._combinationMatchesKeys(normalizedKeyName, combinationMatcher, eventRecordIndex)) {
-
-                  if (Configuration.option('allowCombinationSubmatches')) {
-                    const subMatchDescription = KeyCombinationSerializer.serialize(combinationMatcher.keyDictionary);
-
-                    this.logger.debug(
-                      this._logPrefix(componentSearchIndex),
-                      `Found action that matches '${this.getCurrentCombination().describe()}' (sub-match: '${subMatchDescription}'): ${combinationMatcher.events[eventRecordIndex].actionName}. Calling handler . . .`
-                    );
-                  } else {
-                    this.logger.debug(
-                      this._logPrefix(componentSearchIndex),
-                      `Found action that matches '${this.getCurrentCombination().describe()}': ${combinationMatcher.events[eventRecordIndex].actionName}. Calling handler . . .`
-                    );
-                  }
-
-                  combinationMatcher.events[eventRecordIndex].handler(event);
-
-                  this._stopEventPropagationAfterHandlingIfEnabled(event, componentSearchIndex);
-
-                  return true;
-                }
-              }
-
-              combinationIndex++;
-            }
+            return true;
           }
 
           sequenceLengthCounter--;
@@ -524,6 +475,15 @@ class AbstractKeyEventStrategy {
         this.logger.debug(
           this._logPrefix(componentSearchIndex),
           `No matching actions found for '${this.getCurrentCombination().describe()}' ${eventName}.`
+        );
+      } else {
+        /**
+         * Component doesn't define any matchers for the current key event
+         */
+
+        this.logger.debug(
+          this._logPrefix(componentSearchIndex),
+          `Doesn't define a handler for '${this.getCurrentCombination().describe()}' ${describeKeyEventType(eventRecordIndex)}.`
         );
       }
 
@@ -543,85 +503,6 @@ class AbstractKeyEventStrategy {
 
   _stopEventPropagation(event, componentId) {
     throw new Error('_stopEventPropagation must be overridden by a subclass');
-  }
-
-  _tryMatchSequenceWithKeyAliases(keyMatcher, sequenceIds) {
-    if (sequenceIds.length === 0) {
-      return keyMatcher[''];
-    }
-
-    const idSizes = sequenceIds.map((ids) => ids.length);
-    const indexCounters = sequenceIds.map(() => 0);
-
-    let triedAllPossiblePermutations = false;
-
-    while (!triedAllPossiblePermutations) {
-      const sequenceIdPermutation = indexCounters.map((sequenceIdIndex, index) => {
-        return sequenceIds[index][sequenceIdIndex];
-      });
-
-      const candidateId = sequenceIdPermutation.join(' ');
-
-      if (keyMatcher[candidateId]) {
-        return keyMatcher[candidateId];
-      }
-
-      let incrementer = 0;
-      let carry = true;
-
-      while (carry && incrementer < indexCounters.length) {
-        const count = indexFromEnd(indexCounters, incrementer);
-
-        const newIndex = (count + 1) % (indexFromEnd(idSizes, incrementer) || 1);
-
-        indexCounters[indexCounters.length - (incrementer + 1)] = newIndex;
-
-        carry = newIndex === 0;
-
-        if (carry) {
-          incrementer++;
-        }
-      }
-
-      triedAllPossiblePermutations = incrementer === indexCounters.length;
-    }
-  }
-
-  _combinationMatchesKeys(keyBeingPressed, combinationMatch, eventRecordIndex) {
-    const combinationHasHandlerForEventType =
-      combinationMatch.events[eventRecordIndex];
-
-    if (!combinationHasHandlerForEventType) {
-      /**
-       * If the combination does not have any actions bound to the key event we are
-       * currently processing, we skip checking if it matches the current keys being
-       * pressed.
-       */
-      return false;
-    }
-
-    let keyCompletesCombination = false;
-
-    const combinationMatchesKeysPressed = Object.keys(combinationMatch.keyDictionary).every((candidateKeyName) => {
-      const keyState = this.getCurrentCombination().getKeyState(candidateKeyName);
-
-      if (keyState) {
-        if (keyIsCurrentlyTriggeringEvent(keyState, eventRecordIndex)) {
-          if (keyBeingPressed && (keyBeingPressed === this.getCurrentCombination().getNormalizedKeyName(candidateKeyName))) {
-            keyCompletesCombination =
-              !keyAlreadyTriggeredEvent(keyState, eventRecordIndex);
-          }
-
-          return true;
-        } else {
-          return false;
-        }
-      } else {
-        return false;
-      }
-    });
-
-    return combinationMatchesKeysPressed && keyCompletesCombination;
   }
 
   /**
@@ -686,10 +567,6 @@ class AbstractKeyEventStrategy {
   _logPrefix() {
 
   }
-}
-
-function keyAlreadyTriggeredEvent(keyState, eventRecordIndex) {
-  return keyState && keyState[KeyEventSequenceIndex.previous][eventRecordIndex];
 }
 
 export default AbstractKeyEventStrategy;

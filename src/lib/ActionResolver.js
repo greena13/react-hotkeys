@@ -1,5 +1,4 @@
-import KeyEventRecordManager from './KeyEventRecordManager';
-import stateFromEvent from '../helpers/parsing-key-maps/stateFromEvent';
+import KeyMapMatcher from './KeyMapMatcher';
 
 class ActionResolver {
   constructor() {
@@ -11,7 +10,7 @@ class ActionResolver {
      * List of mappings from key sequences to handlers that is constructed on-the-fly
      * as key events propagate up the render tree
      */
-    this._keyMaps = [];
+    this._keyMapMatchers = [];
 
     /**
      * Array of counters - one for each component - to keep track of how many handlers
@@ -50,7 +49,7 @@ class ActionResolver {
 
     this._componentList.forEach(({ handlers }) => {
       this._unmatchedHandlerStatus.push( [ Object.keys(handlers).length, {} ]);
-      this._keyMaps.push({});
+      this._keyMapMatchers.push(new KeyMapMatcher());
     });
 
     this._initialized = true;
@@ -114,15 +113,7 @@ class ActionResolver {
          * Get key map that corresponds with the component that defines the handler
          * closest to the event target
          */
-        const keyMap = this.getKeyMap(handlerComponentIndex);
-
-        /**
-         * Store the key sequence with the handler that it should call at
-         * a given component level
-         */
-        if (!keyMap.sequences) {
-          keyMap.sequences = {};
-        }
+        const keyMapMatcher = this.getKeyMapMatcher(handlerComponentIndex);
 
         /**
          * At least one child HotKeys component (or the component itself) has
@@ -141,61 +132,7 @@ class ActionResolver {
             return;
           }
 
-          if (!keyMap.sequences[keySequenceMatcher.prefix]) {
-            keyMap.sequences[keySequenceMatcher.prefix] = {combinations: {}};
-          }
-
-          const {
-            prefix, sequenceLength, id, keyDictionary, size,
-            eventRecordIndex: matcherEventRecordIndex,
-            actionName
-          } = keySequenceMatcher;
-
-          const combination =
-            keyMap.sequences[keySequenceMatcher.prefix].combinations[keySequenceMatcher.id];
-
-          if (!combination) {
-            keyMap.sequences[keySequenceMatcher.prefix].combinations[keySequenceMatcher.id] = {
-              prefix, sequenceLength, id, keyDictionary, size,
-              events: {
-                [matcherEventRecordIndex]: {
-                  actionName, eventRecordIndex: matcherEventRecordIndex, handler
-                }
-              }
-            };
-          } else {
-            keyMap.sequences[keySequenceMatcher.prefix].combinations[keySequenceMatcher.id] = {
-              ...combination,
-              events: {
-                ...combination.events,
-                [matcherEventRecordIndex]: {
-                  actionName, eventRecordIndex: matcherEventRecordIndex, handler
-                }
-              }
-            };
-          }
-
-          /**
-           * Merge event records so we can quickly determine if a given component
-           * has any handlers bound to particular key events
-           */
-          if (!keyMap.eventRecord) {
-            keyMap.eventRecord = KeyEventRecordManager.newRecord();
-          }
-
-          KeyEventRecordManager.setBit(
-            keyMap.eventRecord,
-            keySequenceMatcher.eventRecordIndex,
-            stateFromEvent(event)
-          );
-
-          /**
-           * Record the longest sequence length so we know to only check for sequences
-           * of that length or shorter for a particular component
-           */
-          if (!keyMap.longestSequence || keyMap.longestSequence < keySequenceMatcher.sequenceLength) {
-            keyMap.longestSequence = keySequenceMatcher.sequenceLength;
-          }
+          keyMapMatcher.addSequenceMatcher(keySequenceMatcher, handler, event);
 
           this.addKeySequence(keySequence, [
             handlerComponentIndex,
@@ -283,8 +220,8 @@ class ActionResolver {
     this._position++;
   }
 
-  getKeyMap(index) {
-    return this._keyMaps[index];
+  getKeyMapMatcher(index) {
+    return this._keyMapMatchers[index];
   }
 
   getUnmatchedHandlerStatus(index) {
@@ -292,7 +229,7 @@ class ActionResolver {
   }
 
   isKeyMapsEmpty() {
-    return this._keyMaps.length === 0;
+    return this._keyMapMatchers.length === 0;
   }
 }
 
