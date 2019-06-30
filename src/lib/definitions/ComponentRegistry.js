@@ -1,5 +1,5 @@
-import Registry from './Registry';
-import without from '../utils/collection/without';
+import Registry from '../shared/Registry';
+import without from '../../utils/collection/without';
 
 class ComponentRegistry extends Registry {
   add(componentId) {

@@ -9,8 +9,8 @@
  * [1,1,0]
  */
 
-import isUndefined from '../utils/isUndefined';
-import KeyEventRecordState from '../const/KeyEventRecordState';
+import isUndefined from '../../utils/isUndefined';
+import KeyEventRecordState from '../../const/KeyEventRecordState';
 
 /**
  * Creates and modifies KeyEventRecords

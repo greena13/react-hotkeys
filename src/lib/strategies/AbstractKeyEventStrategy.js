@@ -2,15 +2,15 @@ import KeyEventRecordIndex from '../../const/KeyEventRecordIndex';
 import ModifierFlagsDictionary from '../../const/ModifierFlagsDictionary';
 import KeyEventRecordState from '../../const/KeyEventRecordState';
 
-import Logger from '../Logger';
-import KeyCombinationSerializer from '../KeyCombinationSerializer';
-import Configuration from '../Configuration';
-import KeyCombinationHistory from '../KeyCombinationHistory';
-import KeyCombinationRecord from '../KeyCombinationRecord';
-import Registry from '../Registry';
-import ComponentRegistry from '../ComponentRegistry';
-import ComponentOptionsList from '../ComponentOptionsList';
-import ActionResolver from '../ActionResolver';
+import Logger from '../logging/Logger';
+import KeyCombinationSerializer from '../shared/KeyCombinationSerializer';
+import Configuration from '../config/Configuration';
+import KeyCombinationHistory from '../listening/KeyCombinationHistory';
+import KeyCombinationRecord from '../listening/KeyCombinationRecord';
+import Registry from '../shared/Registry';
+import ComponentRegistry from '../definitions/ComponentRegistry';
+import ComponentOptionsList from '../definitions/ComponentOptionsList';
+import ActionResolver from '../matching/ActionResolver';
 
 import arrayFrom from '../../utils/array/arrayFrom';
 import isObject from '../../utils/object/isObject';
@@ -415,14 +415,12 @@ class AbstractKeyEventStrategy {
    * Matching and calling handlers
    ********************************************************************************/
 
-  _callMatchingHandlerClosestToEventTarget(event, keyName, eventRecordIndex, componentPosition, componentSearchIndex) {
+  _callClosestMatchingHandler(event, keyName, eventRecordIndex, componentPosition, componentSearchIndex) {
     if (!this._actionResolver) {
       this._actionResolver = new ActionResolver(this.componentList);
     }
 
     while (componentSearchIndex <= componentPosition) {
-      this._actionResolver.matchHandlersToComponentActions(componentSearchIndex);
-
       const keyMapMatcher = this._actionResolver.getKeyMapMatcher(componentSearchIndex);
 
       this.logger.verbose(
@@ -431,51 +429,47 @@ class AbstractKeyEventStrategy {
         `${printComponent(keyMapMatcher.toJSON())}`
       );
 
-      if (this._actionResolver.componentHasActionsBoundToEventType(componentSearchIndex, eventRecordIndex)) {
-        const combinationSchema =
-          this._actionResolver.findMatchingKeyCombinationInComponent(
-            componentSearchIndex, this.getKeyHistory(), keyName, eventRecordIndex
+      const sequenceMatch =
+        this._actionResolver.findMatchingKeySequenceInComponent(
+          componentSearchIndex, this.getKeyHistory(), keyName, eventRecordIndex
+        );
+
+      if (sequenceMatch) {
+        const eventSchema = sequenceMatch.events[eventRecordIndex];
+
+        if (Configuration.option('allowCombinationSubmatches')) {
+          const subMatchDescription = KeyCombinationSerializer.serialize(sequenceMatch.keyDictionary);
+
+          this.logger.debug(
+            this._logPrefix(componentSearchIndex),
+            `Found action that matches '${this.getCurrentCombination().describe()}' (sub-match: '${subMatchDescription}'): ${eventSchema.actionName}. Calling handler . . .`
           );
-
-        if (combinationSchema) {
-          const eventSchema = combinationSchema.events[eventRecordIndex];
-
-          if (Configuration.option('allowCombinationSubmatches')) {
-            const subMatchDescription = KeyCombinationSerializer.serialize(combinationSchema.keyDictionary);
-
-            this.logger.debug(
-              this._logPrefix(componentSearchIndex),
-              `Found action that matches '${this.getCurrentCombination().describe()}' (sub-match: '${subMatchDescription}'): ${eventSchema.actionName}. Calling handler . . .`
-            );
-          } else {
-            this.logger.debug(
-              this._logPrefix(componentSearchIndex),
-              `Found action that matches '${this.getCurrentCombination().describe()}': ${eventSchema.actionName}. Calling handler . . .`
-            );
-          }
-
-          eventSchema.handler(event);
-
-          this._stopEventPropagationAfterHandlingIfEnabled(event, componentSearchIndex);
-
-          return true;
+        } else {
+          this.logger.debug(
+            this._logPrefix(componentSearchIndex),
+            `Found action that matches '${this.getCurrentCombination().describe()}': ${eventSchema.actionName}. Calling handler . . .`
+          );
         }
 
-        const eventName = describeKeyEventType(eventRecordIndex);
+        eventSchema.handler(event);
 
-        this.logger.debug(
-          this._logPrefix(componentSearchIndex),
-          `No matching actions found for '${this.getCurrentCombination().describe()}' ${eventName}.`
-        );
+        this._stopEventPropagationAfterHandlingIfEnabled(event, componentSearchIndex);
+
+        return true;
       } else {
-        /**
-         * Component doesn't define any matchers for the current key event
-         */
+        if (this._actionResolver.componentHasActionsBoundToEventType(componentSearchIndex, eventRecordIndex)) {
+          const eventName = describeKeyEventType(eventRecordIndex);
 
-        this.logger.debug(
-          this._logPrefix(componentSearchIndex),
-          `Doesn't define a handler for '${this.getCurrentCombination().describe()}' ${describeKeyEventType(eventRecordIndex)}.`
-        );
+          this.logger.debug(
+            this._logPrefix(componentSearchIndex),
+            `No matching actions found for '${this.getCurrentCombination().describe()}' ${eventName}.`
+          );
+        } else {
+          this.logger.debug(
+            this._logPrefix(componentSearchIndex),
+            `Doesn't define a handler for '${this.getCurrentCombination().describe()}' ${describeKeyEventType(eventRecordIndex)}.`
+          );
+        }
       }
 
       componentSearchIndex++;

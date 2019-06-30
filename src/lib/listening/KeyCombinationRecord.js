@@ -1,12 +1,12 @@
-import KeyEventSequenceIndex from '../const/KeyEventSequenceIndex';
-import KeyEventRecordIndex from '../const/KeyEventRecordIndex';
-import KeyCombinationSerializer from './KeyCombinationSerializer';
-import resolveKeyAlias from '../helpers/resolving-handlers/resolveKeyAlias';
-import applicableAliasFunctions from '../helpers/resolving-handlers/applicableAliasFunctions';
-import KeyEventRecordManager from './KeyEventRecordManager';
-import isEmpty from '../utils/collection/isEmpty';
-import Configuration from './Configuration';
-import size from '../utils/collection/size';
+import KeyEventSequenceIndex from '../../const/KeyEventSequenceIndex';
+import KeyEventRecordIndex from '../../const/KeyEventRecordIndex';
+import KeyCombinationSerializer from '../shared/KeyCombinationSerializer';
+import resolveKeyAlias from '../../helpers/resolving-handlers/resolveKeyAlias';
+import applicableAliasFunctions from '../../helpers/resolving-handlers/applicableAliasFunctions';
+import KeyEventRecordManager from '../shared/KeyEventRecordManager';
+import isEmpty from '../../utils/collection/isEmpty';
+import Configuration from '../config/Configuration';
+import size from '../../utils/collection/size';
 
 class KeyCombinationRecord {
   constructor(keys = {}) {

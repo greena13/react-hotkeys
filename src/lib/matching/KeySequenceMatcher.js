@@ -1,7 +1,7 @@
-import keyIsCurrentlyTriggeringEvent from '../helpers/parsing-key-maps/keyIsCurrentlyTriggeringEvent';
-import KeyEventSequenceIndex from '../const/KeyEventSequenceIndex';
-import Configuration from './Configuration';
-import size from '../utils/collection/size';
+import keyIsCurrentlyTriggeringEvent from '../../helpers/parsing-key-maps/keyIsCurrentlyTriggeringEvent';
+import KeyEventSequenceIndex from '../../const/KeyEventSequenceIndex';
+import Configuration from '../config/Configuration';
+import size from '../../utils/collection/size';
 
 class KeySequenceMatcher {
   constructor() {

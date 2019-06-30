@@ -7,7 +7,7 @@ import {HotKeys} from '../../src/';
 
 import KeyCode from '../support/Key';
 import FocusableElement from '../support/FocusableElement';
-import Configuration from '../../src/lib/Configuration';
+import Configuration from '../../src/lib/config/Configuration';
 
 describe('Hard sequence handlers:', () => {
   beforeEach(function () {

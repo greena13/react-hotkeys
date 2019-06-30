@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Configuration from './lib/Configuration';
+import Configuration from './lib/config/Configuration';
 import withHotKeysIgnoreOverride from './withHotKeysIgnoreOverride';
 
 /**

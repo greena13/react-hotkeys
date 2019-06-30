@@ -1,9 +1,9 @@
 import AbstractKeyEventStrategy from './AbstractKeyEventStrategy';
 import KeyEventRecordIndex from '../../const/KeyEventRecordIndex';
-import KeyEventCounter from '../KeyEventCounter';
+import KeyEventCounter from '../listening/KeyEventCounter';
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
-import Configuration from '../Configuration';
-import Logger from '../Logger';
+import Configuration from '../config/Configuration';
+import Logger from '../logging/Logger';
 import printComponent from '../../helpers/logging/printComponent';
 import isUndefined from '../../utils/isUndefined';
 import getKeyName from '../../helpers/resolving-handlers/getKeyName';
@@ -13,7 +13,7 @@ import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 import EventResponse from '../../const/EventResponse';
 import KeyEventRecordState from '../../const/KeyEventRecordState';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
-import EventPropagator from '../EventPropagator';
+import EventPropagator from '../listening/EventPropagator';
 
 /**
  * Defines behaviour for dealing with key maps defined in focus-only HotKey components
@@ -679,7 +679,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         const componentPosition = this.componentList.getIndexById(componentId);
 
         const handlerWasCalled =
-          this._callMatchingHandlerClosestToEventTarget(
+          this._callClosestMatchingHandler(
             event,
             keyName,
             eventRecordIndex,

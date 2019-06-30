@@ -1,6 +1,6 @@
-import stripSuperfluousWhitespace from '../utils/string/stripSuperfluousWhitespace';
-import standardizeKeyName from '../helpers/parsing-key-maps/standardizeKeyName';
-import isValidKey, {InvalidKeyNameError} from '../helpers/parsing-key-maps/isValidKey';
+import stripSuperfluousWhitespace from '../../utils/string/stripSuperfluousWhitespace';
+import standardizeKeyName from '../../helpers/parsing-key-maps/standardizeKeyName';
+import isValidKey, {InvalidKeyNameError} from '../../helpers/parsing-key-maps/isValidKey';
 
 /**
  * Returns a normalized KeyCombinationString (with the key names in the combination

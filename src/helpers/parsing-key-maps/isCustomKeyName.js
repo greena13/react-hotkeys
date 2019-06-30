@@ -1,4 +1,4 @@
-import Configuration from '../../lib/Configuration';
+import Configuration from '../../lib/config/Configuration';
 
 /**
  * Whether the specified key name is among those defined as custom key codes

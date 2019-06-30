@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React, {PureComponent} from 'react';
-import Configuration from './lib/Configuration';
+import Configuration from './lib/config/Configuration';
 import KeyEventManager from './lib/KeyEventManager';
 import isEmpty from './utils/collection/isEmpty';
-import KeyCombinationSerializer from './lib/KeyCombinationSerializer';
+import KeyCombinationSerializer from './lib/shared/KeyCombinationSerializer';
 import backwardsCompatibleContext from './utils/backwardsCompatibleContext';
 import isUndefined from './utils/isUndefined';
 

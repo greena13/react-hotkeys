@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { Component } from 'react';
-import Configuration from './lib/Configuration';
+import Configuration from './lib/config/Configuration';
 import KeyEventManager from './lib/KeyEventManager';
 import backwardsCompatibleContext from './utils/backwardsCompatibleContext';
 

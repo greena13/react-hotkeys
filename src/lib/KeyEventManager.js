@@ -1,8 +1,8 @@
-import Logger from './Logger';
+import Logger from './logging/Logger';
 import FocusOnlyKeyEventStrategy from './strategies/FocusOnlyKeyEventStrategy';
 import GlobalKeyEventStrategy from './strategies/GlobalKeyEventStrategy';
 import isFromFocusOnlyComponent from '../helpers/resolving-handlers/isFromFocusOnlyComponent';
-import Configuration from './Configuration';
+import Configuration from './config/Configuration';
 import EventResponse from '../const/EventResponse';
 
 /**

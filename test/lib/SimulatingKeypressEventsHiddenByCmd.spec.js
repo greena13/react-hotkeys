@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import Key from '../support/Key';
 import KeyEventManager from '../../src/lib/KeyEventManager';
 import KeyEventRecordState from '../../src/const/KeyEventRecordState';
-import Configuration from '../../src/lib/Configuration';
+import Configuration from '../../src/lib/config/Configuration';
 import MockSyntheticEvent from '../support/MockSyntheticEvent';
 
 describe('Simulating keypress events hidden by cmd:', function () {

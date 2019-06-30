@@ -1,13 +1,14 @@
-import removeAtIndex from '../utils/array/removeAtIndex';
-import KeyEventRecordManager from './KeyEventRecordManager';
-import Configuration from './Configuration';
-import KeyCombinationSerializer from './KeyCombinationSerializer';
-import isObject from '../utils/object/isObject';
-import hasKey from '../utils/object/hasKey';
-import arrayFrom from '../utils/array/arrayFrom';
-import isUndefined from '../utils/isUndefined';
-import KeyEventRecordIndex from '../const/KeyEventRecordIndex';
-import KeySequenceParser from './KeySequenceParser';
+import removeAtIndex from '../../utils/array/removeAtIndex';
+import KeyEventRecordManager from '../shared/KeyEventRecordManager';
+import Configuration from '../config/Configuration';
+import KeyCombinationSerializer from '../shared/KeyCombinationSerializer';
+import isObject from '../../utils/object/isObject';
+import hasKey from '../../utils/object/hasKey';
+import arrayFrom from '../../utils/array/arrayFrom';
+import isUndefined from '../../utils/isUndefined';
+import KeyEventRecordIndex from '../../const/KeyEventRecordIndex';
+import KeySequenceParser from '../shared/KeySequenceParser';
+import KeyEventRecordState from '../../const/KeyEventRecordState';
 
 class ComponentOptionsList {
   constructor() {
@@ -297,7 +298,7 @@ class ComponentOptionsList {
          * Record that there is at least one key sequence in the focus tree bound to
          * the keyboard event
          */
-        this._keyMapEventRecord[eventRecordIndex] = true;
+        this._keyMapEventRecord[eventRecordIndex] = KeyEventRecordState.seen;
 
         if (!memo[actionName]) {
           memo[actionName] = [];

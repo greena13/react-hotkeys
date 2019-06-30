@@ -2,12 +2,12 @@ import KeyEventRecordIndex from '../../const/KeyEventRecordIndex';
 import AbstractKeyEventStrategy from './AbstractKeyEventStrategy';
 import capitalize from '../../utils/string/capitalize';
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
-import KeyEventCounter from '../KeyEventCounter';
-import Logger from '../Logger';
+import KeyEventCounter from '../listening/KeyEventCounter';
+import Logger from '../logging/Logger';
 import isUndefined from '../../utils/isUndefined';
 import printComponent from '../../helpers/logging/printComponent';
 import getKeyName from '../../helpers/resolving-handlers/getKeyName';
-import Configuration from '../Configuration';
+import Configuration from '../config/Configuration';
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 import isCmdKey from '../../helpers/parsing-key-maps/isCmdKey';
 import EventResponse from '../../const/EventResponse';
@@ -589,7 +589,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         `Attempting to find action matching '${combinationName}' ${eventName} . . .`
       );
 
-      this._callMatchingHandlerClosestToEventTarget(
+      this._callClosestMatchingHandler(
         event,
         keyName,
         eventRecordIndex
@@ -607,9 +607,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     }
   }
 
-  _callMatchingHandlerClosestToEventTarget(event, keyName, eventRecordIndex) {
+  _callClosestMatchingHandler(event, keyName, eventRecordIndex) {
     for(let componentPosition = 0; componentPosition < this.componentList.getLength(); componentPosition++) {
-      const matchFound = super._callMatchingHandlerClosestToEventTarget(
+      const matchFound = super._callClosestMatchingHandler(
         event,
         keyName,
         eventRecordIndex,

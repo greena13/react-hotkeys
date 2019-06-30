@@ -1,7 +1,7 @@
 import KeyEventCounter from './KeyEventCounter';
-import Configuration from './Configuration';
-import describeKeyEvent from '../helpers/logging/describeKeyEvent';
-import KeyEventRecordIndex from '../const/KeyEventRecordIndex';
+import Configuration from '../config/Configuration';
+import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
+import KeyEventRecordIndex from '../../const/KeyEventRecordIndex';
 
 class EventPropagator {
   constructor(componentList, { logger, logPrefix}) {

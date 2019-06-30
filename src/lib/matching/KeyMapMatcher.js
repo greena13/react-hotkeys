@@ -1,8 +1,8 @@
-import KeyEventRecordManager from './KeyEventRecordManager';
-import stateFromEvent from '../helpers/parsing-key-maps/stateFromEvent';
-import indexFromEnd from '../utils/array/indexFromEnd';
+import KeyEventRecordManager from '../shared/KeyEventRecordManager';
+import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
+import indexFromEnd from '../../utils/array/indexFromEnd';
 import KeySequenceMatcher from './KeySequenceMatcher';
-import KeyEventRecordState from '../const/KeyEventRecordState';
+import KeyEventRecordState from '../../const/KeyEventRecordState';
 
 class KeyMapMatcher {
   constructor() {

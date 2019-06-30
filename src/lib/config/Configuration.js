@@ -1,4 +1,4 @@
-import dictionaryFrom from '../utils/object/dictionaryFrom';
+import dictionaryFrom from '../../utils/object/dictionaryFrom';
 
 /**
  * Default configuration values

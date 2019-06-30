@@ -1,4 +1,4 @@
-import isUndefined from '../utils/isUndefined';
+import isUndefined from '../../utils/isUndefined';
 
 /**
  * Manages the incrementing of a globally unique event id

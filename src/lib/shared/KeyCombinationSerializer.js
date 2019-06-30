@@ -1,11 +1,11 @@
-import resolveShiftedAlias from '../helpers/resolving-handlers/resolveShiftedAlias';
-import resolveUnshiftedAlias from '../helpers/resolving-handlers/resolveUnshiftedAlias';
-import KeyOSAndLayoutAliasesDictionary from '../const/KeyOSAndLayoutAliasesDictionary';
+import resolveShiftedAlias from '../../helpers/resolving-handlers/resolveShiftedAlias';
+import resolveUnshiftedAlias from '../../helpers/resolving-handlers/resolveUnshiftedAlias';
+import KeyOSAndLayoutAliasesDictionary from '../../const/KeyOSAndLayoutAliasesDictionary';
 import KeySequenceParser from './KeySequenceParser';
-import resolveUnaltedAlias from '../helpers/resolving-handlers/resolveUnaltedAlias';
-import resolveAltedAlias from '../helpers/resolving-handlers/resolveAltedAlias';
-import resolveUnaltShiftedAlias from '../helpers/resolving-handlers/resolveUnaltShiftedAlias';
-import resolveAltShiftedAlias from '../helpers/resolving-handlers/resolveAltShiftedAlias';
+import resolveUnaltedAlias from '../../helpers/resolving-handlers/resolveUnaltedAlias';
+import resolveAltedAlias from '../../helpers/resolving-handlers/resolveAltedAlias';
+import resolveUnaltShiftedAlias from '../../helpers/resolving-handlers/resolveUnaltShiftedAlias';
+import resolveAltShiftedAlias from '../../helpers/resolving-handlers/resolveAltShiftedAlias';
 
 /**
  * Serializes instances of KeyCombinationRecord to KeyCombinationString.

@@ -4,7 +4,7 @@
  */
 
 import reactsGetEventKey from '../../vendor/react-dom/reactsGetEventKey';
-import Configuration from '../../lib/Configuration';
+import Configuration from '../../lib/config/Configuration';
 import hasKey from '../../utils/object/hasKey';
 
 /**
