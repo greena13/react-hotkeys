@@ -6,6 +6,7 @@ import size from '../utils/collection/size';
 class KeySequenceMatcher {
   constructor() {
     this._combinations = {};
+    this._order = null;
   }
 
   addCombination(combinationSchema, handler) {
@@ -29,7 +30,7 @@ class KeySequenceMatcher {
       const combinationMatcher = this._combinations[combinationId];
 
       if (canBeMatched(keyCombinationRecord, combinationMatcher)) {
-        if (this._combinationMatchesKeys(keyCombinationRecord, key, combinationMatcher, eventRecordIndex)) {
+        if (this._combinationRecordMatches(keyCombinationRecord, key, combinationMatcher, eventRecordIndex)) {
           return combinationMatcher;
         }
       }
@@ -40,9 +41,16 @@ class KeySequenceMatcher {
     return null;
   }
 
-  _combinationMatchesKeys(keyCombinationRecord, keyBeingPressed, combinationMatch, eventRecordIndex) {
+  toJSON() {
+    return {
+      combinations: this._combinations,
+      order: this._order
+    };
+  }
+
+  _combinationRecordMatches(keyCombinationRecord, keyBeingPressed, combinationMatcher, eventRecordIndex) {
     const combinationHasHandlerForEventType =
-      combinationMatch.events[eventRecordIndex];
+      combinationMatcher.events[eventRecordIndex];
 
     if (!combinationHasHandlerForEventType) {
       /**
@@ -55,7 +63,7 @@ class KeySequenceMatcher {
 
     let keyCompletesCombination = false;
 
-    const combinationMatchesKeysPressed = Object.keys(combinationMatch.keyDictionary).every((candidateKeyName) => {
+    const combinationMatchesKeysPressed = Object.keys(combinationMatcher.keyDictionary).every((candidateKeyName) => {
       const keyState = keyCombinationRecord.getKeyState(candidateKeyName);
 
       if (keyState) {

@@ -125,11 +125,7 @@ class AbstractKeyEventStrategy {
    * @protected
    */
   _initHandlerResolutionState() {
-    if (this.actionResolver && this.actionResolver.isKeyMapsEmpty()) {
-      return;
-    }
-
-    this.actionResolver = new ActionResolver();
+    this._actionResolver = null;
   }
 
   /**
@@ -420,54 +416,49 @@ class AbstractKeyEventStrategy {
    ********************************************************************************/
 
   _callMatchingHandlerClosestToEventTarget(event, keyName, eventRecordIndex, componentPosition, componentSearchIndex) {
-    while (componentSearchIndex <= componentPosition) {
-      this.actionResolver.matchHandlersToActions(this.componentList, { upTo: componentSearchIndex, event });
+    if (!this._actionResolver) {
+      this._actionResolver = new ActionResolver(this.componentList);
+    }
 
-      const keyMapMatcher = this.actionResolver.getKeyMapMatcher(componentSearchIndex);
+    while (componentSearchIndex <= componentPosition) {
+      this._actionResolver.matchHandlersToComponentActions(componentSearchIndex);
+
+      const keyMapMatcher = this._actionResolver.getKeyMapMatcher(componentSearchIndex);
 
       this.logger.verbose(
         this._logPrefix(componentSearchIndex),
         'Internal key mapping:\n',
-        `${printComponent(keyMapMatcher)}`
+        `${printComponent(keyMapMatcher.toJSON())}`
       );
 
-      if (keyMapMatcher && keyMapMatcher.hasMatchesForEventType(eventRecordIndex)) {
-        const normalizedKeyName = this.getCurrentCombination().getNormalizedKeyName(keyName);
-
-        let sequenceLengthCounter = keyMapMatcher.getLongestSequence();
-
-        while (sequenceLengthCounter >= 0) {
-          const combinationSchema = keyMapMatcher.findMatch(
-            this.getKeyHistory(),
-            normalizedKeyName,
-            eventRecordIndex
+      if (this._actionResolver.componentHasActionsBoundToEventType(componentSearchIndex, eventRecordIndex)) {
+        const combinationSchema =
+          this._actionResolver.findMatchingKeyCombinationInComponent(
+            componentSearchIndex, this.getKeyHistory(), keyName, eventRecordIndex
           );
 
-          if (combinationSchema) {
-            const eventSchema = combinationSchema.events[eventRecordIndex];
+        if (combinationSchema) {
+          const eventSchema = combinationSchema.events[eventRecordIndex];
 
-            if (Configuration.option('allowCombinationSubmatches')) {
-              const subMatchDescription = KeyCombinationSerializer.serialize(combinationSchema.keyDictionary);
+          if (Configuration.option('allowCombinationSubmatches')) {
+            const subMatchDescription = KeyCombinationSerializer.serialize(combinationSchema.keyDictionary);
 
-              this.logger.debug(
-                this._logPrefix(componentSearchIndex),
-                `Found action that matches '${this.getCurrentCombination().describe()}' (sub-match: '${subMatchDescription}'): ${eventSchema.actionName}. Calling handler . . .`
-              );
-            } else {
-              this.logger.debug(
-                this._logPrefix(componentSearchIndex),
-                `Found action that matches '${this.getCurrentCombination().describe()}': ${eventSchema.actionName}. Calling handler . . .`
-              );
-            }
-
-            eventSchema.handler(event);
-
-            this._stopEventPropagationAfterHandlingIfEnabled(event, componentSearchIndex);
-
-            return true;
+            this.logger.debug(
+              this._logPrefix(componentSearchIndex),
+              `Found action that matches '${this.getCurrentCombination().describe()}' (sub-match: '${subMatchDescription}'): ${eventSchema.actionName}. Calling handler . . .`
+            );
+          } else {
+            this.logger.debug(
+              this._logPrefix(componentSearchIndex),
+              `Found action that matches '${this.getCurrentCombination().describe()}': ${eventSchema.actionName}. Calling handler . . .`
+            );
           }
 
-          sequenceLengthCounter--;
+          eventSchema.handler(event);
+
+          this._stopEventPropagationAfterHandlingIfEnabled(event, componentSearchIndex);
+
+          return true;
         }
 
         const eventName = describeKeyEventType(eventRecordIndex);

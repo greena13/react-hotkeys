@@ -1,11 +1,7 @@
 import KeyMapMatcher from './KeyMapMatcher';
 
 class ActionResolver {
-  constructor() {
-    this.clear();
-  }
-
-  clear() {
+  constructor(componentList) {
     /**
      * List of mappings from key sequences to handlers that is constructed on-the-fly
      * as key events propagate up the render tree
@@ -19,15 +15,13 @@ class ActionResolver {
      */
     this._unmatchedHandlerStatus = [];
 
-    this._initialized = false;
-
     /**
      * Index marking the number of places from the end of componentList for which the
      * keyMaps have been matched with event handlers. Used to build this.keyMaps as
      * key events propagate up the React tree.
      * @type {Number}
      */
-    this._position =  0;
+    this._position = 0;
 
     /**
      * A dictionary of handlers to the components that register them. This is populated
@@ -42,29 +36,17 @@ class ActionResolver {
      * list of keyMaps on the fly, as key events propagate up the component tree
      */
     this._keySequencesDictionary = {};
-  }
 
-  initialize(componentList) {
     this._componentList = componentList;
 
     this._componentList.forEach(({ handlers }) => {
       this._unmatchedHandlerStatus.push( [ Object.keys(handlers).length, {} ]);
       this._keyMapMatchers.push(new KeyMapMatcher());
     });
-
-    this._initialized = true;
   }
 
-  isInitialized() {
-    return this._initialized;
-  }
-
-  matchHandlersToActions(componentList, { upTo, event }) {
-    if (!this.isInitialized()) {
-      this.initialize(componentList);
-    }
-
-    if (this.componentHasUnmatchedHandlers(upTo)) {
+  matchHandlersToComponentActions(componentId) {
+    if (this._componentHasUnmatchedHandlers(componentId)) {
       /**
        * Component currently handling key event has handlers that have not yet been
        * associated with a key sequence. We need to continue walking up the component
@@ -72,25 +54,33 @@ class ActionResolver {
        * sequence.
        */
 
-      while (this.getPosition() < this._componentList.getLength()) {
-        this._matchHandlersToActions(event);
+      while (this._getPosition() < this._componentList.getLength()) {
+        this._addHandlersFromComponent();
+        this._addActionsFromComponent();
 
-        /**
-         * Search next component up in the hierarchy for actions that match outstanding
-         * handlers
-         */
-        this.next()
+        this._position++;
       }
     }
   }
 
-  _matchHandlersToActions(event) {
-    this._addHandlersFromComponent();
-    this._addActionsFromComponent(event);
+  getKeyMapMatcher(index) {
+    return this._keyMapMatchers[index];
   }
 
-  _addActionsFromComponent(event) {
-    const {actions} = this.getComponent(this.getPosition());
+  componentHasActionsBoundToEventType(componentSearchIndex, eventRecordIndex) {
+    return this.getKeyMapMatcher(componentSearchIndex).hasMatchesForEventType(eventRecordIndex);
+  }
+
+  findMatchingKeyCombinationInComponent(componentSearchIndex, keyHistory, keyName, eventRecordIndex) {
+    return this.getKeyMapMatcher(componentSearchIndex).findMatch(
+      keyHistory,
+      keyName,
+      eventRecordIndex
+    )
+  }
+
+  _addActionsFromComponent() {
+    const {actions} = this._getComponent(this._getPosition());
 
     /**
      * Iterate over the actions of a component (starting with the current component
@@ -124,7 +114,7 @@ class ActionResolver {
         actionOptionsList.forEach((keySequenceMatcher) => {
           const keySequence = [keySequenceMatcher.prefix, keySequenceMatcher.id].join(' ');
 
-          if (this.isClosestHandlerFound(keySequence, keySequenceMatcher)) {
+          if (this._isClosestHandlerFound(keySequence, keySequenceMatcher)) {
             /**
              * Return if there is already a component with handlers for the current
              * key sequence closer to the event target
@@ -132,9 +122,9 @@ class ActionResolver {
             return;
           }
 
-          keyMapMatcher.addSequenceMatcher(keySequenceMatcher, handler, event);
+          keyMapMatcher.addSequenceMatcher(keySequenceMatcher, handler);
 
-          this.addKeySequence(keySequence, [
+          this._addKeySequence(keySequence, [
             handlerComponentIndex,
             keySequenceMatcher.eventRecordIndex
           ]);
@@ -142,7 +132,7 @@ class ActionResolver {
 
         handlerComponentIndexArray.forEach((handlerComponentIndex) => {
           const handlerComponentStatus =
-            this.getUnmatchedHandlerStatus(handlerComponentIndex);
+            this._getUnmatchedHandlerStatus(handlerComponentIndex);
 
           if (!handlerComponentStatus[1][actionName]) {
             handlerComponentStatus[1][actionName] = true;
@@ -160,8 +150,12 @@ class ActionResolver {
     });
   }
 
+  _getHandlers(actionName) {
+    return this._handlersDictionary[actionName];
+  }
+
   _addHandlersFromComponent() {
-    const { handlers } = this.getComponent();
+    const { handlers } = this._getComponent();
 
     /**
      * Add current component's handlers to the handlersDictionary so we know
@@ -172,12 +166,8 @@ class ActionResolver {
     });
   }
 
-  getComponent() {
-    return this._componentList.getAtIndex(this.getPosition());
-  }
-
-  _getHandlers(actionName) {
-    return this._handlersDictionary[actionName];
+  _getComponent() {
+    return this._componentList.getAtIndex(this._getPosition());
   }
 
   _addHandler(actionName) {
@@ -185,10 +175,10 @@ class ActionResolver {
       this._handlersDictionary[actionName] = [];
     }
 
-    this._handlersDictionary[actionName].push(this.getPosition());
+    this._handlersDictionary[actionName].push(this._getPosition());
   }
 
-  addKeySequence(keySequence, value) {
+  _addKeySequence(keySequence, value) {
     /**
      * Record that we have already found a handler for the current action so
      * that we do not override handlers for an action closest to the event target
@@ -201,35 +191,23 @@ class ActionResolver {
     this._keySequencesDictionary[keySequence].push(value);
   }
 
-  componentHasUnmatchedHandlers(componentIndex) {
-    return this.getUnmatchedHandlerStatus(componentIndex)[0] > 0;
+  _componentHasUnmatchedHandlers(componentIndex) {
+    return this._getUnmatchedHandlerStatus(componentIndex)[0] > 0;
   }
 
-  isClosestHandlerFound(keySequence, keyMatcher) {
+  _getUnmatchedHandlerStatus(index) {
+    return this._unmatchedHandlerStatus[index];
+  }
+
+  _isClosestHandlerFound(keySequence, keyMatcher) {
     return this._keySequencesDictionary[keySequence] &&
     this._keySequencesDictionary[keySequence].some((dictEntry) => {
       return dictEntry[1] === keyMatcher.eventRecordIndex
     });
   }
 
-  getPosition() {
+  _getPosition() {
     return this._position;
-  }
-
-  next() {
-    this._position++;
-  }
-
-  getKeyMapMatcher(index) {
-    return this._keyMapMatchers[index];
-  }
-
-  getUnmatchedHandlerStatus(index) {
-    return this._unmatchedHandlerStatus[index];
-  }
-
-  isKeyMapsEmpty() {
-    return this._keyMapMatchers.length === 0;
   }
 }
 

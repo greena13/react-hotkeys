@@ -2,6 +2,7 @@ import KeyEventRecordManager from './KeyEventRecordManager';
 import stateFromEvent from '../helpers/parsing-key-maps/stateFromEvent';
 import indexFromEnd from '../utils/array/indexFromEnd';
 import KeySequenceMatcher from './KeySequenceMatcher';
+import KeyEventRecordState from '../const/KeyEventRecordState';
 
 class KeyMapMatcher {
   constructor() {
@@ -10,16 +11,8 @@ class KeyMapMatcher {
     this._eventRecord = KeyEventRecordManager.newRecord();
   }
 
-  getOrCreateSequenceMatcher(prefix) {
-    if (!this._sequenceMatchers[prefix]) {
-      this._sequenceMatchers[prefix] = new KeySequenceMatcher();
-    }
-
-    return this._sequenceMatchers[prefix];
-  }
-
-  addSequenceMatcher(keyCombinationSchema, handler, event) {
-    const sequenceMatcher = this.getOrCreateSequenceMatcher(keyCombinationSchema.prefix);
+  addSequenceMatcher(keyCombinationSchema, handler) {
+    const sequenceMatcher = this._getOrCreateSequenceMatcher(keyCombinationSchema.prefix);
     sequenceMatcher.addCombination(keyCombinationSchema, handler);
 
     /**
@@ -29,7 +22,7 @@ class KeyMapMatcher {
     KeyEventRecordManager.setBit(
       this._eventRecord,
       keyCombinationSchema.eventRecordIndex,
-      stateFromEvent(event)
+      KeyEventRecordState.seen
     );
 
     /**
@@ -45,14 +38,39 @@ class KeyMapMatcher {
     const sequenceMatcher = this._findSequenceMatcher(keyCombinationHistory);
 
     if (sequenceMatcher) {
+      const currentCombination = keyCombinationHistory.getCurrentCombination();
+      const normalizedKeyName = currentCombination.getNormalizedKeyName(key);
+
       return sequenceMatcher.findMatch(
-        keyCombinationHistory.getCurrentCombination(),
-        key,
+        currentCombination,
+        normalizedKeyName,
         eventRecordIndex
       )
     }
 
     return null;
+  }
+
+  hasMatchesForEventType(eventIndex) {
+    return !!this._eventRecord[eventIndex];
+  }
+
+  _getOrCreateSequenceMatcher(prefix) {
+    if (!this._sequenceMatchers[prefix]) {
+      this._sequenceMatchers[prefix] = new KeySequenceMatcher();
+    }
+
+    return this._sequenceMatchers[prefix];
+  }
+
+  toJSON() {
+    return Object.keys(this._sequenceMatchers).reduce((memo, prefix) => {
+      const sequenceMatcher = this._sequenceMatchers[prefix];
+
+      memo[prefix] = sequenceMatcher.toJSON();
+
+      return memo;
+    }, {});
   }
 
   _findSequenceMatcher(keyCombinationHistory) {
@@ -98,10 +116,6 @@ class KeyMapMatcher {
 
       triedAllPossiblePermutations = incrementer === indexCounters.length;
     }
-  }
-
-  hasMatchesForEventType(eventIndex) {
-    return !!this._eventRecord[eventIndex];
   }
 
   getLongestSequence() {
