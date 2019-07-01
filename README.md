@@ -448,7 +448,7 @@ renderDialog(){
                 </tr>
               );
               
-              return push;
+              return memo;
             }
           }
           </tbody>
