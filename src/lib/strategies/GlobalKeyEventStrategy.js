@@ -171,7 +171,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     const listenersShouldBeBound = this._listenersShouldBeBound();
 
     if (!this.listenersBound && listenersShouldBeBound) {
-      this.componentList.forEachKeyEventType((recordIndex) => {
+      Object.values(KeyEventRecordIndex).forEach((recordIndex) => {
         const eventName = describeKeyEventType(recordIndex);
 
         document[`on${eventName}`] = (keyEvent) => {
@@ -188,7 +188,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     } else if(this.listenersBound && !listenersShouldBeBound) {
 
-      this.componentList.forEachKeyEventType((recordIndex) => {
+      Object.values(KeyEventRecordIndex).forEach((recordIndex) => {
         const eventName = describeKeyEventType(recordIndex);
 
         delete document[`on${eventName}`];
@@ -578,23 +578,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     const eventName = describeKeyEventType(eventRecordIndex);
     const combinationName = this.getCurrentCombination().describe();
 
-    if (this.componentList.isAtLeastOneActionBoundToEvent(eventRecordIndex)) {
-      /**
-       * If there is at least one handler for the specified key event type (keydown,
-       * keypress, keyup), then attempt to find a handler that matches the current
-       * key combination
-       */
-      this.logger.verbose(
-        this._logPrefix(),
-        `Attempting to find action matching '${combinationName}' ${eventName} . . .`
-      );
-
-      this._callClosestMatchingHandler(
-        event,
-        keyName,
-        eventRecordIndex
-      );
-    } else {
+    if (!this.componentList.anyActionsForEventType(eventRecordIndex)) {
       /**
        * If there are no handlers registered for the particular key event type
        * (keydown, keypress, keyup) then skip trying to find a matching handler
@@ -604,7 +588,25 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         this._logPrefix(),
         `Ignored '${combinationName}' ${eventName} because it doesn't have any ${eventName} handlers.`
       );
+
+      return;
     }
+
+    /**
+     * If there is at least one handler for the specified key event type (keydown,
+     * keypress, keyup), then attempt to find a handler that matches the current
+     * key combination
+     */
+    this.logger.verbose(
+      this._logPrefix(),
+      `Attempting to find action matching '${combinationName}' ${eventName} . . .`
+    );
+
+    this._callClosestMatchingHandler(
+      event,
+      keyName,
+      eventRecordIndex
+    );
   }
 
   _callClosestMatchingHandler(event, keyName, eventRecordIndex) {

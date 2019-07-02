@@ -83,8 +83,6 @@ class AbstractKeyEventStrategy {
 
     this.rootComponentId = null;
 
-    this.componentList = new ComponentOptionsList();
-
     this._reset();
 
     this.resetKeyHistory();
@@ -95,7 +93,8 @@ class AbstractKeyEventStrategy {
    * @protected
    */
   _reset() {
-    this.componentList.clear();
+    this.componentList = new ComponentOptionsList();
+
     this._initHandlerResolutionState();
   }
 

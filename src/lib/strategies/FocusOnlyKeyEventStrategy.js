@@ -662,40 +662,42 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const eventName = describeKeyEventType(eventRecordIndex);
     const combinationName = this.getCurrentCombination().describe();
 
-    if (this.componentList.isAtLeastOneActionBoundToEvent(eventRecordIndex)) {
-      if (this.eventPropagator.isHandled()) {
-        this.logger.debug(
-          this._logPrefix(componentId, {focusTreeId}),
-          `Ignored '${combinationName}' ${eventName} as it has already been handled.`
-        );
-      } else {
-        this.logger.verbose(
-          this._logPrefix(componentId, {focusTreeId}),
-          `Attempting to find action matching '${combinationName}' ${eventName} . . .`
-        );
-
-        const previousComponentPosition = this.eventPropagator.getPreviousPosition();
-
-        const componentPosition = this.componentList.getIndexById(componentId);
-
-        const handlerWasCalled =
-          this._callClosestMatchingHandler(
-            event,
-            keyName,
-            eventRecordIndex,
-            componentPosition,
-            previousComponentPosition === -1 ? 0 : previousComponentPosition
-          );
-
-        if (handlerWasCalled) {
-          this.eventPropagator.setHandled();
-        }
-      }
-    } else {
+    if (!this.componentList.anyActionsForEventType(eventRecordIndex)) {
       this.logger.verbose(
         this._logPrefix(componentId, {focusTreeId}),
         `Ignored '${combinationName}' ${eventName} because it doesn't have any ${eventName} handlers.`
       );
+
+      return;
+    }
+
+    if (this.eventPropagator.isHandled()) {
+      this.logger.debug(
+        this._logPrefix(componentId, {focusTreeId}),
+        `Ignored '${combinationName}' ${eventName} as it has already been handled.`
+      );
+    } else {
+      this.logger.verbose(
+        this._logPrefix(componentId, {focusTreeId}),
+        `Attempting to find action matching '${combinationName}' ${eventName} . . .`
+      );
+
+      const previousComponentPosition = this.eventPropagator.getPreviousPosition();
+
+      const componentPosition = this.componentList.getIndexById(componentId);
+
+      const handlerWasCalled =
+        this._callClosestMatchingHandler(
+          event,
+          keyName,
+          eventRecordIndex,
+          componentPosition,
+          previousComponentPosition === -1 ? 0 : previousComponentPosition
+        );
+
+      if (handlerWasCalled) {
+        this.eventPropagator.setHandled();
+      }
     }
   }
 
