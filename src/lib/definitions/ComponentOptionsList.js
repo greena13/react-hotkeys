@@ -9,6 +9,7 @@ import isUndefined from '../../utils/isUndefined';
 import KeyEventRecordIndex from '../../const/KeyEventRecordIndex';
 import KeySequenceParser from '../shared/KeySequenceParser';
 import KeyEventRecordState from '../../const/KeyEventRecordState';
+import ComponentOptionsListIterator from './ComponentOptionsListIterator';
 
 /**
  * @typedef {Object} ComponentOptions a hotkeys component's options in a normalized
@@ -82,6 +83,10 @@ class ComponentOptionsList {
     this._keyMapEventRecord = KeyEventRecordManager.newRecord();
   }
 
+  getNewIterator() {
+    return new ComponentOptionsListIterator(this);
+  }
+
   /**
    * Adds a new hot key component's options, to be parsed and standardised before being
    * added to the list
@@ -126,7 +131,7 @@ class ComponentOptionsList {
    * @returns {ComponentOptions} Options for the component with the specified id
    */
   get(id) {
-    return this.getAtIndex(this.getIndexById(id));
+    return this.getAtPosition(this.getIndexById(id));
   }
 
   /**
@@ -252,7 +257,7 @@ class ComponentOptionsList {
     this._list.forEach(iterator);
   }
 
-  getAtIndex(index) {
+  getAtPosition(index) {
     return this._list[index];
   }
 
@@ -266,7 +271,7 @@ class ComponentOptionsList {
     let counter = index;
 
     while(counter < this.getLength()) {
-      this._idToIndex[this.getAtIndex(counter).componentId] = counter;
+      this._idToIndex[this.getAtPosition(counter).componentId] = counter;
       counter++;
     }
   }

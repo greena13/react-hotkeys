@@ -26,7 +26,7 @@ describe('Ignoring enabling duplicate component ids:', function () {
           {}
         );
 
-        expect(this.eventStrategy.componentList.getAtIndex(0).componentId).to.eql(this.componentId);
+        expect(this.eventStrategy.componentList.getAtPosition(0).componentId).to.eql(this.componentId);
         expect(this.eventStrategy.componentList.getLength()).to.eql(1);
       });
 
@@ -40,7 +40,7 @@ describe('Ignoring enabling duplicate component ids:', function () {
           {}
         );
 
-        expect(this.eventStrategy.componentList.getAtIndex(0).componentId).to.eql(this.componentId);
+        expect(this.eventStrategy.componentList.getAtPosition(0).componentId).to.eql(this.componentId);
         expect(this.eventStrategy.componentList.getLength()).to.eql(1);
 
         expect(result).to.be.undefined;

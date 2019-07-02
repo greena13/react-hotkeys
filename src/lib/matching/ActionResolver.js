@@ -16,14 +16,6 @@ class ActionResolver {
     this._unmatchedHandlerStatus = [];
 
     /**
-     * Index marking the number of places from the end of componentList for which the
-     * keyMaps have been matched with event handlers. Used to build this.keyMaps as
-     * key events propagate up the React tree.
-     * @type {Number}
-     */
-    this._position = 0;
-
-    /**
      * A dictionary of handlers to the components that register them. This is populated
      * as this.handlerResolutionSearchIndex increases, moving from the end of this.componentList to the
      * front, populating this.keyMaps as needed
@@ -38,6 +30,8 @@ class ActionResolver {
     this._keySequencesDictionary = {};
 
     this._componentList = componentList;
+
+    this._componentListIterator = componentList.getNewIterator();
 
     this._componentList.forEach(({ handlers }) => {
       this._unmatchedHandlerStatus.push( [ Object.keys(handlers).length, {} ]);
@@ -55,7 +49,7 @@ class ActionResolver {
        * often defined in parent components of those that ultimately define their
        * handlers.
        */
-      while (this._getPosition() < this._componentList.getLength()) {
+      while (this._componentListIterator.next()) {
         /**
          * Component currently handling key event has handlers that have not yet been
          * associated with a key sequence. We need to continue walking up the component
@@ -64,8 +58,6 @@ class ActionResolver {
          */
         this._addHandlersFromComponent();
         this._addActionsFromComponent();
-
-        this._position++;
       }
     }
 
@@ -93,7 +85,7 @@ class ActionResolver {
   }
 
   _addActionsFromComponent() {
-    const {actions} = this._getComponent();
+    const {actions} = this._componentListIterator.getComponent();
 
     /**
      * Iterate over the actions of a component (starting with the current component
@@ -110,7 +102,7 @@ class ActionResolver {
         const handlerComponentIndex = handlerComponentIndexArray[0];
 
         const handler =
-          this._componentList.getAtIndex(handlerComponentIndex).handlers[actionName];
+          this._componentList.getAtPosition(handlerComponentIndex).handlers[actionName];
 
         /**
          * Get key map that corresponds with the component that defines the handler
@@ -168,7 +160,7 @@ class ActionResolver {
   }
 
   _addHandlersFromComponent() {
-    const { handlers } = this._getComponent();
+    const { handlers } = this._componentListIterator.getComponent();
 
     /**
      * Add current component's handlers to the handlersDictionary so we know
@@ -179,16 +171,12 @@ class ActionResolver {
     });
   }
 
-  _getComponent() {
-    return this._componentList.getAtIndex(this._getPosition());
-  }
-
   _addHandler(actionName) {
     if (!this._handlersDictionary[actionName]) {
       this._handlersDictionary[actionName] = [];
     }
 
-    this._handlersDictionary[actionName].push(this._getPosition());
+    this._handlersDictionary[actionName].push(this._componentListIterator.getPosition());
   }
 
   _addKeySequence(keySequence, value) {
@@ -217,10 +205,6 @@ class ActionResolver {
     this._keySequencesDictionary[keySequence].some((dictEntry) => {
       return dictEntry[1] === keyMatcher.eventRecordIndex
     });
-  }
-
-  _getPosition() {
-    return this._position;
   }
 }
 
