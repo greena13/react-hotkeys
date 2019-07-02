@@ -446,7 +446,9 @@ renderDialog(){
                     </button>
                   </td>
                 </tr>
-              )
+              );
+              
+              return memo;
             }
           }
           </tbody>
