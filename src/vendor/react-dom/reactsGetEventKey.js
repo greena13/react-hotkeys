@@ -31,7 +31,7 @@ const normalizeKey = {
 
 /**
  * @param {object} nativeEvent Native browser event.
- * @return {string} Normalized `key` property.
+ * @returns {string} Normalized `key` property.
  */
 function reactsGetEventKey(nativeEvent) {
   if (nativeEvent.key) {

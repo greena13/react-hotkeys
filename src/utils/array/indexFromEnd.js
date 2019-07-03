@@ -1,7 +1,7 @@
 /**
  * Returns the element in an array at a particular index from the end
  * @param {Array.<T>} array Array to iterate over to find the item
- * @param {Number} placesFromEnd Number of places from the end of the array to find
+ * @param {number} placesFromEnd Number of places from the end of the array to find
  *        the item to return
  * @returns {T} The item found in the array at the particular index
  * @template T

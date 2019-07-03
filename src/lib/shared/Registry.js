@@ -5,7 +5,7 @@
 class Registry {
   /**
    * Create a new Registry instance
-   * @return {Registry}
+   * @returns {Registry}
    */
   constructor() {
     this._registry = {};

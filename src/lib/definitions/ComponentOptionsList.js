@@ -30,7 +30,7 @@ import ComponentOptionsListIterator from './ComponentOptionsListIterator';
  *          combinations, before the final key combination (an empty string for
  *          sequences that are a single key combination)
  * @property {ActionName} actionName - Name of the action
- * @property {Number} sequenceLength - Number of combinations involved in the
+ * @property {number} sequenceLength - Number of combinations involved in the
  *           sequence
  * @property {KeyCombinationString} id - Serialized description of the key combinations
  *            that make up the sequence
@@ -38,7 +38,7 @@ import ComponentOptionsListIterator from './ComponentOptionsListIterator';
  *           in the last key combination of the sequence
  * @property {KeyEventRecordIndex} eventRecordIndex - Record index for key event that
  *          the matcher should match on
- * @property {Number} size - Number of keys involved in the final key combination
+ * @property {number} size - Number of keys involved in the final key combination
  */
 
 /**
@@ -65,7 +65,7 @@ class ComponentOptionsList {
 
     /**
      * Counter for the length of the longest sequence currently enabled.
-     * @type {Number}
+     * @type {number}
      */
     this._longestSequence = 1;
 
@@ -98,9 +98,9 @@ class ComponentOptionsList {
    * @param {KeyMap} actionNameToKeyMap - Map of actions to key maps
    * @param {HandlersMap} actionNameToHandlersMap - Map of actions to handlers
    * @param {Object} options - Hash of options that configure how the key map is built.
-   * @param {String} options.defaultKeyEvent - The default key event to use for any
+   * @param {string} options.defaultKeyEvent - The default key event to use for any
    *        action that does not explicitly define one.
-   * @returns {Number} The position the component options have in the list
+   * @returns {number} The position the component options have in the list
    */
   add(componentId, actionNameToKeyMap, actionNameToHandlersMap, options) {
     if (this.containsId(componentId)) {
@@ -142,7 +142,7 @@ class ComponentOptionsList {
    * Returns the position of the options belonging to the component with the specified
    * id.
    * @param {ComponentId} id Id of the component to retrieve the options for
-   * @returns {Number} The position of the component options in the list.
+   * @returns {number} The position of the component options in the list.
    */
   getIndexById(id) {
     return this._idToIndex[id];
@@ -154,9 +154,9 @@ class ComponentOptionsList {
    * @param {KeyMap} actionNameToKeyMap - Map of actions to key maps
    * @param {HandlersMap} actionNameToHandlersMap - Map of actions to handlers
    * @param {Object} options - Hash of options that configure how the key map is built.
-   * @param {String} options.defaultKeyEvent - The default key event to use for any
+   * @param {string} options.defaultKeyEvent - The default key event to use for any
    *        action that does not explicitly define one.
-   * @returns {Number} The position the component options have in the list
+   * @returns {number} The position the component options have in the list
    */
   update(componentId, actionNameToKeyMap, actionNameToHandlersMap, options) {
     /**
@@ -200,7 +200,7 @@ class ComponentOptionsList {
   /**
    * Removes the options of a component from the list
    * @param {ComponentId} id The id of the component whose options are removed
-   * @return {void}
+   * @returns {void}
    */
   remove(id) {
     const isUpdatingLongestSequenceComponent =
@@ -232,7 +232,7 @@ class ComponentOptionsList {
 
   /**
    * The length of the longest sequence currently defined.
-   * @returns {Number} The sequence length
+   * @returns {number} The sequence length
    */
   getLongestSequence() {
     return this._longestSequence;
@@ -251,7 +251,7 @@ class ComponentOptionsList {
 
   /**
    * The number of components in the list
-   * @returns {Number} Number of components in the list
+   * @returns {number} Number of components in the list
    */
   getLength() {
     return this._list.length;
@@ -259,7 +259,7 @@ class ComponentOptionsList {
 
   /**
    * The component options at particular position in the list
-   * @param {Number} position The position in the list
+   * @param {number} position The position in the list
    * @returns {ComponentOptions} The component options at the position in the list
    */
   getAtPosition(position) {
@@ -268,7 +268,7 @@ class ComponentOptionsList {
 
   /**
    * Remove the component options at a position in the list
-   * @param {Number} position The position in the list to remove the options
+   * @param {number} position The position in the list to remove the options
    * return {void}
    */
   removeAtPosition(position) {
@@ -384,10 +384,10 @@ class ComponentOptionsList {
    * Returns a mapping between ActionNames and FullKeyEventOptions
    * @param {KeyMap} actionNameToKeyMap - Mapping of ActionNames to key sequences.
    * @param {Object} options - Hash of options that configure how the key map is built.
-   * @param {String} options.defaultKeyEvent - The default key event to use for any
+   * @param {string} options.defaultKeyEvent - The default key event to use for any
    *        action that does not explicitly define one.
    * @param {ComponentId} componentId Index of the component the matcher belongs to
-   * @return {ActionDictionary} Map from ActionNames to FullKeyEventOptions
+   * @returns {ActionDictionary} Map from ActionNames to FullKeyEventOptions
    * @private
    */
   _buildActionDictionary(actionNameToKeyMap, options, componentId) {

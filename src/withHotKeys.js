@@ -46,7 +46,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       /**
        * A unique key to associate with KeyEventMatchers that allows associating handler
        * functions at a later stage
-       * @typedef {String} ActionName
+       * @typedef {string} ActionName
        */
 
       /**
@@ -67,10 +67,10 @@ function withHotKeys(Component, hotKeysOptions = {}) {
        *           KeyEventDescription
        * @property {KeyEventName} action - The keyboard state required to satisfy a
        *           KeyEventDescription
-       * @property {String} name - The name of the action, to be displayed to the end user
-       * @property {String} description - A description of the action, to be displayed to
+       * @property {string} name - The name of the action, to be displayed to the end user
+       * @property {string} description - A description of the action, to be displayed to
        *           the end user
-       * @property {String} group - A group the action belongs to, to aid in showing similar
+       * @property {string} group - A group the action belongs to, to aid in showing similar
        *           actions to the user
        */
 
@@ -103,13 +103,13 @@ function withHotKeys(Component, hotKeysOptions = {}) {
 
       /**
        * Function to call when this component gains focus in the browser
-       * @type {Function}
+       * @type {function}
        */
       onFocus: PropTypes.func,
 
       /**
        * Function to call when this component loses focus in the browser
-       * @type {Function}
+       * @type {function}
        */
       onBlur: PropTypes.func,
 

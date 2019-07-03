@@ -13,7 +13,7 @@ class ComponentOptionsListIterator {
 
   /**
    * The position the iterator is currently at
-   * @returns {Number} The current position
+   * @returns {number} The current position
    */
   getPosition() {
     return this._position;
@@ -30,7 +30,7 @@ class ComponentOptionsListIterator {
   /**
    * Move to the next component options in the list, if not already at the end of the
    * list.
-   * @return {ComponentOptionsList|null} The next component options the iterator is now
+   * @returns {ComponentOptionsList|null} The next component options the iterator is now
    *        pointed at. If the iterator is already at the last component options, null
    *        is returned.
    */

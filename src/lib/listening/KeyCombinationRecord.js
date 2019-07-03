@@ -110,7 +110,7 @@ class KeyCombinationRecord {
 
   /**
    * Whether there are any keys in the current combination still being pressed
-   * @return {Boolean} True if all keys in the current combination are released
+   * @returns {boolean} True if all keys in the current combination are released
    */
   hasEnded() {
     return isEmpty(this.keysStillPressedDict());

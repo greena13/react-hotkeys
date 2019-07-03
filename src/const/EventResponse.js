@@ -1,5 +1,5 @@
 /**
- * @typedef {Number} EventResponseType
+ * @typedef {number} EventResponseType
  */
 
 /**

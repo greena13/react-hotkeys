@@ -13,7 +13,7 @@ class EventPropagator {
    * @param {ComponentOptionsList} componentList List of options of the components
    *        the event is propagating through
    * @param {Logger} logger The logger instance to use
-   * @param {Function} logPrefix Function that returns the appropriate log prefix for
+   * @param {function} logPrefix Function that returns the appropriate log prefix for
    *        each log entry
    */
   constructor(componentList, { logger, logPrefix}) {
@@ -31,39 +31,39 @@ class EventPropagator {
   _reset() {
     /**
      * Position of the component that the event last propagated through
-     * @type {Number}
+     * @type {number}
      */
     this._previousPosition = -1;
 
     /**
      * Position of the current component the event is propagating through
-     * @type {Number}
+     * @type {number}
      */
     this._position = -1;
 
     /**
      * Flag to record whether the keyboard event matches an action whose handler
      * has already been called
-     * @type {Boolean}
+     * @type {boolean}
      */
     this._actionHandled = false;
 
     /**
      * Flag to record whether the keyboard event should be ignored
-     * @type {Boolean}
+     * @type {boolean}
      */
     this._ignoreEvent = false;
 
     /**
      * Flag to record whether the keyboard event current being handled should be
      * observed, even if matches the ignoreEventCondition
-     * @type {Boolean}
+     * @type {boolean}
      */
     this._observeIgnoredEvents = false;
 
     /**
      * Flag to record whether the event is being stopped from further propagation
-     * @type {Boolean}
+     * @type {boolean}
      */
     this._stopping = false;
 
@@ -103,7 +103,7 @@ class EventPropagator {
   /**
    * Whether the propagation is for a particular key
    * @param {ReactKeyName} keyName The name of the key to query
-   * @return {boolean} true if the event propagation is for the key
+   * @returns {boolean} true if the event propagation is for the key
    */
   isForKey(keyName) {
     return this._key === keyName;
@@ -112,7 +112,7 @@ class EventPropagator {
   /**
    * The type of keyboard event that is propagating
    * @param {KeyEventRecordIndex} eventRecordIndex The type of keyboard event to query
-   * @return {boolean} true if the keyboard event propagating is that type
+   * @returns {boolean} true if the keyboard event propagating is that type
    */
   isForEventType(eventRecordIndex) {
     return this._type === eventRecordIndex;
@@ -129,7 +129,7 @@ class EventPropagator {
    * @param {KeyboardEvent} event The actual KeyboardEvent that is propagating
    * @param {ReactKeyName} key The name of the key the event relates to
    * @param {KeyEventRecordIndex} type The type of keyboard event
-   * @param {Function} handler Function to call if event should be observed
+   * @param {function} handler Function to call if event should be observed
    * @returns {boolean} true if the event should be observed, otherwise false if it
    *        should be ignored.
    */
@@ -183,7 +183,7 @@ class EventPropagator {
 
   /**
    * Ends handling of a propagation step and performs cleanup. Called as a after callback.
-   * @return {void}
+   * @returns {void}
    */
   finishPropagationStep() {
     if (this.isStopped() || this._componentList.isRoot(this._componentId)) {
@@ -214,7 +214,7 @@ class EventPropagator {
   /**
    * The position of the component that last had the current propagating event
    * propagate through it
-   * @returns {Number}
+   * @returns {number}
    */
   getPreviousPosition() {
     return this._previousPosition;
@@ -262,7 +262,7 @@ class EventPropagator {
    * Set the ignore event flag, to ignore the current event for the rest of its
    * propagation
    * @param {boolean} ignore true to ignore the event, or false to not ignore it
-   * @return {void}
+   * @returns {void}
    */
   setIgnoreEvent(ignore) {
     this._ignoreEvent = ignore;
@@ -270,7 +270,7 @@ class EventPropagator {
 
   /**
    * Whether to ignore the currently propagating event or not
-   * @returns {Boolean} true if the event is being ignored for the current propagation
+   * @returns {boolean} true if the event is being ignored for the current propagation
    */
   isIgnoringEvent() {
     return !this._observeIgnoredEvents && this._ignoreEvent;
@@ -282,7 +282,7 @@ class EventPropagator {
 
   /**
    * Whether the event has been stopped from further propagation
-   * @returns {Boolean} true if the event is being stopped
+   * @returns {boolean} true if the event is being stopped
    */
   isStopped() {
     return this._stopping;
@@ -320,7 +320,7 @@ class EventPropagator {
 
   /**
    * If the action has already been handled
-   * @returns {Boolean} true if the action has already been handled
+   * @returns {boolean} true if the action has already been handled
    */
   isHandled() {
     return this._actionHandled;

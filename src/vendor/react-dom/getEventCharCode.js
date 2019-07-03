@@ -13,7 +13,7 @@
  * presumably because it does not produce a tab-character in browsers.
  *
  * @param {object} nativeEvent Native browser event.
- * @return {number} Normalized `charCode` property.
+ * @returns {number} Normalized `charCode` property.
  */
 function getEventCharCode(nativeEvent) {
   let charCode;

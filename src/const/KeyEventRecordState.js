@@ -1,5 +1,5 @@
 /**
- * @typedef {Number} KeyEventRecordState
+ * @typedef {number} KeyEventRecordState
  */
 
 /**

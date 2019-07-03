@@ -6,7 +6,7 @@ import hasKey from './hasKey';
  * @param {Object} source Object to copy the attributes from
  * @param {Object} target Object to copy the attributes to
  * @param {String[]} attributes List of attributes to copy
- * @return {Object} The target object, now with the copied attributes
+ * @returns {Object} The target object, now with the copied attributes
  */
 function copyAttributes(source, target, attributes) {
   attributes.forEach((attributeName) => {

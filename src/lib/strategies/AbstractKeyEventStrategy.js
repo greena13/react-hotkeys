@@ -49,7 +49,7 @@ class AbstractKeyEventStrategy {
   constructor(options = {}, keyEventManager) {
     this.logger = options.logger || new Logger('warn');
     /**
-     * @typedef {Number} ComponentId Unique index associated with every HotKeys component
+     * @typedef {number} ComponentId Unique index associated with every HotKeys component
      * as it becomes active.
      *
      * For focus-only components, this happens when the component is focused. The HotKeys
@@ -130,7 +130,7 @@ class AbstractKeyEventStrategy {
   /**
    * Reset the state values that record the current and recent state of key events
    * @param {Object} options An options hash
-   * @param {Boolean} options.force Whether to force a hard reset of the key
+   * @param {boolean} options.force Whether to force a hard reset of the key
    *        combination history.
    */
   resetKeyHistory(options = {}) {
@@ -368,7 +368,7 @@ class AbstractKeyEventStrategy {
 
   /**
    * Whether there are any keys in the current combination still being pressed
-   * @return {Boolean} True if all keys in the current combination are released
+   * @returns {boolean} True if all keys in the current combination are released
    * @protected
    */
   _allKeysAreReleased() {
@@ -493,7 +493,7 @@ class AbstractKeyEventStrategy {
    * Synchronises the key combination history to match the modifier key flag attributes
    * on new key events
    * @param {KeyboardEvent} event - Event to check the modifier flags for
-   * @param {String} key - Name of key that events relates to
+   * @param {string} key - Name of key that events relates to
    * @param {KeyEventRecordIndex} keyEventRecordIndex - The record index of the current
    *        key event type
    * @protected

@@ -237,7 +237,7 @@ class KeyEventManager {
    * @param {FocusTreeId} focusTreeId - Id of focus tree component thinks it's
    *        apart of
    * @param {ComponentId} componentId - Index of component that is blurring
-   * @returns {Boolean} Whether the component still has event propagation yet to handle
+   * @returns {boolean} Whether the component still has event propagation yet to handle
    */
   disableHotKeys(focusTreeId, componentId){
     return this._focusOnlyEventStrategy.disableHotKeys(

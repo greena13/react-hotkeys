@@ -1,5 +1,5 @@
 /**
- * @typedef {Number} KeyEventRecordIndex index (0-2) of which position in an event record
+ * @typedef {number} KeyEventRecordIndex index (0-2) of which position in an event record
  * a particular event is located
  */
 

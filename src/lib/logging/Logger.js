@@ -34,7 +34,7 @@ class Logger {
    * Levels of log severity - the higher the log level, the greater the amount (and
    * lesser the importance) of information logged to the console about React HotKey's
    * behaviour
-   * @enum {Number} LogLevel
+   * @enum {number} LogLevel
    */
   static levels = {
     none: 0,

@@ -48,7 +48,7 @@ const _defaultConfiguration = {
    * Whether to ignore changes to keyMap and handlers props by default (this reduces
    * a significant amount of unnecessarily resetting internal state)
    *
-   * @type {Boolean}
+   * @type {boolean}
    */
   ignoreKeymapAndHandlerChangesByDefault: true,
 
@@ -73,14 +73,14 @@ const _defaultConfiguration = {
 
   /**
    * Whether to ignore repeated keyboard events when a key is being held down
-   * @type {Boolean}
+   * @type {boolean}
    */
   ignoreRepeatedEventsWhenKeyHeldDown: true,
 
   /**
    * Whether React HotKeys should simulate keypress events for the keys that do not
    * natively emit them.
-   * @type {Boolean}
+   * @type {boolean}
    */
   simulateMissingKeyPressEvents: true,
 
@@ -92,7 +92,7 @@ const _defaultConfiguration = {
    * This does not affect the behaviour of React Hotkeys, but rather what happens to
    * the event once React Hotkeys is done with it (whether it's allowed to propagate
    * any further through the Render tree).
-   * @type {Boolean}
+   * @type {boolean}
    */
   stopEventPropagationAfterHandling: true,
 
@@ -104,7 +104,7 @@ const _defaultConfiguration = {
    * This does not affect the behaviour of React Hotkeys, but rather what happens to
    * the event once React Hotkeys is done with it (whether it's allowed to propagate
    * any further through the Render tree).
-   * @type {Boolean}
+   * @type {boolean}
    */
   stopEventPropagationAfterIgnoring: true,
 
@@ -112,7 +112,7 @@ const _defaultConfiguration = {
    * Whether to allow combination submatches - e.g. if there is an action bound to
    * cmd, pressing shift+cmd will *not* trigger that action when
    * allowCombinationSubmatches is false.
-   * @type {Boolean}
+   * @type {boolean}
    */
   allowCombinationSubmatches: false,
 
@@ -169,7 +169,7 @@ class Configuration {
 
   /**
    * Sets a single configuration value by name
-   * @param {String} key - Name of the configuration value to set
+   * @param {string} key - Name of the configuration value to set
    * @param {*} value - New value to set
    */
   static set(key, value) {
@@ -182,7 +182,7 @@ class Configuration {
 
   /**
    * Gets a single configuration value by name
-   * @param {String} key - Name of the configuration value
+   * @param {string} key - Name of the configuration value
    * @returns {*} Configuration value
    */
   static option(key) {

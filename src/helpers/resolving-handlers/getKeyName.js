@@ -1,6 +1,6 @@
 /**
  * Lowercased string representing a particular keyboard key
- * @typedef {String} NormalizedKeyName
+ * @typedef {string} NormalizedKeyName
  */
 
 import reactsGetEventKey from '../../vendor/react-dom/reactsGetEventKey';

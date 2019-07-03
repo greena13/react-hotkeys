@@ -7,7 +7,7 @@ import isUndefined from '../../utils/isUndefined';
 class KeyEventCounter {
   /**
    * Globally unique event id
-   * @typedef {Number} EventId
+   * @typedef {number} EventId
    */
 
   /**

@@ -26,7 +26,7 @@ class KeySequenceParser {
    *          describes a key combination
    * @property {KeyCombinationString} id - String description of keys involved in the key
    *          combination
-   * @property {Number} size - Number of keys involved in the combination
+   * @property {number} size - Number of keys involved in the combination
    * @property {Object.<KeyName, Boolean>} keyDictionary - Dictionary of key names involved
    *           in the key combination
    * @property {KeyEventRecordIndex} eventRecordIndex - Record index for key event that
@@ -34,7 +34,7 @@ class KeySequenceParser {
    */
 
   /**
-   * @typedef {String} KeySequenceString String describing a sequence of one or more key
+   * @typedef {string} KeySequenceString String describing a sequence of one or more key
    * combinations with whitespace separating key combinations in the sequence and '+'
    * separating keys within a key combination.
    */
@@ -48,7 +48,7 @@ class KeySequenceParser {
    * @typedef {Object} BasicKeySequence Object containing the basic information that
    *          describes a key sequence
    * @property {NormalizedKeySequenceId} prefix - Normalized key sequence id
-   * @property {Number} size - Number of combinations involved in the sequence
+   * @property {number} size - Number of combinations involved in the sequence
    */
 
   /**
@@ -60,7 +60,7 @@ class KeySequenceParser {
    *          that registered the key sequence
    * @property {BasicKeyCombination[]} sequence A list of key combinations involved in
    *            the sequence
-   * @property {Number} size Number of key combinations in the key sequence
+   * @property {number} size Number of key combinations in the key sequence
    * @property {KeyEventRecordIndex} eventRecordIndex Index that matches key event type
    * @property {ActionName} actionName Name of the action that should be triggered if a
    *           keyboard event matching the sequence and event type occur
@@ -84,7 +84,7 @@ class KeySequenceParser {
    *        should be parsed.
    * @param {KeyEventRecordIndex} options.eventRecordIndex Event record index indicating
    *        what key event the sequence should match
-   * @param {Boolean} options.ensureValidKeys Whether to throw an exception if an invalid
+   * @param {boolean} options.ensureValidKeys Whether to throw an exception if an invalid
    *        key name is found in the key combination string.
    * @returns {KeySequenceOptions} Object containing information about the key
    *        sequence described by the KeySequenceString
@@ -125,7 +125,7 @@ class KeySequenceParser {
 }
 
 /**
- * @typedef {String} KeyCombinationString String describing a combination of one or more
+ * @typedef {string} KeyCombinationString String describing a combination of one or more
  * keys separated by '+'
  */
 
@@ -144,7 +144,7 @@ class KeySequenceParser {
  * Parses a key combination string and returns the corresponding KeyDictionary
  * @param {KeyCombinationString} string Describes key combination
  * @param {Object} options Options hash of how the string should be parsed
- * @param {Boolean} options.ensureValidKeys Whether to throw an exception if an invalid
+ * @param {boolean} options.ensureValidKeys Whether to throw an exception if an invalid
  *        key name is found in the key combination string.
  * @returns {KeyDictionary} Dictionary of keys in the parsed combination
  */

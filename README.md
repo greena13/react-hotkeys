@@ -1221,20 +1221,20 @@ configure({
    * Whether to ignore changes to keyMap and handlers props by default
    * (this reduces a significant amount of unnecessarily resetting
    * internal state)
-   * @type {Boolean}
+   * @type {boolean}
    */
   ignoreKeymapAndHandlerChangesByDefault: true,
 
   /**
    * Whether to ignore repeated keyboard events when a key is being held down
-   * @type {Boolean}
+   * @type {boolean}
    */
   ignoreRepeatedEventsWhenKeyHeldDown: true,
   
   /**
    * Whether React HotKeys should simulate keypress events for the keys that do not
    * natively emit them.
-   * @type {Boolean}
+   * @type {boolean}
    */
   simulateMissingKeyPressEvents: true,
 

@@ -2,11 +2,11 @@ import MousetrapToReactKeyNamesDictionary from '../../const/MousetrapToReactKeyN
 import KeyShorthandDictionary from '../../const/KeyShorthandDictionary';
 
 /**
- * @typedef {String} KeyName Name of the keyboard key
+ * @typedef {string} KeyName Name of the keyboard key
  */
 
 /**
- * @typedef {String} ReactKeyName Name used by React to refer to key
+ * @typedef {string} ReactKeyName Name used by React to refer to key
  */
 
 /**

@@ -1,7 +1,7 @@
 /**
  * Enum for index values for KeyEventRecords
  * @readonly
- * @enum {Number}
+ * @enum {number}
  */
 const KeyEventSequenceIndex = {
   previous: 0,

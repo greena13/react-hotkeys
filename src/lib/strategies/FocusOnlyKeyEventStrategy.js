@@ -37,7 +37,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     /**
      * Unique identifier given to each focus tree - when the focus in the browser
      * changes, and a different tree of elements are focused, a new id is allocated
-     * @typedef {Number} FocusTreeId
+     * @typedef {number} FocusTreeId
      */
 
     /**
@@ -177,7 +177,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {FocusTreeId} focusTreeId - Id of focus tree component thinks it's
    *        apart of
    * @param {ComponentId} componentId - Index of component that is blurring
-   * @returns {Boolean} Whether the component still has event propagation yet to handle
+   * @returns {boolean} Whether the component still has event propagation yet to handle
    */
   disableHotKeys(focusTreeId, componentId){
     if (!this.resetOnNextFocus) {
@@ -200,7 +200,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
   /**
    * @typedef {KeyboardEvent} SyntheticKeyboardEvent
-   * @property {Function} persist
+   * @property {function} persist
    */
 
   /**
@@ -333,7 +333,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *        the keyboard event as it bubbles towards the document root.
    * @param {Object} options - Hash of options that configure how the event
    *        is handled.
-   * @return {Boolean} Whether the HotKeys component should discard its current focus
+   * @returns {boolean} Whether the HotKeys component should discard its current focus
    *        tree Id, because it belongs to an old focus tree.
    */
   handleKeypress(event, focusTreeId, componentId, options) {
@@ -420,7 +420,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *        the keyboard event as it bubbles towards the document root.
    * @param {Object} options Hash of options that configure how the event
    *        is handled.
-   * @return {Boolean} Whether HotKeys component should discard its current focusTreeId
+   * @returns {boolean} Whether HotKeys component should discard its current focusTreeId
    *        because it's stale (part of an old focus tree)
    */
   handleKeyup(event, focusTreeId, componentId, options) {
