@@ -440,7 +440,7 @@ class KeyEventManager {
     const previousPropagation =
       this._focusOnlyEventStrategy.eventPropagator.getPreviousPropagation();
 
-    if (previousPropagation && previousPropagation.getKey() === key && previousPropagation.getEventType() === type) {
+    if (previousPropagation.isForKey(key) && previousPropagation.isForEventType(type)) {
       if (previousPropagation.isHandled()) {
         return EventResponse.handled;
       } else if (previousPropagation.isIgnoringEvent()) {

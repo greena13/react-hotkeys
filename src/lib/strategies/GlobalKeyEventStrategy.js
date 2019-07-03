@@ -610,12 +610,14 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _callClosestMatchingHandler(event, keyName, eventRecordIndex) {
-    for(let componentPosition = 0; componentPosition < this.componentList.getLength(); componentPosition++) {
+    const componentListIterator = this.componentList.getNewIterator();
+
+    while (componentListIterator.next()) {
       const matchFound = super._callClosestMatchingHandler(
         event,
         keyName,
         eventRecordIndex,
-        componentPosition,
+        componentListIterator.getPosition(),
         0
       );
 

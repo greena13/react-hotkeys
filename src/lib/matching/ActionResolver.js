@@ -29,14 +29,16 @@ class ActionResolver {
      */
     this._keySequencesDictionary = {};
 
-    this._componentList = componentList;
+    const iterator = componentList.getNewIterator();
 
-    this._componentListIterator = componentList.getNewIterator();
-
-    this._componentList.forEach(({ handlers }) => {
+    while(iterator.next()) {
+      const { handlers } = iterator.getComponent();
       this._unmatchedHandlerStatus.push( [ Object.keys(handlers).length, {} ]);
       this._keyMapMatchers.push(new KeyMapMatcher());
-    });
+    }
+
+    this._componentList = componentList;
+    this._componentListIterator = componentList.getNewIterator();
   }
 
   getKeyMapMatcher(index) {

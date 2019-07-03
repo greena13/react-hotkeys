@@ -83,6 +83,10 @@ class ComponentOptionsList {
     this._keyMapEventRecord = KeyEventRecordManager.newRecord();
   }
 
+  /**
+   * Return a new iterator that can be used to enumerate the list
+   * @returns {ComponentOptionsListIterator}
+   */
   getNewIterator() {
     return new ComponentOptionsListIterator(this);
   }
@@ -190,7 +194,7 @@ class ComponentOptionsList {
       }
     }
 
-    this.updateAtIndex(this.getIndexById(componentId), componentOptions);
+    this._list[this.getIndexById(componentId)] = componentOptions;
   }
 
   /**
@@ -202,7 +206,7 @@ class ComponentOptionsList {
     const isUpdatingLongestSequenceComponent =
       this._isUpdatingComponentWithLongestSequence(id);
 
-    this.removeAtIndex(this.getIndexById(id));
+    this.removeAtPosition(this.getIndexById(id));
 
     if (isUpdatingLongestSequenceComponent) {
       this._recalculateLongestSequence();
@@ -253,22 +257,24 @@ class ComponentOptionsList {
     return this._list.length;
   }
 
-  forEach(iterator) {
-    this._list.forEach(iterator);
+  /**
+   * The component options at particular position in the list
+   * @param {Number} position The position in the list
+   * @returns {ComponentOptions} The component options at the position in the list
+   */
+  getAtPosition(position) {
+    return this._list[position];
   }
 
-  getAtPosition(index) {
-    return this._list[index];
-  }
+  /**
+   * Remove the component options at a position in the list
+   * @param {Number} position The position in the list to remove the options
+   * return {void}
+   */
+  removeAtPosition(position) {
+    this._list = removeAtIndex(this._list, position);
 
-  updateAtIndex(index, componentOptions) {
-    this._list[index] = componentOptions;
-  }
-
-  removeAtIndex(index) {
-    this._list = removeAtIndex(this._list, index);
-
-    let counter = index;
+    let counter = position;
 
     while(counter < this.getLength()) {
       this._idToIndex[this.getAtPosition(counter).componentId] = counter;
@@ -276,6 +282,11 @@ class ComponentOptionsList {
     }
   }
 
+  /**
+   * A plain JavaScript object representation of the component options list that can
+   * be used for serialization or debugging
+   * @returns {ComponentOptions[]} plain JavaScript object representation of the list
+   */
   toJSON() {
     return this._list;
   }
@@ -302,15 +313,14 @@ class ComponentOptionsList {
     const { keyMap: hardSequenceKeyMap, handlers: includingHardSequenceHandlers } =
       this._applyHardSequences(actionNameToKeyMap, actionNameToHandlersMap);
 
+    const actions = this._buildActionDictionary(
+      { ...actionNameToKeyMap, ...hardSequenceKeyMap },
+      options,
+      componentId
+    );
+
     return {
-      actions: this._buildActionDictionary(
-        {
-          ...actionNameToKeyMap,
-          ...hardSequenceKeyMap
-        },
-        options,
-        componentId
-      ),
+      actions,
       handlers: includingHardSequenceHandlers,
       componentId,
       options
@@ -326,40 +336,47 @@ class ComponentOptionsList {
   }
 
   _recalculateLongestSequence() {
-    this.forEach(({longestSequence, componentId }) => {
+    const iterator = this.getNewIterator();
+
+    while(iterator.next()) {
+      const {longestSequence, componentId } = iterator.getComponent();
+
       if (longestSequence > this.getLongestSequence()) {
         this._longestSequenceComponentId = componentId;
         this._longestSequence = longestSequence;
       }
-    });
+    }
   }
 
   /**
    * Applies hard sequences (handlers attached to actions with names that are valid
    * KeySequenceStrings) that implicitly define a corresponding action name.
    * @param {KeyMap} actionNameToKeyMap - KeyMap specified by HotKeys component
-   * @param {HandlersMap} actionNameToHandlersMap - HandlersMap specified by HotKeys
-   *        component
+   * @param {HandlersMap} actionMap - HandlersMap specified by HotKeys component
    * @returns {{keyMap: {}, handlers: {}}} Object containing keymap and handlers map
    *        with the hard sequence actions applied
    * @private
    */
-  _applyHardSequences(actionNameToKeyMap, actionNameToHandlersMap) {
+  _applyHardSequences(actionNameToKeyMap, actionMap) {
     if (Configuration.option('enableHardSequences')) {
-      return Object.keys(actionNameToHandlersMap).reduce((memo, actionNameOrKeyExpression) => {
-        const actionNameIsInKeyMap = !!actionNameToKeyMap[actionNameOrKeyExpression];
+      return Object.keys(actionMap).reduce((memo, actionNameOrHardSequence) => {
+        const actionNameIsInKeyMap = !!actionNameToKeyMap[actionNameOrHardSequence];
 
-        if (!actionNameIsInKeyMap && KeyCombinationSerializer.isValidKeySerialization(actionNameOrKeyExpression)) {
-          memo.keyMap[actionNameOrKeyExpression] = actionNameOrKeyExpression;
+        if (!actionNameIsInKeyMap &&
+            KeyCombinationSerializer.isValidKeySerialization(actionNameOrHardSequence)) {
+
+          memo.keyMap[actionNameOrHardSequence] = actionNameOrHardSequence;
         }
 
-        memo.handlers[actionNameOrKeyExpression] =
-          actionNameToHandlersMap[actionNameOrKeyExpression];
+        memo.handlers[actionNameOrHardSequence] = actionMap[actionNameOrHardSequence];
 
         return memo;
       }, {keyMap: {}, handlers: {}});
     } else {
-      return { keyMap: actionNameToKeyMap, handlers: actionNameToHandlersMap };
+      return {
+        keyMap: actionNameToKeyMap,
+        handlers: actionMap
+      };
     }
   }
 
@@ -386,49 +403,58 @@ class ComponentOptionsList {
       }();
 
       keyMapOptions.forEach((keyMapOption) => {
-        const { keySequence, eventRecordIndex } = function(){
-          if (isObject(keyMapOption)) {
-            const { sequence, action } = keyMapOption;
+        const { keySequence, eventRecordIndex } =
+          normalizeActionOptions(keyMapOption, options);
 
-            return {
-              keySequence: sequence,
-              eventRecordIndex: isUndefined(action) ? KeyEventRecordIndex[options.defaultKeyEvent] : KeyEventRecordIndex[action]
-            };
-          } else {
-            return {
-              keySequence: keyMapOption,
-              eventRecordIndex: KeyEventRecordIndex[options.defaultKeyEvent]
-            }
-          }
-        }();
-
-        const { sequence, combination } = KeySequenceParser.parse(keySequence, { eventRecordIndex });
-
-        if (sequence.size > this.getLongestSequence()) {
-          this._longestSequence = sequence.size;
-          this._longestSequenceComponentId = componentId;
-        }
-
-        /**
-         * Record that there is at least one key sequence in the focus tree bound to
-         * the keyboard event
-         */
-        this._keyMapEventRecord[eventRecordIndex] = KeyEventRecordState.seen;
-
-        if (!memo[actionName]) {
-          memo[actionName] = [];
-        }
-
-        memo[actionName].push({
-          prefix: sequence.prefix,
-          actionName,
-          sequenceLength: sequence.size,
-          ...combination,
-        });
+        this._addActionOptions(
+          memo, componentId, actionName, keySequence, eventRecordIndex
+        );
       });
 
       return memo;
     }, {});
+  }
+
+  _addActionOptions(memo, componentId, actionName, keySequence, eventRecordIndex) {
+    const {sequence, combination} = KeySequenceParser.parse(keySequence, {eventRecordIndex});
+
+    if (sequence.size > this.getLongestSequence()) {
+      this._longestSequence = sequence.size;
+      this._longestSequenceComponentId = componentId;
+    }
+
+    /**
+     * Record that there is at least one key sequence in the focus tree bound to
+     * the keyboard event
+     */
+    this._keyMapEventRecord[eventRecordIndex] = KeyEventRecordState.seen;
+
+    if (!memo[actionName]) {
+      memo[actionName] = [];
+    }
+
+    memo[actionName].push({
+      prefix: sequence.prefix,
+      actionName,
+      sequenceLength: sequence.size,
+      ...combination,
+    });
+  }
+}
+
+function normalizeActionOptions(keyMapOption, options) {
+  if (isObject(keyMapOption)) {
+    const {sequence, action} = keyMapOption;
+
+    return {
+      keySequence: sequence,
+      eventRecordIndex: isUndefined(action) ? KeyEventRecordIndex[options.defaultKeyEvent] : KeyEventRecordIndex[action]
+    };
+  } else {
+    return {
+      keySequence: keyMapOption,
+      eventRecordIndex: KeyEventRecordIndex[options.defaultKeyEvent]
+    };
   }
 }
 
