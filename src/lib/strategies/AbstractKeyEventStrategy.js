@@ -8,7 +8,7 @@ import Configuration from '../config/Configuration';
 import KeyCombinationHistory from '../listening/KeyCombinationHistory';
 import KeyCombinationRecord from '../listening/KeyCombinationRecord';
 import Registry from '../shared/Registry';
-import ComponentRegistry from '../definitions/ComponentRegistry';
+import ComponentTree from '../definitions/ComponentTree';
 import ComponentOptionsList from '../definitions/ComponentOptionsList';
 import ActionResolver from '../matching/ActionResolver';
 
@@ -79,7 +79,7 @@ class AbstractKeyEventStrategy {
 
     this.keyMapRegistry = new Registry();
 
-    this.componentRegistry = new ComponentRegistry();
+    this.componentRegistry = new ComponentTree();
 
     this.rootComponentId = null;
 

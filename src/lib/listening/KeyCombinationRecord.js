@@ -5,7 +5,6 @@ import resolveKeyAlias from '../../helpers/resolving-handlers/resolveKeyAlias';
 import applicableAliasFunctions from '../../helpers/resolving-handlers/applicableAliasFunctions';
 import KeyEventRecordManager from '../shared/KeyEventRecordManager';
 import isEmpty from '../../utils/collection/isEmpty';
-import Configuration from '../config/Configuration';
 import size from '../../utils/collection/size';
 
 class KeyCombinationRecord {

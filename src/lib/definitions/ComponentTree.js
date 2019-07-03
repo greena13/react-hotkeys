@@ -10,7 +10,7 @@ import without from '../../utils/collection/without';
 /**
  * Registry of hot keys components, mapping children to their parents and vice versa
  */
-class ComponentRegistry extends Registry {
+class ComponentTree extends Registry {
   /**
    * Register a component
    * @param {ComponentId} componentId Id of the component to register
@@ -20,17 +20,6 @@ class ComponentRegistry extends Registry {
       childIds: [],
       parentId: null
     });
-  }
-
-  /**
-   * Retrieve the ComponentRegistryEntry of the parent of a component
-   * @param {ComponentId} componentId Id of the component to return the parent details of
-   * @returns {ComponentRegistryEntry} Parent component's ComponentRegistryEntry
-   */
-  getParent(componentId) {
-    const parentId = this._getParentId(componentId);
-
-    return parentId && this.get(parentId);
   }
 
   /**
@@ -73,4 +62,4 @@ class ComponentRegistry extends Registry {
   }
 }
 
-export default ComponentRegistry;
+export default ComponentTree;
