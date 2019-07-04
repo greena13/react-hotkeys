@@ -9,6 +9,7 @@ import without from '../../utils/collection/without';
 
 /**
  * Registry of hot keys components, mapping children to their parents and vice versa
+ * @class
  */
 class ComponentTree extends Registry {
   /**

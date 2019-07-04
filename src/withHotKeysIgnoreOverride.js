@@ -32,6 +32,7 @@ function withHotKeysIgnoreOverride(Component, hotKeysIgnoreOptions = { only: [],
    * Configuration.ignoreEventCondition and instead either force the event to be
    * ignored or observed. By default, this is all key events, but you can use
    * the only prop to provide a whitelist, or the except prop to pass a blacklist.
+   * @class
    */
   return class HotKeysIgnoreOverride extends PureComponent {
     static propTypes = {

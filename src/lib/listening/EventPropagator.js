@@ -6,6 +6,7 @@ import KeyEventRecordIndex from '../../const/KeyEventRecordIndex';
 /**
  * Handles the propagation of keyboard events up through the React component tree,
  * starting from the hot keys component closest to the event target
+ * @class
  */
 class EventPropagator {
   /**

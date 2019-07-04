@@ -1,6 +1,6 @@
 /**
  * Generic registry for storing and retrieving items
- * @abstract
+ * @class @abstract
  */
 class Registry {
   /**

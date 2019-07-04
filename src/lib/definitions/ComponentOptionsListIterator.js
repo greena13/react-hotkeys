@@ -1,5 +1,6 @@
 /**
  * Iterates over ComponentOptionList instances
+ * @class
  */
 class ComponentOptionsListIterator {
   /**

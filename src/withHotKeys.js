@@ -40,6 +40,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
    * Component that listens to key events when one of its children are in focus and
    * selectively triggers actions (that may be handled by handler functions) when a
    * sequence of events matches a list of pre-defined sequences or combinations
+   * @class
    */
   class HotKeysEnabled extends PureComponent {
     static propTypes = {
