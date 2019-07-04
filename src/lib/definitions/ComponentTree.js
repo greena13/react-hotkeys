@@ -15,12 +15,24 @@ class ComponentTree extends Registry {
   /**
    * Register a component
    * @param {ComponentId} componentId Id of the component to register
+   * @param {KeyMap} keyMap - Map of actions to key expressions
    */
-  add(componentId) {
+  add(componentId, keyMap) {
     super.set(componentId, {
       childIds: [],
-      parentId: null
+      parentId: null,
+      keyMap
     });
+  }
+
+  /**
+   * Updates an existing component's key map
+   * @param {ComponentId} componentId Id of the component to register
+   * @param {KeyMap} keyMap - Map of actions to key expressions
+   */
+  update(componentId, keyMap) {
+    const component = super.get(componentId);
+    super.set(componentId, {...component, keyMap});
   }
 
   /**

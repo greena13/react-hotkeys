@@ -8,6 +8,11 @@ import KeyEventManager from '../../src/lib/KeyEventManager';
 describe('Creating component hierarchy for GlobalHotKeys:', () => {
   beforeEach(function () {
     this.reactDiv = document.createElement('div');
+
+    this.parentKeyMap = {PARENT: 'a'};
+    this.childKeyMap = {CHILD: 'a'};
+    this.grandChildKeyMap = {GRAND_CHILD: 'a'};
+
     document.body.appendChild(this.reactDiv);
   });
 
@@ -18,11 +23,11 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
   context('when a GlobalHotKeys component is nested in another', () => {
     beforeEach(function () {
       this.wrapper = mount(
-        <GlobalHotKeys keyMap={{PARENT: 'a'}} id={0}>
+        <GlobalHotKeys keyMap={this.parentKeyMap} id={0}>
           <div className="outerChildElement" />
 
           <div className="innerChildElement">
-            <GlobalHotKeys keyMap={{CHILD: 'a'}} id={1} />
+            <GlobalHotKeys keyMap={this.childKeyMap} id={1} />
           </div>
         </GlobalHotKeys>,
         { attachTo: this.reactDiv }
@@ -30,14 +35,16 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
     });
 
     it('then builds the correct component registry', function() {
-      expect(KeyEventManager.getInstance()._globalEventStrategy.componentRegistry.toJSON()).to.eql({
+      expect(KeyEventManager.getInstance()._globalEventStrategy._componentTree.toJSON()).to.eql({
         0: {
           parentId: null,
-          childIds: [1]
+          childIds: [1],
+          keyMap: this.parentKeyMap
         },
         1: {
           parentId: 0,
-          childIds: []
+          childIds: [],
+          keyMap: this.childKeyMap
         }
       });
     });
@@ -46,13 +53,13 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
   context('when there are several levels of GlobalHotKeys components', () => {
     beforeEach(function () {
       this.wrapper = mount(
-        <GlobalHotKeys keyMap={{PARENT: 'a'}} id={0}>
+        <GlobalHotKeys keyMap={this.parentKeyMap} id={0}>
           <div className="outerChildElement" />
 
-          <GlobalHotKeys keyMap={{CHILD: 'a'}} id={1}>
+          <GlobalHotKeys keyMap={this.childKeyMap} id={1}>
             <div className="innerChildElement" />
 
-            <GlobalHotKeys keyMap={{GRAND_CHILD: 'a'}} id={2}/>
+            <GlobalHotKeys keyMap={this.grandChildKeyMap} id={2}/>
           </GlobalHotKeys>
         </GlobalHotKeys>,
         { attachTo: this.reactDiv }
@@ -60,18 +67,21 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
     });
 
     it('then builds the correct component registry', function() {
-      expect(KeyEventManager.getInstance()._globalEventStrategy.componentRegistry.toJSON()).to.eql({
+      expect(KeyEventManager.getInstance()._globalEventStrategy._componentTree.toJSON()).to.eql({
         0: {
           parentId: null,
-          childIds: [1]
+          childIds: [1],
+          keyMap: this.parentKeyMap
         },
         1: {
           parentId: 0,
-          childIds: [2]
+          childIds: [2],
+          keyMap: this.childKeyMap
         },
         2: {
           parentId: 1,
-          childIds: []
+          childIds: [],
+          keyMap: this.grandChildKeyMap
         }
       });
     });
@@ -80,29 +90,32 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
   context('when there sibling GlobalHotKeys components', () => {
     beforeEach(function () {
       this.wrapper = mount(
-        <GlobalHotKeys keyMap={{PARENT: 'a'}} id={0}>
+        <GlobalHotKeys keyMap={this.parentKeyMap} id={0}>
           <div className="outerChildElement" />
 
-          <GlobalHotKeys keyMap={{CHILD1: 'a'}} id={1}/>
-          <GlobalHotKeys keyMap={{CHILD1: 'a'}} id={2}/>
+          <GlobalHotKeys keyMap={this.childKeyMap} id={1}/>
+          <GlobalHotKeys keyMap={this.childKeyMap} id={2}/>
         </GlobalHotKeys>,
         { attachTo: this.reactDiv }
       );
     });
 
     it('then builds the correct component registry', function() {
-      expect(KeyEventManager.getInstance()._globalEventStrategy.componentRegistry.toJSON()).to.eql({
+      expect(KeyEventManager.getInstance()._globalEventStrategy._componentTree.toJSON()).to.eql({
         0: {
           parentId: null,
-          childIds: [1, 2]
+          childIds: [1, 2],
+          keyMap: this.parentKeyMap
         },
         1: {
           parentId: 0,
-          childIds: []
+          childIds: [],
+          keyMap: this.childKeyMap
         },
         2: {
           parentId: 0,
-          childIds: []
+          childIds: [],
+          keyMap: this.childKeyMap
         }
       });
     });
@@ -111,7 +124,7 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
   context('when there is complex nesting of GlobalHotKeys components', () => {
     beforeEach(function () {
       this.wrapper = mount(
-        <GlobalHotKeys keyMap={{PARENT: 'a'}} id={0}>
+        <GlobalHotKeys keyMap={this.parentKeyMap} id={0}>
           <div className="outerChildElement" />
 
           <GlobalHotKeys keyMap={{CHILD1: 'a'}} id={1}>
@@ -131,34 +144,41 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
     });
 
     it('then builds the correct component registry', function() {
-      expect(KeyEventManager.getInstance()._globalEventStrategy.componentRegistry.toJSON()).to.eql({
+      expect(KeyEventManager.getInstance()._globalEventStrategy._componentTree.toJSON()).to.eql({
         0: {
           parentId: null,
-          childIds: [1, 4, 6]
+          childIds: [1, 4, 6],
+          keyMap: this.parentKeyMap
         },
         1: {
           parentId: 0,
-          childIds: [2]
+          childIds: [2],
+          keyMap: {CHILD1: 'a'}
         },
         2: {
           parentId: 1,
-          childIds: [3]
+          childIds: [3],
+          keyMap: {GRAND_CHILD1: 'a'}
         },
         3: {
           parentId: 2,
-          childIds: []
+          childIds: [],
+          keyMap: {GREAT_GRAND_CHILD1: 'a'}
         },
         4: {
           parentId: 0,
-          childIds: [5]
+          childIds: [5],
+          keyMap: {CHILD2: 'a'}
         },
         5: {
           parentId: 4,
-          childIds: []
+          childIds: [],
+          keyMap: {GRAND_CHILD2: 'a'}
         },
         6: {
           parentId: 0,
-          childIds: []
+          childIds: [],
+          keyMap: {CHILD3: 'a'}
         },
       });
     });
@@ -167,14 +187,14 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
   context('when a GlobalHotKeys components are unmounted and mounted', () => {
     beforeEach(function () {
       this.wrapper = mount(
-        <GlobalHotKeys keyMap={{PARENT: 'a'}} id={0}>
+        <GlobalHotKeys keyMap={this.parentKeyMap} id={0}>
           <div>
             <div className="outerChildElement" />
 
-            <GlobalHotKeys keyMap={{CHILD: 'a'}} id={1} key={1}>
+            <GlobalHotKeys keyMap={this.childKeyMap} id={1} key={1}>
               <div className="innerChildElement" />
 
-              <GlobalHotKeys keyMap={{GRAND_CHILD: 'a'}} id={2} key={2}/>
+              <GlobalHotKeys keyMap={this.grandChildKeyMap} id={2} key={2}/>
             </GlobalHotKeys>
           </div>
         </GlobalHotKeys>,
@@ -188,10 +208,10 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
             <div>
               <div className="outerChildElement" />
 
-              <GlobalHotKeys keyMap={{CHILD: 'a'}} id={1} nextId={3} >
+              <GlobalHotKeys keyMap={this.childKeyMap} id={1} nextId={3} >
                 <div className="innerChildElement" />
 
-                <GlobalHotKeys keyMap={{GRAND_CHILD: 'a'}} id={2} nextId={4} />
+                <GlobalHotKeys keyMap={this.grandChildKeyMap} id={2} nextId={4} />
               </GlobalHotKeys>
             </div>
           )
@@ -199,18 +219,21 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
       });
 
       it('then builds the correct component registry', function() {
-        expect(KeyEventManager.getInstance()._globalEventStrategy.componentRegistry.toJSON()).to.eql({
+        expect(KeyEventManager.getInstance()._globalEventStrategy._componentTree.toJSON()).to.eql({
           0: {
             parentId: null,
-            childIds: [3]
+            childIds: [3],
+            keyMap: this.parentKeyMap
           },
           3: {
             parentId: 0,
-            childIds: [4]
+            childIds: [4],
+            keyMap: this.childKeyMap
           },
           4: {
             parentId: 3,
-            childIds: []
+            childIds: [],
+            keyMap: this.grandChildKeyMap
           }
         });
       })
@@ -222,10 +245,10 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
             <div>
               <div className="outerChildElement" />
 
-              <GlobalHotKeys keyMap={{CHILD: 'a'}} id={1} key={1}>
+              <GlobalHotKeys keyMap={this.childKeyMap} id={1} key={1}>
                 <div className="innerChildElement" />
 
-                <GlobalHotKeys keyMap={{GRAND_CHILD: 'a'}} id={2} key={3}/>
+                <GlobalHotKeys keyMap={this.grandChildKeyMap} id={2} key={3}/>
               </GlobalHotKeys>
             </div>
           )
@@ -233,18 +256,21 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
       });
 
       it('then builds the correct component registry', function() {
-        expect(KeyEventManager.getInstance()._globalEventStrategy.componentRegistry.toJSON()).to.eql({
+        expect(KeyEventManager.getInstance()._globalEventStrategy._componentTree.toJSON()).to.eql({
           0: {
             parentId: null,
-            childIds: [1]
+            childIds: [1],
+            keyMap: this.parentKeyMap
           },
           1: {
             parentId: 0,
-            childIds: [3]
+            childIds: [3],
+            keyMap: this.childKeyMap
           },
           3: {
             parentId: 1,
-            childIds: []
+            childIds: [],
+            keyMap: this.grandChildKeyMap
           }
         });
       })
@@ -256,7 +282,7 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
             <div>
               <div className="outerChildElement" />
 
-              <GlobalHotKeys keyMap={{CHILD: 'a'}} id={1} key={1}>
+              <GlobalHotKeys keyMap={this.childKeyMap} id={1} key={1}>
                 <div className="innerChildElement" />
               </GlobalHotKeys>
             </div>
@@ -265,14 +291,16 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
       });
 
       it('then builds the correct component registry', function() {
-        expect(KeyEventManager.getInstance()._globalEventStrategy.componentRegistry.toJSON()).to.eql({
+        expect(KeyEventManager.getInstance()._globalEventStrategy._componentTree.toJSON()).to.eql({
           0: {
             parentId: null,
-            childIds: [1]
+            childIds: [1],
+            keyMap: this.parentKeyMap
           },
           1: {
             parentId: 0,
-            childIds: []
+            childIds: [],
+            keyMap: this.childKeyMap
           }
         });
       })
