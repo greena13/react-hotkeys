@@ -291,9 +291,9 @@ class ComponentOptionsList {
     return this._list;
   }
 
-  /**
-   * Private
-   */
+  /********************************************************************************
+   * Private methods
+   ********************************************************************************/
 
   _getLastIndex() {
     return this.getLength() - 1;

@@ -100,6 +100,10 @@ class KeyCombinationHistory {
     this.push(newCombinationRecord);
   }
 
+  /********************************************************************************
+   * Private methods
+   ********************************************************************************/
+
   _ensureInitialKeyCombination() {
     if (this.isEmpty()) {
       this.push(new KeyCombinationRecord())

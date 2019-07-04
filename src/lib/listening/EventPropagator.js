@@ -124,29 +124,6 @@ class EventPropagator {
    *********************************************************************************/
 
   /**
-   * Handle a new propagation step, called as an around callback.
-   * @param {ComponentId} componentId The id of the component that has just had the
-   *        event propagate up to it
-   * @param {KeyboardEvent} event The actual KeyboardEvent that is propagating
-   * @param {ReactKeyName} key The name of the key the event relates to
-   * @param {KeyEventRecordIndex} type The type of keyboard event
-   * @param {function} handler Function to call if event should be observed
-   * @returns {boolean} true if the event should be observed, otherwise false if it
-   *        should be ignored.
-   */
-  propagate(componentId, event, key, type, handler) {
-    if (this.startNewPropagationStep(componentId, event, key, KeyEventRecordIndex.keyup)) {
-      handler();
-
-      this.finishPropagationStep();
-
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
    * Begin a new propagation step, called as a before callback. i.e. the first thing
    * after an event has propagated to a new hot keys component
    * @param {ComponentId} componentId The id of the component that has just had the
@@ -299,6 +276,7 @@ class EventPropagator {
     if (!this.isStopped()) {
       this._stopping = true;
 
+      // noinspection JSUnresolvedVariable
       if (!event.simulated) {
         event.stopPropagation();
       }
@@ -335,6 +313,10 @@ class EventPropagator {
   setHandled() {
     this._actionHandled = true;
   }
+
+  /********************************************************************************
+   * Private methods
+   ********************************************************************************/
 
   _clone({ copyState = true } = {}) {
     const cloned = new EventPropagator(this._componentList, {

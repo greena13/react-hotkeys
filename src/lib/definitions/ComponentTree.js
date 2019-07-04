@@ -16,6 +16,7 @@ class ComponentTree extends Registry {
    * Register a component
    * @param {ComponentId} componentId Id of the component to register
    * @param {KeyMap} keyMap - Map of actions to key expressions
+   * @returns {void}
    */
   add(componentId, keyMap) {
     super.set(componentId, {
@@ -29,6 +30,7 @@ class ComponentTree extends Registry {
    * Updates an existing component's key map
    * @param {ComponentId} componentId Id of the component to register
    * @param {KeyMap} keyMap - Map of actions to key expressions
+   * @returns {void}
    */
   update(componentId, keyMap) {
     const component = super.get(componentId);
@@ -39,6 +41,7 @@ class ComponentTree extends Registry {
    * Set the parent ID of a component
    * @param {ComponentId} componentId Id of the component
    * @param {ComponentId} parentId Id of the parent
+   * @returns {void}
    */
   setParent(componentId, parentId) {
     this.get(componentId).parentId = parentId;
@@ -48,6 +51,7 @@ class ComponentTree extends Registry {
   /**
    * Deregister a component
    * @param {ComponentId} componentId Id of the component to remove
+   * @returns {void}
    */
   remove(componentId) {
     const parentId = this._getParentId(componentId);
@@ -56,6 +60,10 @@ class ComponentTree extends Registry {
 
     super.remove(componentId);
   }
+
+  /********************************************************************************
+   * Private methods
+   ********************************************************************************/
 
   _getParentId(componentId) {
     const component = this.get(componentId);

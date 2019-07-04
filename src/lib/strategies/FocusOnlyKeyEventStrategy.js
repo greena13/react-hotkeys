@@ -237,12 +237,11 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       componentId,
       event,
       key,
-      KeyEventRecordIndex.keydown,
-      options
+      KeyEventRecordIndex.keydown
     );
 
     if (!started) {
-      return true;
+      return;
     }
 
     const responseAction = this._howToHandleKeyEvent(event,
@@ -354,12 +353,11 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       componentId,
       event,
       key,
-      KeyEventRecordIndex.keypress,
-      options
+      KeyEventRecordIndex.keypress
     );
 
     if (!started) {
-      return true;
+      return;
     }
 
     const shouldDiscardFocusTreeId = focusTreeId !== this.focusTreeId;
@@ -441,12 +439,11 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       componentId,
       event,
       key,
-      KeyEventRecordIndex.keyup,
-      options
+      KeyEventRecordIndex.keyup
     );
 
     if (!started) {
-      return true;
+      return;
     }
 
     const shouldDiscardFocusId = focusTreeId !== this.focusTreeId;
