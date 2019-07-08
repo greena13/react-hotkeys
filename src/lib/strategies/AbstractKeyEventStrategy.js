@@ -96,13 +96,9 @@ class AbstractKeyEventStrategy {
   }
 
   _newKeyHistory() {
-    const keyHistory = new KeyCombinationHistory({
+    return new KeyCombinationHistory({
       maxLength: this.componentList.getLongestSequence()
     });
-
-    keyHistory.init();
-
-    return keyHistory;
   }
 
   getKeyHistory() {
@@ -135,16 +131,15 @@ class AbstractKeyEventStrategy {
 
     this.keyupEventsToSimulate = [];
 
-    const keyHistory = this.getKeyHistory();
-    const prevHistoryNonEmpty = keyHistory.any();
-    const keyCombinationRecord = this.getCurrentCombination();
+    if (this.getKeyHistory().any() && !options.force) {
+      const keyCombinationRecord = this.getCurrentCombination();
 
-    this._keyHistory = this._newKeyHistory();
-
-    if (prevHistoryNonEmpty && !options.force) {
-      keyHistory.push(
+      this._keyHistory = new KeyCombinationHistory(
+        { maxLength: this.componentList.getLongestSequence() },
         new KeyCombinationRecord(keyCombinationRecord.keysStillPressedDict())
       );
+    } else {
+      this._keyHistory = this._newKeyHistory();
     }
   }
 

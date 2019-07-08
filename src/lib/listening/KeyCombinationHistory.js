@@ -8,61 +8,52 @@ class KeyCombinationHistory {
   /**
    * Creates a new KeyCombinationHistory instance
    * @param {Number} maxLength Maximum length of the list.
+   * @param {KeyCombinationRecord} startingPoint Initial state of first combination
    * @returns {KeyCombinationHistory}
    */
-  constructor({ maxLength }) {
-    this.records = [];
+  constructor({ maxLength }, startingPoint = null) {
+    this._records = [];
 
-    this.maxLength = maxLength;
-  }
+    this._maxLength = maxLength;
 
-  init(record = null) {
-    if (record) {
-      this.push(record);
-    } else if (this.isEmpty()) {
-      this.push(new KeyCombinationRecord())
+    if (startingPoint) {
+      this._push(startingPoint);
+    } else {
+      this._push(new KeyCombinationRecord());
     }
   }
 
-  push(record) {
-    if (this.getLength() > this.maxLength) {
-      /**
-       * We know the longest key sequence registered for the currently focused
-       * components, so we don't need to keep a record of history longer than
-       * that
-       */
-      this.shift();
-    }
-
-    this.records.push(record);
+  /**
+   * A subset of the most recently press key combinations
+   * @param {Number} numberOfCombinations The number of most recent key combinations
+   * @returns {KeyCombinationRecord[]} List of key combinations
+   */
+  getMostRecentCombinations(numberOfCombinations) {
+    return this._records.slice(-numberOfCombinations, -1);
   }
 
-  shift() {
-    this.records.shift();
-  }
-
-  slice(start, end) {
-    return this.records.slice(start, end);
-  }
-
+  /**
+   * Whether any keys have been stored in the key history
+   * @returns {boolean} true if there is at least one key combination, else false
+   */
   any() {
-    return !this.isEmpty();
+    return this._records.some((keyCombination) => keyCombination.any());
   }
 
-  isEmpty() {
-    return this.getLength() === 0;
-  }
-
+  /**
+   * The number of key combinations in the history (limited by the max length)
+   * @returns {number} Number of key combinations
+   */
   getLength() {
-    return this.records.length;
+    return this._records.length;
   }
 
+  /**
+   * Most recent or current key combination
+   * @returns {KeyCombinationRecord} Key combination record
+   */
   getCurrentCombination() {
-    return this.records[this.getLength() - 1];
-  }
-
-  toJSON() {
-    return this.records.map((keyCombination) => keyCombination.toJSON() );
+    return this._records[this.getLength() - 1];
   }
 
   /**
@@ -78,13 +69,18 @@ class KeyCombinationHistory {
     this.getCurrentCombination().setKeyState(keyName, recordIndex, keyEventState);
   }
 
+  /**
+   * Sets a new maximum length for the key combination history. Once the number of
+   * key combinations exceeds this length, the oldest is dropped.
+   * @param {Number} length New maximum length of the key history
+   */
   setMaxLength(length) {
-    this.maxLength = length;
+    this._maxLength = length;
+    this._trimHistory();
   }
 
   /**
-   * Adds a new KeyCombinationRecord to the event history and resets the includesKeyup
-   * flag to false.
+   * Adds a new KeyCombinationRecord to the event history.
    * @param {ReactKeyName} keyName - Name of the keyboard key to add to the new
    *        KeyCombinationRecord
    * @param {KeyEventRecordState} keyEventState The state to set the key event to
@@ -97,7 +93,16 @@ class KeyCombinationHistory {
 
     newCombinationRecord.addKey(keyName, keyEventState);
 
-    this.push(newCombinationRecord);
+    this._push(newCombinationRecord);
+  }
+
+  /**
+   * A plain JavaScript representation of the key combination history, useful for
+   * serialization or debugging
+   * @returns {Object[]} Serialized representation of the registry
+   */
+  toJSON() {
+    return this._records.map((keyCombination) => keyCombination.toJSON() );
   }
 
   /********************************************************************************
@@ -105,9 +110,30 @@ class KeyCombinationHistory {
    ********************************************************************************/
 
   _ensureInitialKeyCombination() {
-    if (this.isEmpty()) {
-      this.push(new KeyCombinationRecord())
+    if (this.getLength() === 0) {
+      this._push(new KeyCombinationRecord())
     }
+  }
+
+  _push(record) {
+    this._trimHistory();
+
+    this._records.push(record);
+  }
+
+  _trimHistory() {
+    while (this.getLength() > this._maxLength) {
+      /**
+       * We know the longest key sequence registered for the currently focused
+       * components, so we don't need to keep a record of history longer than
+       * that
+       */
+      this._shift();
+    }
+  }
+
+  _shift() {
+    this._records.shift();
   }
 }
 

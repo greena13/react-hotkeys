@@ -27,6 +27,10 @@ class KeyCombinationRecord {
     return this._ids;
   }
 
+  any() {
+    return Object.keys(this.getKeyStates()).length > 0;
+  }
+
   getKeyAliases() {
     return this._keyAliases;
   }

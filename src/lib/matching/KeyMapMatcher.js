@@ -73,15 +73,18 @@ class KeyMapMatcher {
   }
 
   _findSequenceMatcher(keyCombinationHistory) {
-    const sequenceHistory = keyCombinationHistory.slice(-this.getLongestSequence(), -1);
-    const sequenceIds = sequenceHistory.map((keyCombinationRecord) => keyCombinationRecord.getIds() );
+    const sequenceHistory =
+      keyCombinationHistory.getMostRecentCombinations(this.getLongestSequence());
 
-    if (sequenceIds.length === 0) {
+    if (sequenceHistory.length === 0) {
       return this._sequenceMatchers[''];
     }
 
+    const sequenceIds =
+      sequenceHistory.map((keyCombinationRecord) => keyCombinationRecord.getIds());
+
     const idSizes = sequenceIds.map((ids) => ids.length);
-    const indexCounters = sequenceIds.map(() => 0);
+    const indexCounters = new Array(sequenceIds.length).fill(0);
 
     let triedAllPossiblePermutations = false;
 
