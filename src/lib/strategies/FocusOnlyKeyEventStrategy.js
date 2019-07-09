@@ -509,8 +509,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   closeHangingKeyCombination(keyName, recordIndex) {
     const currentCombination = this.getCurrentCombination();
 
-    if (currentCombination.isKeyDownTriggered(keyName) &&
-      !currentCombination.isKeyEventTriggered(keyName, recordIndex)) {
+    if (currentCombination.isKeyIncluded(keyName) &&
+      !currentCombination.isEventTriggered(keyName, recordIndex)) {
 
       /**
        * If the key is in the current combination and recorded as still being pressed

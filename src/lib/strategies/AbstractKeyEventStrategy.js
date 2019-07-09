@@ -357,7 +357,7 @@ class AbstractKeyEventStrategy {
     if (eventType === KeyEventRecordIndex.keypress) {
       return !keyHasNativeKeyPress || (keyHasNativeKeyPress && currentCombination.isKeyStillPressed('Meta'));
     } else if (eventType === KeyEventRecordIndex.keyup) {
-      return (keyupIsHiddenByCmd(keyName) && currentCombination.isKeyUpTriggered('Meta'));
+      return (keyupIsHiddenByCmd(keyName) && currentCombination.isKeyReleased('Meta'));
     }
 
     return false

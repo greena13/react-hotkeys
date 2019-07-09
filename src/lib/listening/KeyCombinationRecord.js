@@ -7,6 +7,7 @@ import KeyEventRecordManager from '../shared/KeyEventRecordManager';
 import isEmpty from '../../utils/collection/isEmpty';
 import size from '../../utils/collection/size';
 import KeyEventRecordState from '../../const/KeyEventRecordState';
+import dictionaryFrom from '../../utils/object/dictionaryFrom';
 
 /**
  * Record of one or more keys pressed together, in a combination
@@ -25,13 +26,9 @@ class KeyCombinationRecord {
     this._update();
   }
 
-  /**
-   * The dictionary of keys pressed and their current event state
-   * @returns {Object<ReactKeyName, Array<KeyEventRecordState[]>>}
-   */
-  getKeyStates() {
-    return this._keys;
-  }
+  /********************************************************************************
+   * Getters
+   *********************************************************************************/
 
   /**
    * List of ids (serialized representations) for the keys involved in the combination
@@ -42,21 +39,88 @@ class KeyCombinationRecord {
   }
 
   /**
-   * Whether there are any keys in the combination
-   * @returns {boolean} true if there is 1 or more keys involved in the combination,
-   *          else false.
-   */
-  any() {
-    return Object.keys(this.getKeyStates()).length > 0;
-  }
-
-  /**
    * Dictionary mapping keys to their acceptable aliases. This includes "shifted" or
    * "alted" key characters.
    * @returns {Object.<ReactKeyName, ReactKeyName[]>}
    */
   getKeyAliases() {
     return this._keyAliases;
+  }
+
+  /**
+   * A normalized version of the key, achieved by comparing it to the list of known
+   * aliases for the keys in the combination
+   * @param {ReactKeyName} keyName Name of the key to normalize
+   * @returns {ReactKeyName} Normalized key name
+   */
+  getNormalizedKeyName(keyName) {
+    const keyState = this._keys[keyName];
+
+    if (keyState) {
+      return keyName;
+    } else {
+      const keyAlias = this._keyAliases[keyName];
+
+      if (keyAlias) {
+        return keyAlias;
+      } else {
+        return keyName;
+      }
+    }
+  }
+
+  /********************************************************************************
+   * Query attributes of entire combination
+   *********************************************************************************/
+
+  /**
+   * Number of keys involved in the combination
+   * @returns {number} Number of keys
+   */
+  getNumberOfKeys() {
+    return size(this._keys);
+  }
+
+  /**
+   * Whether there are any keys in the combination
+   * @returns {boolean} true if there is 1 or more keys involved in the combination,
+   *          else false.
+   */
+  any() {
+    return Object.keys(this._getKeyStates()).length > 0;
+  }
+
+  /**
+   * Whether any of the keys in the combination have been released
+   * @returns {boolean} true if at least 1 key has been released in the combination
+   */
+  isEnding() {
+    return this._includesKeyUp;
+  }
+
+  /**
+   * Whether there are any keys in the current combination still being pressed
+   * @returns {boolean} True if all keys in the current combination are released
+   */
+  hasEnded() {
+    return isEmpty(this.keysStillPressedDict());
+  }
+
+  /********************************************************************************
+   * Adding & modifying key states
+   *********************************************************************************/
+
+  /**
+   * Add a new key to the combination (starting with a state of keydown)
+   * @param {ReactKeyName} keyName Name of key
+   * @param {KeyEventRecordState} keyEventState State key is in
+   * @returns {void}
+   */
+  addKey(keyName, keyEventState) {
+    this._setKeyState(keyName, [
+      KeyEventRecordManager.newRecord(),
+      KeyEventRecordManager.newRecord(KeyEventRecordIndex.keydown, keyEventState)
+    ]);
   }
 
   /**
@@ -85,43 +149,27 @@ class KeyCombinationRecord {
     }
   }
 
-  addKey(keyName, keyEventState) {
-    this._setKeyState(keyName, [
-      KeyEventRecordManager.newRecord(),
-      KeyEventRecordManager.newRecord(KeyEventRecordIndex.keydown, keyEventState)
-    ]);
-  }
+  /********************************************************************************
+   * Iteration and subsets
+   *********************************************************************************/
 
-  forEachKey(iterator){
-    return Object.keys(this._keys).forEach(iterator);
-  }
-
-  isKeyStillPressed(keyName) {
-    const keyState = this._getKeyState(keyName);
-    const currentState = keyState && keyState[KeyEventSequenceIndex.current];
-
-    return currentState && currentState[KeyEventRecordIndex.keypress] && !this.isKeyReleased(keyName);
-  }
-
-  isKeyReleased(keyName) {
-    const keyState = this._getKeyState(keyName);
-    return keyState && keyState[KeyEventSequenceIndex.current][KeyEventRecordIndex.keyup]
-  }
-
-  isKeyIncluded(keyName) {
-    return !!this._getKeyState(keyName);
-  }
-
-  isEnding() {
-    return this._includesKeyUp;
+  /**
+   * Iterates over every key in the combination, calling an function with each
+   * key name
+   * @param {Function} handler Function to call with the name of each key in
+   *        the combination
+   * @returns {void}
+   */
+  forEachKey(handler){
+    return Object.keys(this._keys).forEach(handler);
   }
 
   /**
-   * Whether there are any keys in the current combination still being pressed
-   * @returns {boolean} True if all keys in the current combination are released
+   * Dictionary of keys included in the combination record
+   * @returns {Object.<ReactKeyName, boolean>}
    */
-  hasEnded() {
-    return isEmpty(this.keysStillPressedDict());
+  getKeyDictionary(){
+    return dictionaryFrom(Object.keys(this._getKeyStates()), true);
   }
 
   /**
@@ -141,78 +189,113 @@ class KeyCombinationRecord {
     }, {});
   }
 
-  getNormalizedKeyName(keyName) {
-    const keyState = this._keys[keyName];
+  /********************************************************************************
+   * Query individual keys
+   *********************************************************************************/
 
-    if (keyState) {
-      return keyName;
-    } else {
-      const keyAlias = this._keyAliases[keyName];
-
-      if (keyAlias) {
-        return keyAlias;
-      } else {
-        return keyName;
-      }
-    }
+  /**
+   * Whether key is in the combination
+   * @param {ReactKeyName} keyName Name of key
+   * @returns {boolean} true if the key is in the combination
+   */
+  isKeyIncluded(keyName) {
+    return !!this._getKeyState(keyName);
   }
 
-  getNumberOfKeys() {
-    return size(this._keys);
+  /**
+   * Whether key is in the combination and has yet to be released
+   * @param {ReactKeyName} keyName Name of key
+   * @returns {boolean} true if the key is in the combination and yet to be released
+   */
+  isKeyStillPressed(keyName) {
+    return this.isEventTriggered(keyName, KeyEventRecordIndex.keypress) &&
+      !this.isKeyReleased(keyName);
+  }
+
+  /**
+   * Whether key is in the combination and been released
+   * @param {ReactKeyName} keyName Name of key
+   * @returns {boolean} true if the key is in the combination and has been released
+   */
+  isKeyReleased(keyName) {
+    return this.isEventTriggered(keyName, KeyEventRecordIndex.keyup);
+  }
+
+  /**
+   * Whether an event has been recorded for a key yet
+   * @param {ReactKeyName} keyName Name of the key
+   * @param {KeyEventRecordIndex} eventRecordIndex Index of the event type
+   * @returns {boolean} true if the event has been recorded for the key
+   */
+  isEventTriggered(keyName, eventRecordIndex){
+    return this._getKeyStateType(keyName, KeyEventSequenceIndex.current, eventRecordIndex)
+  }
+
+  /**
+   * Whether an event has been previously recorded for a key (the second most recent
+   * event to occur for the key)
+   * @param {ReactKeyName} keyName Name of the key
+   * @param {KeyEventRecordIndex} eventRecordIndex Index of the event type
+   * @returns {boolean} true if the event has been previously recorded for the key
+   */
+  wasEventPreviouslyTriggered(keyName, eventRecordIndex){
+    return this._getKeyStateType(keyName, KeyEventSequenceIndex.previous, eventRecordIndex)
+  }
+
+  /**
+   * Whether a keypress event is currently being simulated
+   * @param {ReactKeyName} keyName Name of the key
+   * @returns {boolean} true if the keypress event is currently being simulated for the
+   *        key
+   */
+  isKeyPressSimulated(keyName) {
+    return this._isKeyEventSimulated(keyName, KeyEventRecordIndex.keypress);
+  }
+
+  /**
+   * Whether a keyup event is currently being simulated
+   * @param {ReactKeyName} keyName Name of the key
+   * @returns {boolean} true if the keyup event is currently being simulated for the
+   *        key
+   */
+  isKeyUpSimulated(keyName) {
+    return this._isKeyEventSimulated(keyName, KeyEventRecordIndex.keyup);
   }
 
   /********************************************************************************
    * Presentation
    *********************************************************************************/
 
+  /**
+   * Return a serialized description of the keys in the combination
+   * @returns {KeySequence}
+   */
   describe() {
     return this.getIds()[0];
   }
 
+  /**
+   * A plain JavaScript representation of the key combination record, useful for
+   * serialization or debugging
+   * @returns {Object} Serialized representation of the combination record
+   */
   toJSON() {
     return {
-      keys: this.getKeyStates(),
+      keys: this._getKeyStates(),
       ids: this.getIds(),
       keyAliases: this.getKeyAliases()
     };
   }
 
-  isKeyUpTriggered(keyName) {
-    return this.isKeyEventTriggered(keyName, KeyEventRecordIndex.keyup);
-  }
-
-  isKeyDownTriggered(keyName) {
-    return this.isKeyEventTriggered(keyName, KeyEventRecordIndex.keydown);
-  }
-
-  isKeyEventTriggered(keyName, eventRecordIndex){
-    const keyState = this._getKeyState(keyName);
-
-    return keyState && keyState[KeyEventSequenceIndex.current][eventRecordIndex];
-  }
-
-  isKeyCurrentlyTriggeringEvent(keyName, eventRecordIndex) {
-    return this.isKeyEventTriggered(keyName, eventRecordIndex) &&
-      !this.wasEventPreviouslyTriggered(keyName, eventRecordIndex);
-  }
-
-  wasEventPreviouslyTriggered(keyName, eventRecordIndex){
-    const keyState = this._getKeyState(keyName);
-
-    return keyState && keyState[KeyEventSequenceIndex.previous][eventRecordIndex];
-  }
-
-  isKeyPressSimulated(keyName) {
-    return this._isKeyEventSimulated(keyName, KeyEventRecordIndex.keypress);
-  }
-
-  isKeyUpSimulated(keyName) {
-    return this._isKeyEventSimulated(keyName, KeyEventRecordIndex.keyup);
-  }
-
   /********************************************************************************
    * Private methods
    *********************************************************************************/
+
+  _getKeyStateType(keyName, keyStage, eventRecordIndex){
+    const keyState = this._getKeyState(keyName);
+
+    return keyState && keyState[keyStage][eventRecordIndex];
+  }
 
   _update() {
     this._ids = KeyCombinationSerializer.serialize(this._keys);
@@ -220,7 +303,11 @@ class KeyCombinationRecord {
   }
 
   _isKeyEventSimulated(keyName, eventRecordIndex){
-    return this.isKeyEventTriggered(keyName, eventRecordIndex) === KeyEventRecordState.simulated;
+    return this.isEventTriggered(keyName, eventRecordIndex) === KeyEventRecordState.simulated;
+  }
+
+  _getKeyStates() {
+    return this._keys;
   }
 
   _getKeyState(keyName) {

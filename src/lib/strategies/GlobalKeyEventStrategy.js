@@ -489,7 +489,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     if (this.listeners.keyCombination && this._allKeysAreReleased()) {
       this.listeners.keyCombination({
-        keys: dictionaryFrom(Object.keys(currentCombination.getKeyStates()), true),
+        keys: currentCombination.getKeyDictionary(),
         id: currentCombination.describe()
       });
     }

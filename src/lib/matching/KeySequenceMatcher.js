@@ -62,7 +62,7 @@ class KeySequenceMatcher {
     let keyCompletesCombination = false;
 
     const combinationMatchesKeysPressed = Object.keys(combinationMatcher.keyDictionary).every((candidateKeyName) => {
-      if (keyCombinationRecord.isKeyEventTriggered(candidateKeyName, eventRecordIndex)) {
+      if (keyCombinationRecord.isEventTriggered(candidateKeyName, eventRecordIndex)) {
         if (keyBeingPressed && (keyBeingPressed === keyCombinationRecord.getNormalizedKeyName(candidateKeyName))) {
           keyCompletesCombination = !keyCombinationRecord.wasEventPreviouslyTriggered(candidateKeyName, eventRecordIndex);
         }
