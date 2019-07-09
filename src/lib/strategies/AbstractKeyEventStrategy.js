@@ -1,6 +1,5 @@
 import KeyEventRecordIndex from '../../const/KeyEventRecordIndex';
 import ModifierFlagsDictionary from '../../const/ModifierFlagsDictionary';
-import KeyEventRecordState from '../../const/KeyEventRecordState';
 
 import Logger from '../logging/Logger';
 import KeyCombinationSerializer from '../shared/KeyCombinationSerializer';
@@ -20,7 +19,6 @@ import hasKey from '../../utils/object/hasKey';
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import printComponent from '../../helpers/logging/printComponent';
 import hasKeyPressEvent from '../../helpers/resolving-handlers/hasKeyPressEvent';
-import keyIsCurrentlyTriggeringEvent from '../../helpers/parsing-key-maps/keyIsCurrentlyTriggeringEvent';
 import keyupIsHiddenByCmd from '../../helpers/resolving-handlers/keyupIsHiddenByCmd';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 
@@ -358,12 +356,9 @@ class AbstractKeyEventStrategy {
     const keyHasNativeKeypress = hasKeyPressEvent(keyName);
 
     if (eventType === KeyEventRecordIndex.keypress) {
-      return !keyHasNativeKeypress || (keyHasNativeKeypress && this._keyIsCurrentlyDown('Meta'));
+      return !keyHasNativeKeypress || (keyHasNativeKeypress && this.getCurrentCombination().isKeyStillPressed('Meta'));
     } else if (eventType === KeyEventRecordIndex.keyup) {
-      return (keyupIsHiddenByCmd(keyName) && keyIsCurrentlyTriggeringEvent(
-        this._getCurrentKeyState('Meta'),
-        KeyEventRecordIndex.keyup)
-      );
+      return (keyupIsHiddenByCmd(keyName) && this.getCurrentCombination().isKeyUpTriggered('Meta'));
     }
 
     return false
@@ -377,12 +372,6 @@ class AbstractKeyEventStrategy {
     }, {});
 
     return { ...eventAttributes, ...extra };
-  }
-
-  _alreadySimulatedEvent(recordIndex, keyName) {
-    const keyState = this._getCurrentKeyState(keyName);
-
-    return keyIsCurrentlyTriggeringEvent(keyState, recordIndex) === KeyEventRecordState.simulated;
   }
 
   /********************************************************************************
@@ -491,7 +480,7 @@ class AbstractKeyEventStrategy {
         return;
       }
 
-      const modifierStillPressed = this._keyIsCurrentlyDown(modifierKey);
+      const modifierStillPressed = this.getCurrentCombination().isKeyStillPressed(modifierKey);
 
        ModifierFlagsDictionary[modifierKey].forEach((attributeName) => {
          if (event[attributeName] === false && modifierStillPressed) {
@@ -503,19 +492,6 @@ class AbstractKeyEventStrategy {
          }
        });
      })
-  }
-
-  _keyIsCurrentlyDown(keyName) {
-    const keyState = this._getCurrentKeyState(keyName);
-
-    const keyIsDown = keyIsCurrentlyTriggeringEvent(keyState, KeyEventRecordIndex.keypress) &&
-        !keyIsCurrentlyTriggeringEvent(keyState, KeyEventRecordIndex.keyup);
-
-    return !!keyIsDown;
-  }
-
-  _getCurrentKeyState(keyName) {
-    return this.getCurrentCombination().getKeyState(keyName);
   }
 
   /**

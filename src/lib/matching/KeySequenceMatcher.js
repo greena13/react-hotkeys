@@ -1,5 +1,3 @@
-import keyIsCurrentlyTriggeringEvent from '../../helpers/parsing-key-maps/keyIsCurrentlyTriggeringEvent';
-import KeyEventSequenceIndex from '../../const/KeyEventSequenceIndex';
 import Configuration from '../config/Configuration';
 import size from '../../utils/collection/size';
 
@@ -64,19 +62,12 @@ class KeySequenceMatcher {
     let keyCompletesCombination = false;
 
     const combinationMatchesKeysPressed = Object.keys(combinationMatcher.keyDictionary).every((candidateKeyName) => {
-      const keyState = keyCombinationRecord.getKeyState(candidateKeyName);
-
-      if (keyState) {
-        if (keyIsCurrentlyTriggeringEvent(keyState, eventRecordIndex)) {
-          if (keyBeingPressed && (keyBeingPressed === keyCombinationRecord.getNormalizedKeyName(candidateKeyName))) {
-            keyCompletesCombination =
-              !keyAlreadyTriggeredEvent(keyState, eventRecordIndex);
-          }
-
-          return true;
-        } else {
-          return false;
+      if (keyCombinationRecord.isKeyEventTriggered(candidateKeyName, eventRecordIndex)) {
+        if (keyBeingPressed && (keyBeingPressed === keyCombinationRecord.getNormalizedKeyName(candidateKeyName))) {
+          keyCompletesCombination = !keyCombinationRecord.wasEventPreviouslyTriggered(candidateKeyName, eventRecordIndex);
         }
+
+        return true;
       } else {
         return false;
       }
@@ -145,10 +136,6 @@ class KeySequenceMatcher {
   _includesMatcherForCombination(id) {
     return !!this._getCombinationMatcher(id);
   }
-}
-
-function keyAlreadyTriggeredEvent(keyState, eventRecordIndex) {
-  return keyState && keyState[KeyEventSequenceIndex.previous][eventRecordIndex];
 }
 
 function canBeMatched(keyCombinationRecord, combinationMatcher) {

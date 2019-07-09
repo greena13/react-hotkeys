@@ -8,7 +8,6 @@ import printComponent from '../../helpers/logging/printComponent';
 import isUndefined from '../../utils/isUndefined';
 import getKeyName from '../../helpers/resolving-handlers/getKeyName';
 import isCmdKey from '../../helpers/parsing-key-maps/isCmdKey';
-import keyIsCurrentlyTriggeringEvent from '../../helpers/parsing-key-maps/keyIsCurrentlyTriggeringEvent';
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 import EventResponse from '../../const/EventResponse';
 import KeyEventRecordState from '../../const/KeyEventRecordState';
@@ -338,7 +337,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   handleKeypress(event, focusTreeId, componentId, options) {
     const key = getKeyName(event);
 
-    if (this._alreadySimulatedEvent(KeyEventRecordIndex.keypress, key)) {
+    if (this.getCurrentCombination().isKeyPressSimulated(key)) {
       this.logger.debug(
         this._logPrefix(componentId),
         `Ignored ${describeKeyEvent(event, key, KeyEventRecordIndex.keypress)} as it was not expected, and has already been simulated.`
@@ -374,7 +373,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       KeyEventRecordIndex.keypress
     );
 
-    if (this.eventPropagator.isFirstPropagationStep(componentId) && this._getCurrentKeyState(key)) {
+    if (this.eventPropagator.isFirstPropagationStep(componentId) && this.getCurrentCombination().isKeyIncluded(key)) {
       this._addToAndLogCurrentKeyCombination(
         key,
         KeyEventRecordIndex.keypress,
@@ -424,7 +423,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   handleKeyup(event, focusTreeId, componentId, options) {
     const key = getKeyName(event);
 
-    if (this._alreadySimulatedEvent(KeyEventRecordIndex.keyup, key)) {
+    if (this.getCurrentCombination().isKeyUpSimulated(key)) {
       this.logger.debug(
         this._logPrefix(componentId),
         `Ignored ${describeKeyEvent(event, key, KeyEventRecordIndex.keyup)} as it was not expected, and has already been simulated.`
@@ -466,7 +465,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      * function changes focus to a context that ignored events, the keyup event
      * is not lost (leaving react hotkeys thinking the key is still pressed).
      */
-    if (this.eventPropagator.isFirstPropagationStep(componentId) && this._getCurrentKeyState(key)) {
+    if (this.eventPropagator.isFirstPropagationStep(componentId) && this.getCurrentCombination().isKeyIncluded(key)) {
       this._addToAndLogCurrentKeyCombination(
         key,
         KeyEventRecordIndex.keyup,
@@ -504,10 +503,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *        up to.
    */
   closeHangingKeyCombination(keyName, recordIndex) {
-    const keyState = this._getCurrentKeyState(keyName);
-
-    if (keyIsCurrentlyTriggeringEvent(keyState, KeyEventRecordIndex.keydown) &&
-      !keyIsCurrentlyTriggeringEvent(keyState, recordIndex)) {
+    if (this.getCurrentCombination().isKeyDownTriggered(keyName) &&
+      !this.getCurrentCombination().isKeyEventTriggered(keyName, recordIndex)) {
 
       /**
        * If the key is in the current combination and recorded as still being pressed
