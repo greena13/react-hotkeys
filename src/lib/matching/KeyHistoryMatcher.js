@@ -1,4 +1,4 @@
-import KeyEventStateManager from '../shared/KeyEventStateManager';
+import KeyEventStateArrayManager from '../shared/KeyEventStateArrayManager';
 import indexFromEnd from '../../utils/array/indexFromEnd';
 import KeyCombinationMatcher from './KeyCombinationMatcher';
 import KeyEventState from '../../const/KeyEventState';
@@ -15,7 +15,7 @@ class KeyHistoryMatcher {
    */
   constructor() {
     this._combinationMatchers = {};
-    this._eventRecord = KeyEventStateManager.newRecord();
+    this._eventRecord = KeyEventStateArrayManager.newRecord();
   }
 
   /**
@@ -34,7 +34,7 @@ class KeyHistoryMatcher {
      * Merge event records so we can quickly determine if a given component
      * has any handlers bound to particular key events
      */
-    KeyEventStateManager.setBit(
+    KeyEventStateArrayManager.setBit(
       this._eventRecord,
       actionConfig.keyEventType,
       KeyEventState.seen

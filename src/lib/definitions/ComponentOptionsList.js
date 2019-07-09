@@ -1,5 +1,5 @@
 import removeAtIndex from '../../utils/array/removeAtIndex';
-import KeyEventStateManager from '../shared/KeyEventStateManager';
+import KeyEventStateArrayManager from '../shared/KeyEventStateArrayManager';
 import Configuration from '../config/Configuration';
 import KeyCombinationSerializer from '../shared/KeyCombinationSerializer';
 import isObject from '../../utils/object/isObject';
@@ -80,7 +80,7 @@ class ComponentOptionsList {
      * keypress or keyup)
      * @type {KeyEvent}
      */
-    this._keyMapEventRecord = KeyEventStateManager.newRecord();
+    this._keyMapEventRecord = KeyEventStateArrayManager.newRecord();
   }
 
   /**

@@ -16,7 +16,7 @@ import KeyEventState from '../../const/KeyEventState';
  * Creates and modifies KeyEvents
  * @class
  */
-class KeyEventStateManager {
+class KeyEventStateArrayManager {
   /**
    * Makes a new KeyEvent with one of the bits set to true
    * @param {KeyEventType=} keyEventType Index of bit to set to true
@@ -67,4 +67,4 @@ class KeyEventStateManager {
   }
 }
 
-export default KeyEventStateManager;
+export default KeyEventStateArrayManager;

@@ -3,7 +3,7 @@ import KeyEventType from '../../const/KeyEventType';
 import KeyCombinationSerializer from '../shared/KeyCombinationSerializer';
 import resolveKeyAlias from '../../helpers/resolving-handlers/resolveKeyAlias';
 import applicableAliasFunctions from '../../helpers/resolving-handlers/applicableAliasFunctions';
-import KeyEventStateManager from '../shared/KeyEventStateManager';
+import KeyEventStateArrayManager from '../shared/KeyEventStateArrayManager';
 import isEmpty from '../../utils/collection/isEmpty';
 import size from '../../utils/collection/size';
 import KeyEventState from '../../const/KeyEventState';
@@ -118,8 +118,8 @@ class KeyCombination {
    */
   addKey(keyName, keyEventState) {
     this._setKeyState(keyName, [
-      KeyEventStateManager.newRecord(),
-      KeyEventStateManager.newRecord(KeyEventType.keydown, keyEventState)
+      KeyEventStateArrayManager.newRecord(),
+      KeyEventStateArrayManager.newRecord(KeyEventType.keydown, keyEventState)
     ]);
   }
 
@@ -134,10 +134,10 @@ class KeyCombination {
     const existingRecord = this._getKeyState(keyName);
 
     if (this.isKeyIncluded(keyName)) {
-      const previous = KeyEventStateManager.clone(existingRecord[1]);
-      const current = KeyEventStateManager.clone(previous);
+      const previous = KeyEventStateArrayManager.clone(existingRecord[1]);
+      const current = KeyEventStateArrayManager.clone(previous);
 
-      KeyEventStateManager.setBit(current, recordIndex, keyEventState);
+      KeyEventStateArrayManager.setBit(current, recordIndex, keyEventState);
 
       this._setKeyState(keyName, [previous, current]);
     } else {
