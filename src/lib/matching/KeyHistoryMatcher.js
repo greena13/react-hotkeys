@@ -1,6 +1,6 @@
 import KeyEventRecordManager from '../shared/KeyEventRecordManager';
 import indexFromEnd from '../../utils/array/indexFromEnd';
-import KeyCombinationRecordMatcher from './KeyCombinationRecordMatcher';
+import KeyCombinationMatcher from './KeyCombinationMatcher';
 import KeyEventRecordState from '../../const/KeyEventRecordState';
 
 /**
@@ -116,7 +116,7 @@ class KeyHistoryMatcher {
 
   _getOrCreateCombinationMatcher(prefix) {
     if (!this._combinationMatchers[prefix]) {
-      this._combinationMatchers[prefix] = new KeyCombinationRecordMatcher();
+      this._combinationMatchers[prefix] = new KeyCombinationMatcher();
     }
 
     return this._combinationMatchers[prefix];
@@ -131,7 +131,7 @@ class KeyHistoryMatcher {
     }
 
     const sequenceIds =
-      sequenceHistory.map((keyCombinationRecord) => keyCombinationRecord.getIds());
+      sequenceHistory.map((keyCombination) => keyCombination.getIds());
 
     const idSizes = sequenceIds.map((ids) => ids.length);
     const indexCounters = new Array(sequenceIds.length).fill(0);

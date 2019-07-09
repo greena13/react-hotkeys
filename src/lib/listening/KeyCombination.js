@@ -13,12 +13,12 @@ import dictionaryFrom from '../../utils/object/dictionaryFrom';
  * Record of one or more keys pressed together, in a combination
  * @class
  */
-class KeyCombinationRecord {
+class KeyCombination {
   /**
-   * Creates a new KeyCombinationRecord instance
+   * Creates a new KeyCombination instance
    * @param {Object.<ReactKeyName, Array.<KeyEventRecordState[]>>} keys Dictionary
    *        of keys
-   * @returns {KeyCombinationRecord}
+   * @returns {KeyCombination}
    */
   constructor(keys = {}) {
     this._keys = keys;
@@ -173,10 +173,10 @@ class KeyCombinationRecord {
   }
 
   /**
-   * Returns a new KeyCombinationRecord without the keys that have been
+   * Returns a new KeyCombination without the keys that have been
    * released (had the keyup event recorded). Essentially, the keys that are
    * currently still pressed down at the time a key event is being handled.
-   * @returns {KeyCombinationRecord} New KeyCombinationRecord with all of the
+   * @returns {KeyCombination} New KeyCombination with all of the
    *        keys with keyup events omitted
    */
   keysStillPressedDict() {
@@ -349,4 +349,4 @@ function buildKeyAliases(keyDictionary) {
   }, {});
 }
 
-export default KeyCombinationRecord;
+export default KeyCombination;

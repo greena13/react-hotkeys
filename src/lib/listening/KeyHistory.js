@@ -1,4 +1,4 @@
-import KeyCombinationRecord from './KeyCombinationRecord';
+import KeyCombination from './KeyCombination';
 
 /**
  * List of key combinations seen by hot key components
@@ -8,7 +8,7 @@ class KeyHistory {
   /**
    * Creates a new KeyHistory instance
    * @param {Number} maxLength Maximum length of the list.
-   * @param {KeyCombinationRecord} startingPoint Initial state of first combination
+   * @param {KeyCombination} startingPoint Initial state of first combination
    * @returns {KeyHistory}
    */
   constructor({ maxLength }, startingPoint = null) {
@@ -19,14 +19,14 @@ class KeyHistory {
     if (startingPoint) {
       this._push(startingPoint);
     } else {
-      this._push(new KeyCombinationRecord());
+      this._push(new KeyCombination());
     }
   }
 
   /**
    * A subset of the most recently press key combinations
    * @param {Number} numberOfCombinations The number of most recent key combinations
-   * @returns {KeyCombinationRecord[]} List of key combinations
+   * @returns {KeyCombination[]} List of key combinations
    */
   getMostRecentCombinations(numberOfCombinations) {
     return this._records.slice(-numberOfCombinations, -1);
@@ -50,7 +50,7 @@ class KeyHistory {
 
   /**
    * Most recent or current key combination
-   * @returns {KeyCombinationRecord} Key combination record
+   * @returns {KeyCombination} Key combination record
    */
   getCurrentCombination() {
     return this._records[this.getLength() - 1];
@@ -80,16 +80,16 @@ class KeyHistory {
   }
 
   /**
-   * Adds a new KeyCombinationRecord to the event history.
+   * Adds a new KeyCombination to the event history.
    * @param {ReactKeyName} keyName - Name of the keyboard key to add to the new
-   *        KeyCombinationRecord
+   *        KeyCombination
    * @param {KeyEventRecordState} keyEventState The state to set the key event to
    */
   startNewKeyCombination(keyName, keyEventState) {
     this._ensureInitialKeyCombination();
 
     const newCombinationRecord =
-      new KeyCombinationRecord(this.getCurrentCombination().keysStillPressedDict());
+      new KeyCombination(this.getCurrentCombination().keysStillPressedDict());
 
     newCombinationRecord.addKey(keyName, keyEventState);
 
@@ -111,7 +111,7 @@ class KeyHistory {
 
   _ensureInitialKeyCombination() {
     if (this.getLength() === 0) {
-      this._push(new KeyCombinationRecord())
+      this._push(new KeyCombination())
     }
   }
 

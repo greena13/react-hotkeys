@@ -34,14 +34,14 @@ import size from '../../utils/collection/size';
  */
 
 /**
- * Matches a KeyCombinationRecord to a list of pre-registered ActionConfiguration and their
+ * Matches a KeyCombination to a list of pre-registered ActionConfiguration and their
  * corresponding handler functions
  * @class
  */
-class KeyCombinationRecordMatcher {
+class KeyCombinationMatcher {
   /**
    * Returns a new instance of KeyCombinationMatcher
-   * @returns {KeyCombinationRecordMatcher}
+   * @returns {KeyCombinationMatcher}
    */
   constructor() {
     this._actionConfigs = {};
@@ -50,7 +50,7 @@ class KeyCombinationRecordMatcher {
 
   /**
    * Adds a new ActionConfiguration and handler to those that can be used to match a
-   * KeyCombinationRecord
+   * KeyCombination
    * @param {ActionConfiguration} actionConfig
    * @param {Function} handler Function to call if match is selected
    * @returns {void}
@@ -65,16 +65,16 @@ class KeyCombinationRecordMatcher {
   }
 
   /**
-   * Finds a MatchingActionConfig for a KeyCombinationRecord, ReactKeyName and
+   * Finds a MatchingActionConfig for a KeyCombination, ReactKeyName and
    * KeyEventType
-   * @param {KeyCombinationRecord} keyCombinationRecord Record of key combinations
+   * @param {KeyCombination} keyCombination Record of key combinations
    *         to use in the match
    * @param {ReactKeyName} keyName Name of the key to use in the match
    * @param {KeyEventType} keyEventType The type of key event to use in the match
    * @returns {MatchingActionConfig|null} A MatchingActionOptions that matches the
-   *          KeyCombinationRecord, ReactKeyName and KeyEventType
+   *          KeyCombination, ReactKeyName and KeyEventType
    */
-  findMatch(keyCombinationRecord, keyName, keyEventType) {
+  findMatch(keyCombination, keyName, keyEventType) {
     if (!this._order) {
       this._setOrder();
     }
@@ -82,7 +82,7 @@ class KeyCombinationRecordMatcher {
     for(let combinationId of this._order) {
       const actionOptions = this._actionConfigs[combinationId];
 
-      if (this._matchesActionConfig(keyCombinationRecord, keyName, keyEventType, actionOptions)) {
+      if (this._matchesActionConfig(keyCombination, keyName, keyEventType, actionOptions)) {
         return actionOptions;
       }
     }
@@ -110,8 +110,8 @@ class KeyCombinationRecordMatcher {
    * Private methods
    ********************************************************************************/
 
-  _matchesActionConfig(keyCombinationRecord, keyName, keyEventType, actionOptions) {
-    if (!canBeMatched(keyCombinationRecord, actionOptions)) {
+  _matchesActionConfig(keyCombination, keyName, keyEventType, actionOptions) {
+    if (!canBeMatched(keyCombination, actionOptions)) {
       return false;
     }
 
@@ -130,9 +130,9 @@ class KeyCombinationRecordMatcher {
     let keyCompletesCombination = false;
 
     const combinationMatchesKeysPressed = Object.keys(actionOptions.keyDictionary).every((candidateKeyName) => {
-      if (keyCombinationRecord.isEventTriggered(candidateKeyName, keyEventType)) {
-        if (keyName && (keyName === keyCombinationRecord.getNormalizedKeyName(candidateKeyName))) {
-          keyCompletesCombination = !keyCombinationRecord.wasEventPreviouslyTriggered(candidateKeyName, keyEventType);
+      if (keyCombination.isEventTriggered(candidateKeyName, keyEventType)) {
+        if (keyName && (keyName === keyCombination.getNormalizedKeyName(candidateKeyName))) {
+          keyCompletesCombination = !keyCombination.wasEventPreviouslyTriggered(candidateKeyName, keyEventType);
         }
 
         return true;
@@ -204,19 +204,19 @@ class KeyCombinationRecordMatcher {
   }
 }
 
-function canBeMatched(keyCombinationRecord, combinationMatcher) {
+function canBeMatched(keyCombination, combinationMatcher) {
   const combinationKeysNo = size(combinationMatcher.keyDictionary);
 
   if (Configuration.option('allowCombinationSubmatches')) {
-    return keyCombinationRecord.getNumberOfKeys() >= combinationKeysNo;
+    return keyCombination.getNumberOfKeys() >= combinationKeysNo;
   } else {
     /**
      * If sub-matches are not allow, the number of keys in the key state and the
      * number of keys in the combination we are attempting to match, must be
      * exactly the same
      */
-    return keyCombinationRecord.getNumberOfKeys() === combinationKeysNo;
+    return keyCombination.getNumberOfKeys() === combinationKeysNo;
   }
 }
 
-export default KeyCombinationRecordMatcher;
+export default KeyCombinationMatcher;

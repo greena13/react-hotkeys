@@ -5,7 +5,7 @@ import Logger from '../logging/Logger';
 import KeyCombinationSerializer from '../shared/KeyCombinationSerializer';
 import Configuration from '../config/Configuration';
 import KeyHistory from '../listening/KeyHistory';
-import KeyCombinationRecord from '../listening/KeyCombinationRecord';
+import KeyCombination from '../listening/KeyCombination';
 import ComponentTree from '../definitions/ComponentTree';
 import ComponentOptionsList from '../definitions/ComponentOptionsList';
 import ActionResolver from '../matching/ActionResolver';
@@ -132,7 +132,7 @@ class AbstractKeyEventStrategy {
     if (this.getKeyHistory().any() && !options.force) {
       this._keyHistory = new KeyHistory(
         { maxLength: this.componentList.getLongestSequence() },
-        new KeyCombinationRecord(this.getCurrentCombination().keysStillPressedDict())
+        new KeyCombination(this.getCurrentCombination().keysStillPressedDict())
       );
     } else {
       this._keyHistory = this._newKeyHistory();

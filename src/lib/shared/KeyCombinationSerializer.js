@@ -8,16 +8,16 @@ import resolveUnaltShiftedAlias from '../../helpers/resolving-handlers/resolveUn
 import resolveAltShiftedAlias from '../../helpers/resolving-handlers/resolveAltShiftedAlias';
 
 /**
- * Serializes instances of KeyCombinationRecord to KeyCombinationString.
+ * Serializes instances of KeyCombination to KeyCombinationString.
  *
  * Used primarily to serialize string representations of key events as they happen.
  * @class
  */
 class KeyCombinationSerializer {
   /**
-   * Returns a string representation of a single KeyCombinationRecord
-   * @param {KeyCombinationRecord} keyCombination KeyCombinationRecord to serialize
-   * @returns {string[]} Serialization of KeyCombinationRecord
+   * Returns a string representation of a single KeyCombination
+   * @param {KeyCombination} keyCombination KeyCombination to serialize
+   * @returns {string[]} Serialization of KeyCombination
    */
   static serialize(keyCombination) {
     const combinationIncludesShift = keyCombination['Shift'];
