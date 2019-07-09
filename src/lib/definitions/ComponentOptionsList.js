@@ -20,7 +20,7 @@ import ComponentOptionsListIterator from './ComponentOptionsListIterator';
 
 /**
  * A mapping between ActionName and ActionConfiguration
- * @typedef {Object<ActionName,ActionConfiguration>} ActionDictionary
+ * @typedef {Object.<ActionName,ActionConfiguration>} ActionDictionary
  */
 
 /**
@@ -59,7 +59,7 @@ class ComponentOptionsList {
     /**
      * Dictionary mapping the ids of the components defining actions, and their
      * position in the list.
-     * @type {Object<ComponentId, Number>}
+     * @type {Object.<ComponentId, Number>}
      */
     this._idToIndex = {};
 

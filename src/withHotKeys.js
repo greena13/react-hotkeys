@@ -77,7 +77,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
 
       /**
        * A description of key sequence of one or more key combinations
-       * @typedef {MouseTrapKeySequence|KeyEventOptions|Array<MouseTrapKeySequence>} KeyEventDescription
+       * @typedef {MouseTrapKeySequence|KeyEventOptions|Array.<MouseTrapKeySequence>} KeyEventDescription
        */
 
       /**
@@ -93,7 +93,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
 
       /**
        * A map from action names to event handler functions
-       * @typedef {Object<ActionName, Function>} HandlersMap
+       * @typedef {Object.<ActionName, Function>} HandlersMap
        */
 
       /**

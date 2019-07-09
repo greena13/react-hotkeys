@@ -16,6 +16,7 @@ class EventPropagator {
    * @param {Logger} logger The logger instance to use
    * @param {function} logPrefix Function that returns the appropriate log prefix for
    *        each log entry
+   * @returns {EventPropagator}
    */
   constructor(componentList, { logger, logPrefix}) {
     this._componentList = componentList;

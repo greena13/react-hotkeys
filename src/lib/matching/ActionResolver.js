@@ -1,31 +1,42 @@
 import KeyMapMatcher from './KeyMapMatcher';
 
+/**
+ * Resolves the correct actions to trigger for a list of hotkeys components and a
+ * history of key events
+ * @class
+ */
 class ActionResolver {
+  /**
+   * Creates a new instance of ActionResolver
+   * @param {ComponentOptionsList} componentList List of components
+   * @returns {ActionResolver}
+   */
   constructor(componentList) {
     /**
      * List of mappings from key sequences to handlers that is constructed on-the-fly
      * as key events propagate up the render tree
+     * @type {KeyMapMatcher[]}
      */
     this._keyMapMatchers = [];
 
     /**
      * Array of counters - one for each component - to keep track of how many handlers
      * for that component still need actions assigned to them
-     * @type {Number[]}
+     * @type {Array.<Number,Object>}
      */
     this._unmatchedHandlerStatus = [];
 
     /**
-     * A dictionary of handlers to the components that register them. This is populated
-     * as this.handlerResolutionSearchIndex increases, moving from the end of this.componentList to the
-     * front, populating this.keyMaps as needed
-     * @type {Object<ActionName, ComponentId>}
+     * A dictionary mapping action names to the position in the list of the components
+     * that define handlers for them
+     * @type {Object.<ActionName, Number[]>}
      */
     this._handlersDictionary = {};
 
     /**
      * A dictionary of sequences already encountered in the process of building the
      * list of keyMaps on the fly, as key events propagate up the component tree
+     * @type {Object.<MouseTrapKeySequence, Number[]>}
      */
     this._keySequencesDictionary = {};
 
@@ -41,46 +52,63 @@ class ActionResolver {
     this._componentListIterator = componentList.getNewIterator();
   }
 
-  getKeyMapMatcher(index) {
-    if (this._componentHasUnmatchedHandlers(index)) {
+  /**
+   * The key map matcher at a particular component position
+   * @param {number} componentPosition Position of the key map matcher
+   * @returns {KeyMapMatcher}
+   */
+  getKeyMapMatcher(componentPosition) {
+    if (this._componentHasUnmatchedHandlers(componentPosition)) {
       /**
-       * We build the mapping between key sequences and their closest handlers the
-       * first time the key map for the component at <tt>index</tt> is accessed.
+       * We build the mapping between actions and their closest handlers the
+       * first time the key map for the component at <tt>position</tt> is accessed.
        *
        * We must search higher than the current component for actions, as they are
        * often defined in parent components of those that ultimately define their
        * handlers.
        */
       while (this._componentListIterator.next()) {
-        /**
-         * Component currently handling key event has handlers that have not yet been
-         * associated with a key sequence. We need to continue walking up the component
-         * tree in search of the matching actions that describe the applicable key
-         * sequence.
-         */
         this._addHandlersFromComponent();
         this._addActionsFromComponent();
       }
     }
 
-    return this._getKeyMapMatcher(index);
+    return this._getKeyMapMatcher(componentPosition);
   }
 
-  componentHasActionsBoundToEventType(componentSearchIndex, eventRecordIndex) {
-    return this.getKeyMapMatcher(componentSearchIndex).hasMatchesForEventType(eventRecordIndex);
+  /**
+   * Whether a component has one or more actions bound to an event type
+   * @param {number} componentPosition Position of the component
+   * @param {KeyEventRecordIndex} eventRecordIndex
+   * @returns {boolean} true if the component has an action bound to the event type
+   */
+  componentHasActionsBoundToEventType(componentPosition, eventRecordIndex) {
+    return this.getKeyMapMatcher(componentPosition).hasMatchesForEventType(eventRecordIndex);
   }
 
-  findMatchingKeySequenceInComponent(componentSearchIndex, keyHistory, keyName, eventRecordIndex) {
-    if (!this.componentHasActionsBoundToEventType(componentSearchIndex, eventRecordIndex)) {
+  /**
+   * Finds sequence match for a component at a position
+   * @param {number} componentPosition Position of the component
+   * @param {KeyCombinationHistory} keyHistory
+   * @param {ReactKeyName} keyName
+   * @param {KeyEventRecordIndex} eventRecordIndex
+   * @returns {Object|null}
+   */
+  findMatchingKeySequenceInComponent(componentPosition, keyHistory, keyName, eventRecordIndex) {
+    if (!this.componentHasActionsBoundToEventType(componentPosition, eventRecordIndex)) {
       return null;
     }
 
-    return this.getKeyMapMatcher(componentSearchIndex).findMatch(
+    return this.getKeyMapMatcher(componentPosition).findMatch(
       keyHistory,
       keyName,
       eventRecordIndex
     )
   }
+
+  /********************************************************************************
+   * Private methods
+   *********************************************************************************/
 
   _getKeyMapMatcher(index) {
     return this._keyMapMatchers[index];

@@ -14,7 +14,7 @@ class GlobalHotKeys extends Component {
 
     /**
      * A map from action names to event handler functions
-     * @typedef {Object<ActionName, Function>} HandlersMap
+     * @typedef {Object.<ActionName, Function>} HandlersMap
      */
 
     /**

@@ -119,7 +119,7 @@ const _defaultConfiguration = {
   /**
    * A mapping of custom key codes to key names that you can then use in your
    * key sequences
-   * @type {Object<Number, KeyName>}
+   * @type {Object.<Number, KeyName>}
    */
   customKeyCodes: {},
 };

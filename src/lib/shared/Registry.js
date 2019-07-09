@@ -40,7 +40,7 @@ class Registry {
   /**
    * A plain JavaScript representation of the registry, useful for serialization or
    * debugging
-   * @returns {Object<*,*>} Serialized representation of the registry
+   * @returns {Object.<*,*>} Serialized representation of the registry
    */
   toJSON() {
     return this._registry;

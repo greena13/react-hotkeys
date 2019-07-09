@@ -15,18 +15,18 @@ class KeyEventCounter {
    * @returns {EventId} The current event ID
    */
   static getId() {
-    if (isUndefined(this.id)){
-      this.id = 0;
+    if (isUndefined(this._id)){
+      this._id = 0;
     }
 
-    return this.id;
+    return this._id;
   }
 
   /**
    * Increment the current event id
    */
   static incrementId(){
-    this.id = this.getId() + 1;
+    this._id = this.getId() + 1;
   }
 }
 
