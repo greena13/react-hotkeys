@@ -6,7 +6,7 @@ import isObject from '../../utils/object/isObject';
 import hasKey from '../../utils/object/hasKey';
 import arrayFrom from '../../utils/array/arrayFrom';
 import isUndefined from '../../utils/isUndefined';
-import KeyEventRecordIndex from '../../const/KeyEventRecordIndex';
+import KeyEventType from '../../const/KeyEventType';
 import KeySequenceParser from '../shared/KeySequenceParser';
 import KeyEventRecordState from '../../const/KeyEventRecordState';
 import ComponentOptionsListIterator from './ComponentOptionsListIterator';
@@ -36,7 +36,7 @@ import ComponentOptionsListIterator from './ComponentOptionsListIterator';
  *            that make up the sequence
  * @property {Object.<KeyName, Boolean>} keyDictionary - Dictionary of key names involved
  *           in the last key combination of the sequence
- * @property {KeyEventRecordIndex} eventRecordIndex - Record index for key event that
+ * @property {KeyEventType} keyEventType - Record index for key event that
  *          the matcher should match on
  * @property {number} size - Number of keys involved in the final key combination
  */
@@ -241,12 +241,12 @@ class ComponentOptionsList {
   /**
    * Whether the list contains at least one component with an action bound to a
    * particular keyboard event type.
-   * @param {KeyEventRecordIndex} eventRecordIndex Index of the keyboard event type
+   * @param {KeyEventType} keyEventType Index of the keyboard event type
    * @returns {boolean} true when the list contains a component with an action bound
    *          to the event type
    */
-  anyActionsForEventType(eventRecordIndex) {
-    return !!this._keyMapEventRecord[eventRecordIndex];
+  anyActionsForEventType(keyEventType) {
+    return !!this._keyMapEventRecord[keyEventType];
   }
 
   /**
@@ -403,11 +403,11 @@ class ComponentOptionsList {
       }();
 
       keyMapOptions.forEach((keyMapOption) => {
-        const { keySequence, eventRecordIndex } =
+        const { keySequence, keyEventType } =
           normalizeActionOptions(keyMapOption, options);
 
         this._addActionOptions(
-          memo, componentId, actionName, keySequence, eventRecordIndex
+          memo, componentId, actionName, keySequence, keyEventType
         );
       });
 
@@ -415,8 +415,8 @@ class ComponentOptionsList {
     }, {});
   }
 
-  _addActionOptions(memo, componentId, actionName, keySequence, eventRecordIndex) {
-    const {sequence, combination} = KeySequenceParser.parse(keySequence, {eventRecordIndex});
+  _addActionOptions(memo, componentId, actionName, keySequence, keyEventType) {
+    const {sequence, combination} = KeySequenceParser.parse(keySequence, {keyEventType});
 
     if (sequence.size > this.getLongestSequence()) {
       this._longestSequence = sequence.size;
@@ -427,7 +427,7 @@ class ComponentOptionsList {
      * Record that there is at least one key sequence in the focus tree bound to
      * the keyboard event
      */
-    this._keyMapEventRecord[eventRecordIndex] = KeyEventRecordState.seen;
+    this._keyMapEventRecord[keyEventType] = KeyEventRecordState.seen;
 
     if (!memo[actionName]) {
       memo[actionName] = [];
@@ -448,12 +448,12 @@ function normalizeActionOptions(keyMapOption, options) {
 
     return {
       keySequence: sequence,
-      eventRecordIndex: isUndefined(action) ? KeyEventRecordIndex[options.defaultKeyEvent] : KeyEventRecordIndex[action]
+      keyEventType: isUndefined(action) ? KeyEventType[options.defaultKeyEvent] : KeyEventType[action]
     };
   } else {
     return {
       keySequence: keyMapOption,
-      eventRecordIndex: KeyEventRecordIndex[options.defaultKeyEvent]
+      keyEventType: KeyEventType[options.defaultKeyEvent]
     };
   }
 }

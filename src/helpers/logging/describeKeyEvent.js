@@ -1,7 +1,7 @@
 import describeKeyEventType from './describeKeyEventType';
 
-function describeKeyEvent(event, keyName, keyEventRecordIndex) {
-  const eventDescription = `'${keyName}' ${describeKeyEventType(keyEventRecordIndex)}`;
+function describeKeyEvent(event, keyName, keyEventType) {
+  const eventDescription = `'${keyName}' ${describeKeyEventType(keyEventType)}`;
 
   if (event.simulated) {
     return `(simulated) ${eventDescription}`;

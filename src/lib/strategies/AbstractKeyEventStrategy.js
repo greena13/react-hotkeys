@@ -1,4 +1,4 @@
-import KeyEventRecordIndex from '../../const/KeyEventRecordIndex';
+import KeyEventType from '../../const/KeyEventType';
 import ModifierFlagsDictionary from '../../const/ModifierFlagsDictionary';
 
 import Logger from '../logging/Logger';
@@ -354,9 +354,9 @@ class AbstractKeyEventStrategy {
     const keyHasNativeKeyPress = hasKeyPressEvent(keyName);
     const currentCombination = this.getCurrentCombination();
 
-    if (eventType === KeyEventRecordIndex.keypress) {
+    if (eventType === KeyEventType.keypress) {
       return !keyHasNativeKeyPress || (keyHasNativeKeyPress && currentCombination.isKeyStillPressed('Meta'));
-    } else if (eventType === KeyEventRecordIndex.keyup) {
+    } else if (eventType === KeyEventType.keyup) {
       return (keyupIsHiddenByCmd(keyName) && currentCombination.isKeyReleased('Meta'));
     }
 
@@ -377,7 +377,7 @@ class AbstractKeyEventStrategy {
    * Matching and calling handlers
    ********************************************************************************/
 
-  _callClosestMatchingHandler(event, keyName, eventRecordIndex, componentPosition, componentSearchIndex) {
+  _callClosestMatchingHandler(event, keyName, keyEventType, componentPosition, componentSearchIndex) {
     if (!this._actionResolver) {
       this._actionResolver = new ActionResolver(this.componentList);
     }
@@ -393,13 +393,13 @@ class AbstractKeyEventStrategy {
 
       const sequenceMatch =
         this._actionResolver.findMatchingKeySequenceInComponent(
-          componentSearchIndex, this.getKeyHistory(), keyName, eventRecordIndex
+          componentSearchIndex, this.getKeyHistory(), keyName, keyEventType
         );
 
       const currentCombination = this.getCurrentCombination();
 
       if (sequenceMatch) {
-        const eventSchema = sequenceMatch.events[eventRecordIndex];
+        const eventSchema = sequenceMatch.events[keyEventType];
 
         if (Configuration.option('allowCombinationSubmatches')) {
           const subMatchDescription = KeyCombinationSerializer.serialize(sequenceMatch.keyDictionary);
@@ -421,8 +421,8 @@ class AbstractKeyEventStrategy {
 
         return true;
       } else {
-        if (this._actionResolver.componentHasActionsBoundToEventType(componentSearchIndex, eventRecordIndex)) {
-          const eventName = describeKeyEventType(eventRecordIndex);
+        if (this._actionResolver.componentHasActionsBoundToEventType(componentSearchIndex, keyEventType)) {
+          const eventName = describeKeyEventType(keyEventType);
 
           this.logger.debug(
             this._logPrefix(componentSearchIndex),
@@ -431,7 +431,7 @@ class AbstractKeyEventStrategy {
         } else {
           this.logger.debug(
             this._logPrefix(componentSearchIndex),
-            `Doesn't define a handler for '${currentCombination.describe()}' ${describeKeyEventType(eventRecordIndex)}.`
+            `Doesn't define a handler for '${currentCombination.describe()}' ${describeKeyEventType(keyEventType)}.`
           );
         }
       }
@@ -459,11 +459,11 @@ class AbstractKeyEventStrategy {
    * on new key events
    * @param {KeyboardEvent} event - Event to check the modifier flags for
    * @param {string} key - Name of key that events relates to
-   * @param {KeyEventRecordIndex} keyEventRecordIndex - The record index of the current
+   * @param {KeyEventType} keyEventType - The record index of the current
    *        key event type
    * @protected
    */
-  _checkForModifierFlagDiscrepancies(event, key, keyEventRecordIndex) {
+  _checkForModifierFlagDiscrepancies(event, key, keyEventType) {
     /**
      * If a new key event is received with modifier key flags that contradict the
      * key combination history we are maintaining, we can surmise that some keyup events
@@ -477,7 +477,7 @@ class AbstractKeyEventStrategy {
        * If this the case, we want to handle it using the main algorithm and skip the
        * reconciliation algorithm.
        */
-      if (key === modifierKey && keyEventRecordIndex === KeyEventRecordIndex.keyup) {
+      if (key === modifierKey && keyEventType === KeyEventType.keyup) {
         return;
       }
 
@@ -489,7 +489,7 @@ class AbstractKeyEventStrategy {
 
            currentCombination.setKeyState(
              modifierKey,
-             KeyEventRecordIndex.keyup,
+             KeyEventType.keyup,
              stateFromEvent(event)
            );
          }

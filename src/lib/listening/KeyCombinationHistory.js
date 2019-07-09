@@ -60,7 +60,7 @@ class KeyCombinationHistory {
    * Adds a key event to the current key combination (as opposed to starting a new
    * keyboard combination).
    * @param {ReactKeyName} keyName - Name of the key to add to the current combination
-   * @param {KeyEventRecordIndex} recordIndex - Index in record to set to true
+   * @param {KeyEventType} recordIndex - Index in record to set to true
    * @param {KeyEventRecordState} keyEventState The state to set the key event to
    */
   addKeyToCurrentCombination(keyName, recordIndex, keyEventState) {

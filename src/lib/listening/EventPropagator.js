@@ -1,7 +1,7 @@
 import KeyEventCounter from './KeyEventCounter';
 import Configuration from '../config/Configuration';
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
-import KeyEventRecordIndex from '../../const/KeyEventRecordIndex';
+import KeyEventType from '../../const/KeyEventType';
 
 /**
  * Handles the propagation of keyboard events up through the React component tree,
@@ -83,7 +83,7 @@ class EventPropagator {
 
     /**
      * The type of keyboard event that is propagating
-     * @type {KeyEventRecordIndex}
+     * @type {KeyEventType}
      */
     this._type = null;
   }
@@ -113,11 +113,11 @@ class EventPropagator {
 
   /**
    * The type of keyboard event that is propagating
-   * @param {KeyEventRecordIndex} eventRecordIndex The type of keyboard event to query
+   * @param {KeyEventType} keyEventType The type of keyboard event to query
    * @returns {boolean} true if the keyboard event propagating is that type
    */
-  isForEventType(eventRecordIndex) {
-    return this._type === eventRecordIndex;
+  isForEventType(keyEventType) {
+    return this._type === keyEventType;
   }
 
   /********************************************************************************
@@ -131,7 +131,7 @@ class EventPropagator {
    *        event propagate up to it
    * @param {KeyboardEvent} event The actual KeyboardEvent that is propagating
    * @param {ReactKeyName} key The name of the key the event relates to
-   * @param {KeyEventRecordIndex} type The type of keyboard event
+   * @param {KeyEventType} type The type of keyboard event
    * @returns {boolean} true if the event should be observed, otherwise false if it
    *        should be ignored.
    */
@@ -149,7 +149,7 @@ class EventPropagator {
     if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
       this.logger.debug(
         this._logPrefix(componentId),
-        `Ignored repeated ${describeKeyEvent(event, key, KeyEventRecordIndex.keydown)} event.`
+        `Ignored repeated ${describeKeyEvent(event, key, KeyEventType.keydown)} event.`
       );
 
       this.ignoreEvent(event);

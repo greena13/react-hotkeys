@@ -9,14 +9,14 @@ class KeySequenceMatcher {
 
   addCombination(combinationSchema, handler) {
     if (this._includesMatcherForCombination(combinationSchema.id)) {
-      const { eventRecordIndex, actionName, id } = combinationSchema;
-      this._addEventHandlerToCombination(id, { eventRecordIndex, actionName, handler });
+      const { keyEventType, actionName, id } = combinationSchema;
+      this._addEventHandlerToCombination(id, { keyEventType, actionName, handler });
     } else {
       this._addNewCombination(combinationSchema, handler);
     }
   }
 
-  findMatch(keyCombinationRecord, key, eventRecordIndex) {
+  findMatch(keyCombinationRecord, key, keyEventType) {
     if (!this._order) {
       this._setOrder();
     }
@@ -28,7 +28,7 @@ class KeySequenceMatcher {
       const combinationMatcher = this._combinations[combinationId];
 
       if (canBeMatched(keyCombinationRecord, combinationMatcher)) {
-        if (this._combinationRecordMatches(keyCombinationRecord, key, combinationMatcher, eventRecordIndex)) {
+        if (this._combinationRecordMatches(keyCombinationRecord, key, combinationMatcher, keyEventType)) {
           return combinationMatcher;
         }
       }
@@ -46,9 +46,9 @@ class KeySequenceMatcher {
     };
   }
 
-  _combinationRecordMatches(keyCombinationRecord, keyBeingPressed, combinationMatcher, eventRecordIndex) {
+  _combinationRecordMatches(keyCombinationRecord, keyBeingPressed, combinationMatcher, keyEventType) {
     const combinationHasHandlerForEventType =
-      combinationMatcher.events[eventRecordIndex];
+      combinationMatcher.events[keyEventType];
 
     if (!combinationHasHandlerForEventType) {
       /**
@@ -62,9 +62,9 @@ class KeySequenceMatcher {
     let keyCompletesCombination = false;
 
     const combinationMatchesKeysPressed = Object.keys(combinationMatcher.keyDictionary).every((candidateKeyName) => {
-      if (keyCombinationRecord.isEventTriggered(candidateKeyName, eventRecordIndex)) {
+      if (keyCombinationRecord.isEventTriggered(candidateKeyName, keyEventType)) {
         if (keyBeingPressed && (keyBeingPressed === keyCombinationRecord.getNormalizedKeyName(candidateKeyName))) {
-          keyCompletesCombination = !keyCombinationRecord.wasEventPreviouslyTriggered(candidateKeyName, eventRecordIndex);
+          keyCompletesCombination = !keyCombinationRecord.wasEventPreviouslyTriggered(candidateKeyName, keyEventType);
         }
 
         return true;
@@ -100,7 +100,7 @@ class KeySequenceMatcher {
 
   _addNewCombination(combinationSchema, handler) {
     const {
-      prefix, sequenceLength, id, keyDictionary, size, eventRecordIndex, actionName
+      prefix, sequenceLength, id, keyDictionary, size, keyEventType, actionName
     } = combinationSchema;
 
     this._setCombinationMatcher(id, {
@@ -108,18 +108,18 @@ class KeySequenceMatcher {
       events: { }
     });
 
-    this._addEventHandlerToCombination(id, { eventRecordIndex, actionName, handler })
+    this._addEventHandlerToCombination(id, { keyEventType, actionName, handler })
   }
 
-  _addEventHandlerToCombination(id, { eventRecordIndex, actionName, handler }) {
+  _addEventHandlerToCombination(id, { keyEventType, actionName, handler }) {
     const combination = this._getCombinationMatcher(id);
 
     this._setCombinationMatcher(id, {
       ...combination,
       events: {
         ...combination.events,
-        [eventRecordIndex]: {
-          actionName, eventRecordIndex, handler
+        [keyEventType]: {
+          actionName, keyEventType, handler
         }
       }
     });

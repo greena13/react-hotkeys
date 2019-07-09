@@ -20,7 +20,7 @@ class KeyMapMatcher {
      */
     KeyEventRecordManager.setBit(
       this._eventRecord,
-      keyCombinationSchema.eventRecordIndex,
+      keyCombinationSchema.keyEventType,
       KeyEventRecordState.seen
     );
 
@@ -33,7 +33,7 @@ class KeyMapMatcher {
     }
   }
 
-  findMatch(keyCombinationHistory, key, eventRecordIndex) {
+  findMatch(keyCombinationHistory, key, keyEventType) {
     const sequenceMatcher = this._findSequenceMatcher(keyCombinationHistory);
 
     if (sequenceMatcher) {
@@ -43,7 +43,7 @@ class KeyMapMatcher {
       return sequenceMatcher.findMatch(
         currentCombination,
         normalizedKeyName,
-        eventRecordIndex
+        keyEventType
       )
     }
 

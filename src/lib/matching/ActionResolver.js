@@ -79,11 +79,11 @@ class ActionResolver {
   /**
    * Whether a component has one or more actions bound to an event type
    * @param {number} componentPosition Position of the component
-   * @param {KeyEventRecordIndex} eventRecordIndex
+   * @param {KeyEventType} keyEventType
    * @returns {boolean} true if the component has an action bound to the event type
    */
-  componentHasActionsBoundToEventType(componentPosition, eventRecordIndex) {
-    return this.getKeyMapMatcher(componentPosition).hasMatchesForEventType(eventRecordIndex);
+  componentHasActionsBoundToEventType(componentPosition, keyEventType) {
+    return this.getKeyMapMatcher(componentPosition).hasMatchesForEventType(keyEventType);
   }
 
   /**
@@ -91,18 +91,18 @@ class ActionResolver {
    * @param {number} componentPosition Position of the component
    * @param {KeyCombinationHistory} keyHistory
    * @param {ReactKeyName} keyName
-   * @param {KeyEventRecordIndex} eventRecordIndex
+   * @param {KeyEventType} keyEventType
    * @returns {Object|null}
    */
-  findMatchingKeySequenceInComponent(componentPosition, keyHistory, keyName, eventRecordIndex) {
-    if (!this.componentHasActionsBoundToEventType(componentPosition, eventRecordIndex)) {
+  findMatchingKeySequenceInComponent(componentPosition, keyHistory, keyName, keyEventType) {
+    if (!this.componentHasActionsBoundToEventType(componentPosition, keyEventType)) {
       return null;
     }
 
     return this.getKeyMapMatcher(componentPosition).findMatch(
       keyHistory,
       keyName,
-      eventRecordIndex
+      keyEventType
     )
   }
 
@@ -161,7 +161,7 @@ class ActionResolver {
 
           this._addKeySequence(keySequence, [
             handlerComponentIndex,
-            keySequenceMatcher.eventRecordIndex
+            keySequenceMatcher.keyEventType
           ]);
         });
 
@@ -233,7 +233,7 @@ class ActionResolver {
   _isClosestHandlerFound(keySequence, keyMatcher) {
     return this._keySequencesDictionary[keySequence] &&
     this._keySequencesDictionary[keySequence].some((dictEntry) => {
-      return dictEntry[1] === keyMatcher.eventRecordIndex
+      return dictEntry[1] === keyMatcher.keyEventType
     });
   }
 }

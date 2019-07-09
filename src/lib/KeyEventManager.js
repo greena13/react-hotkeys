@@ -429,7 +429,7 @@ class KeyEventManager {
    * by recordIndex.
    * @param {KeyName} keyName The name of the key whose state should be updated if it
    *        is currently set to keydown or keypress.
-   * @param {KeyEventRecordIndex} recordIndex Index of key event to move the key state
+   * @param {KeyEventType} recordIndex Index of key event to move the key state
    *        up to.
    */
   closeHangingKeyCombination(keyName, recordIndex) {

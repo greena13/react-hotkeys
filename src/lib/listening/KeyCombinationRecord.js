@@ -1,5 +1,5 @@
 import KeyEventSequenceIndex from '../../const/KeyEventSequenceIndex';
-import KeyEventRecordIndex from '../../const/KeyEventRecordIndex';
+import KeyEventType from '../../const/KeyEventType';
 import KeyCombinationSerializer from '../shared/KeyCombinationSerializer';
 import resolveKeyAlias from '../../helpers/resolving-handlers/resolveKeyAlias';
 import applicableAliasFunctions from '../../helpers/resolving-handlers/applicableAliasFunctions';
@@ -119,7 +119,7 @@ class KeyCombinationRecord {
   addKey(keyName, keyEventState) {
     this._setKeyState(keyName, [
       KeyEventRecordManager.newRecord(),
-      KeyEventRecordManager.newRecord(KeyEventRecordIndex.keydown, keyEventState)
+      KeyEventRecordManager.newRecord(KeyEventType.keydown, keyEventState)
     ]);
   }
 
@@ -127,7 +127,7 @@ class KeyCombinationRecord {
    * Adds a key event to the current key combination (as opposed to starting a new
    * keyboard combination).
    * @param {ReactKeyName} keyName - Name of the key to add to the current combination
-   * @param {KeyEventRecordIndex} recordIndex - Index in record to set to true
+   * @param {KeyEventType} recordIndex - Index in record to set to true
    * @param {KeyEventRecordState} keyEventState The state to set the key event to
    */
   setKeyState(keyName, recordIndex, keyEventState) {
@@ -144,7 +144,7 @@ class KeyCombinationRecord {
       this.addKey(keyName, keyEventState);
     }
 
-    if (recordIndex === KeyEventRecordIndex.keyup) {
+    if (recordIndex === KeyEventType.keyup) {
       this._includesKeyUp = true;
     }
   }
@@ -208,7 +208,7 @@ class KeyCombinationRecord {
    * @returns {boolean} true if the key is in the combination and yet to be released
    */
   isKeyStillPressed(keyName) {
-    return this.isEventTriggered(keyName, KeyEventRecordIndex.keypress) &&
+    return this.isEventTriggered(keyName, KeyEventType.keypress) &&
       !this.isKeyReleased(keyName);
   }
 
@@ -218,28 +218,28 @@ class KeyCombinationRecord {
    * @returns {boolean} true if the key is in the combination and has been released
    */
   isKeyReleased(keyName) {
-    return this.isEventTriggered(keyName, KeyEventRecordIndex.keyup);
+    return this.isEventTriggered(keyName, KeyEventType.keyup);
   }
 
   /**
    * Whether an event has been recorded for a key yet
    * @param {ReactKeyName} keyName Name of the key
-   * @param {KeyEventRecordIndex} eventRecordIndex Index of the event type
+   * @param {KeyEventType} keyEventType Index of the event type
    * @returns {boolean} true if the event has been recorded for the key
    */
-  isEventTriggered(keyName, eventRecordIndex){
-    return this._getKeyStateType(keyName, KeyEventSequenceIndex.current, eventRecordIndex)
+  isEventTriggered(keyName, keyEventType){
+    return this._getKeyStateType(keyName, KeyEventSequenceIndex.current, keyEventType)
   }
 
   /**
    * Whether an event has been previously recorded for a key (the second most recent
    * event to occur for the key)
    * @param {ReactKeyName} keyName Name of the key
-   * @param {KeyEventRecordIndex} eventRecordIndex Index of the event type
+   * @param {KeyEventType} keyEventType Index of the event type
    * @returns {boolean} true if the event has been previously recorded for the key
    */
-  wasEventPreviouslyTriggered(keyName, eventRecordIndex){
-    return this._getKeyStateType(keyName, KeyEventSequenceIndex.previous, eventRecordIndex)
+  wasEventPreviouslyTriggered(keyName, keyEventType){
+    return this._getKeyStateType(keyName, KeyEventSequenceIndex.previous, keyEventType)
   }
 
   /**
@@ -249,7 +249,7 @@ class KeyCombinationRecord {
    *        key
    */
   isKeyPressSimulated(keyName) {
-    return this._isKeyEventSimulated(keyName, KeyEventRecordIndex.keypress);
+    return this._isKeyEventSimulated(keyName, KeyEventType.keypress);
   }
 
   /**
@@ -259,7 +259,7 @@ class KeyCombinationRecord {
    *        key
    */
   isKeyUpSimulated(keyName) {
-    return this._isKeyEventSimulated(keyName, KeyEventRecordIndex.keyup);
+    return this._isKeyEventSimulated(keyName, KeyEventType.keyup);
   }
 
   /********************************************************************************
@@ -291,10 +291,10 @@ class KeyCombinationRecord {
    * Private methods
    *********************************************************************************/
 
-  _getKeyStateType(keyName, keyStage, eventRecordIndex){
+  _getKeyStateType(keyName, keyStage, keyEventType){
     const keyState = this._getKeyState(keyName);
 
-    return keyState && keyState[keyStage][eventRecordIndex];
+    return keyState && keyState[keyStage][keyEventType];
   }
 
   _update() {
@@ -302,8 +302,8 @@ class KeyCombinationRecord {
     this._keyAliases = buildKeyAliases(this._keys);
   }
 
-  _isKeyEventSimulated(keyName, eventRecordIndex){
-    return this.isEventTriggered(keyName, eventRecordIndex) === KeyEventRecordState.simulated;
+  _isKeyEventSimulated(keyName, keyEventType){
+    return this.isEventTriggered(keyName, keyEventType) === KeyEventRecordState.simulated;
   }
 
   _getKeyStates() {
