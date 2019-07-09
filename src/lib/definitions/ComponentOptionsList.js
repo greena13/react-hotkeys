@@ -381,13 +381,13 @@ class ComponentOptionsList {
   }
 
   /**
-   * Returns a mapping between ActionNames and FullKeyEventOptions
+   * Returns a mapping between ActionNames and ActionConfiguration
    * @param {KeyMap} actionNameToKeyMap - Mapping of ActionNames to key sequences.
    * @param {Object} options - Hash of options that configure how the key map is built.
    * @param {string} options.defaultKeyEvent - The default key event to use for any
    *        action that does not explicitly define one.
    * @param {ComponentId} componentId Index of the component the matcher belongs to
-   * @returns {ActionDictionary} Map from ActionNames to FullKeyEventOptions
+   * @returns {ActionDictionary} Map from ActionNames to ActionConfiguration
    * @private
    */
   _buildActionDictionary(actionNameToKeyMap, options, componentId) {

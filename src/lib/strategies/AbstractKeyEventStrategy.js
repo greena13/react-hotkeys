@@ -383,12 +383,13 @@ class AbstractKeyEventStrategy {
     }
 
     while (componentSearchIndex <= componentPosition) {
-      const keyMapMatcher = this._actionResolver.getKeyMapMatcher(componentSearchIndex);
+      const keyCombinationHistoryMatcher =
+        this._actionResolver.getKeyCombinationHistoryMatcher(componentSearchIndex);
 
       this.logger.verbose(
         this._logPrefix(componentSearchIndex),
         'Internal key mapping:\n',
-        `${printComponent(keyMapMatcher.toJSON())}`
+        `${printComponent(keyCombinationHistoryMatcher.toJSON())}`
       );
 
       const sequenceMatch =
