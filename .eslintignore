@@ -1,14 +1,5 @@
 # Common directories where we don't care about linting
-examples/bundle.js
-cordova/*
-grunt/*
-hooks/*
-platforms/*
-plugins/*
-res/*
-www/*
 webpack.config.js
-Gruntfile.js
 
 # Dependency (external) code
 **/node_modules/*

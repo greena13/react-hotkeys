@@ -23,6 +23,8 @@ import hasKey from './utils/object/hasKey';
  * @param {React.ComponentClass} Component - Component class to wrap
  * @param {Object} hotKeysIgnoreOptions - Options that become the wrapping component's
  *                 default prop values
+ * @param {string} eventManagerMethod - Name of EventManager method to use to handle a
+ *        key event
  * @returns {React.ComponentClass} Wrapped component that is passed all of the React
  * hotkeys props in a single value, hotkeys.
  */

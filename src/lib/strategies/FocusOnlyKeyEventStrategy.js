@@ -84,7 +84,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *        occur).
    */
   enableHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
-    if (this.resetOnNextFocus || this.keyMaps) {
+    if (this.resetOnNextFocus) {
       /**
        * We know components have just lost focus or keymaps have already been built,
        * meaning we are either anticipating a new set of components to be focused or
@@ -300,7 +300,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       return this._eventIsToBeIgnored(event, componentId, key, keyEventType);
     }
 
-    return this._eventIsToBeHandled();
+    return EventResponse.handled;
   }
 
   _eventIsToBeIgnored(event, componentId, key, keyEventType){
@@ -310,10 +310,6 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     );
 
     return EventResponse.ignored;
-  }
-
-  _eventIsToBeHandled() {
-    return EventResponse.handled;
   }
 
   /**

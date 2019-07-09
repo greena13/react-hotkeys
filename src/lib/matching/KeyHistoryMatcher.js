@@ -134,6 +134,11 @@ class KeyHistoryMatcher {
       sequenceHistory.map((keyCombination) => keyCombination.getIds());
 
     const idSizes = sequenceIds.map((ids) => ids.length);
+
+    /**
+     * List of counters
+     * @type {number[]}
+     */
     const indexCounters = new Array(sequenceIds.length).fill(0);
 
     let triedAllPossiblePermutations = false;

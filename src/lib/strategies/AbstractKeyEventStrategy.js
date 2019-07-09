@@ -36,8 +36,8 @@ class AbstractKeyEventStrategy {
    ********************************************************************************/
 
   /**
-   * Creates a new instance of a event strategy (this class is an abstract one and
-   * not intended to be instantiated directly)
+   * Creates a new instance of an event strategy (this class is an abstract one and
+   * not intended to be instantiated directly).
    * @param {Object} options Options for how event strategy should behave
    * @param {Logger} options.logger The Logger to use to report event strategy actions
    * @param {KeyEventManager} keyEventManager KeyEventManager used for passing

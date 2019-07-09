@@ -11,7 +11,6 @@ import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 import isCmdKey from '../../helpers/parsing-key-maps/isCmdKey';
 import EventResponse from '../../const/EventResponse';
 import contains from '../../utils/collection/contains';
-import dictionaryFrom from '../../utils/object/dictionaryFrom';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 import normalizeEventName from '../../utils/string/normalizeEventName';
 

@@ -24,6 +24,10 @@ class KeyCombinationSerializer {
     const combinationIncludesAlt = keyCombination['Alt'];
     const keyCombinationIdDict = {};
 
+    /**
+     * List of key names in alphabetical order
+     * @type {string[]}
+     */
     const sortedKeys = Object.keys(keyCombination).sort();
 
     sortedKeys.forEach((keyName) => {

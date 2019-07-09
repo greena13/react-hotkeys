@@ -234,7 +234,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       }
     }
 
-    componentDidUpdate(previousProps) {
+    componentDidUpdate() {
       const keyEventManager = KeyEventManager.getInstance();
 
       keyEventManager.reregisterKeyMap(this._id, this.props.keyMap);

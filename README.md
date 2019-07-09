@@ -40,6 +40,7 @@ See the [upgrade notes](https://github.com/greena13/react-hotkeys/releases/tag/v
 ```javascript
 import { HotKeys } from "react-hotkeys";
 import MyNode from "./MyNode";
+import React from 'react';
 
 const keyMap = {
   SNAP_LEFT: "command+left",
@@ -64,6 +65,7 @@ export default App;
 
 ```javascript
 import { HotKeys } from "react-hotkeys";
+import React from 'react';
 
 const MyNode = () => {
   const handlers = {
@@ -322,20 +324,24 @@ The full list of valid key events is: `keypress`, `keydown`, and `keyup`.
 You can specify data used to display the application's key maps using the object syntax and the `name`, `description` and `group` attributes (each are optional):
 
 ```javascript
-  SHOW_DIALOG: { 
-    name: 'Display keyboard shortcuts', 
-    sequence: 'shift+?', 
-    action: 'keyup' 
+  {
+    SHOW_DIALOG: { 
+        name: 'Display keyboard shortcuts', 
+        sequence: 'shift+?', 
+        action: 'keyup' 
+      }
   }
 ```
 
 If you want to also provide alternative key sequences for the same action, use the `sequences` attribute:
 
 ```javascript
-  SHOW_DIALOG: { 
-    name: 'Display keyboard shortcuts', 
-    sequences: ['shift+?', { sequence: '`', action: 'keyup' }], 
-    action: 'keyup' 
+  {
+    SHOW_DIALOG: { 
+        name: 'Display keyboard shortcuts', 
+        sequences: ['shift+?', { sequence: '`', action: 'keyup' }], 
+        action: 'keyup' 
+      }
   }
 ```
 
@@ -415,6 +421,7 @@ An example, rendering two dialogs:
 
 ```javascript
 import { recordKeyCombination } from 'react-hotkeys';
+import React from 'react';
 
 renderDialog(){
   if (this.state.showShortcutsDialog) {
@@ -449,7 +456,7 @@ renderDialog(){
               );
               
               return memo;
-            }
+            })
           }
           </tbody>
         </table>
@@ -509,6 +516,7 @@ Handlers may be defined in the same `<HotKeys />` component as the key map:
 
 ```javascript
 import { HotKeys } from "react-hotkeys";
+import React from 'react';
 
 const keyMap = {
   MOVE_UP: "up"
@@ -527,6 +535,7 @@ Or they may be defined in any _descendant_ of the `<HotKeys />` component that d
 
 ```javascript
 import { HotKeys } from "react-hotkeys";
+import React from 'react';
 
 const keyMap = {
   MOVE_UP: "up"
@@ -705,6 +714,7 @@ You can use the second argument of `withHotKeys` to specify default values for a
 
 ```javascript
 import { withHotKeys } from "react-hotkeys";
+import React from 'react';
 
 class MyComponent extends Component {
   render() {
@@ -868,6 +878,7 @@ Below is how the example application renders a dialog of all available hot keys:
 
 ```javascript
 import { getApplicationKeyMap } from 'react-hotkeys';
+import React from 'react';
 
 // ...
 
@@ -895,8 +906,10 @@ renderDialog(){
                     { sequences.map(({sequence}) => <span key={sequence}>{sequence}</span>) }
                   </td>
                 </tr>
-              )
-            }
+              );
+              
+              return memo;
+            })
            }
           </tbody>
         </table>
@@ -942,6 +955,7 @@ If you want `react-hotkeys` to ignore key events coming from a particular area o
 
 ```javascript
 import { IgnoreKeys } from "react-hotkeys";
+import React from 'react';
 
 <IgnoreKeys>
   /** * Children that, when in focus, should have its key events ignored by *
@@ -988,6 +1002,7 @@ Similar to the `<HotKeys>`'s `withHotKeys()` function, there is a `withIgnoreKey
 
 ```javascript
 import { withHotKeysIgnore } from "react-hotkeys";
+import React from 'react';
 
 class MyComponent extends Component {
   render() {
@@ -1018,6 +1033,7 @@ const MyHotKeysComponent = withHotKeysIgnore(MyComponent);
 
 ```javascript
 import { withHotKeysIgnore } from "react-hotkeys";
+import React from 'react';
 
 class MyComponent extends Component {
   render() {
@@ -1052,6 +1068,7 @@ If you want `react-hotkeys` to always observe key events coming from a particula
 
 ```javascript
 import {ObserveKeys} from 'react-hotkeys';
+import React from 'react';
 
 <ObserveKeys>
     /**
@@ -1101,6 +1118,7 @@ Similar to the `<HotKeys>`'s `withHotKeys()` function, there is a `withObserveKe
 
 ```javascript
 import {withObserveKeys} from 'react-hotkeys';
+import React from 'react';
 
 class MyComponent extends Component {
   render() {
@@ -1133,6 +1151,7 @@ const MyHotKeysComponent = withObserveKeys(MyComponent);
 
 ```javascript
 import {withObserveKeys} from 'react-hotkeys';
+import React from 'react';
 
 class MyComponent extends Component {
   render() {

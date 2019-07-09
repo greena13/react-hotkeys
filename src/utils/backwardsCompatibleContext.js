@@ -22,7 +22,7 @@ import React from 'react';
  *        available from React 16.* onwards
  * @param {Object} options.newAPI.contextType Object describing the shape and default
  *        values of the context instance used provide context to descendant components
- * @returns {Component} Component that has now had the specified context applied
+ * @returns {React.Component} Component that has now had the specified context applied
  */
 function backwardsCompatibleContext(
   Component, { deprecatedAPI: { contextTypes, childContextTypes }, newAPI: { contextType } }) {
