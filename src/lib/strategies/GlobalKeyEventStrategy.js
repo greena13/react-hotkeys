@@ -261,7 +261,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     if (reactAppResponse !== EventResponse.ignored) {
       const keyEventState = stateFromEvent(event);
 
-      if (this.getCurrentCombination().isKeyIncluded(_key) || this.getCurrentCombination().isEnding()) {
+      const currentCombination = this.getCurrentCombination();
+
+      if (currentCombination.isKeyIncluded(_key) || currentCombination.isEnding()) {
         this._startAndLogNewKeyCombination(
           _key,
           keyEventState
@@ -344,7 +346,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       return true;
     }
 
-    if (this.getCurrentCombination().isKeyPressSimulated(key)) {
+    const currentCombination = this.getCurrentCombination();
+
+    if (currentCombination.isKeyPressSimulated(key)) {
       this.logger.debug(
         this._logPrefix(),
         `Ignored ${describeKeyEvent(event, key, KeyEventRecordIndex.keypress)} as it was not expected, and has already been simulated.`
@@ -367,7 +371,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * Add new key event to key combination history
      */
 
-    if (this.getCurrentCombination().isKeyIncluded(key)) {
+    if (currentCombination.isKeyIncluded(key)) {
       this._addToAndLogCurrentKeyCombination(
         key,
         KeyEventRecordIndex.keypress,
@@ -411,7 +415,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   handleKeyUp(event) {
     const key = getKeyName(event);
 
-    if (this.getCurrentCombination().isKeyUpSimulated(key)) {
+    const currentCombination = this.getCurrentCombination();
+    if (currentCombination.isKeyUpSimulated(key)) {
       this.logger.debug(
         this._logPrefix(),
         `Ignored ${describeKeyEvent(event, key, KeyEventRecordIndex.keyup)} as it was not expected, and has already been simulated.`
@@ -436,7 +441,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * function changes focus to a context that ignored events, the keyup event
      * is not lost (leaving react hotkeys thinking the key is still pressed).
      */
-    if (this.getCurrentCombination().isKeyIncluded(key)) {
+    if (currentCombination.isKeyIncluded(key)) {
       this._addToAndLogCurrentKeyCombination(
         key,
         KeyEventRecordIndex.keyup,
@@ -483,8 +488,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this._simulateKeyUpEventsHiddenByCmd(event, key);
 
     if (this.listeners.keyCombination && this._allKeysAreReleased()) {
-      const currentCombination = this.getCurrentCombination();
-
       this.listeners.keyCombination({
         keys: dictionaryFrom(Object.keys(currentCombination.getKeyStates()), true),
         id: currentCombination.describe()
