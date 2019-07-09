@@ -60,7 +60,7 @@ describe('Ignoring repeated events:', function () {
             this.eventOptions
           );
 
-          this.eventStrategy.handleKeypress(
+          this.eventStrategy.handleKeyPress(
             new MockSyntheticEvent('keypress', {key: Key.A}),
             0,
             this.componentId,
@@ -74,7 +74,7 @@ describe('Ignoring repeated events:', function () {
             this.eventOptions
           );
 
-          this.eventStrategy.handleKeypress(
+          this.eventStrategy.handleKeyPress(
             new MockSyntheticEvent('keypress', {key: Key.A, repeat: true}),
             0,
             this.componentId,

@@ -353,10 +353,10 @@ class AbstractKeyEventStrategy {
   }
 
   _shouldSimulate(eventType, keyName) {
-    const keyHasNativeKeypress = hasKeyPressEvent(keyName);
+    const keyHasNativeKeyPress = hasKeyPressEvent(keyName);
 
     if (eventType === KeyEventRecordIndex.keypress) {
-      return !keyHasNativeKeypress || (keyHasNativeKeypress && this.getCurrentCombination().isKeyStillPressed('Meta'));
+      return !keyHasNativeKeyPress || (keyHasNativeKeyPress && this.getCurrentCombination().isKeyStillPressed('Meta'));
     } else if (eventType === KeyEventRecordIndex.keyup) {
       return (keyupIsHiddenByCmd(keyName) && this.getCurrentCombination().isKeyUpTriggered('Meta'));
     }

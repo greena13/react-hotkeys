@@ -276,7 +276,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this._callHandlerIfActionNotHandled(event, key, KeyEventRecordIndex.keydown, componentId, focusTreeId);
     }
 
-    this._simulateKeypressForNonPrintableKeys(event, key, focusTreeId, componentId, options);
+    this._simulateKeyPressForNonPrintableKeys(event, key, focusTreeId, componentId, options);
 
     this.eventPropagator.finishPropagationStep();
 
@@ -334,7 +334,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * @returns {boolean} Whether the HotKeys component should discard its current focus
    *        tree Id, because it belongs to an old focus tree.
    */
-  handleKeypress(event, focusTreeId, componentId, options) {
+  handleKeyPress(event, focusTreeId, componentId, options) {
     const key = getKeyName(event);
 
     if (this.getCurrentCombination().isKeyPressSimulated(key)) {
@@ -420,7 +420,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * @returns {boolean} Whether HotKeys component should discard its current focusTreeId
    *        because it's stale (part of an old focus tree)
    */
-  handleKeyup(event, focusTreeId, componentId, options) {
+  handleKeyUp(event, focusTreeId, componentId, options) {
     const key = getKeyName(event);
 
     if (this.getCurrentCombination().isKeyUpSimulated(key)) {
@@ -515,7 +515,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     }
   }
 
-  _simulateKeypressForNonPrintableKeys(event, key, focusTreeId, componentId, options){
+  _simulateKeyPressForNonPrintableKeys(event, key, focusTreeId, componentId, options){
     this._handleEventSimulation(
       'keypressEventsToSimulate',
       'simulatePendingKeyPressEvents',
@@ -618,11 +618,11 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   simulatePendingKeyPressEvents() {
-    this._simulatePendingKeyEvents('keypressEventsToSimulate', 'handleKeypress');
+    this._simulatePendingKeyEvents('keypressEventsToSimulate', 'handleKeyPress');
   }
 
   simulatePendingKeyUpEvents() {
-    this._simulatePendingKeyEvents('keyupEventsToSimulate', 'handleKeyup');
+    this._simulatePendingKeyEvents('keyupEventsToSimulate', 'handleKeyUp');
   }
 
   _simulatePendingKeyEvents(listName, handlerName) {

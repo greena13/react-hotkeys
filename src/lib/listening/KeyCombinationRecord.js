@@ -21,7 +21,7 @@ class KeyCombinationRecord {
    */
   constructor(keys = {}) {
     this._keys = keys;
-    this._includesKeyup = false;
+    this._includesKeyUp = false;
     this._update();
   }
 
@@ -81,7 +81,7 @@ class KeyCombinationRecord {
     }
 
     if (recordIndex === KeyEventRecordIndex.keyup) {
-      this._includesKeyup = true;
+      this._includesKeyUp = true;
     }
   }
 
@@ -113,7 +113,7 @@ class KeyCombinationRecord {
   }
 
   isEnding() {
-    return this._includesKeyup;
+    return this._includesKeyUp;
   }
 
   /**

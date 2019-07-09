@@ -77,7 +77,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
             }
           ]);
 
-          this.eventStrategy.handleKeyup(
+          this.eventStrategy.handleKeyUp(
             new MockSyntheticEvent('keyup', {key: 'Meta'}),
             0,
             this.componentId,
@@ -162,7 +162,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
             }
           ]);
 
-          this.eventStrategy.handleKeyup(
+          this.eventStrategy.handleKeyUp(
             new MockSyntheticEvent('keyup', {key: 'Meta'}),
             0,
             this.componentId,

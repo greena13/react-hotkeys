@@ -1,4 +1,4 @@
-import KeysWithKeyupHiddenByCmd from '../../const/KeysWithKeyupHiddenByCmd';
+import KeysWithKeyUpHiddenByCmd from '../../const/KeysWithKeyUpHiddenByCmd';
 import hasKey from '../../utils/object/hasKey';
 
 /**
@@ -8,7 +8,7 @@ import hasKey from '../../utils/object/hasKey';
  * @returns {boolean} Whether the key has its keyup event hidden by cmd
  */
 function keyupIsHiddenByCmd(keyName) {
-  return keyName.length === 1 || hasKey(KeysWithKeyupHiddenByCmd, keyName);
+  return keyName.length === 1 || hasKey(KeysWithKeyUpHiddenByCmd, keyName);
 }
 
 export default keyupIsHiddenByCmd;

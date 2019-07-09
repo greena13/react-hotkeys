@@ -283,9 +283,9 @@ class KeyEventManager {
    * @param {Object} options - Hash of options that configure how the event
    *        is handled.
    */
-  handleKeypress(event, focusTreeId, componentId, options) {
+  handleKeyPress(event, focusTreeId, componentId, options) {
     if (isFromFocusOnlyComponent(focusTreeId)) {
-      return this._focusOnlyEventStrategy.handleKeypress(event, focusTreeId, componentId, options);
+      return this._focusOnlyEventStrategy.handleKeyPress(event, focusTreeId, componentId, options);
     }
   }
 
@@ -305,9 +305,9 @@ class KeyEventManager {
    * @param {Object} options Hash of options that configure how the event
    *        is handled.
    */
-  handleKeyup(event, focusTreeId, componentId, options) {
+  handleKeyUp(event, focusTreeId, componentId, options) {
     if (isFromFocusOnlyComponent(focusTreeId)) {
-      return this._focusOnlyEventStrategy.handleKeyup(event, focusTreeId, componentId, options);
+      return this._focusOnlyEventStrategy.handleKeyUp(event, focusTreeId, componentId, options);
     }
   }
 
@@ -374,7 +374,7 @@ class KeyEventManager {
    * the keymaps for all of the mounted global HotKey components.
    * @param {KeyboardEvent} event - Event containing the key name and state
    */
-  handleGlobalKeydown(event) {
+  handleGlobalKeyDown(event) {
     return this._globalEventStrategy.handleKeydown(event);
   }
 
@@ -387,8 +387,8 @@ class KeyEventManager {
    * the keymaps for all of the mounted global HotKey components.
    * @param {KeyboardEvent} event - Event containing the key name and state
    */
-  handleGlobalKeypress(event) {
-    return this._globalEventStrategy.handleKeypress(event);
+  handleGlobalKeyPress(event) {
+    return this._globalEventStrategy.handleKeyPress(event);
   }
 
   /**
@@ -400,8 +400,8 @@ class KeyEventManager {
    * the keymaps for all of the mounted global HotKey components.
    * @param {KeyboardEvent} event - Event containing the key name and state
    */
-  handleGlobalKeyup(event) {
-    return this._globalEventStrategy.handleKeyup(event);
+  handleGlobalKeyUp(event) {
+    return this._globalEventStrategy.handleKeyUp(event);
   }
 
   /**

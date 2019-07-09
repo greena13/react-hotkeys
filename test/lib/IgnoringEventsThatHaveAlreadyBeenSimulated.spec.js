@@ -90,7 +90,7 @@ describe('Ignoring events that have already been simulated:', function () {
 
           expect(this.handler).to.have.been.calledOnce;
 
-          this.eventStrategy.handleKeypress(
+          this.eventStrategy.handleKeyPress(
             new MockSyntheticEvent('keypress', {key: Key.A}),
             0,
             this.componentId,
@@ -192,7 +192,7 @@ describe('Ignoring events that have already been simulated:', function () {
             }
           ]);
 
-          this.eventStrategy.handleKeyup(
+          this.eventStrategy.handleKeyUp(
             new MockSyntheticEvent('keyup', {key: Key.COMMAND}),
             0,
             this.componentId,
@@ -218,7 +218,7 @@ describe('Ignoring events that have already been simulated:', function () {
 
           expect(this.handler).to.have.been.calledOnce;
 
-          this.eventStrategy.handleKeyup(
+          this.eventStrategy.handleKeyUp(
             new MockSyntheticEvent('keyup', {key: Key.A}),
             0,
             this.componentId,

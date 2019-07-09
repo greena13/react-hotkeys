@@ -125,7 +125,7 @@ describe('Handling ignored events:', function () {
               this.eventOptions
             );
 
-            this.eventStrategy.handleKeypress(
+            this.eventStrategy.handleKeyPress(
               new MockSyntheticEvent('keypress', {key: 'a'}),
               0,
               this.componentId,
@@ -155,7 +155,7 @@ describe('Handling ignored events:', function () {
 
         context('and the key does NOT already exist in the current combination', () => {
           beforeEach(function () {
-            this.eventStrategy.handleKeypress(
+            this.eventStrategy.handleKeyPress(
               new MockSyntheticEvent('keypress', {key: 'a'}),
               0,
               this.componentId,
@@ -197,7 +197,7 @@ describe('Handling ignored events:', function () {
               { ignoreEventsCondition: () => false }
             );
 
-            this.eventStrategy.handleKeypress(
+            this.eventStrategy.handleKeyPress(
               new MockSyntheticEvent('keypress', {key: 'a'}),
               0,
               this.componentId,
@@ -227,7 +227,7 @@ describe('Handling ignored events:', function () {
 
         context('and the key does NOT already exist in the current combination', () => {
           beforeEach(function () {
-            this.eventStrategy.handleKeypress(
+            this.eventStrategy.handleKeyPress(
               new MockSyntheticEvent('keypress', {key: 'a'}),
               0,
               this.componentId,
@@ -275,14 +275,14 @@ describe('Handling ignored events:', function () {
               this.eventOptions
             );
 
-            this.eventStrategy.handleKeypress(
+            this.eventStrategy.handleKeyPress(
               new MockSyntheticEvent('keypress', {key: 'a'}),
               0,
               this.componentId,
               this.eventOptions
             );
 
-            this.eventStrategy.handleKeyup(
+            this.eventStrategy.handleKeyUp(
               new MockSyntheticEvent('keyup', {key: 'a'}),
               0,
               this.componentId,
@@ -312,7 +312,7 @@ describe('Handling ignored events:', function () {
 
         context('and the key does NOT already exist in the current combination', () => {
           beforeEach(function () {
-            this.eventStrategy.handleKeyup(
+            this.eventStrategy.handleKeyUp(
               new MockSyntheticEvent('keyup', {key: 'a'}),
               0,
               this.componentId,
@@ -354,14 +354,14 @@ describe('Handling ignored events:', function () {
               { ignoreEventsCondition: () => false }
             );
 
-            this.eventStrategy.handleKeypress(
+            this.eventStrategy.handleKeyPress(
               new MockSyntheticEvent('keypress', {key: 'a'}),
               0,
               this.componentId,
               { ignoreEventsCondition: () => false }
             );
 
-            this.eventStrategy.handleKeyup(
+            this.eventStrategy.handleKeyUp(
               new MockSyntheticEvent('keyup', {key: 'a'}),
               0,
               this.componentId,
@@ -391,7 +391,7 @@ describe('Handling ignored events:', function () {
 
         context('and the key does NOT already exist in the current combination', () => {
           beforeEach(function () {
-            this.eventStrategy.handleKeypress(
+            this.eventStrategy.handleKeyPress(
               new MockSyntheticEvent('keypress', {key: 'a'}),
               0,
               this.componentId,

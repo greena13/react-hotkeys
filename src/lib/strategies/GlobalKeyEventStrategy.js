@@ -1,6 +1,5 @@
 import KeyEventRecordIndex from '../../const/KeyEventRecordIndex';
 import AbstractKeyEventStrategy from './AbstractKeyEventStrategy';
-import capitalize from '../../utils/string/capitalize';
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import KeyEventCounter from '../listening/KeyEventCounter';
 import Logger from '../logging/Logger';
@@ -14,6 +13,7 @@ import EventResponse from '../../const/EventResponse';
 import contains from '../../utils/collection/contains';
 import dictionaryFrom from '../../utils/object/dictionaryFrom';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
+import normalizeEventName from '../../utils/string/normalizeEventName';
 
 /**
  * Defines behaviour for dealing with key maps defined in global HotKey components
@@ -175,12 +175,12 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         const eventName = describeKeyEventType(recordIndex);
 
         document[`on${eventName}`] = (keyEvent) => {
-          this.keyEventManager[`handleGlobal${capitalize(eventName)}`](keyEvent);
+          this.keyEventManager[`handleGlobal${normalizeEventName(eventName)}`](keyEvent);
         };
 
         this.logger.debug(
           this._logPrefix(this.componentId, {eventId: false}),
-          `Bound handler handleGlobal${capitalize(eventName)}() to document.on${eventName}()`
+          `Bound handler handleGlobal${normalizeEventName(eventName)}() to document.on${eventName}()`
         );
       });
 
@@ -195,7 +195,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
         this.logger.debug(
           this._logPrefix(this.componentId, {eventId: false}),
-          `Removed handler handleGlobal${capitalize(eventName)}() from document.on${eventName}()`
+          `Removed handler handleGlobal${normalizeEventName(eventName)}() from document.on${eventName}()`
         );
       });
 
@@ -279,7 +279,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this._callHandlerIfExists(event, _key, KeyEventRecordIndex.keydown);
     }
 
-    this._simulateKeypressForNonPrintableKeys(event, _key);
+    this._simulateKeyPressForNonPrintableKeys(event, _key);
   }
 
   _howReactAppRespondedTo(event, key, eventRecordIndex) {
@@ -332,7 +332,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * the keymaps for all of the mounted global HotKey components.
    * @param {KeyboardEvent} event - Event containing the key name and state
    */
-  handleKeypress(event) {
+  handleKeyPress(event) {
     const key = getKeyName(event);
 
     if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
@@ -408,7 +408,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * the keymaps for all of the mounted global HotKey components.
    * @param {KeyboardEvent} event - Event containing the key name and state
    */
-  handleKeyup(event) {
+  handleKeyUp(event) {
     const key = getKeyName(event);
 
     if (this.getCurrentCombination().isKeyUpSimulated(key)) {
@@ -492,11 +492,11 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     }
   }
 
-  _simulateKeypressForNonPrintableKeys(event, key) {
+  _simulateKeyPressForNonPrintableKeys(event, key) {
     this.keyEventManager.simulatePendingKeyPressEvents();
 
     this._handleEventSimulation(
-      'handleKeypress',
+      'handleKeyPress',
       this._shouldSimulate(KeyEventRecordIndex.keypress, key),
       {event, key}
     );
@@ -515,7 +515,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         }
 
         this._handleEventSimulation(
-          'handleKeyup',
+          'handleKeyUp',
           this._shouldSimulate(KeyEventRecordIndex.keyup, keyName),
           {event, key: keyName}
         );

@@ -2,7 +2,7 @@
  * Dictionary of keys that, when pressed down with the cmd key, never trigger a keyup
  * event in the browser
  */
-const KeysWithKeyupHiddenByCmd = {
+const KeysWithKeyUpHiddenByCmd = {
   Enter: true,
   Backspace: true,
   ArrowRight: true,
@@ -17,7 +17,7 @@ const KeysWithKeyupHiddenByCmd = {
 };
 
 for(let i = 1; i < 13; i++) {
-  KeysWithKeyupHiddenByCmd[`F${i}`] = true;
+  KeysWithKeyUpHiddenByCmd[`F${i}`] = true;
 }
 
-export default KeysWithKeyupHiddenByCmd;
+export default KeysWithKeyUpHiddenByCmd;

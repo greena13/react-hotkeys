@@ -350,7 +350,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
      */
     _handleKeyPress(event) {
       const discardFocusTreeId =
-        KeyEventManager.getInstance().handleKeypress(
+        KeyEventManager.getInstance().handleKeyPress(
           event,
           this._getFocusTreeId(),
           this._id,
@@ -369,7 +369,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
      */
     _handleKeyUp(event) {
       const discardFocusTreeId =
-        KeyEventManager.getInstance().handleKeyup(
+        KeyEventManager.getInstance().handleKeyUp(
           event,
           this._getFocusTreeId(),
           this._id,

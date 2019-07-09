@@ -55,7 +55,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeypress(simulant('keypress', {key: 'A'}));
+          this.eventStrategy.handleKeyPress(simulant('keypress', {key: 'A'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
@@ -77,7 +77,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeyup(simulant('keyup', {key: 'A'}));
+          this.eventStrategy.handleKeyUp(simulant('keyup', {key: 'A'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
@@ -99,7 +99,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeyup(simulant('keyup', {key: 'Shift'}));
+          this.eventStrategy.handleKeyUp(simulant('keyup', {key: 'Shift'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
@@ -147,7 +147,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeypress(simulant('keypress', {key: 'A'}));
+          this.eventStrategy.handleKeyPress(simulant('keypress', {key: 'A'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
@@ -169,7 +169,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeyup(simulant('keyup', {key: 'Shift'}));
+          this.eventStrategy.handleKeyUp(simulant('keyup', {key: 'Shift'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
@@ -191,7 +191,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeyup(simulant('keyup', {key: 'a'}));
+          this.eventStrategy.handleKeyUp(simulant('keyup', {key: 'a'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
@@ -219,7 +219,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
     context('and a is pressed first', () => {
       beforeEach(function () {
         this.eventStrategy.handleKeydown(simulant('keydown', {key: 'a'}));
-        this.eventStrategy.handleKeypress(simulant('keypress', {key: 'a'}));
+        this.eventStrategy.handleKeyPress(simulant('keypress', {key: 'a'}));
 
         expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
           {
@@ -261,7 +261,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeyup(simulant('keyup', {key: 'Shift'}));
+          this.eventStrategy.handleKeyUp(simulant('keyup', {key: 'Shift'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
@@ -283,7 +283,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeyup(simulant('keyup', {key: 'a'}));
+          this.eventStrategy.handleKeyUp(simulant('keyup', {key: 'a'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
@@ -331,7 +331,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeyup(simulant('keyup', {key: 'A'}));
+          this.eventStrategy.handleKeyUp(simulant('keyup', {key: 'A'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
@@ -353,7 +353,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeyup(simulant('keyup', {key: 'Shift'}));
+          this.eventStrategy.handleKeyUp(simulant('keyup', {key: 'Shift'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
@@ -424,7 +424,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeypress(simulant('keypress', {key: 'å'}));
+          this.eventStrategy.handleKeyPress(simulant('keypress', {key: 'å'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
@@ -446,7 +446,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeyup(simulant('keyup', {key: 'å'}));
+          this.eventStrategy.handleKeyUp(simulant('keyup', {key: 'å'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
@@ -468,7 +468,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeyup(simulant('keyup', {key: 'Alt'}));
+          this.eventStrategy.handleKeyUp(simulant('keyup', {key: 'Alt'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
@@ -516,7 +516,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeypress(simulant('keypress', {key: 'å'}));
+          this.eventStrategy.handleKeyPress(simulant('keypress', {key: 'å'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
@@ -538,7 +538,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeyup(simulant('keyup', {key: 'Alt'}));
+          this.eventStrategy.handleKeyUp(simulant('keyup', {key: 'Alt'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
@@ -560,7 +560,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeyup(simulant('keyup', {key: 'a'}));
+          this.eventStrategy.handleKeyUp(simulant('keyup', {key: 'a'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
@@ -588,7 +588,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
     context('and a is pressed first', () => {
       beforeEach(function () {
         this.eventStrategy.handleKeydown(simulant('keydown', {key: 'a'}));
-        this.eventStrategy.handleKeypress(simulant('keypress', {key: 'a'}));
+        this.eventStrategy.handleKeyPress(simulant('keypress', {key: 'a'}));
 
         expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
           {
@@ -630,7 +630,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeyup(simulant('keyup', {key: 'Alt'}));
+          this.eventStrategy.handleKeyUp(simulant('keyup', {key: 'Alt'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
@@ -652,7 +652,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeyup(simulant('keyup', {key: 'a'}));
+          this.eventStrategy.handleKeyUp(simulant('keyup', {key: 'a'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
@@ -700,7 +700,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeyup(simulant('keyup', {key: 'å'}));
+          this.eventStrategy.handleKeyUp(simulant('keyup', {key: 'å'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
@@ -722,7 +722,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
             }
           ]);
 
-          this.eventStrategy.handleKeyup(simulant('keyup', {key: 'Alt'}));
+          this.eventStrategy.handleKeyUp(simulant('keyup', {key: 'Alt'}));
 
           expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
             {
