@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 
 import KeyEventManager from '../../../src/lib/KeyEventManager';
-import KeyEventRecordState from '../../../src/const/KeyEventRecordState';
+import KeyEventState from '../../../src/const/KeyEventState';
 import MockSyntheticEvent from '../../support/MockSyntheticEvent';
 import EmptyKeyCombination from '../../support/EmptyKeyCombination';
 
@@ -25,7 +25,7 @@ describe('Handling ignored events:', function () {
       context('that is NOT ignored', () => {
         beforeEach(function () {
           this.eventOptions = {
-            ignoreEventsCondition: () => KeyEventRecordState.unseen
+            ignoreEventsCondition: () => KeyEventState.unseen
           };
 
           this.eventStrategy.enableHotKeys(
@@ -46,8 +46,8 @@ describe('Handling ignored events:', function () {
             {
               'keys': {
                 'a': [
-                  [KeyEventRecordState.unseen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen]
+                  [KeyEventState.unseen, KeyEventState.unseen, KeyEventState.unseen],
+                  [KeyEventState.seen, KeyEventState.unseen, KeyEventState.unseen]
                 ]
               },
               'ids': ['a'],
@@ -126,8 +126,8 @@ describe('Handling ignored events:', function () {
               {
                 'keys': {
                   'a': [
-                    [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                    [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                    [KeyEventState.seen, KeyEventState.unseen, KeyEventState.unseen],
+                    [KeyEventState.seen, KeyEventState.seen, KeyEventState.unseen]
                   ]
                 },
                 'ids': ['a'],
@@ -189,8 +189,8 @@ describe('Handling ignored events:', function () {
               {
                 'keys': {
                   'a': [
-                    [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                    [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                    [KeyEventState.seen, KeyEventState.unseen, KeyEventState.unseen],
+                    [KeyEventState.seen, KeyEventState.seen, KeyEventState.unseen]
                   ]
                 },
                 'ids': ['a'],
@@ -262,8 +262,8 @@ describe('Handling ignored events:', function () {
               {
                 'keys': {
                   'a': [
-                    [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                    [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                    [KeyEventState.seen, KeyEventState.seen, KeyEventState.unseen],
+                    [KeyEventState.seen, KeyEventState.seen, KeyEventState.seen]
                   ]
                 },
                 'ids': ['a'],
@@ -329,8 +329,8 @@ describe('Handling ignored events:', function () {
               {
                 'keys': {
                   'a': [
-                    [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen],
-                    [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.seen]
+                    [KeyEventState.seen, KeyEventState.seen, KeyEventState.unseen],
+                    [KeyEventState.seen, KeyEventState.seen, KeyEventState.seen]
                   ]
                 },
                 'ids': ['a'],

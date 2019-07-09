@@ -10,7 +10,7 @@ import getKeyName from '../../helpers/resolving-handlers/getKeyName';
 import isCmdKey from '../../helpers/parsing-key-maps/isCmdKey';
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 import EventResponse from '../../const/EventResponse';
-import KeyEventRecordState from '../../const/KeyEventRecordState';
+import KeyEventState from '../../const/KeyEventState';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 import EventPropagator from '../listening/EventPropagator';
 
@@ -517,7 +517,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
        * down (as either keydown or keypress), then we update the state
        * to keypress or keyup (depending on the value of recordIndex).
        */
-      currentCombination.setKeyState(keyName, recordIndex, KeyEventRecordState.simulated);
+      currentCombination.setKeyState(keyName, recordIndex, KeyEventState.simulated);
     }
   }
 

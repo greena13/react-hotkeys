@@ -3,10 +3,10 @@ import KeyEventType from '../../const/KeyEventType';
 import KeyCombinationSerializer from '../shared/KeyCombinationSerializer';
 import resolveKeyAlias from '../../helpers/resolving-handlers/resolveKeyAlias';
 import applicableAliasFunctions from '../../helpers/resolving-handlers/applicableAliasFunctions';
-import KeyEventRecordManager from '../shared/KeyEventRecordManager';
+import KeyEventStateManager from '../shared/KeyEventStateManager';
 import isEmpty from '../../utils/collection/isEmpty';
 import size from '../../utils/collection/size';
-import KeyEventRecordState from '../../const/KeyEventRecordState';
+import KeyEventState from '../../const/KeyEventState';
 import dictionaryFrom from '../../utils/object/dictionaryFrom';
 
 /**
@@ -16,7 +16,7 @@ import dictionaryFrom from '../../utils/object/dictionaryFrom';
 class KeyCombination {
   /**
    * Creates a new KeyCombination instance
-   * @param {Object.<ReactKeyName, Array.<KeyEventRecordState[]>>} keys Dictionary
+   * @param {Object.<ReactKeyName, Array.<KeyEventState[]>>} keys Dictionary
    *        of keys
    * @returns {KeyCombination}
    */
@@ -113,13 +113,13 @@ class KeyCombination {
   /**
    * Add a new key to the combination (starting with a state of keydown)
    * @param {ReactKeyName} keyName Name of key
-   * @param {KeyEventRecordState} keyEventState State key is in
+   * @param {KeyEventState} keyEventState State key is in
    * @returns {void}
    */
   addKey(keyName, keyEventState) {
     this._setKeyState(keyName, [
-      KeyEventRecordManager.newRecord(),
-      KeyEventRecordManager.newRecord(KeyEventType.keydown, keyEventState)
+      KeyEventStateManager.newRecord(),
+      KeyEventStateManager.newRecord(KeyEventType.keydown, keyEventState)
     ]);
   }
 
@@ -128,16 +128,16 @@ class KeyCombination {
    * keyboard combination).
    * @param {ReactKeyName} keyName - Name of the key to add to the current combination
    * @param {KeyEventType} recordIndex - Index in record to set to true
-   * @param {KeyEventRecordState} keyEventState The state to set the key event to
+   * @param {KeyEventState} keyEventState The state to set the key event to
    */
   setKeyState(keyName, recordIndex, keyEventState) {
     const existingRecord = this._getKeyState(keyName);
 
     if (this.isKeyIncluded(keyName)) {
-      const previous = KeyEventRecordManager.clone(existingRecord[1]);
-      const current = KeyEventRecordManager.clone(previous);
+      const previous = KeyEventStateManager.clone(existingRecord[1]);
+      const current = KeyEventStateManager.clone(previous);
 
-      KeyEventRecordManager.setBit(current, recordIndex, keyEventState);
+      KeyEventStateManager.setBit(current, recordIndex, keyEventState);
 
       this._setKeyState(keyName, [previous, current]);
     } else {
@@ -303,7 +303,7 @@ class KeyCombination {
   }
 
   _isKeyEventSimulated(keyName, keyEventType){
-    return this.isEventTriggered(keyName, keyEventType) === KeyEventRecordState.simulated;
+    return this.isEventTriggered(keyName, keyEventType) === KeyEventState.simulated;
   }
 
   _getKeyStates() {

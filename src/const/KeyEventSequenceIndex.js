@@ -1,5 +1,5 @@
 /**
- * Enum for index values for KeyEventRecords
+ * Enum for index values for KeyEvents
  * @readonly
  * @enum {number}
  */

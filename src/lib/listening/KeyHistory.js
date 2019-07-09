@@ -61,7 +61,7 @@ class KeyHistory {
    * keyboard combination).
    * @param {ReactKeyName} keyName - Name of the key to add to the current combination
    * @param {KeyEventType} recordIndex - Index in record to set to true
-   * @param {KeyEventRecordState} keyEventState The state to set the key event to
+   * @param {KeyEventState} keyEventState The state to set the key event to
    */
   addKeyToCurrentCombination(keyName, recordIndex, keyEventState) {
     this._ensureInitialKeyCombination();
@@ -83,7 +83,7 @@ class KeyHistory {
    * Adds a new KeyCombination to the event history.
    * @param {ReactKeyName} keyName - Name of the keyboard key to add to the new
    *        KeyCombination
-   * @param {KeyEventRecordState} keyEventState The state to set the key event to
+   * @param {KeyEventState} keyEventState The state to set the key event to
    */
   startNewKeyCombination(keyName, keyEventState) {
     this._ensureInitialKeyCombination();

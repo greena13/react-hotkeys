@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import Key from '../support/Key';
 import KeyEventManager from '../../src/lib/KeyEventManager';
 import Configuration from '../../src/lib/config/Configuration';
-import KeyEventRecordState from '../../src/const/KeyEventRecordState';
+import KeyEventState from '../../src/const/KeyEventState';
 import MockSyntheticEvent from '../support/MockSyntheticEvent';
 
 describe('Ignoring repeated events:', function () {
@@ -44,8 +44,8 @@ describe('Ignoring repeated events:', function () {
             {
               'keys': {
                 'Shift': [
-                  [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
+                  [KeyEventState.seen, KeyEventState.unseen, KeyEventState.unseen],
+                  [KeyEventState.seen, KeyEventState.simulated, KeyEventState.unseen]
                 ]
               },
               'ids': ['Shift'],
@@ -85,12 +85,12 @@ describe('Ignoring repeated events:', function () {
             {
               'keys': {
                 'Shift': [
-                  [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
+                  [KeyEventState.seen, KeyEventState.unseen, KeyEventState.unseen],
+                  [KeyEventState.seen, KeyEventState.simulated, KeyEventState.unseen]
                 ],
                 'a': [
-                  [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.seen, KeyEventRecordState.unseen]
+                  [KeyEventState.seen, KeyEventState.unseen, KeyEventState.unseen],
+                  [KeyEventState.seen, KeyEventState.seen, KeyEventState.unseen]
                 ]
               },
               'ids': ['Shift+a', 'A+Shift'],

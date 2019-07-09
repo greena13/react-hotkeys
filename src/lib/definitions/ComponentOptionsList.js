@@ -1,5 +1,5 @@
 import removeAtIndex from '../../utils/array/removeAtIndex';
-import KeyEventRecordManager from '../shared/KeyEventRecordManager';
+import KeyEventStateManager from '../shared/KeyEventStateManager';
 import Configuration from '../config/Configuration';
 import KeyCombinationSerializer from '../shared/KeyCombinationSerializer';
 import isObject from '../../utils/object/isObject';
@@ -8,7 +8,7 @@ import arrayFrom from '../../utils/array/arrayFrom';
 import isUndefined from '../../utils/isUndefined';
 import KeyEventType from '../../const/KeyEventType';
 import KeySequenceParser from '../shared/KeySequenceParser';
-import KeyEventRecordState from '../../const/KeyEventRecordState';
+import KeyEventState from '../../const/KeyEventState';
 import ComponentOptionsListIterator from './ComponentOptionsListIterator';
 
 /**
@@ -78,9 +78,9 @@ class ComponentOptionsList {
     /**
      * Record of whether at least one keymap is bound to each event type (keydown,
      * keypress or keyup)
-     * @type {KeyEventRecord}
+     * @type {KeyEvent}
      */
-    this._keyMapEventRecord = KeyEventRecordManager.newRecord();
+    this._keyMapEventRecord = KeyEventStateManager.newRecord();
   }
 
   /**
@@ -427,7 +427,7 @@ class ComponentOptionsList {
      * Record that there is at least one key sequence in the focus tree bound to
      * the keyboard event
      */
-    this._keyMapEventRecord[keyEventType] = KeyEventRecordState.seen;
+    this._keyMapEventRecord[keyEventType] = KeyEventState.seen;
 
     if (!memo[actionName]) {
       memo[actionName] = [];

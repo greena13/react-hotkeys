@@ -1,5 +1,5 @@
 /**
- * @typedef {KeyEventRecordState[]} KeyEventRecord A record indicating which of the key events
+ * @typedef {KeyEventState[]} KeyEvent A record indicating which of the key events
  * have been registered to a particular key. The first bit is for the keydown event,
  * the second keypress and the third is for keyup.
  *
@@ -10,24 +10,24 @@
  */
 
 import isUndefined from '../../utils/isUndefined';
-import KeyEventRecordState from '../../const/KeyEventRecordState';
+import KeyEventState from '../../const/KeyEventState';
 
 /**
- * Creates and modifies KeyEventRecords
+ * Creates and modifies KeyEvents
  * @class
  */
-class KeyEventRecordManager {
+class KeyEventStateManager {
   /**
-   * Makes a new KeyEventRecord with one of the bits set to true
+   * Makes a new KeyEvent with one of the bits set to true
    * @param {KeyEventType=} keyEventType Index of bit to set to true
-   * @param {KeyEventRecordState} keyEventState The state to set the key event to
-   * @returns {KeyEventRecord} New key event record with bit set to true
+   * @param {KeyEventState} keyEventState The state to set the key event to
+   * @returns {KeyEvent} New key event record with bit set to true
    */
   static newRecord(keyEventType, keyEventState) {
     const record = [
-      KeyEventRecordState.unseen,
-      KeyEventRecordState.unseen,
-      KeyEventRecordState.unseen
+      KeyEventState.unseen,
+      KeyEventState.unseen,
+      KeyEventState.unseen
     ];
 
     if (!isUndefined(keyEventType)) {
@@ -41,9 +41,9 @@ class KeyEventRecordManager {
 
   /**
    * Sets a bit in the map to true
-   * @param {KeyEventRecord} record Map to set a bit to true
+   * @param {KeyEvent} record Map to set a bit to true
    * @param {KeyEventType} index Index of bit to set
-   * @param {KeyEventRecordState} keyEventState The state to set the key event to
+   * @param {KeyEventState} keyEventState The state to set the key event to
    */
   static setBit(record, index, keyEventState) {
     record[index] = keyEventState;
@@ -53,8 +53,8 @@ class KeyEventRecordManager {
 
   /**
    * Returns a new record with the same values as the one passed to it
-   * @param {KeyEventRecord} original Record to copy
-   * @returns {KeyEventRecord} Record with the same values as the original
+   * @param {KeyEvent} original Record to copy
+   * @returns {KeyEvent} Record with the same values as the original
    */
   static clone(original) {
     const record = this.newRecord();
@@ -67,4 +67,4 @@ class KeyEventRecordManager {
   }
 }
 
-export default KeyEventRecordManager;
+export default KeyEventStateManager;

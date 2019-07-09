@@ -2,7 +2,7 @@ import { expect } from 'chai';
 
 import Key from '../support/Key';
 import KeyEventManager from '../../src/lib/KeyEventManager';
-import KeyEventRecordState from '../../src/const/KeyEventRecordState';
+import KeyEventState from '../../src/const/KeyEventState';
 import Configuration from '../../src/lib/config/Configuration';
 import MockSyntheticEvent from '../support/MockSyntheticEvent';
 
@@ -44,8 +44,8 @@ describe('Simulating keypress events hidden by cmd:', function () {
             {
               'keys': {
                 'Meta': [
-                  [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
+                  [KeyEventState.seen, KeyEventState.unseen, KeyEventState.unseen],
+                  [KeyEventState.seen, KeyEventState.simulated, KeyEventState.unseen]
                 ]
               },
               'ids': ['Meta'],
@@ -64,12 +64,12 @@ describe('Simulating keypress events hidden by cmd:', function () {
             {
               'keys': {
                 'Meta': [
-                  [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
+                  [KeyEventState.seen, KeyEventState.unseen, KeyEventState.unseen],
+                  [KeyEventState.seen, KeyEventState.simulated, KeyEventState.unseen]
                 ],
                 'a': [
-                  [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
+                  [KeyEventState.seen, KeyEventState.unseen, KeyEventState.unseen],
+                  [KeyEventState.seen, KeyEventState.simulated, KeyEventState.unseen]
                 ]
               },
               'ids': ['Meta+a'],
@@ -88,12 +88,12 @@ describe('Simulating keypress events hidden by cmd:', function () {
             {
               'keys': {
                 'Meta': [
-                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.seen]
+                  [KeyEventState.seen, KeyEventState.simulated, KeyEventState.unseen],
+                  [KeyEventState.seen, KeyEventState.simulated, KeyEventState.seen]
                 ],
                 'a': [
-                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.simulated]
+                  [KeyEventState.seen, KeyEventState.simulated, KeyEventState.unseen],
+                  [KeyEventState.seen, KeyEventState.simulated, KeyEventState.simulated]
                 ]
               },
               'ids': ['Meta+a'],
@@ -129,8 +129,8 @@ describe('Simulating keypress events hidden by cmd:', function () {
             {
               'keys': {
                 'Meta': [
-                  [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
+                  [KeyEventState.seen, KeyEventState.unseen, KeyEventState.unseen],
+                  [KeyEventState.seen, KeyEventState.simulated, KeyEventState.unseen]
                 ]
               },
               'ids': ['Meta'],
@@ -149,12 +149,12 @@ describe('Simulating keypress events hidden by cmd:', function () {
             {
               'keys': {
                 'Meta': [
-                  [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
+                  [KeyEventState.seen, KeyEventState.unseen, KeyEventState.unseen],
+                  [KeyEventState.seen, KeyEventState.simulated, KeyEventState.unseen]
                 ],
                 'a': [
-                  [KeyEventRecordState.seen, KeyEventRecordState.unseen, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen]
+                  [KeyEventState.seen, KeyEventState.unseen, KeyEventState.unseen],
+                  [KeyEventState.seen, KeyEventState.simulated, KeyEventState.unseen]
                 ]
               },
               'ids': ['Meta+a'],
@@ -173,12 +173,12 @@ describe('Simulating keypress events hidden by cmd:', function () {
             {
               'keys': {
                 'Meta': [
-                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.seen]
+                  [KeyEventState.seen, KeyEventState.simulated, KeyEventState.unseen],
+                  [KeyEventState.seen, KeyEventState.simulated, KeyEventState.seen]
                 ],
                 'a': [
-                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.unseen],
-                  [KeyEventRecordState.seen, KeyEventRecordState.simulated, KeyEventRecordState.simulated]
+                  [KeyEventState.seen, KeyEventState.simulated, KeyEventState.unseen],
+                  [KeyEventState.seen, KeyEventState.simulated, KeyEventState.simulated]
                 ]
               },
               'ids': ['Meta+a'],
