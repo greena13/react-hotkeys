@@ -1,4 +1,4 @@
-import KeyCombinationHistoryMatcher from './KeyCombinationHistoryMatcher';
+import KeyHistoryMatcher from './KeyHistoryMatcher';
 
 /**
  * Resolves the correct actions to trigger for a list of hotkeys components and a
@@ -15,7 +15,7 @@ class ActionResolver {
     /**
      * List of mappings from key sequences to handlers that is constructed on-the-fly
      * as key events propagate up the render tree
-     * @type {KeyCombinationHistoryMatcher[]}
+     * @type {KeyHistoryMatcher[]}
      */
     this._keyMapMatchers = [];
 
@@ -45,7 +45,7 @@ class ActionResolver {
     while(iterator.next()) {
       const { handlers } = iterator.getComponent();
       this._unmatchedHandlerStatus.push( [ Object.keys(handlers).length, {} ]);
-      this._keyMapMatchers.push(new KeyCombinationHistoryMatcher());
+      this._keyMapMatchers.push(new KeyHistoryMatcher());
     }
 
     this._componentList = componentList;
@@ -53,13 +53,13 @@ class ActionResolver {
   }
 
   /**
-   * The KeyCombinationHistoryMatcher for the component in a particular position
+   * The KeyHistoryMatcher for the component in a particular position
    * @param {number} componentPosition Position of component to find the
-   *        KeyCombinationHistoryMatcher for
-   * @returns {KeyCombinationHistoryMatcher} Key combination matcher that corresponds
+   *        KeyHistoryMatcher for
+   * @returns {KeyHistoryMatcher} Key combination matcher that corresponds
    *        to the component
    */
-  getKeyCombinationHistoryMatcher(componentPosition) {
+  getKeyHistoryMatcher(componentPosition) {
     if (this._componentHasUnmatchedHandlers(componentPosition)) {
       /**
        * We build the mapping between actions and their closest handlers the
@@ -75,7 +75,7 @@ class ActionResolver {
       }
     }
 
-    return this._getKeyCombinationHistoryMatcher(componentPosition);
+    return this._getKeyHistoryMatcher(componentPosition);
   }
 
   /**
@@ -85,13 +85,13 @@ class ActionResolver {
    * @returns {boolean} true if the component has an action bound to the event type
    */
   componentHasActionsBoundToEventType(componentPosition, keyEventType) {
-    return this.getKeyCombinationHistoryMatcher(componentPosition).hasMatchesForEventType(keyEventType);
+    return this.getKeyHistoryMatcher(componentPosition).hasMatchesForEventType(keyEventType);
   }
 
   /**
    * Finds matcher for sequence and current key event for a component at a position
    * @param {number} componentPosition Position of the component
-   * @param {KeyCombinationHistory} keyHistory History of key combinations to match
+   * @param {KeyHistory} keyHistory History of key combinations to match
    *        against actions defined in component
    * @param {ReactKeyName} keyName Name of the key the current event relates to
    * @param {KeyEventType} keyEventType Type of key event
@@ -102,7 +102,7 @@ class ActionResolver {
       return null;
     }
 
-    return this.getKeyCombinationHistoryMatcher(componentPosition).findMatch(
+    return this.getKeyHistoryMatcher(componentPosition).findMatch(
       keyHistory,
       keyName,
       keyEventType
@@ -113,7 +113,7 @@ class ActionResolver {
    * Private methods
    *********************************************************************************/
 
-  _getKeyCombinationHistoryMatcher(index) {
+  _getKeyHistoryMatcher(index) {
     return this._keyMapMatchers[index];
   }
 
@@ -141,7 +141,7 @@ class ActionResolver {
          * Get key map that corresponds with the component that defines the handler
          * closest to the event target
          */
-        const keyMapMatcher = this._getKeyCombinationHistoryMatcher(handlerComponentIndex);
+        const keyMapMatcher = this._getKeyHistoryMatcher(handlerComponentIndex);
 
         /**
          * At least one child HotKeys component (or the component itself) has

@@ -4,7 +4,7 @@ import ModifierFlagsDictionary from '../../const/ModifierFlagsDictionary';
 import Logger from '../logging/Logger';
 import KeyCombinationSerializer from '../shared/KeyCombinationSerializer';
 import Configuration from '../config/Configuration';
-import KeyCombinationHistory from '../listening/KeyCombinationHistory';
+import KeyHistory from '../listening/KeyHistory';
 import KeyCombinationRecord from '../listening/KeyCombinationRecord';
 import ComponentTree from '../definitions/ComponentTree';
 import ComponentOptionsList from '../definitions/ComponentOptionsList';
@@ -94,7 +94,7 @@ class AbstractKeyEventStrategy {
   }
 
   _newKeyHistory() {
-    return new KeyCombinationHistory({
+    return new KeyHistory({
       maxLength: this.componentList.getLongestSequence()
     });
   }
@@ -130,7 +130,7 @@ class AbstractKeyEventStrategy {
     this.keyupEventsToSimulate = [];
 
     if (this.getKeyHistory().any() && !options.force) {
-      this._keyHistory = new KeyCombinationHistory(
+      this._keyHistory = new KeyHistory(
         { maxLength: this.componentList.getLongestSequence() },
         new KeyCombinationRecord(this.getCurrentCombination().keysStillPressedDict())
       );
@@ -383,13 +383,13 @@ class AbstractKeyEventStrategy {
     }
 
     while (componentSearchIndex <= componentPosition) {
-      const keyCombinationHistoryMatcher =
-        this._actionResolver.getKeyCombinationHistoryMatcher(componentSearchIndex);
+      const keyHistoryMatcher =
+        this._actionResolver.getKeyHistoryMatcher(componentSearchIndex);
 
       this.logger.verbose(
         this._logPrefix(componentSearchIndex),
         'Internal key mapping:\n',
-        `${printComponent(keyCombinationHistoryMatcher.toJSON())}`
+        `${printComponent(keyHistoryMatcher.toJSON())}`
       );
 
       const sequenceMatch =

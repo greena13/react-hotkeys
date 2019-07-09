@@ -4,14 +4,14 @@ import KeyCombinationRecordMatcher from './KeyCombinationRecordMatcher';
 import KeyEventRecordState from '../../const/KeyEventRecordState';
 
 /**
- * Matches a KeyCombinationHistory to a list of pre-registered ActionConfiguration and
+ * Matches a KeyHistory to a list of pre-registered ActionConfiguration and
  * their corresponding handler functions
  * @class
  */
-class KeyCombinationHistoryMatcher {
+class KeyHistoryMatcher {
   /**
    * Returns a new instance of KeyMapMatcher
-   * @returns {KeyCombinationHistoryMatcher}
+   * @returns {KeyHistoryMatcher}
    */
   constructor() {
     this._combinationMatchers = {};
@@ -52,19 +52,19 @@ class KeyCombinationHistoryMatcher {
   /**
    * Attempts to find a match from the list of possible matches previously registered
    * for a given key event and key combination history
-   * @param {KeyCombinationHistory} keyCombinationHistory History to attempt to
+   * @param {KeyHistory} keyHistory History to attempt to
    *        find a match for
    * @param {ReactKeyName} key Name of the key to find a match for
    * @param {KeyEventType} keyEventType Type of event to find a match
    * @returns {MatchingActionConfig|null} First MatchingActionOptions that matches
    */
-  findMatch(keyCombinationHistory, key, keyEventType) {
-    const combinationMatcher = this._findCombinationMatcher(keyCombinationHistory);
+  findMatch(keyHistory, key, keyEventType) {
+    const combinationMatcher = this._findCombinationMatcher(keyHistory);
 
     if (combinationMatcher) {
       return combinationMatcher.findMatch(
-        keyCombinationHistory.getCurrentCombination(),
-        keyCombinationHistory.getCurrentCombination().getNormalizedKeyName(key),
+        keyHistory.getCurrentCombination(),
+        keyHistory.getCurrentCombination().getNormalizedKeyName(key),
         keyEventType
       )
     }
@@ -122,9 +122,9 @@ class KeyCombinationHistoryMatcher {
     return this._combinationMatchers[prefix];
   }
 
-  _findCombinationMatcher(keyCombinationHistory) {
+  _findCombinationMatcher(keyHistory) {
     const sequenceHistory =
-      keyCombinationHistory.getMostRecentCombinations(this.getLongestSequence());
+      keyHistory.getMostRecentCombinations(this.getLongestSequence());
 
     if (sequenceHistory.length === 0) {
       return this._combinationMatchers[''];
@@ -171,4 +171,4 @@ class KeyCombinationHistoryMatcher {
   }
 }
 
-export default KeyCombinationHistoryMatcher;
+export default KeyHistoryMatcher;

@@ -4,12 +4,12 @@ import KeyCombinationRecord from './KeyCombinationRecord';
  * List of key combinations seen by hot key components
  * @class
  */
-class KeyCombinationHistory {
+class KeyHistory {
   /**
-   * Creates a new KeyCombinationHistory instance
+   * Creates a new KeyHistory instance
    * @param {Number} maxLength Maximum length of the list.
    * @param {KeyCombinationRecord} startingPoint Initial state of first combination
-   * @returns {KeyCombinationHistory}
+   * @returns {KeyHistory}
    */
   constructor({ maxLength }, startingPoint = null) {
     this._records = [];
@@ -137,4 +137,4 @@ class KeyCombinationHistory {
   }
 }
 
-export default KeyCombinationHistory;
+export default KeyHistory;
