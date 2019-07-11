@@ -154,14 +154,35 @@ class KeyCombination {
    *********************************************************************************/
 
   /**
+   * @callback forEachHandler
+   * @param {ReactKeyName} keyName Name of a key in the combination
+   * @returns {void}
+   */
+
+  /**
    * Iterates over every key in the combination, calling an function with each
    * key name
-   * @param {Function} handler Function to call with the name of each key in
-   *        the combination
+   * @param {forEachHandler} handler Function to call with the name of each key
+   *        in the combination
    * @returns {void}
    */
   forEachKey(handler){
     return Object.keys(this._keys).forEach(handler);
+  }
+
+  /**
+   * @callback evaluator
+   * @param {ReactKeyName} keyName Name of a key in the combination
+   * @returns {boolean}
+   */
+
+  /**
+   * Whether at least one of the keys causes a evaluator function to return true
+   * @callback {evaluator} evaluator Function to evaluate each key
+   * @returns {boolean} Whether at least one key satisfies the evaluator
+   */
+  some(evaluator) {
+    return Object.keys(this._keys).some(evaluator);
   }
 
   /**

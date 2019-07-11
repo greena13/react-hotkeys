@@ -1,5 +1,6 @@
 import Configuration from '../config/Configuration';
 import size from '../../utils/collection/size';
+import keyupIsHiddenByCmd from '../../helpers/resolving-handlers/keyupIsHiddenByCmd';
 
 /**
  * Object containing all information necessary to match a handler to a history of
@@ -207,7 +208,7 @@ class KeyCombinationMatcher {
 function canBeMatched(keyCombination, combinationMatcher) {
   const combinationKeysNo = size(combinationMatcher.keyDictionary);
 
-  if (Configuration.option('allowCombinationSubmatches')) {
+  if (Configuration.option('allowCombinationSubmatches') || keyUpIsBeingHidden(keyCombination)) {
     return keyCombination.getNumberOfKeys() >= combinationKeysNo;
   } else {
     /**
@@ -217,6 +218,14 @@ function canBeMatched(keyCombination, combinationMatcher) {
      */
     return keyCombination.getNumberOfKeys() === combinationKeysNo;
   }
+}
+
+function keyUpIsBeingHidden(keyCombination) {
+  if (keyCombination.isKeyStillPressed('Meta')) {
+    return keyCombination.some((keyName) => keyupIsHiddenByCmd(keyName));
+  }
+
+  return false;
 }
 
 export default KeyCombinationMatcher;

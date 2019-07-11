@@ -112,6 +112,12 @@ const _defaultConfiguration = {
    * Whether to allow combination submatches - e.g. if there is an action bound to
    * cmd, pressing shift+cmd will *not* trigger that action when
    * allowCombinationSubmatches is false.
+   *
+   * @note This option is ignored for combinations involving command (Meta) and
+   *      submatches are <i>always</i> allowed because Meta hides keyup events
+   *      of other keys, so until Command is released, it's impossible to know
+   *      if one of the keys that has also been pressed has been released.
+   *      @see https://github.com/greena13/react-hotkeys/pull/207
    * @type {boolean}
    */
   allowCombinationSubmatches: false,
