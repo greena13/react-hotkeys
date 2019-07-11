@@ -7,7 +7,7 @@ import simulant from 'simulant';
 import KeyCode from '../support/Key';
 import { configure, GlobalHotKeys } from '../../src';
 
-describe('Holding down key shared by actions:', function () {
+describe('Holding down Cmd while pressing other keys:', function () {
   after(function() {
     configure({allowCombinationSubmatches: false });
   });
