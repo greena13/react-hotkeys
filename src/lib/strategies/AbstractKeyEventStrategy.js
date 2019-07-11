@@ -789,14 +789,13 @@ class AbstractKeyEventStrategy {
       return !keyHasNativeKeypress || (keyHasNativeKeypress && this._keyIsCurrentlyDown('Meta'));
     } else if (eventType === KeyEventRecordIndex.keyup) {
       return (keyupIsHiddenByCmd(keyName) && keyIsCurrentlyTriggeringEvent(
-        this._getCurrentKeyState('Meta'),
-        KeyEventRecordIndex.keyup)
+          this._getCurrentKeyState('Meta'),
+          KeyEventRecordIndex.keyup)
       );
     }
 
     return false
   }
-
   _cloneAndMergeEvent(event, extra) {
     const eventAttributes = Object.keys(ModifierFlagsDictionary).reduce((memo, eventAttribute) => {
       memo[eventAttribute] = event[eventAttribute];
@@ -1069,7 +1068,14 @@ class AbstractKeyEventStrategy {
               const combinationId = combinationOrder[combinationIndex];
               const combinationMatcher = matchingSequence.combinations[combinationId];
 
-              if (isMatchPossibleBasedOnNumberOfKeys(currentKeyState, combinationMatcher)) {
+              const cmdKeyIsPressed =
+                this._getCurrentKeyState('Meta') && !keyIsCurrentlyTriggeringEvent(this._getCurrentKeyState('Meta'), KeyEventRecordIndex.keyup);
+
+              const keyupIsHidden = cmdKeyIsPressed && Object.keys(combinationMatcher.keyDictionary).some((keyName) => {
+                return keyupIsHiddenByCmd(keyName);
+              });
+
+              if (isMatchPossibleBasedOnNumberOfKeys(currentKeyState, combinationMatcher, keyupIsHidden)) {
                 if (this._combinationMatchesKeys(normalizedKeyName, currentKeyState, combinationMatcher, eventRecordIndex)) {
 
                   if (Configuration.option('allowCombinationSubmatches')) {

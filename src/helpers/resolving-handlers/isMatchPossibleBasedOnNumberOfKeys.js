@@ -8,15 +8,17 @@ import Configuration from '../../lib/Configuration';
  *        in the key event.
  * @param {ActionConfiguration} combinationMatcher Matcher to compare to the
  *        key state
+ * @param {boolean} keyupIsHiddenByCmd Whether current combination involves the
+ *        cmd key and keys for which it hides their keyup event
  * @returns {boolean} True if the key state has the right amount of keys for a
  *        match with combinationMatcher to be possible
  * @private
  */
-function isMatchPossibleBasedOnNumberOfKeys(keyState, combinationMatcher) {
+function isMatchPossibleBasedOnNumberOfKeys(keyState, combinationMatcher, keyupIsHiddenByCmd) {
   const keyStateKeysNo = Object.keys(keyState.keys).length;
   const combinationKeysNo = Object.keys(combinationMatcher.keyDictionary).length;
 
-  if (Configuration.option('allowCombinationSubmatches')) {
+  if (keyupIsHiddenByCmd || Configuration.option('allowCombinationSubmatches')) {
     return keyStateKeysNo >= combinationKeysNo;
   } else {
     /**
