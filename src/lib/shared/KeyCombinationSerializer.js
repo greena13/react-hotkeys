@@ -6,6 +6,7 @@ import resolveUnaltedAlias from '../../helpers/resolving-handlers/resolveUnalted
 import resolveAltedAlias from '../../helpers/resolving-handlers/resolveAltedAlias';
 import resolveUnaltShiftedAlias from '../../helpers/resolving-handlers/resolveUnaltShiftedAlias';
 import resolveAltShiftedAlias from '../../helpers/resolving-handlers/resolveAltShiftedAlias';
+import normalizedCombinationId from '../../helpers/parsing-key-maps/normalizedCombinationId';
 
 /**
  * Serializes instances of KeyCombination to KeyCombinationString.
@@ -99,7 +100,7 @@ class KeyCombinationSerializer {
     });
 
     return Object.values(keyCombinationIdDict).map((keysInCombo) => {
-      return Object.keys(keysInCombo).sort().join('+');
+      return normalizedCombinationId(Object.keys(keysInCombo));
     });
   }
 
