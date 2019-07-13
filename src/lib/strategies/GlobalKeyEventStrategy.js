@@ -144,7 +144,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {ComponentId} componentId - Index of component that is being unmounted
    */
   disableHotKeys(componentId) {
-
     /**
      * Manually update the registered key map state, usually reset using
      * _resetRegisteredKeyMapsState() method

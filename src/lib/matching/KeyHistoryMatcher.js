@@ -123,56 +123,65 @@ class KeyHistoryMatcher {
   }
 
   _findCombinationMatcher(keyHistory) {
-    const sequenceHistory =
-      keyHistory.getMostRecentCombinations(this.getLongestSequence());
+    const previousCombinations =
+      keyHistory.getPreviousCombinations(this.getLongestSequence() - 1);
 
-    if (sequenceHistory.length === 0) {
-      return this._combinationMatchers[''];
-    }
+    if (previousCombinations.length) {
+      /**
+       * We need to match a sequence, and therefore try different combination
+       * permutations leading up the final, most recent one
+       */
 
-    const sequenceIds =
-      sequenceHistory.map((keyCombination) => keyCombination.getIds());
+      const sequenceIds =
+        previousCombinations.map((keyCombination) => keyCombination.getIds());
 
-    const idSizes = sequenceIds.map((ids) => ids.length);
+      const idSizes = sequenceIds.map((ids) => ids.length);
 
-    /**
-     * List of counters
-     * @type {number[]}
-     */
-    const indexCounters = new Array(sequenceIds.length).fill(0);
+      /**
+       * List of counters
+       * @type {number[]}
+       */
+      const indexCounters = new Array(sequenceIds.length).fill(0);
 
-    let triedAllPossiblePermutations = false;
+      let triedAllPossiblePermutations = false;
 
-    while (!triedAllPossiblePermutations) {
-      const sequenceIdPermutation = indexCounters.map((sequenceIdIndex, index) => {
-        return sequenceIds[index][sequenceIdIndex];
-      });
+      while (!triedAllPossiblePermutations) {
+        const sequenceIdPermutation = indexCounters.map((sequenceIdIndex, index) => {
+          return sequenceIds[index][sequenceIdIndex];
+        });
 
-      const candidateId = sequenceIdPermutation.join(' ');
+        const candidateId = sequenceIdPermutation.join(' ');
 
-      if (this._combinationMatchers[candidateId]) {
-        return this._combinationMatchers[candidateId];
-      }
-
-      let incrementer = 0;
-      let carry = true;
-
-      while (carry && incrementer < indexCounters.length) {
-        const count = indexFromEnd(indexCounters, incrementer);
-
-        const newIndex = (count + 1) % (indexFromEnd(idSizes, incrementer) || 1);
-
-        indexCounters[indexCounters.length - (incrementer + 1)] = newIndex;
-
-        carry = newIndex === 0;
-
-        if (carry) {
-          incrementer++;
+        if (this._combinationMatchers[candidateId]) {
+          return this._combinationMatchers[candidateId];
         }
-      }
 
-      triedAllPossiblePermutations = incrementer === indexCounters.length;
+        /**
+         * Cycle through the list of different combination aliases
+         */
+
+        let incrementer = 0;
+        let carry = true;
+
+        while (carry && incrementer < indexCounters.length) {
+          const count = indexFromEnd(indexCounters, incrementer);
+
+          const newIndex = (count + 1) % (indexFromEnd(idSizes, incrementer) || 1);
+
+          indexCounters[indexCounters.length - (incrementer + 1)] = newIndex;
+
+          carry = newIndex === 0;
+
+          if (carry) {
+            incrementer++;
+          }
+        }
+
+        triedAllPossiblePermutations = incrementer === indexCounters.length;
+      }
     }
+
+    return this._combinationMatchers[''];
   }
 }
 

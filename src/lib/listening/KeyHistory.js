@@ -12,7 +12,7 @@ class KeyHistory {
    * @returns {KeyHistory}
    */
   constructor({ maxLength }, startingPoint = null) {
-    this._records = [];
+    this._combinations = [];
 
     this._maxLength = maxLength;
 
@@ -28,8 +28,8 @@ class KeyHistory {
    * @param {Number} numberOfCombinations The number of most recent key combinations
    * @returns {KeyCombination[]} List of key combinations
    */
-  getMostRecentCombinations(numberOfCombinations) {
-    return this._records.slice(-numberOfCombinations, -1);
+  getPreviousCombinations(numberOfCombinations) {
+    return this._combinations.slice(-(numberOfCombinations+1), -1);
   }
 
   /**
@@ -37,7 +37,7 @@ class KeyHistory {
    * @returns {boolean} true if there is at least one key combination, else false
    */
   any() {
-    return this._records.some((keyCombination) => keyCombination.any());
+    return this._combinations.some((keyCombination) => keyCombination.any());
   }
 
   /**
@@ -45,7 +45,7 @@ class KeyHistory {
    * @returns {number} Number of key combinations
    */
   getLength() {
-    return this._records.length;
+    return this._combinations.length;
   }
 
   /**
@@ -53,7 +53,7 @@ class KeyHistory {
    * @returns {KeyCombination} Key combination record
    */
   getCurrentCombination() {
-    return this._records[this.getLength() - 1];
+    return this._combinations[this.getLength() - 1];
   }
 
   /**
@@ -102,7 +102,7 @@ class KeyHistory {
    * @returns {Object[]} Serialized representation of the registry
    */
   toJSON() {
-    return this._records.map((keyCombination) => keyCombination.toJSON() );
+    return this._combinations.map((keyCombination) => keyCombination.toJSON() );
   }
 
   /********************************************************************************
@@ -118,7 +118,7 @@ class KeyHistory {
   _push(record) {
     this._trimHistory();
 
-    this._records.push(record);
+    this._combinations.push(record);
   }
 
   _trimHistory() {
@@ -133,7 +133,7 @@ class KeyHistory {
   }
 
   _shift() {
-    this._records.shift();
+    this._combinations.shift();
   }
 }
 
