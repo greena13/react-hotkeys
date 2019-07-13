@@ -81,9 +81,7 @@ class KeyCombinationSerializer {
       const keyCombinationIds = Object.keys(keyCombinationIdDict);
 
       if (keyCombinationIds.length > 0) {
-
         keyCombinationIds.forEach((keyCombinationId) => {
-
           keyAliases.forEach((keyAlias) => {
             keyCombinationIdDict[keyCombinationId + `+${keyAlias}`] = {
               ...keyCombinationIdDict[keyCombinationId],
@@ -93,7 +91,6 @@ class KeyCombinationSerializer {
 
           delete keyCombinationIdDict[keyCombinationId];
         });
-
       } else {
         keyAliases.forEach((keyAlias) => {
           keyCombinationIdDict[keyAlias] = { [keyAlias]: true };

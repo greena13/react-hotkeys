@@ -23,7 +23,6 @@ class KeyCombination {
   constructor(keys = {}) {
     this._keys = keys;
     this._includesKeyUp = false;
-    this._update();
   }
 
   /********************************************************************************
@@ -35,6 +34,10 @@ class KeyCombination {
    * @returns {KeySequence[]} List of combination ids
    */
   getIds() {
+    if (!this._ids) {
+      this._ids = KeyCombinationSerializer.serialize(this._keys);
+    }
+
     return this._ids;
   }
 
@@ -44,6 +47,10 @@ class KeyCombination {
    * @returns {Object.<ReactKeyName, ReactKeyName[]>}
    */
   getKeyAliases() {
+    if (!this._keyAliases) {
+      this._keyAliases = buildKeyAliases(this._keys);
+    }
+
     return this._keyAliases;
   }
 
@@ -59,7 +66,7 @@ class KeyCombination {
     if (keyState) {
       return keyName;
     } else {
-      const keyAlias = this._keyAliases[keyName];
+      const keyAlias = this.getKeyAliases()[keyName];
 
       if (keyAlias) {
         return keyAlias;
@@ -318,11 +325,6 @@ class KeyCombination {
     return keyState && keyState[keyStage][keyEventType];
   }
 
-  _update() {
-    this._ids = KeyCombinationSerializer.serialize(this._keys);
-    this._keyAliases = buildKeyAliases(this._keys);
-  }
-
   _isKeyEventSimulated(keyName, keyEventType){
     return this.isEventTriggered(keyName, keyEventType) === KeyEventState.simulated;
   }
@@ -337,7 +339,7 @@ class KeyCombination {
     if (keyState) {
       return keyState;
     } else {
-      const keyAlias = this._keyAliases[keyName];
+      const keyAlias = this.getKeyAliases()[keyName];
 
       if (keyAlias) {
         return this._keys[keyAlias];
@@ -350,7 +352,8 @@ class KeyCombination {
 
     this._keys[keyAlias] = keyState;
 
-    this._update();
+    delete this._keyAliases;
+    delete this._ids;
   }
 }
 
