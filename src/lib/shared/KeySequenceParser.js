@@ -91,12 +91,12 @@ class KeySequenceParser {
       const prefix = nonTerminalCombinations.map((keyCombination) => {
         const keysInComboDict = parseCombination(keyCombination, options);
 
-        return normalizedCombinationId(Object.keys(keysInComboDict));
+        return normalizedCombinationId(keysInComboDict);
       }).join(' ');
 
       const keysInComboDict = parseCombination(terminalCombination, options);
 
-      const normalizedComboString = normalizedCombinationId(Object.keys(keysInComboDict));
+      const normalizedComboString = normalizedCombinationId(keysInComboDict);
 
       const combination = {
         id: normalizedComboString,
@@ -139,8 +139,14 @@ class KeySequenceParser {
  * @returns {KeyDictionary} Dictionary of keys in the parsed combination
  */
 function parseCombination(string, options = {}) {
+  const shiftPressed = string.indexOf(/[sS]hift/) !== -1;
+  const altPressed = string.indexOf(/[sS]hift/) !== -1;
+
   return string.replace(/^\+|(\s|[^+]\+)\+/, '$1plus').split('+').reduce((keyDictionary, keyName) => {
-    let finalKeyName = standardizeKeyName(keyName);
+    let finalKeyName = standardizeKeyName(keyName, {
+      shift: shiftPressed,
+      alt: altPressed
+    });
 
     if (options.ensureValidKeys) {
       if (!isValidKey(finalKeyName)) {

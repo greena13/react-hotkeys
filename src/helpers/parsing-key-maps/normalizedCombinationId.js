@@ -1,12 +1,11 @@
 /**
  * Returns a normalized KeyCombinationString (with the key names in the combination
  * sorted in alphabetical order)
- * @param {KeyName[]} keys List of key names to sort and reconstitute as a
- *        KeyCombinationString
+ * @param {Object.<ReactKeyName, Boolean>} keyDictionary Dictionary of key names
  * @returns {NormalizedKeyCombinationString} Normalized KeyCombinationString
  */
-function normalizedCombinationId(keys) {
-  return keys.sort().join('+');
+function normalizedCombinationId(keyDictionary) {
+  return Object.keys(keyDictionary).sort().join('+');
 }
 
 export default normalizedCombinationId;

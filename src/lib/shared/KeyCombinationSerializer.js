@@ -99,9 +99,7 @@ class KeyCombinationSerializer {
       }
     });
 
-    return Object.values(keyCombinationIdDict).map((keysInCombo) => {
-      return normalizedCombinationId(Object.keys(keysInCombo));
-    });
+    return Object.values(keyCombinationIdDict).map(normalizedCombinationId);
   }
 
   /**
