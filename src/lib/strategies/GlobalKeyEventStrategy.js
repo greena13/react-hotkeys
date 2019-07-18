@@ -348,14 +348,10 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     }
 
     const currentCombination = this.getCurrentCombination();
+    const eventIsSimulated = currentCombination.isKeyPressSimulated(key);
 
-    if (currentCombination.isKeyPressSimulated(key)) {
-      this.logger.debug(
-        this._logPrefix(),
-        `Ignored ${describeKeyEvent(event, key, KeyEventType.keypress)} as it was not expected, and has already been simulated.`
-      );
-
-      return true;
+    if (this._logEventAlreadySimulated(eventIsSimulated, key, event, KeyEventType.keypress)){
+      return;
     }
 
     /**
@@ -417,13 +413,10 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     const key = getKeyName(event);
 
     const currentCombination = this.getCurrentCombination();
-    if (currentCombination.isKeyUpSimulated(key)) {
-      this.logger.debug(
-        this._logPrefix(),
-        `Ignored ${describeKeyEvent(event, key, KeyEventType.keyup)} as it was not expected, and has already been simulated.`
-      );
+    const eventIsSimulated = currentCombination.isKeyUpSimulated(key);
 
-      return true;
+    if (this._logEventAlreadySimulated(eventIsSimulated, key, event, KeyEventType.keyup)){
+      return;
     }
 
     /**
@@ -494,6 +487,19 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         id: currentCombination.describe()
       });
     }
+  }
+
+  _logEventAlreadySimulated(eventIsSimulated, key, event, eventType) {
+    if (eventIsSimulated) {
+      this.logger.debug(
+        this._logPrefix(),
+        `Ignored ${describeKeyEvent(event, key, eventType)} as it was not expected, and has already been simulated.`
+      );
+
+      return true;
+    }
+
+    return false;
   }
 
   _simulateKeyPressForNonPrintableKeys(event, key) {
