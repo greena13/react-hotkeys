@@ -226,22 +226,17 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {KeyboardEvent} event - Event containing the key name and state
    */
   handleKeyDown(event) {
-    const _key = getKeyName(event);
+    const key = getKeyName(event);
 
-    if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
-      this.logger.debug(
-        this._logPrefix(),
-        `Ignored repeated ${describeKeyEvent(event, _key, KeyEventType.keydown)} event.`
-      );
-
-      return true;
+    if (this._isIgnoringRepeatedEvent(event, key, KeyEventType.keydown)) {
+      return;
     }
 
-    this._checkForModifierFlagDiscrepancies(event, _key, KeyEventType.keydown);
+    this._checkForModifierFlagDiscrepancies(event, key, KeyEventType.keydown);
 
     const reactAppResponse = this._howReactAppRespondedTo(
       event,
-      _key,
+      key,
       KeyEventType.keydown
     );
 
@@ -250,7 +245,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
       this.logger.debug(
         this._logPrefix(),
-        `Ignored ${describeKeyEvent(event, _key, KeyEventType.keydown)} event because ignoreEventsFilter rejected it.`
+        `Ignored ${describeKeyEvent(event, key, KeyEventType.keydown)} event because ignoreEventsFilter rejected it.`
       );
 
       return;
@@ -261,14 +256,14 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
       const currentCombination = this.getCurrentCombination();
 
-      if (currentCombination.isKeyIncluded(_key) || currentCombination.isEnding()) {
+      if (currentCombination.isKeyIncluded(key) || currentCombination.isEnding()) {
         this._startAndLogNewKeyCombination(
-          _key,
+          key,
           keyEventState
         );
       } else {
         this._addToAndLogCurrentKeyCombination(
-          _key,
+          key,
           KeyEventType.keydown,
           keyEventState
         );
@@ -276,10 +271,23 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     }
 
     if (!contains([EventResponse.ignored, EventResponse.handled], reactAppResponse)) {
-      this._callHandlerIfExists(event, _key, KeyEventType.keydown);
+      this._callHandlerIfExists(event, key, KeyEventType.keydown);
     }
 
-    this._simulateKeyPressForNonPrintableKeys(event, _key);
+    this._simulateKeyPressForNonPrintableKeys(event, key);
+  }
+
+  _isIgnoringRepeatedEvent(event, key, eventType) {
+    if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
+      this.logger.debug(
+        this._logPrefix(),
+        `Ignored repeated ${describeKeyEvent(event, key, eventType)} event.`
+      );
+
+      return true;
+    }
+
+    return false;
   }
 
   _howReactAppRespondedTo(event, key, keyEventType) {
@@ -335,13 +343,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   handleKeyPress(event) {
     const key = getKeyName(event);
 
-    if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
-      this.logger.debug(
-        this._logPrefix(),
-        `Ignored repeated ${describeKeyEvent(event, key, KeyEventType.keypress)} event.`
-      );
-
-      return true;
+    if (this._isIgnoringRepeatedEvent(event, key, KeyEventType.keypress)) {
+      return;
     }
 
     const currentCombination = this.getCurrentCombination();
