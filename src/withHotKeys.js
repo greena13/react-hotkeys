@@ -173,7 +173,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       };
 
       if (this._shouldBindKeyListeners()) {
-        hotKeys.onKeyDown = (event) => this._delegateEventToManager(event, 'handleKeydown');
+        hotKeys.onKeyDown = (event) => this._delegateEventToManager(event, 'handleKeyDown');
         hotKeys.onKeyPress = (event) => this._delegateEventToManager(event, 'handleKeyPress');
         hotKeys.onKeyUp = (event) => this._delegateEventToManager(event, 'handleKeyUp');
       }

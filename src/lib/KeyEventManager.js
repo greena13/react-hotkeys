@@ -261,9 +261,9 @@ class KeyEventManager {
    * @param {Object} options - Hash of options that configure how the event is handled.
    * @returns Whether the event was discarded because it was part of an old focus tree
    */
-  handleKeydown(event, focusTreeId, componentId, options) {
+  handleKeyDown(event, focusTreeId, componentId, options) {
     if (isFromFocusOnlyComponent(focusTreeId)) {
-      return this._focusOnlyEventStrategy.handleKeydown(event, focusTreeId, componentId, options);
+      return this._focusOnlyEventStrategy.handleKeyDown(event, focusTreeId, componentId, options);
     }
   }
 
@@ -375,7 +375,7 @@ class KeyEventManager {
    * @param {KeyboardEvent} event - Event containing the key name and state
    */
   handleGlobalKeyDown(event) {
-    return this._globalEventStrategy.handleKeydown(event);
+    return this._globalEventStrategy.handleKeyDown(event);
   }
 
   /**

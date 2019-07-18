@@ -33,7 +33,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
         });
 
         it('then simulates the cmd keypress event and the non-modifier key\'s keypress event', function () {
-          this.eventStrategy.handleKeydown(
+          this.eventStrategy.handleKeyDown(
             new MockSyntheticEvent('keydown', {key: 'Meta'}),
             0,
             this.componentId,
@@ -53,7 +53,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
             }
           ]);
 
-          this.eventStrategy.handleKeydown(
+          this.eventStrategy.handleKeyDown(
             new MockSyntheticEvent('keydown', {key: Key.A, metaKey: true}),
             0,
             this.componentId,
@@ -118,7 +118,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
         });
 
         it('then simulates the cmd keypress event and the non-modifier key\'s keypress event', function () {
-          this.eventStrategy.handleKeydown(
+          this.eventStrategy.handleKeyDown(
             new MockSyntheticEvent('keydown', {key: 'Meta'}),
             0,
             this.componentId,
@@ -138,7 +138,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
             }
           ]);
 
-          this.eventStrategy.handleKeydown(
+          this.eventStrategy.handleKeyDown(
             new MockSyntheticEvent('keydown', {key: Key.A, metaKey: true}),
             0,
             this.componentId,

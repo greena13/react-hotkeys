@@ -36,7 +36,7 @@ describe('Handling ignored events:', function () {
             this.eventOptions
           );
 
-          this.eventStrategy.handleKeydown(
+          this.eventStrategy.handleKeyDown(
             new MockSyntheticEvent('keydown', {key: 'a'})
           );
         });
@@ -75,7 +75,7 @@ describe('Handling ignored events:', function () {
             this.eventOptions
           );
 
-          this.eventStrategy.handleKeydown(
+          this.eventStrategy.handleKeyDown(
             new MockSyntheticEvent('keydown', {key: 'a'})
           );
         });
@@ -112,7 +112,7 @@ describe('Handling ignored events:', function () {
 
         context('and the key already exists in the current combination', () => {
           beforeEach(function () {
-            this.eventStrategy.handleKeydown(
+            this.eventStrategy.handleKeyDown(
               new MockSyntheticEvent('keydown', {key: 'a'})
             );
 
@@ -175,7 +175,7 @@ describe('Handling ignored events:', function () {
 
         context('and the key already exists in the current combination', () => {
           beforeEach(function () {
-            this.eventStrategy.handleKeydown(
+            this.eventStrategy.handleKeyDown(
               new MockSyntheticEvent('keydown', {key: 'a'})
             );
 
@@ -244,7 +244,7 @@ describe('Handling ignored events:', function () {
 
         context('and the key already exists in the current combination', () => {
           beforeEach(function () {
-            this.eventStrategy.handleKeydown(
+            this.eventStrategy.handleKeyDown(
               new MockSyntheticEvent('keydown', {key: 'a'}),
             );
 
@@ -311,7 +311,7 @@ describe('Handling ignored events:', function () {
 
         context('and the key already exists in the current combination', () => {
           beforeEach(function () {
-            this.eventStrategy.handleKeydown(
+            this.eventStrategy.handleKeyDown(
               new MockSyntheticEvent('keydown', {key: 'a'}),
             );
 

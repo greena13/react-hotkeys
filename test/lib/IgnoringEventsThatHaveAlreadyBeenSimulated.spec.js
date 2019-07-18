@@ -44,7 +44,7 @@ describe('Ignoring events that have already been simulated:', function () {
         });
 
         it('then ignores the event', function () {
-          this.eventStrategy.handleKeydown(
+          this.eventStrategy.handleKeyDown(
             new MockSyntheticEvent('keydown', {key: 'Meta'}),
             0,
             this.componentId,
@@ -64,7 +64,7 @@ describe('Ignoring events that have already been simulated:', function () {
             }
           ]);
 
-          this.eventStrategy.handleKeydown(
+          this.eventStrategy.handleKeyDown(
             new MockSyntheticEvent('keydown', {key: Key.A}),
             0,
             this.componentId,
@@ -148,7 +148,7 @@ describe('Ignoring events that have already been simulated:', function () {
         });
 
         it('then ignores the event', function () {
-          this.eventStrategy.handleKeydown(
+          this.eventStrategy.handleKeyDown(
             new MockSyntheticEvent('keydown', {key: 'Meta'}),
             0,
             this.componentId,
@@ -168,7 +168,7 @@ describe('Ignoring events that have already been simulated:', function () {
             }
           ]);
 
-          this.eventStrategy.handleKeydown(
+          this.eventStrategy.handleKeyDown(
             new MockSyntheticEvent('keydown', {key: Key.A}),
             0,
             this.componentId,

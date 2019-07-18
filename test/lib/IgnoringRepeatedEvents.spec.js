@@ -33,7 +33,7 @@ describe('Ignoring repeated events:', function () {
         });
 
         it('then the repeated events are ignored', function () {
-          this.eventStrategy.handleKeydown(
+          this.eventStrategy.handleKeyDown(
             new MockSyntheticEvent('keydown', {key: 'Shift'}),
             0,
             this.componentId,
@@ -53,7 +53,7 @@ describe('Ignoring repeated events:', function () {
             }
           ]);
 
-          this.eventStrategy.handleKeydown(
+          this.eventStrategy.handleKeyDown(
             new MockSyntheticEvent('keydown', {key: Key.A}),
             0,
             this.componentId,
@@ -67,7 +67,7 @@ describe('Ignoring repeated events:', function () {
             this.eventOptions
           );
 
-          this.eventStrategy.handleKeydown(
+          this.eventStrategy.handleKeyDown(
             new MockSyntheticEvent('keydown', {key: Key.A, repeat: true}),
             0,
             this.componentId,

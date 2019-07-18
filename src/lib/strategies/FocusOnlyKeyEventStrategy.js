@@ -218,7 +218,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {Object} options - Hash of options that configure how the event is handled.
    * @returns Whether the event was discarded because it was part of an old focus tree
    */
-  handleKeydown(event, focusTreeId, componentId, options = {}) {
+  handleKeyDown(event, focusTreeId, componentId, options = {}) {
     const key = getKeyName(event);
 
     if (focusTreeId !== this.focusTreeId) {

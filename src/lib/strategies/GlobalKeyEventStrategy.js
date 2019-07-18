@@ -225,7 +225,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * the keymaps for all of the mounted global HotKey components.
    * @param {KeyboardEvent} event - Event containing the key name and state
    */
-  handleKeydown(event) {
+  handleKeyDown(event) {
     const _key = getKeyName(event);
 
     if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
