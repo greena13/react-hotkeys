@@ -336,10 +336,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const currentCombination = this.getCurrentCombination();
 
     if (currentCombination.isKeyPressSimulated(key)) {
-      this.logger.debug(
-        this._logPrefix(componentId),
-        `Ignored ${describeKeyEvent(event, key, KeyEventType.keypress)} as it was not expected, and has already been simulated.`
-      );
+      this._logUnexpectSimulatedEvent(componentId, event, key, KeyEventType.keypress);
 
       this.eventPropagator.ignoreEvent(event);
 
@@ -400,6 +397,13 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     return shouldDiscardFocusTreeId;
   }
 
+  _logUnexpectSimulatedEvent(componentId, event, key, eventType) {
+    this.logger.debug(
+      this._logPrefix(componentId),
+      `Ignored ${describeKeyEvent(event, key, eventType)} as it was not expected, and has already been simulated.`
+    );
+  }
+
   /**
    * Records a keyup keyboard event and matches it against the list of pre-registered
    * event handlers, calling the first matching handler with the highest priority if
@@ -424,10 +428,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const currentCombination = this.getCurrentCombination();
 
     if (currentCombination.isKeyUpSimulated(key)) {
-      this.logger.debug(
-        this._logPrefix(componentId),
-        `Ignored ${describeKeyEvent(event, key, KeyEventType.keyup)} as it was not expected, and has already been simulated.`
-      );
+      this._logUnexpectSimulatedEvent(componentId, event, key, KeyEventType.keyup);
 
       this.eventPropagator.ignoreEvent(event);
 
