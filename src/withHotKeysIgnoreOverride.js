@@ -12,6 +12,7 @@ import resolveUnshiftedAlias from './helpers/resolving-handlers/resolveUnshifted
 import resolveAltedAlias from './helpers/resolving-handlers/resolveAltedAlias';
 import resolveUnaltedAlias from './helpers/resolving-handlers/resolveUnaltedAlias';
 import hasKey from './utils/object/hasKey';
+import dictionaryFrom from './utils/object/dictionaryFrom';
 
 /**
  * Wraps a React component in a HotKeysIgnoreOverride component, which passes down the
@@ -126,16 +127,14 @@ function keyDictionary(list) {
       throw new InvalidKeyNameError(keyName);
     }
 
-    [
+    dictionaryFrom([
       resolveAltShiftedAlias,
       resolveUnaltShiftedAlias,
       resolveShiftedAlias,
       resolveUnshiftedAlias,
       resolveAltedAlias,
       resolveUnaltedAlias
-    ].forEach((func) => {
-      memo[func(finalKeyName)] = true;
-    });
+    ], true, memo, (func) => func(finalKeyName));
 
     return memo;
   }, {});

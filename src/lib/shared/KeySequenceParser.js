@@ -110,8 +110,6 @@ class KeySequenceParser {
       return { sequence: null, combination: null }
     }
   }
-
-
 }
 
 /**
