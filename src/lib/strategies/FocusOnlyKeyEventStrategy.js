@@ -24,14 +24,14 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    ********************************************************************************/
 
   constructor(configuration = {}, keyEventManager) {
-    /**
+    /******************************************************************************
      * Set state that DOES get cleared on each new focus tree
-     */
+     ******************************************************************************/
     super(configuration, keyEventManager);
 
-    /**
+    /*****************************************************************************
      * State that doesn't get cleared on each new focus tree
-     */
+     *****************************************************************************/
 
     /**
      * Unique identifier given to each focus tree - when the focus in the browser

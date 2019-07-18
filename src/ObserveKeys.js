@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
-import Configuration from './lib/config/Configuration';
 import withHotKeysIgnoreOverride from './withHotKeysIgnoreOverride';
+import overrideComponent from './lib/overrideComponent';
 
 /**
  * A component that forces React Hotkeys to observe all matching key events
@@ -10,17 +9,8 @@ import withHotKeysIgnoreOverride from './withHotKeysIgnoreOverride';
  *
  * @see HotKeysIgnoreOverride
  */
-class ObserveKeys extends Component {
-  render() {
-    const {hotKeys, ...remainingProps} = this.props;
-
-    const DefaultComponent = remainingProps.component || Configuration.option('defaultComponent');
-
-    return (
-      <DefaultComponent { ... { ...hotKeys, ...remainingProps } } />
-    )
-  }
-}
-
-export default withHotKeysIgnoreOverride(ObserveKeys, {}, 'observeIgnoredEvents');
-
+export default withHotKeysIgnoreOverride(
+  overrideComponent('ObserveKeys'),
+  {},
+  'observeIgnoredEvents'
+);
