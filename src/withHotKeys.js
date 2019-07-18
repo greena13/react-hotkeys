@@ -138,9 +138,6 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       this._handleFocus = this._handleFocus.bind(this);
       this._handleBlur = this._handleBlur.bind(this);
 
-      this._handleKeyDown = this._handleKeyDown.bind(this);
-      this._handleKeyPress = this._handleKeyPress.bind(this);
-      this._handleKeyUp = this._handleKeyUp.bind(this);
       this._componentIsFocused = this._componentIsFocused.bind(this);
 
       this._id = KeyEventManager.getInstance().registerKeyMap(props.keyMap);
@@ -176,9 +173,9 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       };
 
       if (this._shouldBindKeyListeners()) {
-        hotKeys.onKeyDown = this._handleKeyDown;
-        hotKeys.onKeyPress = this._handleKeyPress;
-        hotKeys.onKeyUp = this._handleKeyUp;
+        hotKeys.onKeyDown = (event) => this._delegateEventToManager(event, 'handleKeydown');
+        hotKeys.onKeyPress = (event) => this._delegateEventToManager(event, 'handleKeyPress');
+        hotKeys.onKeyUp = (event) => this._delegateEventToManager(event, 'handleKeyUp');
       }
 
       return (
@@ -324,52 +321,9 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       this._focused = false;
     }
 
-    /**
-     * Delegates handing the keydown event to the KeyEventManager
-     * @param {KeyboardEvent} event Key board event containing key name and state
-     * @private
-     */
-    _handleKeyDown(event) {
+    _delegateEventToManager(event, methodName) {
       const discardFocusTreeId =
-        KeyEventManager.getInstance().handleKeydown(
-          event,
-          this._getFocusTreeId(),
-          this._id,
-          this._getEventOptions()
-        );
-
-      if (discardFocusTreeId) {
-        this._focusTreeIdsShift();
-      }
-    }
-
-    /**
-     * Delegates handing the keypress event to the KeyEventManager
-     * @param {KeyboardEvent} event Key board event containing key name and state
-     * @private
-     */
-    _handleKeyPress(event) {
-      const discardFocusTreeId =
-        KeyEventManager.getInstance().handleKeyPress(
-          event,
-          this._getFocusTreeId(),
-          this._id,
-          this._getEventOptions()
-        );
-
-      if (discardFocusTreeId) {
-        this._focusTreeIdsShift();
-      }
-    }
-
-    /**
-     * Delegates handing the keyup event to the KeyEventManager
-     * @param {KeyboardEvent} event Key board event containing key name and state
-     * @private
-     */
-    _handleKeyUp(event) {
-      const discardFocusTreeId =
-        KeyEventManager.getInstance().handleKeyUp(
+        KeyEventManager.getInstance()[methodName](
           event,
           this._getFocusTreeId(),
           this._id,
