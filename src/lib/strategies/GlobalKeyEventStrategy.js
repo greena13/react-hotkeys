@@ -15,6 +15,7 @@ import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 import GlobalKeyEventSimulator from '../simulation/GlobalKeyEventSimulator';
 import GlobalEventListenerAdaptor from '../listening/GlobalEventListenerAdaptor';
 import normalizeEventName from '../../utils/string/normalizeEventName';
+import Registry from '../shared/Registry';
 
 /**
  * Defines behaviour for dealing with key maps defined in global HotKey components
@@ -45,7 +46,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * Dictionary of listener functions - currently only intended to house
      * keyCombinationListener
      */
-    this.listeners = {};
+    this.listeners = new Registry();
 
     this._simulator = new GlobalKeyEventSimulator(this);
 
@@ -182,7 +183,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * @private
    */
   _shouldListenersBeBound() {
-    return this._componentList.any() || this.listeners.keyCombination;
+    return this._componentList.any() || this.listeners.get('keyCombination');
   }
 
   /********************************************************************************
@@ -420,8 +421,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      */
     this._simulateKeyUpEventsHiddenByCmd(event, key);
 
-    if (this.listeners.keyCombination && this._allKeysAreReleased()) {
-      this.listeners.keyCombination({
+    if (this.listeners.get('keyCombination') && this._allKeysAreReleased()) {
+      this.listeners.get('keyCombination')({
         keys: currentCombination.getKeyDictionary(),
         id: currentCombination.describe()
       });
@@ -571,13 +572,13 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    */
   addKeyCombinationListener(callbackFunction) {
     const cancel = () => {
-      delete this.listeners.keyCombination;
+      this.listeners.remove('keyCombination');
     };
 
-    this.listeners.keyCombination = (keyCombination) => {
+    this.listeners.set('keyCombination', (keyCombination) => {
       callbackFunction(keyCombination);
       cancel();
-    };
+    });
 
     this._updateDocumentHandlers();
 
