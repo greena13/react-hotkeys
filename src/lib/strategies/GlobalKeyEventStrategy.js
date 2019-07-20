@@ -12,8 +12,9 @@ import isCmdKey from '../../helpers/parsing-key-maps/isCmdKey';
 import EventResponse from '../../const/EventResponse';
 import contains from '../../utils/collection/contains';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
-import normalizeEventName from '../../utils/string/normalizeEventName';
 import GlobalKeyEventSimulator from '../simulation/GlobalKeyEventSimulator';
+import GlobalEventListenerAdaptor from '../listening/GlobalEventListenerAdaptor';
+import normalizeEventName from '../../utils/string/normalizeEventName';
 
 /**
  * Defines behaviour for dealing with key maps defined in global HotKey components
@@ -36,12 +37,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * @type {number}
      */
 
-    /**
-     * Whether the global key event handlers have been bound to document yet or not
-     * @type {boolean}
-     */
-    this.listenersBound = false;
-
     this.eventOptions = {
       ignoreEventsCondition: Configuration.option('ignoreEventsCondition')
     };
@@ -53,6 +48,10 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this.listeners = {};
 
     this._simulator = new GlobalKeyEventSimulator(this);
+
+    this._listenerAdaptor = new GlobalEventListenerAdaptor(this,
+      { logger: this.logger, logPrefix: this._logPrefix }
+    );
   }
 
   /********************************************************************************
@@ -166,39 +165,17 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
   _updateDocumentHandlers(){
     const listenersShouldBeBound = this._listenersShouldBeBound();
+    const listenersAreBound = this.isListenersBound();
 
-    if (!this.listenersBound && listenersShouldBeBound) {
-      Object.values(KeyEventType).forEach((recordIndex) => {
-        const eventName = describeKeyEventType(recordIndex);
-
-        document[`on${eventName}`] = (keyEvent) => {
-          this[`handle${normalizeEventName(eventName)}`](keyEvent);
-        };
-
-        this._logHandlerStateChange(`Bound`, eventName);
-      });
-
-      this.listenersBound = true;
-
-    } else if(this.listenersBound && !listenersShouldBeBound) {
-
-      Object.values(KeyEventType).forEach((recordIndex) => {
-        const eventName = describeKeyEventType(recordIndex);
-
-        delete document[`on${eventName}`];
-
-        this._logHandlerStateChange(`Removed`, eventName);
-      });
-
-      this.listenersBound = false;
+    if (!listenersAreBound && listenersShouldBeBound) {
+      this._listenerAdaptor.bindListeners(this.componentId);
+    } else if (listenersAreBound && !listenersShouldBeBound) {
+      this._listenerAdaptor.unbindListeners(this.componentId);
     }
   }
 
-  _logHandlerStateChange(action, eventName) {
-    this.logger.debug(
-      this._logPrefix(this.componentId, {eventId: false}),
-      `${action} handler handleGlobal${normalizeEventName(eventName)}() to document.on${eventName}()`
-    );
+  isListenersBound() {
+    return this._listenerAdaptor.isListenersBound();
   }
 
   /**
@@ -271,7 +248,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this._callHandlerIfExists(event, key, KeyEventType.keydown);
     }
 
-    this._simulateKeyPressForNonPrintableKeys(event, key);
+    this.keyEventManager.simulatePendingKeyPressEvents();
+    this._simulator.handleKeyPressSimulation({event, key});
   }
 
   _logEventRejectedByFilter(event, key, eventType) {
@@ -487,11 +465,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     return false;
   }
 
-  _simulateKeyPressForNonPrintableKeys(event, key) {
-    this.keyEventManager.simulatePendingKeyPressEvents();
-    this._simulator.handleKeyPressSimulation({event, key});
-  }
-
   _simulateKeyUpEventsHiddenByCmd(event, key) {
     if (isCmdKey(key)) {
       /**
@@ -584,18 +557,13 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     while (componentListIterator.next()) {
       const matchFound = super._callClosestMatchingHandler(
-        event,
-        keyName,
-        keyEventType,
+        event, keyName, keyEventType,
         componentListIterator.getPosition(),
         0
       );
 
       if (matchFound) {
-        this.logger.debug(
-          this._logPrefix(),
-          `Searching no further, as handler has been found (and called).`
-        );
+        this.logger.debug(this._logPrefix(), `Searching no further, as handler has been found (and called).`);
 
         return;
       }

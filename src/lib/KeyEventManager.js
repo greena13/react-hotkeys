@@ -207,7 +207,7 @@ class KeyEventManager {
   }
 
   isGlobalListenersBound() {
-    return this.getGlobalEventStrategy().listenersBound;
+    return this.getGlobalEventStrategy().isListenersBound();
   }
 }
 
