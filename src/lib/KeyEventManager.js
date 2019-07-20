@@ -262,8 +262,12 @@ class KeyEventManager {
    * @returns Whether the event was discarded because it was part of an old focus tree
    */
   handleKeyDown(event, focusTreeId, componentId, options) {
+    return this._delegateToFocusOnlyStrategy('handleKeyDown', focusTreeId, event, componentId, options);
+  }
+
+  _delegateToFocusOnlyStrategy(methodName, focusTreeId, event, componentId, options) {
     if (isFromFocusOnlyComponent(focusTreeId)) {
-      return this._focusOnlyEventStrategy.handleKeyDown(event, focusTreeId, componentId, options);
+      return this._focusOnlyEventStrategy[methodName](event, focusTreeId, componentId, options);
     }
   }
 
@@ -284,9 +288,7 @@ class KeyEventManager {
    *        is handled.
    */
   handleKeyPress(event, focusTreeId, componentId, options) {
-    if (isFromFocusOnlyComponent(focusTreeId)) {
-      return this._focusOnlyEventStrategy.handleKeyPress(event, focusTreeId, componentId, options);
-    }
+    return this._delegateToFocusOnlyStrategy('handleKeyPress', focusTreeId, event, componentId, options);
   }
 
   /**
@@ -306,9 +308,7 @@ class KeyEventManager {
    *        is handled.
    */
   handleKeyUp(event, focusTreeId, componentId, options) {
-    if (isFromFocusOnlyComponent(focusTreeId)) {
-      return this._focusOnlyEventStrategy.handleKeyUp(event, focusTreeId, componentId, options);
-    }
+    return this._delegateToFocusOnlyStrategy('handleKeyUp', focusTreeId, event, componentId, options);
   }
 
   /********************************************************************************
