@@ -1,24 +1,22 @@
 import AbstractKeyEventSimulator from './AbstractKeyEventSimulator';
 import Configuration from '../config/Configuration';
 import KeyEventCounter from '../listening/KeyEventCounter';
-import hasKeyPressEvent from '../../helpers/resolving-handlers/hasKeyPressEvent';
 import KeyEventType from '../../const/KeyEventType';
-import keyupIsHiddenByCmd from '../../helpers/resolving-handlers/keyupIsHiddenByCmd';
 
 class FocusOnlyKeyEventSimulator extends AbstractKeyEventSimulator{
-  handleKeyPressSimulation({event, key, focusTreeId, componentId, options}){
+  handleKeyPressSimulation(options){
     this._handleEventSimulation(
       'keypressEventsToSimulate',
       'simulatePendingKeyPressEvents',
-      {event, eventType: KeyEventType.keypress, key, focusTreeId, componentId, options}
+      {eventType: KeyEventType.keypress, ...options}
     );
   }
 
-  handleKeyUpSimulation({event, key, focusTreeId, componentId, options}){
+  handleKeyUpSimulation(options){
     this._handleEventSimulation(
       'keyupEventsToSimulate',
       'simulatePendingKeyUpEvents',
-      {event, eventType: KeyEventType.keyup, key, focusTreeId, componentId, options}
+      {eventType: KeyEventType.keyup, ...options}
     );
   }
 
@@ -65,19 +63,6 @@ class FocusOnlyKeyEventSimulator extends AbstractKeyEventSimulator{
     });
 
     this[listName] = [];
-  }
-
-  _shouldSimulate(eventType, keyName) {
-    const keyHasNativeKeyPress = hasKeyPressEvent(keyName);
-    const currentCombination = this._keyEventStrategy.getCurrentCombination();
-
-    if (eventType === KeyEventType.keypress) {
-      return !keyHasNativeKeyPress || (keyHasNativeKeyPress && currentCombination.isKeyStillPressed('Meta'));
-    } else if (eventType === KeyEventType.keyup) {
-      return (keyupIsHiddenByCmd(keyName) && currentCombination.isKeyReleased('Meta'));
-    }
-
-    return false
   }
 
   _shouldSimulateEventsImmediately() {

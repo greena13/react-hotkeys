@@ -1,4 +1,7 @@
 import ModifierFlagsDictionary from '../../const/ModifierFlagsDictionary';
+import hasKeyPressEvent from '../../helpers/resolving-handlers/hasKeyPressEvent';
+import KeyEventType from '../../const/KeyEventType';
+import keyupIsHiddenByCmd from '../../helpers/resolving-handlers/keyupIsHiddenByCmd';
 
 class AbstractKeyEventSimulator {
   constructor(keyEventStrategy) {
@@ -20,6 +23,19 @@ class AbstractKeyEventSimulator {
     }, {});
 
     return { ...eventAttributes, ...extra };
+  }
+
+  _shouldSimulate(eventType, keyName) {
+    const keyHasNativeKeyPress = hasKeyPressEvent(keyName);
+    const currentCombination = this._keyEventStrategy.getCurrentCombination();
+
+    if (eventType === KeyEventType.keypress) {
+      return !keyHasNativeKeyPress || (keyHasNativeKeyPress && currentCombination.isKeyStillPressed('Meta'));
+    } else if (eventType === KeyEventType.keyup) {
+      return (keyupIsHiddenByCmd(keyName) && currentCombination.isKeyReleased('Meta'));
+    }
+
+    return false
   }
 }
 

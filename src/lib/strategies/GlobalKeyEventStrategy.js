@@ -489,12 +489,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
   _simulateKeyPressForNonPrintableKeys(event, key) {
     this.keyEventManager.simulatePendingKeyPressEvents();
-
-    this._handleEventSimulation(
-      'handleKeyPress',
-      this._shouldSimulate(KeyEventType.keypress, key),
-      {event, key}
-    );
+    this._simulator.handleKeyPressSimulation({event, key});
   }
 
   _simulateKeyUpEventsHiddenByCmd(event, key) {
@@ -509,11 +504,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
           return;
         }
 
-        this._handleEventSimulation(
-          'handleKeyUp',
-          this._shouldSimulate(KeyEventType.keyup, keyName),
-          {event, key: keyName}
-        );
+        this._simulator.handleKeyUpSimulation({event, key: keyName});
       });
     }
   }
@@ -547,14 +538,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     }
 
     this._logKeyHistory();
-  }
-
-  /********************************************************************************
-   * Event simulation
-   ********************************************************************************/
-
-  _handleEventSimulation(handlerName, shouldSimulate, {event, key}) {
-    this._simulator.handleEventSimulation(handlerName, shouldSimulate, {event, key});
   }
 
   /********************************************************************************

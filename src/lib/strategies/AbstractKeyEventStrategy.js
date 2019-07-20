@@ -351,19 +351,6 @@ class AbstractKeyEventStrategy {
     return this.getKeyHistory().getCurrentCombination();
   }
 
-  _shouldSimulate(eventType, keyName) {
-    const keyHasNativeKeyPress = hasKeyPressEvent(keyName);
-    const currentCombination = this.getCurrentCombination();
-
-    if (eventType === KeyEventType.keypress) {
-      return !keyHasNativeKeyPress || (keyHasNativeKeyPress && currentCombination.isKeyStillPressed('Meta'));
-    } else if (eventType === KeyEventType.keyup) {
-      return (keyupIsHiddenByCmd(keyName) && currentCombination.isKeyReleased('Meta'));
-    }
-
-    return false
-  }
-
   /********************************************************************************
    * Matching and calling handlers
    ********************************************************************************/
