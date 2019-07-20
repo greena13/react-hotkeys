@@ -61,26 +61,21 @@ class Logger {
   constructor(logLevel = 'warn') {
     this.logLevel = this.constructor.levels[logLevel];
 
-    if (this.logLevel >= this.constructor.levels.error) {
-      this.error = console.error;
-    } else {
-      return;
-    }
-
-    if (this.logLevel >= this.constructor.levels.warn) {
-      this.warn = console.warn;
-    } else {
-      return;
-    }
-
-    ['info', 'debug', 'verbose'].some((logLevel) => {
-      if (this.logLevel >= this.constructor.levels[logLevel]) {
-        this[logLevel] = console.log;
-        return false;
+    for (const level of ['error', 'warn']) {
+      if (this.logLevel >= this.constructor.levels[level]) {
+        this[level] = console[level];
+      } else {
+        return;
       }
+    }
 
-      return true;
-    });
+    for (const level of ['info', 'debug', 'verbose']) {
+      if (this.logLevel >= this.constructor.levels[level]) {
+        this[level] = console.log;
+      } else {
+        return;
+      }
+    }
   }
 }
 

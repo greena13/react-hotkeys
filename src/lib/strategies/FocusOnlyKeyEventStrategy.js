@@ -648,13 +648,13 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const combinationName = this.getCurrentCombination().describe();
 
     if (!this.componentList.anyActionsForEventType(keyEventType)) {
-      this._logIgnoredEvent(`'${combinationName}' ${eventName}`, `it doesn't have any ${eventName} handlers`);
+      this._logIgnoredEvent(componentId, `'${combinationName}' ${eventName}`, `it doesn't have any ${eventName} handlers`);
 
       return;
     }
 
     if (this.eventPropagator.isHandled()) {
-      this._logIgnoredEvent(`'${combinationName}' ${eventName}`, 'it has already been handled');
+      this._logIgnoredEvent(componentId, `'${combinationName}' ${eventName}`, 'it has already been handled');
     } else {
       this.logger.verbose(
         this._logPrefix(componentId, {focusTreeId}),
