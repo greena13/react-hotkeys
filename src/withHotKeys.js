@@ -1,11 +1,109 @@
 import PropTypes from 'prop-types';
-import React, {PureComponent} from 'react';
-import Configuration from './lib/config/Configuration';
-import KeyEventManager from './lib/KeyEventManager';
-import isEmpty from './utils/collection/isEmpty';
-import KeyCombinationSerializer from './lib/shared/KeyCombinationSerializer';
+import React, { PureComponent } from 'react';
 import backwardsCompatibleContext from './utils/backwardsCompatibleContext';
-import isUndefined from './utils/isUndefined';
+import ComponentManager from './lib/ComponentManager';
+import printComponent from './helpers/logging/printComponent';
+
+
+const propTypes = {
+  /**
+   * A unique key to associate with KeyEventMatchers that allows associating handler
+   * functions at a later stage
+   * @typedef {string} ActionName
+   */
+
+  /**
+   * Name of a key event
+   * @typedef {'keyup'|'keydown'|'keypress'} KeyEventName
+   */
+
+  /**
+   * A string or list of strings, that represent a sequence of one or more keys
+   * @typedef {String | Array.<String>} MouseTrapKeySequence
+   * @see {@link https://craig.is/killing/mice} for support key sequences
+   */
+
+  /**
+   * Options for the mapping of a key sequence and event
+   * @typedef {Object} KeyEventOptions
+   * @property {MouseTrapKeySequence} sequence - The key sequence required to satisfy a
+   *           KeyEventDescription
+   * @property {KeyEventName} action - The keyboard state required to satisfy a
+   *           KeyEventDescription
+   * @property {string} name - The name of the action, to be displayed to the end user
+   * @property {string} description - A description of the action, to be displayed to
+   *           the end user
+   * @property {string} group - A group the action belongs to, to aid in showing similar
+   *           actions to the user
+   */
+
+  /**
+   * A description of key sequence of one or more key combinations
+   * @typedef {MouseTrapKeySequence|KeyEventOptions|Array.<MouseTrapKeySequence>} KeyEventDescription
+   */
+
+  /**
+   * A mapping from ActionName to KeyEventDescription
+   * @typedef {Object.<ActionName, KeyEventDescription>} KeyMap
+   */
+
+  /**
+   * A map from action names to Mousetrap or Browser key sequences
+   * @type {KeyMap}
+   */
+  keyMap: PropTypes.object,
+
+  /**
+   * A map from action names to event handler functions
+   * @typedef {Object.<ActionName, Function>} HandlersMap
+   */
+
+  /**
+   * A map from action names to event handler functions
+   * @type {HandlersMap}
+   */
+  handlers: PropTypes.object,
+
+  /**
+   * Function to call when this component gains focus in the browser
+   * @type {function}
+   */
+  onFocus: PropTypes.func,
+
+  /**
+   * Function to call when this component loses focus in the browser
+   * @type {function}
+   */
+  onBlur: PropTypes.func,
+
+  /**
+   * Whether the keyMap or handlers are permitted to change after the
+   * component mounts. If false, changes to the keyMap and handlers
+   * props will be ignored
+   */
+  allowChanges: PropTypes.bool,
+
+  /**
+   * Whether this is the root HotKeys node - this enables some special behaviour
+   */
+  root: PropTypes.bool
+};
+
+function provideWithContext(HotKeysEnabled) {
+  return backwardsCompatibleContext(HotKeysEnabled, {
+    deprecatedAPI: {
+      contextTypes: {
+        hotKeysParentId: PropTypes.number,
+      },
+      childContextTypes: {
+        hotKeysParentId: PropTypes.number,
+      },
+    },
+    newAPI: {
+      contextType: {hotKeysParentId: undefined},
+    }
+  });
+}
 
 /**
  * Wraps a React component in a HotKeysEnabled component, which passes down the
@@ -21,21 +119,6 @@ import isUndefined from './utils/isUndefined';
  * props in a single value, hotkeys.
  */
 function withHotKeys(Component, hotKeysOptions = {}) {
-  function mergeWithOptions(key, props) {
-    return {
-      ...(hotKeysOptions[key] || {}),
-      ...(props[key] || {})
-    };
-  }
-
-  function getHandlers(props) {
-    return mergeWithOptions('handlers', props);
-  }
-
-  function getKeyMap(props) {
-    return mergeWithOptions('keyMap', props);
-  }
-
   /**
    * Component that listens to key events when one of its children are in focus and
    * selectively triggers actions (that may be handled by handler functions) when a
@@ -43,104 +126,12 @@ function withHotKeys(Component, hotKeysOptions = {}) {
    * @class
    */
   class HotKeysEnabled extends PureComponent {
-    static propTypes = {
-      /**
-       * A unique key to associate with KeyEventMatchers that allows associating handler
-       * functions at a later stage
-       * @typedef {string} ActionName
-       */
-
-      /**
-       * Name of a key event
-       * @typedef {'keyup'|'keydown'|'keypress'} KeyEventName
-       */
-
-      /**
-       * A string or list of strings, that represent a sequence of one or more keys
-       * @typedef {String | Array.<String>} MouseTrapKeySequence
-       * @see {@link https://craig.is/killing/mice} for support key sequences
-       */
-
-      /**
-       * Options for the mapping of a key sequence and event
-       * @typedef {Object} KeyEventOptions
-       * @property {MouseTrapKeySequence} sequence - The key sequence required to satisfy a
-       *           KeyEventDescription
-       * @property {KeyEventName} action - The keyboard state required to satisfy a
-       *           KeyEventDescription
-       * @property {string} name - The name of the action, to be displayed to the end user
-       * @property {string} description - A description of the action, to be displayed to
-       *           the end user
-       * @property {string} group - A group the action belongs to, to aid in showing similar
-       *           actions to the user
-       */
-
-      /**
-       * A description of key sequence of one or more key combinations
-       * @typedef {MouseTrapKeySequence|KeyEventOptions|Array.<MouseTrapKeySequence>} KeyEventDescription
-       */
-
-      /**
-       * A mapping from ActionName to KeyEventDescription
-       * @typedef {Object.<ActionName, KeyEventDescription>} KeyMap
-       */
-
-      /**
-       * A map from action names to Mousetrap or Browser key sequences
-       * @type {KeyMap}
-       */
-      keyMap: PropTypes.object,
-
-      /**
-       * A map from action names to event handler functions
-       * @typedef {Object.<ActionName, Function>} HandlersMap
-       */
-
-      /**
-       * A map from action names to event handler functions
-       * @type {HandlersMap}
-       */
-      handlers: PropTypes.object,
-
-      /**
-       * Function to call when this component gains focus in the browser
-       * @type {function}
-       */
-      onFocus: PropTypes.func,
-
-      /**
-       * Function to call when this component loses focus in the browser
-       * @type {function}
-       */
-      onBlur: PropTypes.func,
-
-      /**
-       * Whether the keyMap or handlers are permitted to change after the
-       * component mounts. If false, changes to the keyMap and handlers
-       * props will be ignored
-       */
-      allowChanges: PropTypes.bool,
-
-      /**
-       * Whether this is the root HotKeys node - this enables some special behaviour
-       */
-      root: PropTypes.bool
-    };
+    static propTypes = propTypes;
 
     constructor(props) {
       super(props);
 
-      /**
-       * The focus and blur handlers need access to the current component as 'this'
-       * so they need to be bound to it when the component is instantiated
-       */
-
-      this._handleFocus = this._handleFocus.bind(this);
-      this._handleBlur = this._handleBlur.bind(this);
-
-      this._componentIsFocused = this._componentIsFocused.bind(this);
-
-      this._id = KeyEventManager.getInstance().registerKeyMap(props.keyMap);
+      this._manager = new ComponentManager(hotKeysOptions, props);
 
       /**
        * We maintain a separate instance variable to contain context that will be
@@ -151,216 +142,35 @@ function withHotKeys(Component, hotKeysOptions = {}) {
        *
        * @see https://reactjs.org/docs/context.html#caveats
        */
-      this._childContext = { hotKeysParentId: this._id };
+      this._childContext = { hotKeysParentId: this._manager.getId() };
+    }
+
+    componentDidMount() {
+      const {hotKeysParentId} = this.context;
+      this._manager.addHotKeys(hotKeysParentId);
+    }
+
+    componentDidUpdate() {
+      this._manager.updateHotKeys(this.props);
+    }
+
+    componentWillUnmount(){
+      this._manager.removeKeyMap(this.props);
     }
 
     render() {
-      const {
-        /**
-         * Props used by HotKeys that should not be passed down to its focus trap
-         * component
-         */
-        keyMap, handlers, allowChanges, root,
-
-        ...props
-      } = this.props;
-
-
-      const hotKeys = {
-        onFocus: this._wrapFunction('onFocus', this._handleFocus),
-        onBlur: this._wrapFunction('onBlur', this._handleBlur),
-        tabIndex: Configuration.option('defaultTabIndex')
-      };
-
-      if (this._shouldBindKeyListeners()) {
-        hotKeys.onKeyDown = (event) => this._delegateEventToManager(event, 'handleKeyDown');
-        hotKeys.onKeyPress = (event) => this._delegateEventToManager(event, 'handleKeyPress');
-        hotKeys.onKeyUp = (event) => this._delegateEventToManager(event, 'handleKeyUp');
-      }
+      const {keyMap, handlers, allowChanges, root, ...props} = this.props;
 
       return (
         <Component
-          hotKeys={ hotKeys }
+          hotKeys={ this._manager.getComponentProps(this.props) }
           { ...props }
         />
       );
     }
-
-    _shouldBindKeyListeners() {
-      const keyMap = getKeyMap(this.props);
-
-      return !isEmpty(keyMap) || this.props.root || (
-        Configuration.option('enableHardSequences') && this._handlersIncludeHardSequences(keyMap, getHandlers(this.props))
-      );
-    }
-
-    _handlersIncludeHardSequences(keyMap, handlers) {
-      return Object.keys(handlers).some((action) => {
-        return !keyMap[action] && KeyCombinationSerializer.isValidKeySerialization(action);
-      });
-    }
-
-    _wrapFunction(propName, func){
-      if (typeof this.props[propName] === 'function') {
-        return (event) => {
-          this.props[propName](event);
-          func(event);
-        }
-      } else {
-        return func;
-      }
-    }
-
-    _focusTreeIdsPush(componentId) {
-      if (!this._focusTreeIds) {
-        this._focusTreeIds = [];
-      }
-
-      this._focusTreeIds.push(componentId);
-    }
-
-    _focusTreeIdsShift() {
-      if (this._focusTreeIds) {
-        this._focusTreeIds.shift();
-      }
-    }
-
-    _getFocusTreeId() {
-      if (this._focusTreeIds) {
-        return this._focusTreeIds[0];
-      }
-    }
-
-    componentDidUpdate() {
-      const keyEventManager = KeyEventManager.getInstance();
-
-      keyEventManager.reregisterKeyMap(this._id, this.props.keyMap);
-
-      if (this._componentIsFocused() && (this.props.allowChanges || !Configuration.option('ignoreKeymapAndHandlerChangesByDefault'))) {
-        const {keyMap, handlers} = this.props;
-
-        keyEventManager.updateEnabledHotKeys(
-          this._getFocusTreeId(),
-          this._id,
-          keyMap,
-          handlers,
-          this._getComponentOptions()
-        );
-      }
-    }
-
-    _componentIsFocused() {
-      return this._focused === true;
-    }
-
-    componentDidMount() {
-      const keyEventManager = KeyEventManager.getInstance();
-      const {hotKeysParentId} = this.context;
-
-      keyEventManager.registerComponentMount(this._id, hotKeysParentId);
-    }
-
-    /**
-     * Handles when the component gains focus by calling onFocus prop, if defined, and
-     * registering itself with the KeyEventManager
-     * @private
-     */
-    _handleFocus() {
-      if (this.props.onFocus) {
-        this.props.onFocus(...arguments);
-      }
-
-      const focusTreeId =
-        KeyEventManager.getInstance().enableHotKeys(
-          this._id,
-          getKeyMap(this.props),
-          getHandlers(this.props),
-          this._getComponentOptions()
-        );
-
-      if (!isUndefined(focusTreeId)) {
-        /**
-         * focusTreeId should never normally be undefined, but this return state is
-         * used to indicate that a component with the same componentId has already
-         * registered as focused/enabled (again, a condition that should not normally
-         * occur, but apparently can for as-yet unknown reasons).
-         *
-         * @see https://github.com/greena13/react-hotkeys/issues/173
-         */
-        this._focusTreeIdsPush(focusTreeId);
-      }
-
-      this._focused = true;
-    }
-
-    componentWillUnmount(){
-      const keyEventManager = KeyEventManager.getInstance();
-
-      keyEventManager.deregisterKeyMap(this._id);
-      keyEventManager.registerComponentUnmount();
-
-      this._handleBlur();
-    }
-
-    /**
-     * Handles when the component loses focus by calling the onBlur prop, if defined
-     * and removing itself from the KeyEventManager
-     * @private
-     */
-    _handleBlur() {
-      if (this.props.onBlur) {
-        this.props.onBlur(...arguments);
-      }
-
-      const retainCurrentFocusTreeId = KeyEventManager.getInstance().disableHotKeys(this._getFocusTreeId(), this._id);
-
-      if (!retainCurrentFocusTreeId) {
-        this._focusTreeIdsShift();
-      }
-
-      this._focused = false;
-    }
-
-    _delegateEventToManager(event, methodName) {
-      const discardFocusTreeId =
-        KeyEventManager.getInstance()[methodName](
-          event,
-          this._getFocusTreeId(),
-          this._id,
-          this._getEventOptions()
-        );
-
-      if (discardFocusTreeId) {
-        this._focusTreeIdsShift();
-      }
-    }
-
-    _getComponentOptions() {
-      return {
-        defaultKeyEvent: Configuration.option('defaultKeyEvent')
-      };
-    }
-
-    _getEventOptions() {
-      return {
-        ignoreEventsCondition: Configuration.option('ignoreEventsCondition')
-      };
-    }
   }
 
-  return backwardsCompatibleContext(HotKeysEnabled, {
-    deprecatedAPI: {
-      contextTypes: {
-        hotKeysParentId: PropTypes.number,
-      },
-      childContextTypes: {
-        hotKeysParentId: PropTypes.number,
-      },
-    },
-    newAPI: {
-      contextType: { hotKeysParentId: undefined },
-    }
-  });
+  return provideWithContext(HotKeysEnabled);
 }
 
 export default withHotKeys;
