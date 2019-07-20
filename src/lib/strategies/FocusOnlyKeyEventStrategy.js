@@ -2,7 +2,6 @@ import AbstractKeyEventStrategy from './AbstractKeyEventStrategy';
 import KeyEventType from '../../const/KeyEventType';
 import KeyEventCounter from '../listening/KeyEventCounter';
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
-import Configuration from '../config/Configuration';
 import Logger from '../logging/Logger';
 import printComponent from '../../helpers/logging/printComponent';
 import isUndefined from '../../utils/isUndefined';
@@ -13,6 +12,7 @@ import EventResponse from '../../const/EventResponse';
 import KeyEventState from '../../const/KeyEventState';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 import EventPropagator from '../listening/EventPropagator';
+import FocusOnlyKeyEventSimulator from '../simulation/FocusOnlyKeyEventSimulator';
 
 /**
  * Defines behaviour for dealing with key maps defined in focus-only HotKey components
@@ -44,6 +44,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      * @type {FocusTreeId}
      */
     this.focusTreeId = 0;
+
+    this._simulator = new FocusOnlyKeyEventSimulator(this);
   }
 
   /**
@@ -54,7 +56,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   _reset() {
     super._reset();
 
-    this.keypressEventsToSimulate = [];
+    if (this._simulator) {
+      this._simulator.clear();
+    }
 
     /**
      * Increase the unique ID associated with each unique focus tree
@@ -106,17 +110,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       return undefined;
     }
 
-    this._addComponent(
-      componentId,
-      actionNameToKeyMap,
-      actionNameToHandlersMap,
-      options
-    );
+    this._addComponent(componentId, actionNameToKeyMap, actionNameToHandlersMap, options);
 
-    this.logger.debug(
-      this._logPrefix(componentId, { eventId: false }),
-      'Focused. \n'
-    );
+    this.logger.debug(this._logPrefix(componentId, { eventId: false }), 'Focused. \n');
 
     this._logComponentOptions(componentId, {eventId: false});
 
@@ -268,7 +264,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this._callHandlerIfActionNotHandled(event, key, KeyEventType.keydown, componentId, focusTreeId);
     }
 
-    this._simulateKeyPressForNonPrintableKeys(event, key, focusTreeId, componentId, options);
+    this._simulator.handleKeyPressSimulation({event, key, focusTreeId, componentId, options});
 
     this.eventPropagator.finishPropagationStep();
 
@@ -505,17 +501,6 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     }
   }
 
-  _simulateKeyPressForNonPrintableKeys(event, key, focusTreeId, componentId, options){
-    this._handleEventSimulation(
-      'keypressEventsToSimulate',
-      'simulatePendingKeyPressEvents',
-      this._shouldSimulate(KeyEventType.keypress, key),
-      {
-        event, key, focusTreeId, componentId, options
-      }
-    );
-  }
-
   _simulateKeyUpEventsHiddenByCmd(event, key, focusTreeId, componentId, options) {
     if (isCmdKey(key)) {
       this.getCurrentCombination().forEachKey((keyName) => {
@@ -523,14 +508,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
           return;
         }
 
-        this._handleEventSimulation(
-          'keyupEventsToSimulate',
-          'simulatePendingKeyUpEvents',
-          this._shouldSimulate(KeyEventType.keyup, keyName),
-          {
-            event, key: keyName, focusTreeId, componentId, options
-          }
-        );
+        this._simulator.handleKeyUpSimulation({event, key: keyName, focusTreeId, componentId, options});
       });
     }
   }
@@ -583,49 +561,16 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * Event simulation
    ********************************************************************************/
 
-  _handleEventSimulation(listName, handlerName, shouldSimulate, {event, key, focusTreeId, componentId, options}) {
-    if (shouldSimulate && Configuration.option('simulateMissingKeyPressEvents')) {
-      /**
-       * If a key does not have a keypress event, we save the details of the keydown
-       * event to simulate the keypress event, as the keydown event bubbles through
-       * the last focus-only HotKeysComponent
-       */
-      const _event = this._cloneAndMergeEvent(event, {key, simulated: true });
-
-      this[listName].push({
-        event: _event, focusTreeId, componentId, options
-      });
-    }
-
-    if (this.componentList.isRoot(componentId) || this.eventPropagator.isStopped()) {
-      if (!this.keyEventManager.isGlobalListenersBound()) {
-        this[handlerName]();
-      }
-      /**
-       * else, we wait for keydown event to propagate through global strategy
-       * before we simulate the keypress
-       */
-    }
-  }
-
   simulatePendingKeyPressEvents() {
-    this._simulatePendingKeyEvents('keypressEventsToSimulate', 'handleKeyPress');
+    this._simulator.simulatePendingKeyPressEvents();
   }
 
   simulatePendingKeyUpEvents() {
-    this._simulatePendingKeyEvents('keyupEventsToSimulate', 'handleKeyUp');
+    this._simulator.simulatePendingKeyUpEvents();
   }
 
-  _simulatePendingKeyEvents(listName, handlerName) {
-    if (this[listName].length > 0) {
-      KeyEventCounter.incrementId();
-    }
-
-    this[listName].forEach(({ event, focusTreeId, componentId, options }) => {
-      this[handlerName](event, focusTreeId, componentId, options);
-    });
-
-    this[listName] = [];
+  shouldSimulateEventsImmediately() {
+    return !this.keyEventManager.isGlobalListenersBound();
   }
 
   /********************************************************************************

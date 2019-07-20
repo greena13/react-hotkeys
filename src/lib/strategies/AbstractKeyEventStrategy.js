@@ -126,9 +126,9 @@ class AbstractKeyEventStrategy {
    *        combination history.
    */
   resetKeyHistory(options = {}) {
-    this.keypressEventsToSimulate = [];
-
-    this.keyupEventsToSimulate = [];
+    if (this._simulator) {
+      this._simulator.clear();
+    }
 
     if (this.getKeyHistory().any() && !options.force) {
       this._keyHistory = new KeyHistory(
@@ -362,16 +362,6 @@ class AbstractKeyEventStrategy {
     }
 
     return false
-  }
-
-  _cloneAndMergeEvent(event, extra) {
-    const eventAttributes = Object.keys(ModifierFlagsDictionary).reduce((memo, eventAttribute) => {
-      memo[eventAttribute] = event[eventAttribute];
-
-      return memo;
-    }, {});
-
-    return { ...eventAttributes, ...extra };
   }
 
   /********************************************************************************

@@ -13,6 +13,7 @@ import EventResponse from '../../const/EventResponse';
 import contains from '../../utils/collection/contains';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 import normalizeEventName from '../../utils/string/normalizeEventName';
+import GlobalKeyEventSimulator from '../simulation/GlobalKeyEventSimulator';
 
 /**
  * Defines behaviour for dealing with key maps defined in global HotKey components
@@ -50,6 +51,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * keyCombinationListener
      */
     this.listeners = {};
+
+    this._simulator = new GlobalKeyEventSimulator(this);
   }
 
   /********************************************************************************
@@ -551,15 +554,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    ********************************************************************************/
 
   _handleEventSimulation(handlerName, shouldSimulate, {event, key}) {
-    if (shouldSimulate && Configuration.option('simulateMissingKeyPressEvents')) {
-      /**
-       * If a key does not have a keypress event, we simulate one immediately after
-       * the keydown event, to keep the behaviour consistent across all keys
-       */
-
-      const _event = this._cloneAndMergeEvent(event, {key, simulated: true});
-      this[handlerName](_event);
-    }
+    this._simulator.handleEventSimulation(handlerName, shouldSimulate, {event, key});
   }
 
   /********************************************************************************
