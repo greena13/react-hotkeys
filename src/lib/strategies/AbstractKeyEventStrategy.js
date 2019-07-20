@@ -77,8 +77,6 @@ class AbstractKeyEventStrategy {
 
     this._componentTree = new ComponentTree();
 
-    this.rootComponentId = null;
-
     this._reset();
 
     this.resetKeyHistory();
@@ -151,11 +149,11 @@ class AbstractKeyEventStrategy {
    * @returns {ApplicationKeyMap} The application's key map
    */
   getApplicationKeyMap() {
-    if (this.rootComponentId === null) {
+    if (!this._componentTree.hasRoot()) {
       return {};
     }
 
-    return this._buildApplicationKeyMap([this.rootComponentId], {});
+    return this._buildApplicationKeyMap([this._componentTree.getRootId()], {});
   }
 
   _buildApplicationKeyMap(componentIds, keyMapSummary) {
@@ -278,11 +276,7 @@ class AbstractKeyEventStrategy {
    * @param {ComponentId} parentId - Id of the parent hot keys component
    */
   registerComponentMount(componentId, parentId) {
-    if (!isUndefined(parentId)) {
-      this._componentTree.setParent(componentId, parentId);
-    } else {
-      this.rootComponentId = componentId;
-    }
+    this._componentTree.setParent(componentId, parentId);
 
     this.logger.verbose(
       this._logPrefix(componentId),
@@ -305,8 +299,8 @@ class AbstractKeyEventStrategy {
       `${printComponent(this._componentTree.toJSON())}`
     );
 
-    if (componentId === this.rootComponentId) {
-      this.rootComponentId = null;
+    if (this._componentTree.isRootId(componentId)) {
+      this._componentTree.clearRootId();
     }
   }
 

@@ -1,5 +1,6 @@
 import Registry from '../shared/Registry';
 import without from '../../utils/collection/without';
+import isUndefined from '../../utils/isUndefined';
 
 /**
  * @typedef {Object} ComponentRegistryEntry
@@ -12,6 +13,28 @@ import without from '../../utils/collection/without';
  * @class
  */
 class ComponentTree extends Registry {
+  constructor() {
+    super();
+
+    this.clearRootId();
+  }
+
+  getRootId() {
+    return this._rootId;
+  }
+
+  hasRoot() {
+    return !this.isRootId(null);
+  }
+
+  isRootId(componentId) {
+    return componentId === this.getRootId()
+  }
+
+  clearRootId() {
+    this._rootId = null;
+  }
+
   /**
    * Register a component
    * @param {ComponentId} componentId Id of the component to register
@@ -44,8 +67,12 @@ class ComponentTree extends Registry {
    * @returns {void}
    */
   setParent(componentId, parentId) {
-    this.get(componentId).parentId = parentId;
-    this._addChildId(parentId, componentId);
+    if (!isUndefined(parentId)) {
+      this.get(componentId).parentId = parentId;
+      this._addChildId(parentId, componentId);
+    } else {
+      this._rootId = componentId;
+    }
   }
 
   /**
