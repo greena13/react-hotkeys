@@ -87,6 +87,10 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       'Mounted.',
     );
 
+    this._logComponentOptions(componentId);
+  }
+
+  _logComponentOptions(componentId) {
     this.logger.verbose(
       this._logPrefix(componentId, {eventId: false}),
       'Component options: \n',
@@ -132,11 +136,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       `Global component ${componentId} updated.`,
     );
 
-    this.logger.verbose(
-      this._logPrefix(componentId, {eventId: false}),
-      'Component options: \n',
-      printComponent(this.componentList.get(componentId))
-    );
+    this._logComponentOptions(componentId);
   }
 
   /**
@@ -176,10 +176,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
           this.keyEventManager[`handleGlobal${normalizeEventName(eventName)}`](keyEvent);
         };
 
-        this.logger.debug(
-          this._logPrefix(this.componentId, {eventId: false}),
-          `Bound handler handleGlobal${normalizeEventName(eventName)}() to document.on${eventName}()`
-        );
+        this._logHandlerStateChange(`Bound`, eventName);
       });
 
       this.listenersBound = true;
@@ -191,14 +188,18 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
         delete document[`on${eventName}`];
 
-        this.logger.debug(
-          this._logPrefix(this.componentId, {eventId: false}),
-          `Removed handler handleGlobal${normalizeEventName(eventName)}() from document.on${eventName}()`
-        );
+        this._logHandlerStateChange(`Removed`, eventName);
       });
 
       this.listenersBound = false;
     }
+  }
+
+  _logHandlerStateChange(action, eventName) {
+    this.logger.debug(
+      this._logPrefix(this.componentId, {eventId: false}),
+      `${action} handler handleGlobal${normalizeEventName(eventName)}() to document.on${eventName}()`
+    );
   }
 
   /**
@@ -541,6 +542,10 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       `Started a new combination with '${keyName}'.`
     );
 
+    this._logKeyHistory();
+  }
+
+  _logKeyHistory() {
     this.logger.verbose(
       this._logPrefix(),
       `Key history: ${printComponent(this.getKeyHistory().toJSON())}.`
@@ -557,10 +562,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       );
     }
 
-    this.logger.verbose(
-      this._logPrefix(),
-      `Key history: ${printComponent(this.getKeyHistory().toJSON())}.`
-    );
+    this._logKeyHistory();
   }
 
   /********************************************************************************
