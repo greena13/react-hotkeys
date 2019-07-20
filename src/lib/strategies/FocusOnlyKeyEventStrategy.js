@@ -118,11 +118,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       'Focused. \n'
     );
 
-    this.logger.verbose(
-      this._logPrefix(componentId, { eventId: false }),
-      'Component options:\n',
-      printComponent(this.componentList.get(componentId))
-    );
+    this._logComponentOptions(componentId, {eventId: false});
 
     return this.focusTreeId;
   }
@@ -163,11 +159,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      */
     this._initHandlerResolutionState();
 
-    this.logger.verbose(
-      this._logPrefix(componentId, {focusTreeId, eventId: false}),
-      'Component options:\n',
-      printComponent(this.componentList.get(componentId))
-    );
+    this._logComponentOptions(componentId, {focusTreeId, eventId: false});
   }
 
   /**
@@ -222,9 +214,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const key = getKeyName(event);
 
     if (focusTreeId !== this.focusTreeId) {
-      this.logger.debug(
-        this._logPrefix(componentId),
-        `Ignored ${describeKeyEvent(event, key, KeyEventType.keydown)} event because it had an old focus tree id: ${focusTreeId}.`
+      this._logIgnoredKeyEvent(
+        event, componentId, key, KeyEventType.keydown,
+        `it had an old focus tree id: ${focusTreeId}`
       );
 
       this.eventPropagator.ignoreEvent(event);
@@ -304,10 +296,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _eventIsToBeIgnored(event, componentId, key, keyEventType){
-    this.logger.debug(
-      this._logPrefix(componentId),
-      `Ignored ${describeKeyEvent(event, key, keyEventType)} event because ignoreEventsFilter rejected it.`
-    );
+    this._logIgnoredKeyEvent(event, componentId, key, keyEventType, `ignoreEventsFilter rejected it`);
 
     return EventResponse.ignored;
   }
@@ -396,9 +385,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _logAndIgnoreUnexpectSimulatedEvent(componentId, event, key, eventType) {
-    this.logger.debug(
-      this._logPrefix(componentId),
-      `Ignored ${describeKeyEvent(event, key, eventType)} as it was not expected, and has already been simulated.`
+    this._logIgnoredKeyEvent(
+      componentId, event, key, eventType,
+      'it was not expected, and has already been simulated'
     );
 
     this.eventPropagator.ignoreEvent(event);
@@ -659,19 +648,13 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const combinationName = this.getCurrentCombination().describe();
 
     if (!this.componentList.anyActionsForEventType(keyEventType)) {
-      this.logger.verbose(
-        this._logPrefix(componentId, {focusTreeId}),
-        `Ignored '${combinationName}' ${eventName} because it doesn't have any ${eventName} handlers.`
-      );
+      this._logIgnoredEvent(`'${combinationName}' ${eventName}`, `it doesn't have any ${eventName} handlers`);
 
       return;
     }
 
     if (this.eventPropagator.isHandled()) {
-      this.logger.debug(
-        this._logPrefix(componentId, {focusTreeId}),
-        `Ignored '${combinationName}' ${eventName} as it has already been handled.`
-      );
+      this._logIgnoredEvent(`'${combinationName}' ${eventName}`, 'it has already been handled');
     } else {
       this.logger.verbose(
         this._logPrefix(componentId, {focusTreeId}),
@@ -701,6 +684,17 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * Logging
    ********************************************************************************/
 
+  _logIgnoredKeyEvent(event, componentId, key, eventType, reason) {
+    this._logIgnoredEvent(componentId, describeKeyEvent(event, key, eventType), reason);
+  }
+
+  _logIgnoredEvent(componentId, eventDescription, reason) {
+    this.logger.debug(
+      this._logPrefix(componentId),
+      `Ignored ${eventDescription} because ${reason}.`
+    );
+  }
+
   _logPrefix(componentId, options = {}) {
     const logIcons = Logger.logIcons;
     const eventIcons = Logger.eventIcons;
@@ -729,7 +723,6 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     return `${base})`;
   }
-
 }
 
 export default FocusOnlyKeyEventStrategy;

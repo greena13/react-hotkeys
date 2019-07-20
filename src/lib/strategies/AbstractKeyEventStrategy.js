@@ -21,6 +21,7 @@ import printComponent from '../../helpers/logging/printComponent';
 import hasKeyPressEvent from '../../helpers/resolving-handlers/hasKeyPressEvent';
 import keyupIsHiddenByCmd from '../../helpers/resolving-handlers/keyupIsHiddenByCmd';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
+import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 
 const SEQUENCE_ATTRIBUTES = ['sequence', 'action'];
 const KEYMAP_ATTRIBUTES = ['name', 'description', 'group'];
@@ -505,6 +506,25 @@ class AbstractKeyEventStrategy {
    */
   _logPrefix() {
 
+  }
+
+  _logComponentOptions(componentId, options) {
+    this.logger.verbose(
+      this._logPrefix(componentId, options),
+      'Component options:\n',
+      printComponent(this.componentList.get(componentId))
+    );
+  }
+
+  _logIgnoredKeyEvent(event, key, eventType, reason) {
+    this._logIgnoredEvent(describeKeyEvent(event, key, eventType), reason)
+  }
+
+  _logIgnoredEvent(eventDescription, reason) {
+    this.logger.debug(
+      this._logPrefix(),
+      `Ignored ${eventDescription} because ${reason}.`
+    );
   }
 }
 
