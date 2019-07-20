@@ -1,4 +1,5 @@
 import UnshiftedKeysDictionary from '../../const/reverse-dictionaries/UnshiftedKeysDictionary';
+import fallbackToTransformedSelf from './fallbackToTransformedSelf';
 
 /**
  * Returns the name of the key that must be pressed with the shift key, to yield the
@@ -8,7 +9,7 @@ import UnshiftedKeysDictionary from '../../const/reverse-dictionaries/UnshiftedK
  *          yield the specified symbol
  */
 function resolveUnshiftedAlias(keyName) {
-  return UnshiftedKeysDictionary[keyName] || [ keyName.length === 1 ? keyName.toLowerCase(): keyName ];
+  return fallbackToTransformedSelf(UnshiftedKeysDictionary, keyName, 'toLowerCase');
 }
 
 export default resolveUnshiftedAlias;

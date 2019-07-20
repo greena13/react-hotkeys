@@ -1,4 +1,5 @@
 import ShiftedKeysDictionary from '../../const/ShiftedKeysDictionary';
+import fallbackToTransformedSelf from './fallbackToTransformedSelf';
 
 /**
  * Returns the corresponding symbol or character for a particular key, when it is
@@ -8,7 +9,7 @@ import ShiftedKeysDictionary from '../../const/ShiftedKeysDictionary';
  *          shift key
  */
 function resolveShiftedAlias(keyName) {
-  return ShiftedKeysDictionary[keyName] || [ keyName.length === 1 ? keyName.toUpperCase(): keyName ];
+  return fallbackToTransformedSelf(ShiftedKeysDictionary, keyName, 'toUpperCase');
 }
 
 export default resolveShiftedAlias;
