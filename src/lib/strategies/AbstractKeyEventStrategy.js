@@ -249,7 +249,7 @@ class AbstractKeyEventStrategy {
     this._componentTree.add(this.componentId, keyMap);
 
     this.logger.verbose(
-      this._logPrefix(this.componentId),
+      this._keyEventPrefix(this.componentId),
       'Registered component:\n',
       `${printComponent(this._componentTree.get(this.componentId))}`
     );
@@ -276,7 +276,7 @@ class AbstractKeyEventStrategy {
     this._componentTree.setParent(componentId, parentId);
 
     this.logger.verbose(
-      this._logPrefix(componentId),
+      this._keyEventPrefix(componentId),
       'Registered component mount:\n',
       `${printComponent(this._componentTree.get(componentId))}`
     );
@@ -291,7 +291,7 @@ class AbstractKeyEventStrategy {
     this._componentTree.remove(componentId);
 
     this.logger.verbose(
-      this._logPrefix(componentId),
+      this._keyEventPrefix(componentId),
       'De-registered component. Remaining component Registry:\n',
       `${printComponent(this._componentTree.toJSON())}`
     );
@@ -376,7 +376,7 @@ class AbstractKeyEventStrategy {
         this._actionResolver.getKeyHistoryMatcher(componentSearchIndex);
 
       this.logger.verbose(
-        this._logPrefix(componentSearchIndex),
+        this._keyEventPrefix(componentSearchIndex),
         'Internal key mapping:\n',
         `${printComponent(keyHistoryMatcher.toJSON())}`
       );
@@ -395,12 +395,12 @@ class AbstractKeyEventStrategy {
           const subMatchDescription = KeyCombinationSerializer.serialize(sequenceMatch.keyDictionary);
 
           this.logger.debug(
-            this._logPrefix(componentSearchIndex),
+            this._keyEventPrefix(componentSearchIndex),
             `Found action that matches '${currentCombination.describe()}' (sub-match: '${subMatchDescription}'): ${eventSchema.actionName}. Calling handler . . .`
           );
         } else {
           this.logger.debug(
-            this._logPrefix(componentSearchIndex),
+            this._keyEventPrefix(componentSearchIndex),
             `Found action that matches '${currentCombination.describe()}': ${eventSchema.actionName}. Calling handler . . .`
           );
         }
@@ -415,12 +415,12 @@ class AbstractKeyEventStrategy {
           const eventName = describeKeyEventType(keyEventType);
 
           this.logger.debug(
-            this._logPrefix(componentSearchIndex),
+            this._keyEventPrefix(componentSearchIndex),
             `No matching actions found for '${currentCombination.describe()}' ${eventName}.`
           );
         } else {
           this.logger.debug(
-            this._logPrefix(componentSearchIndex),
+            this._keyEventPrefix(componentSearchIndex),
             `Doesn't define a handler for '${currentCombination.describe()}' ${describeKeyEventType(keyEventType)}.`
           );
         }
@@ -492,19 +492,23 @@ class AbstractKeyEventStrategy {
    * @protected
    * @abstract
    */
-  _logPrefix() {
+  _keyEventPrefix() {
 
   }
 
+  _nonKeyEventPrefix(componentId, options = {}) {
+    this._keyEventPrefix(componentId, { ...options, eventId: false});
+  }
+
   _logNewComponentOptions(componentId, action) {
-    this.logger.debug(this._logPrefix(componentId, {eventId: false}), action);
+    this.logger.debug(this._nonKeyEventPrefix(componentId), action);
 
     this._logComponentOptions(componentId);
   }
 
   _logComponentOptions(componentId, options = { }) {
     this.logger.verbose(
-      this._logPrefix(componentId, { ...options, eventId: false }),
+      this._nonKeyEventPrefix(componentId, options),
       'Component options:\n',
       printComponent(this._componentList.get(componentId))
     );
@@ -516,7 +520,7 @@ class AbstractKeyEventStrategy {
 
   _logIgnoredEvent(eventDescription, reason) {
     this.logger.debug(
-      this._logPrefix(),
+      this._keyEventPrefix(),
       `Ignored ${eventDescription} because ${reason}.`
     );
   }

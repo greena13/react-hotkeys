@@ -50,7 +50,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this._simulator = new GlobalKeyEventSimulator(this);
 
     this._listenerAdaptor = new GlobalEventListenerAdaptor(this,
-      { logger: this.logger, logPrefix: this._logPrefix }
+      { logger: this.logger, logPrefix: this._keyEventPrefix }
     );
   }
 
@@ -95,7 +95,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this.eventOptions = eventOptions;
 
     this.logger.debug(
-      this._logPrefix(componentId, {eventId: false}),
+      this._nonKeyEventPrefix(componentId),
       `Global component ${componentId} updated.`,
     );
 
@@ -128,7 +128,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this._initHandlerResolutionState();
 
     this.logger.debug(
-      this._logPrefix(componentId, {eventId: false}),
+      this._nonKeyEventPrefix(componentId),
       `Unmounted global component ${componentId}`
     );
   }
@@ -242,7 +242,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
       case EventResponse.seen:
         this.logger.debug(
-          this._logPrefix(),
+          this._keyEventPrefix(),
           `Received ${describeKeyEvent(event, key, keyEventType)} event (that has already passed through React app).`
         );
 
@@ -252,7 +252,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         KeyEventCounter.incrementId();
 
         this.logger.debug(
-          this._logPrefix(),
+          this._keyEventPrefix(),
           `New ${describeKeyEvent(event, key, keyEventType)} event (that has NOT passed through React app).`
         );
     }
@@ -426,7 +426,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this.getKeyHistory().startNewKeyCombination(keyName, keyEventState);
 
     this.logger.verbose(
-      this._logPrefix(),
+      this._keyEventPrefix(),
       `Started a new combination with '${keyName}'.`
     );
 
@@ -435,7 +435,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
   _logKeyHistory() {
     this.logger.verbose(
-      this._logPrefix(),
+      this._keyEventPrefix(),
       `Key history: ${printComponent(this.getKeyHistory().toJSON())}.`
     );
   }
@@ -445,7 +445,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     if (keyEventType === KeyEventType.keydown) {
       this.logger.verbose(
-        this._logPrefix(),
+        this._keyEventPrefix(),
         `Added '${keyName}' to current combination: '${this.getCurrentCombination().describe()}'.`
       );
     }
@@ -481,7 +481,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * key combination
      */
     this.logger.verbose(
-      this._logPrefix(),
+      this._keyEventPrefix(),
       `Attempting to find action matching '${combinationName}' ${eventName} . . .`
     );
 
@@ -501,7 +501,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       );
 
       if (matchFound) {
-        this.logger.debug(this._logPrefix(), `Searching no further, as handler has been found (and called).`);
+        this.logger.debug(this._keyEventPrefix(), `Searching no further, as handler has been found (and called).`);
 
         return;
       }
@@ -510,7 +510,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
   _stopEventPropagation(event, componentId) {
     this.logger.debug(
-      this._logPrefix(componentId),
+      this._keyEventPrefix(componentId),
       'Stopping further event propagation.'
     );
 
@@ -550,7 +550,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * Logging
    ********************************************************************************/
 
-  _logPrefix(componentId, options = {}) {
+  _keyEventPrefix(componentId, options = {}) {
     const eventIcons = Logger.eventIcons;
     const componentIcons = Logger.componentIcons;
 
