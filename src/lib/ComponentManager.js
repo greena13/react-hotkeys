@@ -32,7 +32,7 @@ class ComponentManager {
   constructor(hotKeysOptions, {keyMap}) {
     this._hotKeysOptions = hotKeysOptions;
 
-    this._id = KeyEventManager.getInstance().registerKeyMap(keyMap);
+    this._id = KeyEventManager.getFocusOnlyEventStrategy().registerKeyMap(keyMap);
   }
 
   getId() {
@@ -89,7 +89,7 @@ class ComponentManager {
     }
 
     const focusTreeId =
-      KeyEventManager.getInstance().enableHotKeys(
+      KeyEventManager.getFocusOnlyEventStrategy().enableHotKeys(
         this._id,
         this._getKeyMap(props),
         this._getHandlers(props),
@@ -112,7 +112,7 @@ class ComponentManager {
   }
 
   updateHotKeys(props) {
-    const keyEventManager = KeyEventManager.getInstance();
+    const keyEventManager = KeyEventManager.getFocusOnlyEventStrategy();
 
     keyEventManager.reregisterKeyMap(this.getId(), props.keyMap);
 
@@ -139,7 +139,7 @@ class ComponentManager {
       props.onBlur(...arguments);
     }
 
-    const retainCurrentFocusTreeId = KeyEventManager.getInstance().disableHotKeys(this.getFocusTreeId(), this.getId());
+    const retainCurrentFocusTreeId = KeyEventManager.getFocusOnlyEventStrategy().disableHotKeys(this.getFocusTreeId(), this.getId());
 
     if (!retainCurrentFocusTreeId) {
       this._focusTreeIdsShift();
@@ -149,10 +149,10 @@ class ComponentManager {
   }
 
   removeKeyMap(props) {
-    const keyEventManager = KeyEventManager.getInstance();
+    const keyEventManager = KeyEventManager.getFocusOnlyEventStrategy();
 
     keyEventManager.deregisterKeyMap(this.getId());
-    keyEventManager.registerComponentUnmount();
+    KeyEventManager.getInstance().registerComponentUnmount();
 
     this.disableHotKeys(props);
   }
@@ -191,7 +191,7 @@ class ComponentManager {
 
   _delegateEventToManager(event, methodName) {
     const discardFocusTreeId =
-      KeyEventManager.getInstance()[methodName](
+      KeyEventManager.getFocusOnlyEventStrategy()[methodName](
         event,
         this.getFocusTreeId(),
         this.getId(),

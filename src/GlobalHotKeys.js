@@ -34,7 +34,7 @@ class GlobalHotKeys extends Component {
   constructor(props) {
     super(props);
 
-    this._id = KeyEventManager.getInstance().registerGlobalKeyMap(props.keyMap);
+    this._id = KeyEventManager.getGlobalEventStrategy().registerKeyMap(props.keyMap);
 
     /**
      * We maintain a separate instance variable to contain context that will be
@@ -53,9 +53,9 @@ class GlobalHotKeys extends Component {
   }
 
   componentDidUpdate() {
-    const keyEventManager = KeyEventManager.getInstance();
+    const keyEventManager = KeyEventManager.getGlobalEventStrategy();
 
-    keyEventManager.reregisterGlobalKeyMap(this._id, this.props.keyMap);
+    keyEventManager.reregisterKeyMap(this._id, this.props.keyMap);
 
     if (this.props.allowChanges || !Configuration.option('ignoreKeymapAndHandlerChangesByDefault')) {
       const {keyMap, handlers} = this.props;
@@ -63,7 +63,7 @@ class GlobalHotKeys extends Component {
        * Component defines global hotkeys, so any changes to props may have changes
        * that should have immediate effect
        */
-      keyEventManager.updateEnabledGlobalHotKeys(
+      keyEventManager.updateEnabledHotKeys(
         this._id,
         keyMap,
         handlers,
@@ -77,11 +77,9 @@ class GlobalHotKeys extends Component {
     const {keyMap, handlers} = this.props;
     const {globalHotKeysParentId} = this.context;
 
-    const keyEventManager = KeyEventManager.getInstance();
+    KeyEventManager.getInstance().registerGlobalComponentMount(this._id, globalHotKeysParentId);
 
-    keyEventManager.registerGlobalComponentMount(this._id, globalHotKeysParentId);
-
-    keyEventManager.enableGlobalHotKeys(
+    KeyEventManager.getGlobalEventStrategy().enableHotKeys(
       this._id,
       keyMap,
       handlers,
@@ -91,12 +89,12 @@ class GlobalHotKeys extends Component {
   }
 
   componentWillUnmount(){
-    const keyEventManager = KeyEventManager.getInstance();
+    const keyEventManager = KeyEventManager.getGlobalEventStrategy();
 
-    keyEventManager.deregisterGlobalKeyMap(this._id);
-    keyEventManager.disableGlobalHotKeys(this._id);
+    keyEventManager.deregisterKeyMap(this._id);
+    keyEventManager.disableHotKeys(this._id);
 
-    keyEventManager.registerGlobalComponentUnmount();
+    KeyEventManager.getInstance().registerGlobalComponentUnmount();
   }
 
   _getComponentOptions() {

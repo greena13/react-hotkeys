@@ -172,7 +172,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         const eventName = describeKeyEventType(recordIndex);
 
         document[`on${eventName}`] = (keyEvent) => {
-          this.keyEventManager[`handleGlobal${normalizeEventName(eventName)}`](keyEvent);
+          this[`handle${normalizeEventName(eventName)}`](keyEvent);
         };
 
         this._logHandlerStateChange(`Bound`, eventName);
