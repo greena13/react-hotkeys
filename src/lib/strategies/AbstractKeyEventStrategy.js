@@ -87,14 +87,14 @@ class AbstractKeyEventStrategy {
    * @protected
    */
   _reset() {
-    this.componentList = new ComponentOptionsList();
+    this._componentList = new ComponentOptionsList();
 
     this._initHandlerResolutionState();
   }
 
   _newKeyHistory() {
     return new KeyHistory({
-      maxLength: this.componentList.getLongestSequence()
+      maxLength: this._componentList.getLongestSequence()
     });
   }
 
@@ -130,7 +130,7 @@ class AbstractKeyEventStrategy {
 
     if (this.getKeyHistory().any() && !options.force) {
       this._keyHistory = new KeyHistory(
-        { maxLength: this.componentList.getLongestSequence() },
+        { maxLength: this._componentList.getLongestSequence() },
         new KeyCombination(this.getCurrentCombination().keysStillPressedDict())
       );
     } else {
@@ -319,13 +319,13 @@ class AbstractKeyEventStrategy {
    * @protected
    */
   _addComponent(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
-    this.componentList.add(componentId,
+    this._componentList.add(componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options
     );
 
-    this.getKeyHistory().setMaxLength(this.componentList.getLongestSequence());
+    this._updateLongestSequence();
   }
 
   /********************************************************************************
@@ -345,13 +345,16 @@ class AbstractKeyEventStrategy {
     return this.getKeyHistory().getCurrentCombination();
   }
 
+  _updateLongestSequence() {
+    this.getKeyHistory().setMaxLength(this._componentList.getLongestSequence());
+  }
   /********************************************************************************
    * Matching and calling handlers
    ********************************************************************************/
 
   _callClosestMatchingHandler(event, keyName, keyEventType, componentPosition, componentSearchIndex) {
     if (!this._actionResolver) {
-      this._actionResolver = new ActionResolver(this.componentList);
+      this._actionResolver = new ActionResolver(this._componentList);
     }
 
     while (componentSearchIndex <= componentPosition) {
@@ -483,7 +486,7 @@ class AbstractKeyEventStrategy {
     this.logger.verbose(
       this._logPrefix(componentId, options),
       'Component options:\n',
-      printComponent(this.componentList.get(componentId))
+      printComponent(this._componentList.get(componentId))
     );
   }
 

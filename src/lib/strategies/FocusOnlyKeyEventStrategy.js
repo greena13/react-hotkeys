@@ -66,7 +66,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      */
     this.focusTreeId += 1;
 
-    this.eventPropagator = new EventPropagator(this.componentList, {
+    this.eventPropagator = new EventPropagator(this._componentList, {
       logger: this.logger,
       logPrefix: this._logPrefix.bind(this)
     });
@@ -99,7 +99,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this.resetOnNextFocus = false;
     }
 
-    if (this.componentList.containsId(componentId)) {
+    if (this._componentList.containsId(componentId)) {
       /**
        * The <tt>componentId</tt> has already been registered - this occurs when the
        * same component has somehow managed to be focused twice, without being blurred
@@ -133,17 +133,17 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *        and handlers are associated and called.
    */
   updateEnabledHotKeys(focusTreeId, componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
-    if (focusTreeId !== this.focusTreeId || !this.componentList.containsId(componentId)) {
+    if (focusTreeId !== this.focusTreeId || !this._componentList.containsId(componentId)) {
       return;
     }
 
-    this.componentList.update(componentId,
+    this._componentList.update(componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
       options
     );
 
-    this.getKeyHistory().setMaxLength(this.componentList.getLongestSequence());
+    this._updateLongestSequence();
 
     this.logger.debug(
       this._logPrefix(componentId, {focusTreeId, eventId: false}),
@@ -592,7 +592,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const eventName = describeKeyEventType(keyEventType);
     const combinationName = this.getCurrentCombination().describe();
 
-    if (!this.componentList.anyActionsForEventType(keyEventType)) {
+    if (!this._componentList.anyActionsForEventType(keyEventType)) {
       this._logIgnoredEvent(componentId, `'${combinationName}' ${eventName}`, `it doesn't have any ${eventName} handlers`);
 
       return;
@@ -608,7 +608,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
       const previousComponentPosition = this.eventPropagator.getPreviousPosition();
 
-      const componentPosition = this.componentList.getIndexById(componentId);
+      const componentPosition = this._componentList.getIndexById(componentId);
 
       const handlerWasCalled =
         this._callClosestMatchingHandler(
@@ -660,7 +660,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     base += `C${componentId}${componentIcons[componentId % componentIcons.length]}`;
 
-    const position = this.componentList.getIndexById(componentId);
+    const position = this._componentList.getIndexById(componentId);
 
     if (!isUndefined(position)) {
       base += `-P${position}${componentIcons[position % componentIcons.length]}:`

@@ -110,14 +110,11 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   updateEnabledHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
     this.eventOptions = eventOptions;
 
-    this.componentList.update(
-      componentId,
-      actionNameToKeyMap,
-      actionNameToHandlersMap,
-      options
+    this._componentList.update(
+      componentId, actionNameToKeyMap, actionNameToHandlersMap, options
     );
 
-    this.getKeyHistory().setMaxLength(this.componentList.getLongestSequence());
+    this._updateLongestSequence();
 
     /**
      * Reset strategy state specific to the global strategy
@@ -146,10 +143,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * Manually update the registered key map state, usually reset using
      * _resetRegisteredKeyMapsState() method
      */
-    this.componentList.remove(componentId);
+    this._componentList.remove(componentId);
 
-    this.getKeyHistory().setMaxLength(this.componentList.getLongestSequence());
-
+    this._updateLongestSequence();
     this._updateDocumentHandlers();
 
     /**
@@ -164,7 +160,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _updateDocumentHandlers(){
-    const listenersShouldBeBound = this._listenersShouldBeBound();
+    const listenersShouldBeBound = this._shouldListenersBeBound();
     const listenersAreBound = this.isListenersBound();
 
     if (!listenersAreBound && listenersShouldBeBound) {
@@ -185,8 +181,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * @returns {boolean} True if the document listeners should be bound
    * @private
    */
-  _listenersShouldBeBound() {
-    return this.componentList.any() || this.listeners.keyCombination;
+  _shouldListenersBeBound() {
+    return this._componentList.any() || this.listeners.keyCombination;
   }
 
   /********************************************************************************
@@ -212,9 +208,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this._checkForModifierFlagDiscrepancies(event, key, KeyEventType.keydown);
 
     const reactAppResponse = this._howReactAppRespondedTo(
-      event,
-      key,
-      KeyEventType.keydown
+      event, key, KeyEventType.keydown
     );
 
     if (reactAppResponse === EventResponse.unseen &&
@@ -231,22 +225,13 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       const currentCombination = this.getCurrentCombination();
 
       if (currentCombination.isKeyIncluded(key) || currentCombination.isEnding()) {
-        this._startAndLogNewKeyCombination(
-          key,
-          keyEventState
-        );
+        this._startAndLogNewKeyCombination(key, keyEventState);
       } else {
-        this._addToAndLogCurrentKeyCombination(
-          key,
-          KeyEventType.keydown,
-          keyEventState
-        );
+        this._addToAndLogCurrentKeyCombination(key, KeyEventType.keydown, keyEventState);
       }
     }
 
-    if (!contains([EventResponse.ignored, EventResponse.handled], reactAppResponse)) {
-      this._callHandlerIfExists(event, key, KeyEventType.keydown);
-    }
+    this._callHandlerIfNeeded(reactAppResponse, event, key, KeyEventType.keydown);
 
     this.keyEventManager.simulatePendingKeyPressEvents();
     this._simulator.handleKeyPressSimulation({event, key});
@@ -329,15 +314,12 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * order of logging statements)
      */
     const reactAppResponse = this._howReactAppRespondedTo(
-      event,
-      key,
-      KeyEventType.keypress
+      event, key, KeyEventType.keypress
     );
 
     /**
      * Add new key event to key combination history
      */
-
     if (currentCombination.isKeyIncluded(key)) {
       this._addToAndLogCurrentKeyCombination(
         key,
@@ -362,8 +344,12 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       }
     }
 
+    this._callHandlerIfNeeded(reactAppResponse, event, key, KeyEventType.keypress);
+  }
+
+  _callHandlerIfNeeded(reactAppResponse, event, key, eventType) {
     if (!contains([EventResponse.ignored, EventResponse.handled], reactAppResponse)) {
-      this._callHandlerIfExists(event, key, KeyEventType.keypress);
+      this._callHandlerIfExists(event, key, eventType);
     }
   }
 
@@ -421,11 +407,11 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       if(this.eventOptions.ignoreEventsCondition(event)) {
         this._logIgnoredKeyEvent(event, key, KeyEventType.keyup, 'ignoreEventsFilter rejected it');
       } else {
-        this._callHandlerIfShouldBeHandled(reactAppResponse, event, key);
+        this._callHandlerIfNeeded(reactAppResponse, event, key, KeyEventType.keyup);
       }
 
     } else {
-      this._callHandlerIfShouldBeHandled(reactAppResponse, event, key);
+      this._callHandlerIfNeeded(reactAppResponse, event, key, KeyEventType.keyup);
     }
 
     /**
@@ -439,16 +425,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         keys: currentCombination.getKeyDictionary(),
         id: currentCombination.describe()
       });
-    }
-  }
-
-  _callHandlerIfShouldBeHandled(reactAppResponse, event, key) {
-    /**
-     * We attempt to find a handler of the event, only if it has not already
-     * been handled and should not be ignored
-     */
-    if (!contains([EventResponse.ignored, EventResponse.handled], reactAppResponse)) {
-      this._callHandlerIfExists(event, key, KeyEventType.keyup);
     }
   }
 
@@ -521,7 +497,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     const eventName = describeKeyEventType(keyEventType);
     const combinationName = this.getCurrentCombination().describe();
 
-    if (!this.componentList.anyActionsForEventType(keyEventType)) {
+    if (!this._componentList.anyActionsForEventType(keyEventType)) {
       /**
        * If there are no handlers registered for the particular key event type
        * (keydown, keypress, keyup) then skip trying to find a matching handler
@@ -553,7 +529,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _callClosestMatchingHandler(event, keyName, keyEventType) {
-    const componentListIterator = this.componentList.getNewIterator();
+    const componentListIterator = this._componentList.getNewIterator();
 
     while (componentListIterator.next()) {
       const matchFound = super._callClosestMatchingHandler(
