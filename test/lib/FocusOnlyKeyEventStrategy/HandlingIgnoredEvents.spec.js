@@ -10,7 +10,7 @@ describe('Handling ignored events:', function () {
   context('when the FocusOnlyKeyEventStrategy receives', () => {
     beforeEach(function () {
       this.keyEventManager = new KeyEventManager();
-      this.eventStrategy = this.keyEventManager._focusOnlyEventStrategy;
+      this.eventStrategy = this.keyEventManager.getFocusOnlyEventStrategy();
 
       this.handler = sinon.spy();
 

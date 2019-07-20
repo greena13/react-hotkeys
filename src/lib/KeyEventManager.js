@@ -27,6 +27,14 @@ class KeyEventManager {
     return this.instance;
   }
 
+  static getFocusOnlyEventStrategy() {
+    return this.getInstance().getFocusOnlyEventStrategy();
+  }
+
+  static getGlobalEventStrategy() {
+    return this.getInstance().getGlobalEventStrategy()
+  }
+
   static clear() {
     delete this.instance;
   }
@@ -47,14 +55,22 @@ class KeyEventManager {
     this.mountedComponentsCount = 0;
   }
 
+  getFocusOnlyEventStrategy() {
+    return this._focusOnlyEventStrategy;
+  }
+
+  getGlobalEventStrategy() {
+    return this._globalEventStrategy;
+  }
+
   /********************************************************************************
    * Generating key maps
    ********************************************************************************/
 
   getApplicationKeyMap() {
     return Object.assign(
-      this._globalEventStrategy.getApplicationKeyMap(),
-      this._focusOnlyEventStrategy.getApplicationKeyMap()
+      this.getGlobalEventStrategy().getApplicationKeyMap(),
+      this.getFocusOnlyEventStrategy().getApplicationKeyMap()
     );
   }
   /********************************************************************************
@@ -69,7 +85,7 @@ class KeyEventManager {
    *          component and passed back when handling a key event
    */
   registerKeyMap(keyMap = {}) {
-    return this._focusOnlyEventStrategy.registerKeyMap(keyMap);
+    return this.getFocusOnlyEventStrategy().registerKeyMap(keyMap);
   }
 
   /**
@@ -78,7 +94,7 @@ class KeyEventManager {
    * @param {KeyMap} keyMap - Map of actions to key expressions
    */
   reregisterKeyMap(componentId, keyMap = {}) {
-    this._focusOnlyEventStrategy.reregisterKeyMap(componentId, keyMap);
+    this.getFocusOnlyEventStrategy().reregisterKeyMap(componentId, keyMap);
   }
 
   /**
@@ -86,7 +102,7 @@ class KeyEventManager {
    * @param {ComponentId} componentId - Id of the component that the keyMap belongs to
    */
   deregisterKeyMap(componentId) {
-    this._focusOnlyEventStrategy.deregisterKeyMap(componentId);
+    this.getFocusOnlyEventStrategy().deregisterKeyMap(componentId);
   }
 
   /**
@@ -98,7 +114,7 @@ class KeyEventManager {
   registerComponentMount(componentId, parentId) {
     this._incrementComponentCount();
 
-    return this._focusOnlyEventStrategy.registerComponentMount(componentId, parentId);
+    return this.getFocusOnlyEventStrategy().registerComponentMount(componentId, parentId);
   }
 
   registerComponentUnmount() {
@@ -125,8 +141,8 @@ class KeyEventManager {
 
   _clearKeyHistory() {
     this.logger.info('HotKeys: Window focused - clearing key history');
-    this._focusOnlyEventStrategy.resetKeyHistory({ force: true });
-    this._globalEventStrategy.resetKeyHistory({ force: true });
+    this.getFocusOnlyEventStrategy().resetKeyHistory({ force: true });
+    this.getGlobalEventStrategy().resetKeyHistory({ force: true });
   }
 
   /**
@@ -137,7 +153,7 @@ class KeyEventManager {
    *          component and passed back when handling a key event
    */
   registerGlobalKeyMap(keyMap = {}) {
-    return this._globalEventStrategy.registerKeyMap(keyMap);
+    return this.getGlobalEventStrategy().registerKeyMap(keyMap);
   }
 
   registerGlobalComponentUnmount() {
@@ -153,7 +169,7 @@ class KeyEventManager {
   registerGlobalComponentMount(componentId, parentId) {
     this._incrementComponentCount();
 
-    return this._globalEventStrategy.registerComponentMount(componentId, parentId);
+    return this.getGlobalEventStrategy().registerComponentMount(componentId, parentId);
   }
 
   /**
@@ -162,7 +178,7 @@ class KeyEventManager {
    * @param {KeyMap} keyMap - Map of actions to key expressions
    */
   reregisterGlobalKeyMap(componentId, keyMap) {
-    this._globalEventStrategy.reregisterKeyMap(componentId, keyMap);
+    this.getGlobalEventStrategy().reregisterKeyMap(componentId, keyMap);
   }
 
   /**
@@ -170,7 +186,7 @@ class KeyEventManager {
    * @param {ComponentId} componentId - Id of the component that the keyMap belongs to
    */
   deregisterGlobalKeyMap(componentId) {
-    this._globalEventStrategy.deregisterKeyMap(componentId);
+    this.getGlobalEventStrategy().deregisterKeyMap(componentId);
   }
 
   /********************************************************************************
@@ -183,7 +199,7 @@ class KeyEventManager {
    * @returns {function} Function to call to cancel listening to the next key combination
    */
   addKeyCombinationListener(callbackFunction) {
-    return this._globalEventStrategy.addKeyCombinationListener(callbackFunction);
+    return this.getGlobalEventStrategy().addKeyCombinationListener(callbackFunction);
   }
 
   /********************************************************************************
@@ -200,7 +216,7 @@ class KeyEventManager {
    * @returns {FocusTreeId} The current focus tree's ID
    */
   enableHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
-    return this._focusOnlyEventStrategy.enableHotKeys(
+    return this.getFocusOnlyEventStrategy().enableHotKeys(
       componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
@@ -222,7 +238,7 @@ class KeyEventManager {
    *        and handlers are associated and called.
    */
   updateEnabledHotKeys(focusTreeId, componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
-    return this._focusOnlyEventStrategy.updateEnabledHotKeys(
+    return this.getFocusOnlyEventStrategy().updateEnabledHotKeys(
       focusTreeId,
       componentId,
       actionNameToKeyMap,
@@ -240,7 +256,7 @@ class KeyEventManager {
    * @returns {boolean} Whether the component still has event propagation yet to handle
    */
   disableHotKeys(focusTreeId, componentId){
-    return this._focusOnlyEventStrategy.disableHotKeys(
+    return this.getFocusOnlyEventStrategy().disableHotKeys(
       focusTreeId, componentId
     )
   }
@@ -267,7 +283,7 @@ class KeyEventManager {
 
   _delegateToFocusOnlyStrategy(methodName, focusTreeId, event, componentId, options) {
     if (isFromFocusOnlyComponent(focusTreeId)) {
-      return this._focusOnlyEventStrategy[methodName](event, focusTreeId, componentId, options);
+      return this.getFocusOnlyEventStrategy()[methodName](event, focusTreeId, componentId, options);
     }
   }
 
@@ -327,7 +343,7 @@ class KeyEventManager {
    *        component and passed back when handling a key event
    */
   enableGlobalHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
-    return this._globalEventStrategy.enableHotKeys(
+    return this.getGlobalEventStrategy().enableHotKeys(
       componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
@@ -348,7 +364,7 @@ class KeyEventManager {
    * @param {Object} eventOptions - Options for how the event should be handled
    */
   updateEnabledGlobalHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
-    return this._globalEventStrategy.updateEnabledHotKeys(
+    return this.getGlobalEventStrategy().updateEnabledHotKeys(
       componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
@@ -362,7 +378,7 @@ class KeyEventManager {
    * @param {ComponentId} componentId - Index of component that is being unmounted
    */
   disableGlobalHotKeys(componentId) {
-    return this._globalEventStrategy.disableHotKeys(componentId);
+    return this.getGlobalEventStrategy().disableHotKeys(componentId);
   }
 
   /**
@@ -375,7 +391,7 @@ class KeyEventManager {
    * @param {KeyboardEvent} event - Event containing the key name and state
    */
   handleGlobalKeyDown(event) {
-    return this._globalEventStrategy.handleKeyDown(event);
+    return this.getGlobalEventStrategy().handleKeyDown(event);
   }
 
   /**
@@ -388,7 +404,7 @@ class KeyEventManager {
    * @param {KeyboardEvent} event - Event containing the key name and state
    */
   handleGlobalKeyPress(event) {
-    return this._globalEventStrategy.handleKeyPress(event);
+    return this.getGlobalEventStrategy().handleKeyPress(event);
   }
 
   /**
@@ -401,7 +417,7 @@ class KeyEventManager {
    * @param {KeyboardEvent} event - Event containing the key name and state
    */
   handleGlobalKeyUp(event) {
-    return this._globalEventStrategy.handleKeyUp(event);
+    return this.getGlobalEventStrategy().handleKeyUp(event);
   }
 
   /**
@@ -411,7 +427,7 @@ class KeyEventManager {
    * @see Configuration.ignoreEventsCondition
    */
   ignoreEvent(event) {
-    this._focusOnlyEventStrategy.getEventPropagator().ignoreEvent(event);
+    this.getFocusOnlyEventStrategy().getEventPropagator().ignoreEvent(event);
   }
 
   /**
@@ -421,7 +437,7 @@ class KeyEventManager {
    * @see Configuration.ignoreEventsCondition
    */
   observeIgnoredEvents(event) {
-    this._focusOnlyEventStrategy.getEventPropagator().observeIgnoredEvents(event);
+    this.getFocusOnlyEventStrategy().getEventPropagator().observeIgnoredEvents(event);
   }
 
   /**
@@ -433,12 +449,12 @@ class KeyEventManager {
    *        up to.
    */
   closeHangingKeyCombination(keyName, recordIndex) {
-    this._focusOnlyEventStrategy.closeHangingKeyCombination(keyName, recordIndex);
+    this.getFocusOnlyEventStrategy().closeHangingKeyCombination(keyName, recordIndex);
   }
 
   reactAppHistoryWithEvent(key, type) {
     const previousPropagation =
-      this._focusOnlyEventStrategy.eventPropagator.getPreviousPropagation();
+      this.getFocusOnlyEventStrategy().eventPropagator.getPreviousPropagation();
 
     if (previousPropagation.isForKey(key) && previousPropagation.isForEventType(type)) {
       if (previousPropagation.isHandled()) {
@@ -454,15 +470,15 @@ class KeyEventManager {
   }
 
   simulatePendingKeyPressEvents() {
-    this._focusOnlyEventStrategy.simulatePendingKeyPressEvents();
+    this.getFocusOnlyEventStrategy().simulatePendingKeyPressEvents();
   }
 
   simulatePendingKeyUpEvents() {
-    this._focusOnlyEventStrategy.simulatePendingKeyUpEvents();
+    this.getFocusOnlyEventStrategy().simulatePendingKeyUpEvents();
   }
 
   isGlobalListenersBound() {
-    return this._globalEventStrategy.listenersBound;
+    return this.getGlobalEventStrategy().listenersBound;
   }
 }
 

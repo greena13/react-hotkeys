@@ -67,7 +67,7 @@ describe('Closing hanging combinations in HotKeys Components:', function () {
         simulant.fire(this.reactDiv, 'keypress', { key: KeyCode.A });
         simulant.fire(this.reactDiv, 'keyup', { key: KeyCode.A });
 
-        expect(KeyEventManager.getInstance()._focusOnlyEventStrategy.getKeyHistory().toJSON()).to.eql([
+        expect(KeyEventManager.getFocusOnlyEventStrategy().getKeyHistory().toJSON()).to.eql([
           {
             'keys': {
               'a': [

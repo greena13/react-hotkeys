@@ -7,7 +7,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
   beforeEach(function () {
     this.keyEventManager = new KeyEventManager();
 
-    this.eventStrategy = this.keyEventManager._globalEventStrategy;
+    this.eventStrategy = this.keyEventManager.getGlobalEventStrategy();
   });
 
   context('when shift and a are pressed together', () => {

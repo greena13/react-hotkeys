@@ -10,7 +10,7 @@ describe('Handling ignored events:', function () {
   context('when the GlobalKeyEventStrategy receives', () => {
     beforeEach(function () {
       this.keyEventManager = new KeyEventManager();
-      this.eventStrategy = this.keyEventManager._globalEventStrategy;
+      this.eventStrategy = this.keyEventManager.getGlobalEventStrategy();
 
       this.handler = sinon.spy();
 

@@ -56,7 +56,7 @@ describe('HotKeys root prop:', function () {
         this.secondElement.keyPress(KeyCode.A);
         this.secondElement.keyUp(KeyCode.A);
 
-        expect(KeyEventManager.getInstance()._focusOnlyEventStrategy.getKeyHistory().toJSON()).to.eql([
+        expect(KeyEventManager.getFocusOnlyEventStrategy().getKeyHistory().toJSON()).to.eql([
           {
             'keys': {
               'a': [

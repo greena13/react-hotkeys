@@ -7,7 +7,7 @@ describe('Ignoring enabling duplicate component ids:', function () {
   context('when the FocusOnlyKeyEventStrategy registers a component ID', () => {
     beforeEach(function () {
       this.keyEventManager = new KeyEventManager();
-      this.eventStrategy = this.keyEventManager._focusOnlyEventStrategy;
+      this.eventStrategy = this.keyEventManager.getFocusOnlyEventStrategy();
 
       this.handler = sinon.spy();
 

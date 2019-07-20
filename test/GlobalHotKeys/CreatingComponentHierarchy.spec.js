@@ -35,7 +35,7 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
     });
 
     it('then builds the correct component registry', function() {
-      expect(KeyEventManager.getInstance()._globalEventStrategy._componentTree.toJSON()).to.eql({
+      expect(KeyEventManager.getGlobalEventStrategy()._componentTree.toJSON()).to.eql({
         0: {
           parentId: null,
           childIds: [1],
@@ -67,7 +67,7 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
     });
 
     it('then builds the correct component registry', function() {
-      expect(KeyEventManager.getInstance()._globalEventStrategy._componentTree.toJSON()).to.eql({
+      expect(KeyEventManager.getGlobalEventStrategy()._componentTree.toJSON()).to.eql({
         0: {
           parentId: null,
           childIds: [1],
@@ -101,7 +101,7 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
     });
 
     it('then builds the correct component registry', function() {
-      expect(KeyEventManager.getInstance()._globalEventStrategy._componentTree.toJSON()).to.eql({
+      expect(KeyEventManager.getGlobalEventStrategy()._componentTree.toJSON()).to.eql({
         0: {
           parentId: null,
           childIds: [1, 2],
@@ -144,7 +144,7 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
     });
 
     it('then builds the correct component registry', function() {
-      expect(KeyEventManager.getInstance()._globalEventStrategy._componentTree.toJSON()).to.eql({
+      expect(KeyEventManager.getGlobalEventStrategy()._componentTree.toJSON()).to.eql({
         0: {
           parentId: null,
           childIds: [1, 4, 6],
@@ -219,7 +219,7 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
       });
 
       it('then builds the correct component registry', function() {
-        expect(KeyEventManager.getInstance()._globalEventStrategy._componentTree.toJSON()).to.eql({
+        expect(KeyEventManager.getGlobalEventStrategy()._componentTree.toJSON()).to.eql({
           0: {
             parentId: null,
             childIds: [3],
@@ -256,7 +256,7 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
       });
 
       it('then builds the correct component registry', function() {
-        expect(KeyEventManager.getInstance()._globalEventStrategy._componentTree.toJSON()).to.eql({
+        expect(KeyEventManager.getGlobalEventStrategy()._componentTree.toJSON()).to.eql({
           0: {
             parentId: null,
             childIds: [1],
@@ -291,7 +291,7 @@ describe('Creating component hierarchy for GlobalHotKeys:', () => {
       });
 
       it('then builds the correct component registry', function() {
-        expect(KeyEventManager.getInstance()._globalEventStrategy._componentTree.toJSON()).to.eql({
+        expect(KeyEventManager.getGlobalEventStrategy()._componentTree.toJSON()).to.eql({
           0: {
             parentId: null,
             childIds: [1],
