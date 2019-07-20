@@ -14,7 +14,6 @@ import contains from '../../utils/collection/contains';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 import GlobalKeyEventSimulator from '../simulation/GlobalKeyEventSimulator';
 import GlobalEventListenerAdaptor from '../listening/GlobalEventListenerAdaptor';
-import normalizeEventName from '../../utils/string/normalizeEventName';
 import Registry from '../shared/Registry';
 
 /**
@@ -71,12 +70,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   enableHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
     this.eventOptions = eventOptions;
 
-    this._addComponent(
-      componentId,
-      actionNameToKeyMap,
-      actionNameToHandlersMap,
-      options
-    );
+    this._addComponent(componentId, actionNameToKeyMap, actionNameToHandlersMap, 'Mounted', options);
 
     this._updateDocumentHandlers();
 
@@ -84,17 +78,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * Reset handler resolution state
      */
     this._initHandlerResolutionState();
-
-    this.logger.debug(
-      this._logPrefix(componentId, {eventId: false}),
-      'Mounted.',
-    );
-
-    this._logComponentOptions(componentId);
-  }
-
-  _logComponentOptions(componentId) {
-    super._logComponentOptions(componentId, {eventId: false});
   }
 
   /**
@@ -111,26 +94,16 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   updateEnabledHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
     this.eventOptions = eventOptions;
 
-    this._componentList.update(
-      componentId, actionNameToKeyMap, actionNameToHandlersMap, options
-    );
-
-    this._updateLongestSequence();
-
-    /**
-     * Reset strategy state specific to the global strategy
-     */
-    this._updateDocumentHandlers();
-
-    /**
-     * Reset handler resolution state
-     */
-    this._initHandlerResolutionState();
-
     this.logger.debug(
       this._logPrefix(componentId, {eventId: false}),
       `Global component ${componentId} updated.`,
     );
+
+    this._updateComponentList(
+      componentId, actionNameToKeyMap, actionNameToHandlersMap, options
+    );
+
+    this._updateDocumentHandlers();
 
     this._logComponentOptions(componentId);
   }
@@ -323,9 +296,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      */
     if (currentCombination.isKeyIncluded(key)) {
       this._addToAndLogCurrentKeyCombination(
-        key,
-        KeyEventType.keypress,
-        stateFromEvent(event)
+        key, KeyEventType.keypress, stateFromEvent(event)
       );
     }
 
@@ -377,11 +348,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * We first decide if the keyup event should be handled (to ensure the correct
      * order of logging statements)
      */
-    const reactAppResponse = this._howReactAppRespondedTo(
-      event,
-      key,
-      KeyEventType.keyup
-    );
+    const reactAppResponse = this._howReactAppRespondedTo(event, key, KeyEventType.keyup);
 
     /**
      * We then add the keyup to our current combination - regardless of whether
@@ -390,11 +357,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * is not lost (leaving react hotkeys thinking the key is still pressed).
      */
     if (currentCombination.isKeyIncluded(key)) {
-      this._addToAndLogCurrentKeyCombination(
-        key,
-        KeyEventType.keyup,
-        stateFromEvent(event)
-      );
+      this._addToAndLogCurrentKeyCombination(key, KeyEventType.keyup, stateFromEvent(event));
     }
 
     if (reactAppResponse === EventResponse.unseen){
@@ -523,9 +486,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     );
 
     this._callClosestMatchingHandler(
-      event,
-      keyName,
-      keyEventType
+      event, keyName, keyEventType
     );
   }
 

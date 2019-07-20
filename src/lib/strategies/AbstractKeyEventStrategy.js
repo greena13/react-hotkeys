@@ -12,14 +12,11 @@ import ActionResolver from '../matching/ActionResolver';
 
 import arrayFrom from '../../utils/array/arrayFrom';
 import isObject from '../../utils/object/isObject';
-import isUndefined from '../../utils/isUndefined';
 import copyAttributes from '../../utils/object/copyAttributes';
 import hasKey from '../../utils/object/hasKey';
 
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import printComponent from '../../helpers/logging/printComponent';
-import hasKeyPressEvent from '../../helpers/resolving-handlers/hasKeyPressEvent';
-import keyupIsHiddenByCmd from '../../helpers/resolving-handlers/keyupIsHiddenByCmd';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 
@@ -315,10 +312,12 @@ class AbstractKeyEventStrategy {
    *        in the HotKeys component
    * @param {HandlersMap} actionNameToHandlersMap - Map of ActionNames to handlers
    *        defined in the HotKeys component
+   * @param {string} action - Description of the action that triggers the new component
+   *        registering a new key map.
    * @param {Object} options - Hash of options that configure how the key map is built.
    * @protected
    */
-  _addComponent(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
+  _addComponent(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, action, options) {
     this._componentList.add(componentId,
       actionNameToKeyMap,
       actionNameToHandlersMap,
@@ -326,6 +325,21 @@ class AbstractKeyEventStrategy {
     );
 
     this._updateLongestSequence();
+
+    this._logNewComponentOptions(componentId, action);
+  }
+
+  _updateComponentList(componentId, actionNameToKeyMap, actionNameToHandlersMap, options) {
+    this._componentList.update(
+      componentId, actionNameToKeyMap, actionNameToHandlersMap, options
+    );
+
+    this._updateLongestSequence();
+
+    /**
+     * Reset handler resolution state
+     */
+    this._initHandlerResolutionState();
   }
 
   /********************************************************************************
@@ -482,9 +496,15 @@ class AbstractKeyEventStrategy {
 
   }
 
-  _logComponentOptions(componentId, options) {
+  _logNewComponentOptions(componentId, action) {
+    this.logger.debug(this._logPrefix(componentId, {eventId: false}), action);
+
+    this._logComponentOptions(componentId);
+  }
+
+  _logComponentOptions(componentId, options = { }) {
     this.logger.verbose(
-      this._logPrefix(componentId, options),
+      this._logPrefix(componentId, { ...options, eventId: false }),
       'Component options:\n',
       printComponent(this._componentList.get(componentId))
     );

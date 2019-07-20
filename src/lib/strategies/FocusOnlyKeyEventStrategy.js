@@ -110,11 +110,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       return undefined;
     }
 
-    this._addComponent(componentId, actionNameToKeyMap, actionNameToHandlersMap, options);
-
-    this.logger.debug(this._logPrefix(componentId, { eventId: false }), 'Focused. \n');
-
-    this._logComponentOptions(componentId, {eventId: false});
+    this._addComponent(componentId, actionNameToKeyMap, actionNameToHandlersMap, 'Focused', options);
 
     return this.focusTreeId;
   }
@@ -137,25 +133,16 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       return;
     }
 
-    this._componentList.update(componentId,
-      actionNameToKeyMap,
-      actionNameToHandlersMap,
-      options
-    );
-
-    this._updateLongestSequence();
-
     this.logger.debug(
       this._logPrefix(componentId, {focusTreeId, eventId: false}),
       'Received new props.',
     );
 
-    /**
-     * Reset handler resolution state
-     */
-    this._initHandlerResolutionState();
+    this._updateComponentList(
+      componentId, actionNameToKeyMap, actionNameToHandlersMap, options
+    );
 
-    this._logComponentOptions(componentId, {focusTreeId, eventId: false});
+    this._logComponentOptions(componentId, { focusTreeId });
   }
 
   /**

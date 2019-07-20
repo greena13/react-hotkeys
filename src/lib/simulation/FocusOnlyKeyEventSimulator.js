@@ -68,7 +68,6 @@ class FocusOnlyKeyEventSimulator extends AbstractKeyEventSimulator{
   _shouldSimulateEventsImmediately() {
     return this._keyEventStrategy.shouldSimulateEventsImmediately();
   }
-
 }
 
 export default FocusOnlyKeyEventSimulator;
