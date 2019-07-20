@@ -569,10 +569,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       `Started a new combination with '${keyName}'.`
     );
 
-    this.logger.verbose(
-      this._logPrefix(componentId, {focusTreeId}),
-      `Key history: ${printComponent(this.getKeyHistory().toJSON())}.`
-    );
+    this._logKeyHistory(componentId, focusTreeId);
   }
 
   _addToAndLogCurrentKeyCombination(keyName, keyEventType, focusTreeId, componentId, keyEventState) {
@@ -585,6 +582,10 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       );
     }
 
+    this._logKeyHistory(componentId, focusTreeId);
+  }
+
+  _logKeyHistory(componentId, focusTreeId) {
     this.logger.verbose(
       this._logPrefix(componentId, {focusTreeId}),
       `Key history: ${printComponent(this.getKeyHistory().toJSON())}.`
