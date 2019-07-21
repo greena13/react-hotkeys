@@ -13,6 +13,7 @@ import KeyEventState from '../../const/KeyEventState';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 import EventPropagator from '../listening/EventPropagator';
 import FocusOnlyKeyEventSimulator from '../simulation/FocusOnlyKeyEventSimulator';
+import FocusTree from '../listening/FocusTree';
 
 /**
  * Defines behaviour for dealing with key maps defined in focus-only HotKey components
@@ -43,7 +44,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      * Counter to keep track of what focus tree ID should be allocated next
      * @type {FocusTreeId}
      */
-    this.focusTreeId = 0;
+    this.focusTree = new FocusTree();
 
     this._simulator = new FocusOnlyKeyEventSimulator(this);
   }
@@ -64,7 +65,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      * Increase the unique ID associated with each unique focus tree
      * @type {number}
      */
-    this.focusTreeId += 1;
+    if (this.focusTree) {
+      this.focusTree.new();
+    }
 
     this.eventPropagator = new EventPropagator(this._componentList, {
       logger: this.logger,
@@ -114,7 +117,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       componentId, actionNameToKeyMap, actionNameToHandlersMap, 'Focused', options
     );
 
-    return this.focusTreeId;
+    return this.focusTree.getId();
   }
 
   /**
@@ -131,7 +134,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *        and handlers are associated and called.
    */
   updateEnabledHotKeys(focusTreeId, componentId, keyMap = {}, handlersMap = {}, options) {
-    if (focusTreeId !== this.focusTreeId || !this._componentList.containsId(componentId)) {
+    if (this.focusTree.isOld(focusTreeId)|| !this._componentList.containsId(componentId)) {
       return;
     }
 
@@ -189,7 +192,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   handleKeyDown(event, focusTreeId, componentId, options = {}) {
     const key = getKeyName(event);
 
-    if (focusTreeId !== this.focusTreeId) {
+    if (this.focusTree.isOld(focusTreeId)) {
       this._logIgnoredKeyEvent(
         event, componentId, key, KeyEventType.keydown,
         `it had an old focus tree id: ${focusTreeId}`
@@ -307,7 +310,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       return;
     }
 
-    const shouldDiscardFocusTreeId = focusTreeId !== this.focusTreeId;
+    const shouldDiscardFocusTreeId = this.focusTree.isOld(focusTreeId);
 
     /**
      * We first decide if the keypress event should be handled (to ensure the correct
@@ -399,7 +402,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       return;
     }
 
-    const shouldDiscardFocusId = focusTreeId !== this.focusTreeId;
+    const shouldDiscardFocusId = this.focusTree.isOld(focusTreeId);
 
     /**
      * We first decide if the keyup event should be handled (to ensure the correct
@@ -618,7 +621,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     let base = 'HotKeys (';
 
     if (options.focusTreeId !== false) {
-      const focusTreeId = isUndefined(options.focusTreeId) ? this.focusTreeId : options.focusTreeId;
+      const focusTreeId = isUndefined(options.focusTreeId) ? this.focusTree.getId() : options.focusTreeId;
       base += `F${focusTreeId}${logIcons[focusTreeId % logIcons.length]}-`;
     }
 
