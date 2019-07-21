@@ -405,16 +405,14 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       `Attempting to find action matching '${combinationName}' ${eventName} . . .`
     );
 
-    this._callClosestMatchingHandler(
-      event, keyName, keyEventType
-    );
+    this._callClosestMatchingHandler(event, keyName, keyEventType);
   }
 
   _callClosestMatchingHandler(event, keyName, keyEventType) {
     const componentListIterator = this._componentList.getNewIterator();
 
     while (componentListIterator.next()) {
-      const matchFound = super._callClosestMatchingHandler(
+      const matchFound = this.getActionResolver().callClosestMatchingHandler(
         event, keyName, keyEventType,
         componentListIterator.getPosition(),
         0
@@ -428,7 +426,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     }
   }
 
-  _stopEventPropagation(event, componentId) {
+  stopEventPropagation(event, componentId) {
     this.logger.debug(
       this.logger.keyEventPrefix(componentId),
       'Stopping further event propagation.'

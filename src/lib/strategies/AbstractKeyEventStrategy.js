@@ -1,6 +1,5 @@
 import KeyEventType from '../../const/KeyEventType';
 
-import KeyCombinationSerializer from '../shared/KeyCombinationSerializer';
 import Configuration from '../config/Configuration';
 import KeyHistory from '../listening/KeyHistory';
 import KeyCombination from '../listening/KeyCombination';
@@ -8,7 +7,6 @@ import ComponentTree from '../definitions/ComponentTree';
 import ComponentOptionsList from '../definitions/ComponentOptionsList';
 import ActionResolver from '../matching/ActionResolver';
 
-import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import printComponent from '../../helpers/logging/printComponent';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 import KeyCombinationDecorator from '../listening/KeyCombinationDecorator';
@@ -92,6 +90,10 @@ class AbstractKeyEventStrategy {
 
   getKeyHistory() {
     return lazyLoadAttribute(this, '_keyHistory', () => this._newKeyHistory());
+  }
+
+  getActionResolver() {
+    return lazyLoadAttribute(this, '_actionResolver', () => new ActionResolver(this._componentList, this, this.logger));
   }
 
   /**
@@ -293,81 +295,9 @@ class AbstractKeyEventStrategy {
    * Matching and calling handlers
    ********************************************************************************/
 
-  _callClosestMatchingHandler(event, keyName, keyEventType, componentPosition, componentSearchIndex) {
-    lazyLoadAttribute(this, '_actionResolver', () => new ActionResolver(this._componentList));
-
-    while (componentSearchIndex <= componentPosition) {
-      const keyHistoryMatcher =
-        this._actionResolver.getKeyHistoryMatcher(componentSearchIndex);
-
-      this.logger.verbose(
-        this.logger.keyEventPrefix(componentSearchIndex),
-        'Internal key mapping:\n',
-        `${printComponent(keyHistoryMatcher.toJSON())}`
-      );
-
-      const sequenceMatch =
-        this._actionResolver.findMatchingKeySequenceInComponent(
-          componentSearchIndex, this.getKeyHistory(), keyName, keyEventType
-        );
-
-      if (sequenceMatch) {
-        const eventSchema = sequenceMatch.events[keyEventType];
-
-        if (Configuration.option('allowCombinationSubmatches')) {
-          const subMatchDescription = KeyCombinationSerializer.serialize(sequenceMatch.keyDictionary);
-
-          this.logger.debug(
-            this.logger.keyEventPrefix(componentSearchIndex),
-            `Found action that matches '${this._describeCurrentCombination()}' (sub-match: '${subMatchDescription}'): ${eventSchema.actionName}. Calling handler . . .`
-          );
-        } else {
-          this.logger.debug(
-            this.logger.keyEventPrefix(componentSearchIndex),
-            `Found action that matches '${this._describeCurrentCombination()}': ${eventSchema.actionName}. Calling handler . . .`
-          );
-        }
-
-        eventSchema.handler(event);
-
-        this._stopEventPropagationAfterHandlingIfEnabled(event, componentSearchIndex);
-
-        return true;
-      } else {
-        if (this._actionResolver.componentHasActionsBoundToEventType(componentSearchIndex, keyEventType)) {
-          const eventName = describeKeyEventType(keyEventType);
-
-          this.logger.debug(
-            this.logger.keyEventPrefix(componentSearchIndex),
-            `No matching actions found for '${this._describeCurrentCombination()}' ${eventName}.`
-          );
-        } else {
-          this.logger.debug(
-            this.logger.keyEventPrefix(componentSearchIndex),
-            `Doesn't define a handler for '${this._describeCurrentCombination()}' ${describeKeyEventType(keyEventType)}.`
-          );
-        }
-      }
-
-      componentSearchIndex++;
-    }
-  }
-
-  _stopEventPropagationAfterHandlingIfEnabled(event, componentId) {
-    if (Configuration.option('stopEventPropagationAfterHandling')) {
-      this._stopEventPropagation(event, componentId);
-
-      return true;
-    }
-
-    return false;
-  }
-
-  _stopEventPropagation(event, componentId) {
+  stopEventPropagation(event, componentId) {
     throw new Error('_stopEventPropagation must be overridden by a subclass');
   }
-
-
 
   _isIgnoringRepeatedEvent(event, key, eventType) {
     if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {

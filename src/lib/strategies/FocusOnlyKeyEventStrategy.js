@@ -440,7 +440,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     }
   }
 
-  _stopEventPropagation(event, componentId) {
+  stopEventPropagation(event, componentId) {
     if (this.eventPropagator.stop(event)) {
       this.logger.debug(
         this.logger.keyEventPrefix(componentId),
@@ -507,11 +507,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       const componentPosition = this._componentList.getIndexById(componentId);
 
       const handlerWasCalled =
-        this._callClosestMatchingHandler(
-          event,
-          keyName,
-          keyEventType,
-          componentPosition,
+        this.getActionResolver().callClosestMatchingHandler(
+          event, keyName, keyEventType, componentPosition,
           previousComponentPosition === -1 ? 0 : previousComponentPosition
         );
 

@@ -1,5 +1,10 @@
 import KeyHistoryMatcher from './KeyHistoryMatcher';
 import lazyLoadAttribute from '../../utils/object/lazyLoadAttribute';
+import printComponent from '../../helpers/logging/printComponent';
+import Configuration from '../config/Configuration';
+import KeyCombinationSerializer from '../shared/KeyCombinationSerializer';
+import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
+import KeyCombinationDecorator from '../listening/KeyCombinationDecorator';
 
 /**
  * Resolves the correct actions to trigger for a list of hotkeys components and a
@@ -10,9 +15,15 @@ class ActionResolver {
   /**
    * Creates a new instance of ActionResolver
    * @param {ComponentOptionsList} componentList List of components
+   * @param {AbstractKeyEventStrategy} eventStrategy
+   * @param {Logger} logger
    * @returns {ActionResolver}
    */
-  constructor(componentList) {
+  constructor(componentList, eventStrategy, logger) {
+    this.logger = logger;
+
+    this._eventStrategy = eventStrategy;
+
     /**
      * List of mappings from key sequences to handlers that is constructed on-the-fly
      * as key events propagate up the render tree
@@ -109,6 +120,72 @@ class ActionResolver {
       keyEventType
     )
   }
+
+  callClosestMatchingHandler(event, keyName, keyEventType, componentPosition, componentSearchIndex) {
+    while (componentSearchIndex <= componentPosition) {
+      const keyHistoryMatcher =
+        this.getKeyHistoryMatcher(componentSearchIndex);
+
+      this.logger.verbose(
+        this.logger.keyEventPrefix(componentSearchIndex),
+        'Internal key mapping:\n',
+        `${printComponent(keyHistoryMatcher.toJSON())}`
+      );
+
+      const keyHistory = this._eventStrategy.getKeyHistory();
+      const currentCombination = keyHistory.getCurrentCombination();
+
+      const keyCombinationDecorator = new KeyCombinationDecorator(currentCombination);
+
+      const sequenceMatch =
+        this.findMatchingKeySequenceInComponent(
+          componentSearchIndex, keyHistory, keyName, keyEventType
+        );
+
+      if (sequenceMatch) {
+        const eventSchema = sequenceMatch.events[keyEventType];
+
+        if (Configuration.option('allowCombinationSubmatches')) {
+          const subMatchDescription = KeyCombinationSerializer.serialize(sequenceMatch.keyDictionary);
+
+          this.logger.debug(
+            this.logger.keyEventPrefix(componentSearchIndex),
+            `Found action that matches '${keyCombinationDecorator.describe()}' (sub-match: '${subMatchDescription}'): ${eventSchema.actionName}. Calling handler . . .`
+          );
+        } else {
+          this.logger.debug(
+            this.logger.keyEventPrefix(componentSearchIndex),
+            `Found action that matches '${keyCombinationDecorator.describe()}': ${eventSchema.actionName}. Calling handler . . .`
+          );
+        }
+
+        eventSchema.handler(event);
+
+        if (Configuration.option('stopEventPropagationAfterHandling')) {
+          this._eventStrategy.stopEventPropagation(event, componentSearchIndex);
+        }
+
+        return true;
+      } else {
+        if (this.componentHasActionsBoundToEventType(componentSearchIndex, keyEventType)) {
+          const eventName = describeKeyEventType(keyEventType);
+
+          this.logger.debug(
+            this.logger.keyEventPrefix(componentSearchIndex),
+            `No matching actions found for '${keyCombinationDecorator.describe()}' ${eventName}.`
+          );
+        } else {
+          this.logger.debug(
+            this.logger.keyEventPrefix(componentSearchIndex),
+            `Doesn't define a handler for '${keyCombinationDecorator.describe()}' ${describeKeyEventType(keyEventType)}.`
+          );
+        }
+      }
+
+      componentSearchIndex++;
+    }
+  }
+
 
   /********************************************************************************
    * Private methods
