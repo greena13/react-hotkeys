@@ -12,18 +12,18 @@ class EventStrategyLogger extends Logger {
     this.keyEventPrefix(componentId, { ...options, eventId: false});
   }
 
-  logComponentOptions(componentId, options = { }) {
+  logComponentOptions(componentId, componentOptions) {
     this.verbose(
-      this.nonKeyEventPrefix(componentId, options),
+      this.nonKeyEventPrefix(componentId),
       'New component options:\n',
-      printComponent(this._eventStrategy.getComponent(componentId))
+      printComponent(componentOptions)
     );
   }
 
-  logKeyHistory() {
+  logKeyHistory(keyHistory) {
     this.verbose(
       this.keyEventPrefix(),
-      `Key history: ${printComponent(this._eventStrategy.getKeyHistory().toJSON())}.`
+      `Key history: ${printComponent(keyHistory.toJSON())}.`
     );
   }
 }

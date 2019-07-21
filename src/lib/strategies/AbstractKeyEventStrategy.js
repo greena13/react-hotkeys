@@ -220,7 +220,7 @@ class AbstractKeyEventStrategy {
     this._recalculate();
 
     this.logger.debug(this.logger.nonKeyEventPrefix(componentId), action);
-    this.logger.logComponentOptions(componentId);
+    this.logger.logComponentOptions(componentId, this._componentList.get(componentId));
   }
 
   _updateComponent(componentId, actionNameToKeyMap, actionNameToHandlersMap, options) {
@@ -230,7 +230,7 @@ class AbstractKeyEventStrategy {
 
     this._recalculate();
 
-    this.logger.logComponentOptions(componentId);
+    this.logger.logComponentOptions(componentId, this._componentList.get(componentId));
   }
 
   /********************************************************************************
@@ -241,16 +241,11 @@ class AbstractKeyEventStrategy {
     return this.getKeyHistory().getCurrentCombination();
   }
 
-  getComponent(componentId) {
-    return this._componentList.get(componentId);
-  }
-
   _describeCurrentCombination() {
     const keyCombinationDecorator = new KeyCombinationDecorator(this.getCurrentCombination());
-
     return keyCombinationDecorator.describe();
   }
-  
+
   _recordKeyDown(event, key) {
     const keyEventState = stateFromEvent(event);
 
@@ -271,7 +266,7 @@ class AbstractKeyEventStrategy {
       `Started a new combination with '${keyName}'.`
     );
 
-    this.logger.logKeyHistory();
+    this.logger.logKeyHistory(this.getKeyHistory());
   }
 
   _addToAndLogCurrentKeyCombination(keyName, keyEventType, keyEventState) {
@@ -284,7 +279,7 @@ class AbstractKeyEventStrategy {
       );
     }
 
-    this.logger.logKeyHistory();
+    this.logger.logKeyHistory(this.getKeyHistory());
   }
 
   /********************************************************************************
