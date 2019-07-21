@@ -70,14 +70,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   enableHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
     this.eventOptions = eventOptions;
 
-    this._addComponent(componentId, actionNameToKeyMap, actionNameToHandlersMap, 'Mounted', options);
-
-    this._updateDocumentHandlers();
-
-    /**
-     * Reset handler resolution state
-     */
-    this._initHandlerResolutionState();
+    this._addComponent(
+      componentId, actionNameToKeyMap, actionNameToHandlersMap, 'Mounted', options
+    );
   }
 
   /**
@@ -85,25 +80,16 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * either the keyMap or handlers prop value
    * @param {ComponentId} componentId - The component index of the component to
    *        update
-   * @param {KeyMap} actionNameToKeyMap - Map of actions to key expressions
-   * @param {HandlersMap} actionNameToHandlersMap - Map of actions to handler functions
+   * @param {KeyMap} keyMap - Map of actions to key expressions
+   * @param {HandlersMap} handlersMap - Map of actions to handler functions
    * @param {Object} options Hash of options that configure how the actions
    *        and handlers are associated and called.
    * @param {Object} eventOptions - Options for how the event should be handled
    */
-  updateEnabledHotKeys(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options, eventOptions) {
+  updateEnabledHotKeys(componentId, keyMap = {}, handlersMap = {}, options, eventOptions) {
     this.eventOptions = eventOptions;
 
-    this.logger.debug(
-      this._nonKeyEventPrefix(componentId),
-      `Global component ${componentId} updated.`,
-    );
-
-    this._updateComponentList(
-      componentId, actionNameToKeyMap, actionNameToHandlersMap, options
-    );
-
-    this._updateDocumentHandlers();
+    this._updateComponent(componentId, keyMap, handlersMap, options);
 
     this._logComponentOptions(componentId);
   }
@@ -119,18 +105,18 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      */
     this._componentList.remove(componentId);
 
-    this._updateLongestSequence();
-    this._updateDocumentHandlers();
-
-    /**
-     * Reset handler resolution state
-     */
-    this._initHandlerResolutionState();
-
     this.logger.debug(
       this._nonKeyEventPrefix(componentId),
       `Unmounted global component ${componentId}`
     );
+
+    this._recalculate();
+  }
+
+  _recalculate() {
+    super._recalculate();
+
+    this._updateDocumentHandlers();
   }
 
   _updateDocumentHandlers(){

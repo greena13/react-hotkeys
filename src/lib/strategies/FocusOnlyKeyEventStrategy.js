@@ -107,10 +107,12 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
        *
        * @see https://github.com/greena13/react-hotkeys/issues/173
        */
-      return undefined;
+      return;
     }
 
-    this._addComponent(componentId, actionNameToKeyMap, actionNameToHandlersMap, 'Focused', options);
+    this._addComponent(
+      componentId, actionNameToKeyMap, actionNameToHandlersMap, 'Focused', options
+    );
 
     return this.focusTreeId;
   }
@@ -122,25 +124,18 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *        Used to identify (and ignore) stale updates.
    * @param {ComponentId} componentId - The component index of the component to
    *        update
-   * @param {KeyMap} actionNameToKeyMap - Map of key sequences to action names
-   * @param {HandlersMap} actionNameToHandlersMap - Map of action names to handler
+   * @param {KeyMap} keyMap - Map of key sequences to action names
+   * @param {HandlersMap} handlersMap - Map of action names to handler
    *        functions
    * @param {Object} options Hash of options that configure how the actions
    *        and handlers are associated and called.
    */
-  updateEnabledHotKeys(focusTreeId, componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, options) {
+  updateEnabledHotKeys(focusTreeId, componentId, keyMap = {}, handlersMap = {}, options) {
     if (focusTreeId !== this.focusTreeId || !this._componentList.containsId(componentId)) {
       return;
     }
 
-    this.logger.debug(
-      this._nonKeyEventPrefix(componentId, {focusTreeId}),
-      'Received new props.',
-    );
-
-    this._updateComponentList(
-      componentId, actionNameToKeyMap, actionNameToHandlersMap, options
-    );
+    this._updateComponent(componentId, keyMap, handlersMap, options);
 
     this._logComponentOptions(componentId, { focusTreeId });
   }
@@ -154,9 +149,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * @returns {boolean} Whether the component still has event propagation yet to handle
    */
   disableHotKeys(focusTreeId, componentId){
-    if (!this.resetOnNextFocus) {
-      this.resetOnNextFocus = true;
-    }
+    this.resetOnNextFocus = true;
 
     const outstandingEventPropagation = this.eventPropagator.isPendingPropagation();
 

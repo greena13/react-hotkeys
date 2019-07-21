@@ -319,27 +319,20 @@ class AbstractKeyEventStrategy {
    */
   _addComponent(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, action, options) {
     this._componentList.add(componentId,
-      actionNameToKeyMap,
-      actionNameToHandlersMap,
-      options
+      actionNameToKeyMap, actionNameToHandlersMap, options
     );
 
-    this._updateLongestSequence();
+    this._recalculate();
 
     this._logNewComponentOptions(componentId, action);
   }
 
-  _updateComponentList(componentId, actionNameToKeyMap, actionNameToHandlersMap, options) {
+  _updateComponent(componentId, actionNameToKeyMap, actionNameToHandlersMap, options) {
     this._componentList.update(
       componentId, actionNameToKeyMap, actionNameToHandlersMap, options
     );
 
-    this._updateLongestSequence();
-
-    /**
-     * Reset handler resolution state
-     */
-    this._initHandlerResolutionState();
+    this._recalculate();
   }
 
   /********************************************************************************
@@ -362,6 +355,12 @@ class AbstractKeyEventStrategy {
   _updateLongestSequence() {
     this.getKeyHistory().setMaxLength(this._componentList.getLongestSequence());
   }
+
+  _recalculate() {
+    this._initHandlerResolutionState();
+    this._updateLongestSequence();
+  }
+
   /********************************************************************************
    * Matching and calling handlers
    ********************************************************************************/
@@ -509,7 +508,7 @@ class AbstractKeyEventStrategy {
   _logComponentOptions(componentId, options = { }) {
     this.logger.verbose(
       this._nonKeyEventPrefix(componentId, options),
-      'Component options:\n',
+      'New component options:\n',
       printComponent(this._componentList.get(componentId))
     );
   }
