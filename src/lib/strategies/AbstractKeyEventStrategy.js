@@ -85,7 +85,7 @@ class AbstractKeyEventStrategy {
   _recalculate() {
     this._actionResolver = null;
 
-    this._updateLongestSequence();
+    this.getKeyHistory().setMaxLength(this._componentList.getLongestSequence());
   }
 
   getKeyHistory() {
@@ -250,11 +250,7 @@ class AbstractKeyEventStrategy {
 
     return keyCombinationDecorator.describe();
   }
-
-  _updateLongestSequence() {
-    this.getKeyHistory().setMaxLength(this._componentList.getLongestSequence());
-  }
-
+  
   _recordKeyDown(event, key) {
     const keyEventState = stateFromEvent(event);
 
