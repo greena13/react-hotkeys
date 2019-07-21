@@ -278,9 +278,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const currentCombination = this.getCurrentCombination();
 
     if (currentCombination.isKeyPressSimulated(key)) {
-      this.logger.logAlreadySimulatedEvent(componentId, event, key, KeyEventType.keypress);
-
-      this.eventPropagator.ignoreEvent(event);
+      this._ignoreAlreadySimulatedEvent(componentId, event, key, KeyEventType.keypress);
 
       return false;
     }
@@ -344,9 +342,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const currentCombination = this.getCurrentCombination();
 
     if (currentCombination.isKeyUpSimulated(key)) {
-      this.logger.logAlreadySimulatedEvent(componentId, event, key, KeyEventType.keyup);
-
-      this.eventPropagator.ignoreEvent(event);
+      this._ignoreAlreadySimulatedEvent(componentId, event, key, KeyEventType.keyup);
 
       return true;
     }
@@ -399,6 +395,12 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     this.eventPropagator.finishPropagationStep();
 
     return shouldDiscardFocusId;
+  }
+
+  _ignoreAlreadySimulatedEvent(componentId, event, key, eventType) {
+    this.logger.logAlreadySimulatedEvent(componentId, event, key, eventType);
+
+    this.eventPropagator.ignoreEvent(event);
   }
 
   /**
