@@ -1,7 +1,6 @@
 import removeAtIndex from '../../utils/array/removeAtIndex';
 import KeyEventStateArrayManager from '../shared/KeyEventStateArrayManager';
 import Configuration from '../config/Configuration';
-import KeyCombinationSerializer from '../shared/KeyCombinationSerializer';
 import isObject from '../../utils/object/isObject';
 import hasKey from '../../utils/object/hasKey';
 import arrayFrom from '../../utils/array/arrayFrom';
@@ -10,6 +9,7 @@ import KeyEventType from '../../const/KeyEventType';
 import KeySequenceParser from '../shared/KeySequenceParser';
 import KeyEventState from '../../const/KeyEventState';
 import ComponentOptionsListIterator from './ComponentOptionsListIterator';
+import HardSequencer from './HardSequencer';
 
 /**
  * @typedef {Object} ComponentOptions a hotkeys component's options in a normalized
@@ -310,20 +310,23 @@ class ComponentOptionsList {
    * @private
    */
   _build(componentId, actionNameToKeyMap, actionNameToHandlersMap, options){
-    const { keyMap: hardSequenceKeyMap, handlers: includingHardSequenceHandlers } =
-      this._applyHardSequences(actionNameToKeyMap, actionNameToHandlersMap);
+    const { keyMap: hardSequenceKeyMap, handlers: includingHardSequenceHandlers } = (() => {
+      if (Configuration.option('enableHardSequences')) {
+        return HardSequencer.apply(actionNameToKeyMap, actionNameToHandlersMap);
+      } else {
+        return {
+          keyMap: actionNameToKeyMap,
+          handlers: actionNameToHandlersMap
+        };
+      }
+    })();
 
     const actions = this._buildActionDictionary(
-      { ...actionNameToKeyMap, ...hardSequenceKeyMap },
-      options,
-      componentId
+      { ...actionNameToKeyMap, ...hardSequenceKeyMap }, options, componentId
     );
 
     return {
-      actions,
-      handlers: includingHardSequenceHandlers,
-      componentId,
-      options
+      actions, handlers: includingHardSequenceHandlers, componentId, options
     };
   }
 
@@ -345,38 +348,6 @@ class ComponentOptionsList {
         this._longestSequenceComponentId = componentId;
         this._longestSequence = longestSequence;
       }
-    }
-  }
-
-  /**
-   * Applies hard sequences (handlers attached to actions with names that are valid
-   * KeySequenceStrings) that implicitly define a corresponding action name.
-   * @param {KeyMap} actionNameToKeyMap - KeyMap specified by HotKeys component
-   * @param {HandlersMap} actionMap - HandlersMap specified by HotKeys component
-   * @returns {{keyMap: {}, handlers: {}}} Object containing keymap and handlers map
-   *        with the hard sequence actions applied
-   * @private
-   */
-  _applyHardSequences(actionNameToKeyMap, actionMap) {
-    if (Configuration.option('enableHardSequences')) {
-      return Object.keys(actionMap).reduce((memo, actionNameOrHardSequence) => {
-        const actionNameIsInKeyMap = !!actionNameToKeyMap[actionNameOrHardSequence];
-
-        if (!actionNameIsInKeyMap &&
-            KeyCombinationSerializer.isValidKeySerialization(actionNameOrHardSequence)) {
-
-          memo.keyMap[actionNameOrHardSequence] = actionNameOrHardSequence;
-        }
-
-        memo.handlers[actionNameOrHardSequence] = actionMap[actionNameOrHardSequence];
-
-        return memo;
-      }, {keyMap: {}, handlers: {}});
-    } else {
-      return {
-        keyMap: actionNameToKeyMap,
-        handlers: actionMap
-      };
     }
   }
 
