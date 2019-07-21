@@ -343,7 +343,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      */
     this._simulateKeyUpEventsHiddenByCmd(event, key);
 
-    if (this.listeners.get('keyCombination') && this._allKeysAreReleased()) {
+    if (this.listeners.get('keyCombination') && this.getCurrentCombination().hasEnded()) {
       this.listeners.get('keyCombination')({
         keys: currentCombination.getKeyDictionary(),
         id: currentCombination.describe()

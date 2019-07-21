@@ -9,17 +9,10 @@ import ComponentTree from '../definitions/ComponentTree';
 import ComponentOptionsList from '../definitions/ComponentOptionsList';
 import ActionResolver from '../matching/ActionResolver';
 
-import arrayFrom from '../../utils/array/arrayFrom';
-import isObject from '../../utils/object/isObject';
-import copyAttributes from '../../utils/object/copyAttributes';
-import hasKey from '../../utils/object/hasKey';
-
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import printComponent from '../../helpers/logging/printComponent';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
-
-const SEQUENCE_ATTRIBUTES = ['sequence', 'action'];
-const KEYMAP_ATTRIBUTES = ['name', 'description', 'group'];
+import ApplicationKeyMapBuilder from '../definitions/ApplicationKeyMapBuilder';
 
 /**
  * Defines common behaviour for key event strategies
@@ -148,90 +141,7 @@ class AbstractKeyEventStrategy {
    * @returns {ApplicationKeyMap} The application's key map
    */
   getApplicationKeyMap() {
-    if (!this._componentTree.hasRoot()) {
-      return {};
-    }
-
-    return this._buildApplicationKeyMap([this._componentTree.getRootId()], {});
-  }
-
-  _buildApplicationKeyMap(componentIds, keyMapSummary) {
-    componentIds.forEach((componentId) => {
-      const { childIds, keyMap } = this._componentTree.get(componentId);
-
-      if (keyMap) {
-        Object.keys(keyMap).forEach((actionName) => {
-          const keyMapConfig = keyMap[actionName];
-
-          keyMapSummary[actionName] = {};
-
-          if (isObject(keyMapConfig)) {
-            if (hasKey(keyMapConfig, 'sequences')) {
-              /**
-               * Support syntax:
-               *  {
-               *    sequences: [ {sequence: 'a+b', action: 'keyup' }],
-               *    name: 'My keymap',
-               *    description: 'Key to press for something special',
-               *    group: 'Vanity'
-               *  }
-               */
-              copyAttributes(
-                keyMapConfig,
-                keyMapSummary[actionName],
-                KEYMAP_ATTRIBUTES
-              );
-
-              keyMapSummary[actionName].sequences =
-                this._createSequenceFromConfig(keyMapConfig.sequences);
-            } else {
-              /**
-               * Support syntax:
-               * {
-               *   sequence: 'a+b', action: 'keyup',
-               *   name: 'My keymap',
-               *   description: 'Key to press for something special',
-               *   group: 'Vanity'
-               * }
-               */
-              copyAttributes(keyMapConfig, keyMapSummary[actionName], KEYMAP_ATTRIBUTES);
-
-              keyMapSummary[actionName].sequences = [
-                copyAttributes(keyMapConfig, {}, SEQUENCE_ATTRIBUTES)
-              ]
-            }
-          } else {
-            keyMapSummary[actionName].sequences =
-              this._createSequenceFromConfig(keyMapConfig)
-          }
-        });
-      }
-
-      this._buildApplicationKeyMap(childIds, keyMapSummary);
-    });
-
-    return keyMapSummary;
-  }
-
-  _createSequenceFromConfig(keyMapConfig) {
-    return arrayFrom(keyMapConfig).map((sequenceOrKeyMapOptions) => {
-      if (isObject(sequenceOrKeyMapOptions)) {
-        /**
-         * Support syntax:
-         * [
-         *   { sequence: 'a+b', action: 'keyup' },
-         *   { sequence: 'c' }
-         * ]
-         */
-        return copyAttributes(sequenceOrKeyMapOptions, {}, SEQUENCE_ATTRIBUTES);
-      } else {
-        /**
-         * Support syntax:
-         * 'a+b'
-         */
-        return { sequence: sequenceOrKeyMapOptions };
-      }
-    })
+    return new ApplicationKeyMapBuilder(this._componentTree).build();
   }
 
   /********************************************************************************
@@ -343,15 +253,6 @@ class AbstractKeyEventStrategy {
   /********************************************************************************
    * Recording key events
    ********************************************************************************/
-
-  /**
-   * Whether there are any keys in the current combination still being pressed
-   * @returns {boolean} True if all keys in the current combination are released
-   * @protected
-   */
-  _allKeysAreReleased() {
-    return this.getCurrentCombination().hasEnded();
-  }
 
   getCurrentCombination() {
     return this.getKeyHistory().getCurrentCombination();
