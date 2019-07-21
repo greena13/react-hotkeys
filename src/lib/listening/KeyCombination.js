@@ -8,6 +8,8 @@ import isEmpty from '../../utils/collection/isEmpty';
 import KeyEventState from '../../const/KeyEventState';
 import KeyCombinationIterator from './KeyCombinationIterator';
 import lazyLoadAttribute from '../../utils/object/lazyLoadAttribute';
+import ModifierFlagsDictionary from '../../const/ModifierFlagsDictionary';
+import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 
 /**
  * Record of one or more keys pressed together, in a combination
@@ -227,6 +229,47 @@ class KeyCombination {
    */
   isKeyUpSimulated(keyName) {
     return this._isKeyEventSimulated(keyName, KeyEventType.keyup);
+  }
+
+  /**
+   * Synchronises the key combination history to match the modifier key flag attributes
+   * on new key events
+   * @param {KeyboardEvent} event - Event to check the modifier flags for
+   * @param {string} key - Name of key that events relates to
+   * @param {KeyEventType} keyEventType - The record index of the current
+   *        key event type
+   */
+  resolveModifierFlagDiscrepancies(event, key, keyEventType) {
+    /**
+     * If a new key event is received with modifier key flags that contradict the
+     * key combination history we are maintaining, we can surmise that some keyup events
+     * for those modifier keys have been lost (possibly because the window lost focus).
+     * We update the key combination to match the modifier flags
+     */
+    Object.keys(ModifierFlagsDictionary).forEach((modifierKey) => {
+      /**
+       * When a modifier key is being released (keyup), it sets its own modifier flag
+       * to false. (e.g. On the keyup event for Command, the metaKey attribute is false).
+       * If this the case, we want to handle it using the main algorithm and skip the
+       * reconciliation algorithm.
+       */
+      if (key === modifierKey && keyEventType === KeyEventType.keyup) {
+        return;
+      }
+
+      const modifierStillPressed = this.isKeyStillPressed(modifierKey);
+
+      ModifierFlagsDictionary[modifierKey].forEach((attributeName) => {
+        if (event[attributeName] === false && modifierStillPressed) {
+
+          this.setKeyState(
+            modifierKey,
+            KeyEventType.keyup,
+            stateFromEvent(event)
+          );
+        }
+      });
+    })
   }
 
   /********************************************************************************

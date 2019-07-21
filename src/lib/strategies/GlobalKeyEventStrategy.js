@@ -162,7 +162,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       return;
     }
 
-    this._checkForModifierFlagDiscrepancies(event, key, KeyEventType.keydown);
+    this.getCurrentCombination().resolveModifierFlagDiscrepancies(event, key, KeyEventType.keydown);
 
     const reactAppResponse =
       this._howReactAppRespondedTo(event, key, KeyEventType.keydown);

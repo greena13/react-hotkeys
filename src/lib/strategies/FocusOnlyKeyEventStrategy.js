@@ -235,7 +235,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         `New ${describeKeyEvent(event, key, keyEventType)} event.`
       );
 
-      this._checkForModifierFlagDiscrepancies(event, key, keyEventType);
+      this.getCurrentCombination().resolveModifierFlagDiscrepancies(event, key, keyEventType);
 
     } else if (this.eventPropagator.isIgnoringEvent()) {
       return this._eventIsToBeIgnored(event, componentId, key, keyEventType);
