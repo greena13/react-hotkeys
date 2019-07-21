@@ -94,7 +94,7 @@ class KeyCombination {
    *          else false.
    */
   any() {
-    return Object.keys(this._getKeyStates()).length > 0;
+    return this._getKeys().length > 0;
   }
 
   /**
@@ -174,7 +174,7 @@ class KeyCombination {
    * @returns {void}
    */
   forEachKey(handler){
-    return Object.keys(this._keys).forEach(handler);
+    return this._getKeys().forEach(handler);
   }
 
   /**
@@ -189,7 +189,7 @@ class KeyCombination {
    * @returns {boolean} Whether at least one key satisfies the evaluator
    */
   some(evaluator) {
-    return Object.keys(this._keys).some(evaluator);
+    return this._getKeys().some(evaluator);
   }
 
   /**
@@ -197,7 +197,7 @@ class KeyCombination {
    * @returns {Object.<ReactKeyName, boolean>}
    */
   getKeyDictionary(){
-    return dictionaryFrom(Object.keys(this._getKeyStates()), true);
+    return dictionaryFrom(this._getKeys(), true);
   }
 
   /**
@@ -208,7 +208,7 @@ class KeyCombination {
    *        keys with keyup events omitted
    */
   keysStillPressedDict() {
-    return Object.keys(this._keys).reduce((memo, keyName) => {
+    return this._getKeys().reduce((memo, keyName) => {
       if (this.isKeyStillPressed(keyName)) {
         memo[keyName] = this._getKeyState(keyName);
       }
@@ -331,6 +331,10 @@ class KeyCombination {
 
   _getKeyStates() {
     return this._keys;
+  }
+
+  _getKeys() {
+    return Object.keys(this._getKeyStates());
   }
 
   _getKeyState(keyName) {
