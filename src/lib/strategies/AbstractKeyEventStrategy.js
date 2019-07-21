@@ -486,6 +486,16 @@ class AbstractKeyEventStrategy {
      })
   }
 
+  _isIgnoringRepeatedEvent(event, key, eventType) {
+    if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
+      this._logIgnoredKeyEvent(event, key, eventType, 'it was a repeated event');
+
+      return true;
+    }
+
+    return false;
+  }
+
   /**
    * Returns a prefix for all log entries related to the current event strategy
    * @protected

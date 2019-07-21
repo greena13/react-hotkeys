@@ -167,13 +167,10 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     this._checkForModifierFlagDiscrepancies(event, key, KeyEventType.keydown);
 
-    const reactAppResponse = this._howReactAppRespondedTo(
-      event, key, KeyEventType.keydown
-    );
+    const reactAppResponse =
+      this._howReactAppRespondedTo(event, key, KeyEventType.keydown);
 
-    if (reactAppResponse === EventResponse.unseen &&
-          this.eventOptions.ignoreEventsCondition(event)) {
-
+    if (reactAppResponse === EventResponse.unseen && this.eventOptions.ignoreEventsCondition(event)) {
       this._logEventRejectedByFilter(event, key, KeyEventType.keydown);
 
       return;
@@ -199,16 +196,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
   _logEventRejectedByFilter(event, key, eventType) {
     this._logIgnoredKeyEvent(event, key, eventType, 'ignoreEventsFilter rejected it');
-  }
-
-  _isIgnoringRepeatedEvent(event, key, eventType) {
-    if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
-      this._logIgnoredKeyEvent(event, key, eventType, 'it was a repeated event');
-
-      return true;
-    }
-
-    return false;
   }
 
   _howReactAppRespondedTo(event, key, keyEventType) {

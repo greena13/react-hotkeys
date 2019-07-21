@@ -200,23 +200,16 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       return true;
     }
 
-    const started = this.eventPropagator.startNewPropagationStep(
-      componentId,
-      event,
-      key,
-      KeyEventType.keydown
-    );
-
-    if (!started) {
-      return;
+    if (this._isIgnoringRepeatedEvent(event, key, KeyEventType.keydown)) {
+      return false;
     }
 
-    const responseAction = this._howToHandleKeyEvent(event,
-      focusTreeId,
-      componentId,
-      key,
-      options,
-      KeyEventType.keydown
+    if (!this.eventPropagator.startNewPropagationStep(componentId, event, key, KeyEventType.keydown)) {
+      return false;
+    }
+
+    const responseAction = this._howToHandleKeyEvent(
+      event, focusTreeId, componentId, key, options, KeyEventType.keydown
     );
 
     if (responseAction === EventResponse.handled) {
@@ -226,18 +219,11 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
       if (currentCombination.isKeyIncluded(key) || currentCombination.isEnding()) {
         this._startAndLogNewKeyCombination(
-          key,
-          focusTreeId,
-          componentId,
-          keyEventState
+          key, focusTreeId, componentId, keyEventState
         );
       } else {
         this._addToAndLogCurrentKeyCombination(
-          key,
-          KeyEventType.keydown,
-          focusTreeId,
-          componentId,
-          keyEventState
+          key, KeyEventType.keydown, focusTreeId, componentId, keyEventState
         );
       }
 
@@ -297,6 +283,10 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    */
   handleKeyPress(event, focusTreeId, componentId, options) {
     const key = getKeyName(event);
+
+    if (this._isIgnoringRepeatedEvent(event, key, KeyEventType.keypress)) {
+      return;
+    }
 
     const currentCombination = this.getCurrentCombination();
 
