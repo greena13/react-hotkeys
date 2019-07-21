@@ -1,4 +1,5 @@
 import KeyHistoryMatcher from './KeyHistoryMatcher';
+import lazyLoadAttribute from '../../utils/object/lazyLoadAttribute';
 
 /**
  * Resolves the correct actions to trigger for a list of hotkeys components and a
@@ -205,9 +206,7 @@ class ActionResolver {
   }
 
   _addHandler(actionName) {
-    if (!this._handlersDictionary[actionName]) {
-      this._handlersDictionary[actionName] = [];
-    }
+    lazyLoadAttribute(this._handlersDictionary, actionName, []);
 
     this._handlersDictionary[actionName].push(this._componentListIterator.getPosition());
   }
@@ -218,9 +217,7 @@ class ActionResolver {
      * that we do not override handlers for an action closest to the event target
      * with handlers further up the tree
      */
-    if (!this._keySequencesDictionary[keySequence]) {
-      this._keySequencesDictionary[keySequence] = [];
-    }
+    lazyLoadAttribute(this._keySequencesDictionary, keySequence, []);
 
     this._keySequencesDictionary[keySequence].push(value);
   }

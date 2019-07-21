@@ -13,6 +13,7 @@ import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import printComponent from '../../helpers/logging/printComponent';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 import KeyCombinationDecorator from '../listening/KeyCombinationDecorator';
+import lazyLoadAttribute from '../../utils/object/lazyLoadAttribute';
 
 /**
  * Defines common behaviour for key event strategies
@@ -91,11 +92,7 @@ class AbstractKeyEventStrategy {
   }
 
   getKeyHistory() {
-    if (!this._keyHistory) {
-      this._keyHistory = this._newKeyHistory();
-    }
-
-    return this._keyHistory;
+    return lazyLoadAttribute(this, '_keyHistory', () => this._newKeyHistory());
   }
 
   /**
@@ -298,9 +295,7 @@ class AbstractKeyEventStrategy {
    ********************************************************************************/
 
   _callClosestMatchingHandler(event, keyName, keyEventType, componentPosition, componentSearchIndex) {
-    if (!this._actionResolver) {
-      this._actionResolver = new ActionResolver(this._componentList);
-    }
+    lazyLoadAttribute(this, '_actionResolver', () => new ActionResolver(this._componentList));
 
     while (componentSearchIndex <= componentPosition) {
       const keyHistoryMatcher =

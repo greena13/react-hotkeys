@@ -4,6 +4,7 @@ import GlobalKeyEventStrategy from './strategies/GlobalKeyEventStrategy';
 import Configuration from './config/Configuration';
 import EventResponse from '../const/EventResponse';
 import ApplicationKeyMapBuilder from './definitions/ApplicationKeyMapBuilder';
+import lazyLoadAttribute from '../utils/object/lazyLoadAttribute';
 
 /**
  * Provides a registry for keyboard sequences and events, and the handlers that should
@@ -20,11 +21,7 @@ class KeyEventManager {
    * @returns {KeyEventManager} The key event manager instance
    */
   static getInstance(configuration = {}) {
-    if (!this.instance) {
-      this.instance = new KeyEventManager(configuration);
-    }
-
-    return this.instance;
+    return lazyLoadAttribute(this, 'instance', () => new KeyEventManager(configuration));
   }
 
   static getFocusOnlyEventStrategy() {

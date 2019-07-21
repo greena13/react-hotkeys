@@ -1,4 +1,5 @@
 import simulant from 'simulant';
+import lazyLoadAttribute from '../../src/utils/object/lazyLoadAttribute';
 
 let focused = null;
 
@@ -56,10 +57,6 @@ export default class FocusableElement {
   }
 
   getInstance() {
-    if (!this.instance) {
-      this.instance = this.element.getDOMNode();
-    }
-
-    return this.instance;
+    lazyLoadAttribute(this, 'instance', () => this.element.getDOOMNode());
   }
 };

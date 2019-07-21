@@ -3,6 +3,7 @@ import isUndefined from '../utils/isUndefined';
 import KeyEventManager from './KeyEventManager';
 import isEmpty from '../utils/collection/isEmpty';
 import KeyCombinationSerializer from './shared/KeyCombinationSerializer';
+import lazyLoadAttribute from '../utils/object/lazyLoadAttribute';
 
 function wrapPropInFunction(prop, func){
   if (typeof prop === 'function') {
@@ -172,9 +173,7 @@ class ComponentManager {
   }
 
   _focusTreeIdsPush(componentId) {
-    if (!this._focusTreeIds) {
-      this._focusTreeIds = [];
-    }
+    lazyLoadAttribute(this, '_focusTreeIds', []);
 
     this._focusTreeIds.push(componentId);
   }

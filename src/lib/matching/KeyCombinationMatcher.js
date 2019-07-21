@@ -1,6 +1,7 @@
 import Configuration from '../config/Configuration';
 import size from '../../utils/collection/size';
 import keyupIsHiddenByCmd from '../../helpers/resolving-handlers/keyupIsHiddenByCmd';
+import lazyLoadAttribute from '../../utils/object/lazyLoadAttribute';
 
 /**
  * Object containing all information necessary to match a handler to a history of
@@ -76,9 +77,7 @@ class KeyCombinationMatcher {
    *          KeyCombination, ReactKeyName and KeyEventType
    */
   findMatch(keyCombination, keyName, keyEventType) {
-    if (!this._order) {
-      this._setOrder();
-    }
+    lazyLoadAttribute(this, 'order', () => this._setOrder());
 
     for(let combinationId of this._order) {
       const actionOptions = this._actionConfigs[combinationId];

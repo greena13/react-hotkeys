@@ -7,6 +7,7 @@ import KeyEventStateArrayManager from '../shared/KeyEventStateArrayManager';
 import isEmpty from '../../utils/collection/isEmpty';
 import KeyEventState from '../../const/KeyEventState';
 import KeyCombinationIterator from './KeyCombinationIterator';
+import lazyLoadAttribute from '../../utils/object/lazyLoadAttribute';
 
 /**
  * Record of one or more keys pressed together, in a combination
@@ -33,11 +34,7 @@ class KeyCombination {
    * @returns {KeySequence[]} List of combination ids
    */
   getIds() {
-    if (!this._ids) {
-      this._ids = KeyCombinationSerializer.serialize(this._keys);
-    }
-
-    return this._ids;
+    return lazyLoadAttribute(this, '_ids', () => KeyCombinationSerializer.serialize(this._keys));
   }
 
   /**
@@ -46,11 +43,7 @@ class KeyCombination {
    * @returns {Object.<ReactKeyName, ReactKeyName[]>}
    */
   getKeyAliases() {
-    if (!this._keyAliases) {
-      this._keyAliases = buildKeyAliases(this._keys);
-    }
-
-    return this._keyAliases;
+    return lazyLoadAttribute(this, '_keyAliases', () => buildKeyAliases(this._keys));
   }
 
   /**

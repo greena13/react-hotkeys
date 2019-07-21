@@ -2,6 +2,7 @@ import KeyEventCounter from './KeyEventCounter';
 import Configuration from '../config/Configuration';
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 import KeyEventType from '../../const/KeyEventType';
+import lazyLoadAttribute from '../../utils/object/lazyLoadAttribute';
 
 /**
  * Handles the propagation of keyboard events up through the React component tree,
@@ -187,11 +188,7 @@ class EventPropagator {
    * @returns {EventPropagator} The propagator for the previous event propagation
    */
   getPreviousPropagation() {
-    if (!this._previousPropagation) {
-      this._previousPropagation = this._clone({copyState: false});
-    }
-
-    return this._previousPropagation;
+    return lazyLoadAttribute(this, '_previousPropagation', () => this._clone({copyState: false}));
   }
 
   /**

@@ -2,6 +2,7 @@ import KeyEventStateArrayManager from '../shared/KeyEventStateArrayManager';
 import indexFromEnd from '../../utils/array/indexFromEnd';
 import KeyCombinationMatcher from './KeyCombinationMatcher';
 import KeyEventState from '../../const/KeyEventState';
+import lazyLoadAttribute from '../../utils/object/lazyLoadAttribute';
 
 /**
  * Matches a KeyHistory to a list of pre-registered ActionConfiguration and
@@ -115,11 +116,7 @@ class KeyHistoryMatcher {
    ********************************************************************************/
 
   _getOrCreateCombinationMatcher(prefix) {
-    if (!this._combinationMatchers[prefix]) {
-      this._combinationMatchers[prefix] = new KeyCombinationMatcher();
-    }
-
-    return this._combinationMatchers[prefix];
+    return lazyLoadAttribute(this._combinationMatchers, prefix, () => new KeyCombinationMatcher());
   }
 
   _findCombinationMatcher(keyHistory) {
