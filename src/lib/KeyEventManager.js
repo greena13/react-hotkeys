@@ -83,7 +83,7 @@ class KeyEventManager {
       return { ...memo, ...keyMap };
     }, {});
   }
-  
+
   /********************************************************************************
    * Registering key maps
    ********************************************************************************/
@@ -124,6 +124,7 @@ class KeyEventManager {
 
   _clearKeyHistory() {
     this.logger.info('HotKeys: Window focused - clearing key history');
+
     this.getFocusOnlyEventStrategy().resetKeyHistory({ force: true });
     this.getGlobalEventStrategy().resetKeyHistory({ force: true });
   }

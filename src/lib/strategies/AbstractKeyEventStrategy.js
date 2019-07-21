@@ -12,7 +12,6 @@ import ActionResolver from '../matching/ActionResolver';
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import printComponent from '../../helpers/logging/printComponent';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
-import ApplicationKeyMapBuilder from '../definitions/ApplicationKeyMapBuilder';
 import KeyCombinationDecorator from '../listening/KeyCombinationDecorator';
 
 /**
@@ -82,28 +81,17 @@ class AbstractKeyEventStrategy {
   _reset() {
     this._componentList = new ComponentOptionsList();
 
-    this._initHandlerResolutionState();
-  }
-
-  /**
-   * Resets the state of the values used to resolve which handler function should be
-   * called when key events match a registered key map
-   * @protected
-   */
-  _initHandlerResolutionState() {
     this._actionResolver = null;
   }
 
-  _newKeyHistory() {
-    return new KeyHistory({
-      maxLength: this._componentList.getLongestSequence()
-    });
+  _recalculate() {
+    this._actionResolver = null;
+
+    this._updateLongestSequence();
   }
 
   getKeyHistory() {
-    if (this._keyHistory) {
-      return this._keyHistory;
-    } else {
+    if (!this._keyHistory) {
       this._keyHistory = this._newKeyHistory();
     }
 
@@ -129,6 +117,12 @@ class AbstractKeyEventStrategy {
     } else {
       this._keyHistory = this._newKeyHistory();
     }
+  }
+
+  _newKeyHistory() {
+    return new KeyHistory({
+      maxLength: this._componentList.getLongestSequence()
+    });
   }
 
   getComponentTree() {
@@ -249,6 +243,16 @@ class AbstractKeyEventStrategy {
     return this.getKeyHistory().getCurrentCombination();
   }
 
+  getComponent(componentId) {
+    return this._componentList.get(componentId);
+  }
+
+  _describeCurrentCombination() {
+    const keyCombinationDecorator = new KeyCombinationDecorator(this.getCurrentCombination());
+
+    return keyCombinationDecorator.describe();
+  }
+
   _updateLongestSequence() {
     this.getKeyHistory().setMaxLength(this._componentList.getLongestSequence());
   }
@@ -265,25 +269,6 @@ class AbstractKeyEventStrategy {
     }
   }
 
-  _addToAndLogCurrentKeyCombination(keyName, keyEventType, keyEventState) {
-    this.getKeyHistory().addKeyToCurrentCombination(keyName, keyEventType, keyEventState);
-
-    if (keyEventType === KeyEventType.keydown) {
-      this.logger.verbose(
-        this.logger.keyEventPrefix(),
-        `Added '${keyName}' to current combination: '${this._describeCurrentCombination()}'.`
-      );
-    }
-
-    this.logger.logKeyHistory();
-  }
-
-  _describeCurrentCombination() {
-    const keyCombinationDecorator = new KeyCombinationDecorator(this.getCurrentCombination());
-
-    return keyCombinationDecorator.describe();
-  }
-
   _startAndLogNewKeyCombination(keyName, keyEventState) {
     this.getKeyHistory().startNewKeyCombination(keyName, keyEventState);
 
@@ -295,9 +280,17 @@ class AbstractKeyEventStrategy {
     this.logger.logKeyHistory();
   }
 
-  _recalculate() {
-    this._initHandlerResolutionState();
-    this._updateLongestSequence();
+  _addToAndLogCurrentKeyCombination(keyName, keyEventType, keyEventState) {
+    this.getKeyHistory().addKeyToCurrentCombination(keyName, keyEventType, keyEventState);
+
+    if (keyEventType === KeyEventType.keydown) {
+      this.logger.verbose(
+        this.logger.keyEventPrefix(),
+        `Added '${keyName}' to current combination: '${this._describeCurrentCombination()}'.`
+      );
+    }
+
+    this.logger.logKeyHistory();
   }
 
   /********************************************************************************
@@ -431,10 +424,6 @@ class AbstractKeyEventStrategy {
     }
 
     return false;
-  }
-
-  getComponent(componentId) {
-    return this._componentList.get(componentId);
   }
 }
 
