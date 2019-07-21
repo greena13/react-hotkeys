@@ -295,10 +295,6 @@ class AbstractKeyEventStrategy {
    * Matching and calling handlers
    ********************************************************************************/
 
-  stopEventPropagation(event, componentId) {
-    throw new Error('_stopEventPropagation must be overridden by a subclass');
-  }
-
   _isIgnoringRepeatedEvent(event, key, eventType) {
     if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
       this.logger.logIgnoredKeyEvent(event, key, eventType, 'it was a repeated event');
