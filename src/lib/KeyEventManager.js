@@ -3,6 +3,7 @@ import FocusOnlyKeyEventStrategy from './strategies/FocusOnlyKeyEventStrategy';
 import GlobalKeyEventStrategy from './strategies/GlobalKeyEventStrategy';
 import Configuration from './config/Configuration';
 import EventResponse from '../const/EventResponse';
+import ApplicationKeyMapBuilder from './definitions/ApplicationKeyMapBuilder';
 
 /**
  * Provides a registry for keyboard sequences and events, and the handlers that should
@@ -68,12 +69,21 @@ class KeyEventManager {
    * Generating key maps
    ********************************************************************************/
 
+  /**
+   * Returns a mapping of all of the application's actions and the key sequences
+   * needed to trigger them.
+   *
+   * @returns {ApplicationKeyMap} The application's key map
+   */
   getApplicationKeyMap() {
-    return Object.assign(
-      this.getGlobalEventStrategy().getApplicationKeyMap(),
-      this.getFocusOnlyEventStrategy().getApplicationKeyMap()
-    );
+    return [this.getGlobalEventStrategy(), this.getFocusOnlyEventStrategy()].reduce((memo, strategy) => {
+      const builder = new ApplicationKeyMapBuilder(strategy.getComponentTree());
+      const keyMap = builder.build();
+
+      return { ...memo, ...keyMap };
+    }, {});
   }
+  
   /********************************************************************************
    * Registering key maps
    ********************************************************************************/

@@ -85,6 +85,15 @@ class AbstractKeyEventStrategy {
     this._initHandlerResolutionState();
   }
 
+  /**
+   * Resets the state of the values used to resolve which handler function should be
+   * called when key events match a registered key map
+   * @protected
+   */
+  _initHandlerResolutionState() {
+    this._actionResolver = null;
+  }
+
   _newKeyHistory() {
     return new KeyHistory({
       maxLength: this._componentList.getLongestSequence()
@@ -99,15 +108,6 @@ class AbstractKeyEventStrategy {
     }
 
     return this._keyHistory;
-  }
-
-  /**
-   * Resets the state of the values used to resolve which handler function should be
-   * called when key events match a registered key map
-   * @protected
-   */
-  _initHandlerResolutionState() {
-    this._actionResolver = null;
   }
 
   /**
@@ -131,18 +131,8 @@ class AbstractKeyEventStrategy {
     }
   }
 
-  /********************************************************************************
-   * Generating key maps
-   ********************************************************************************/
-
-  /**
-   * Returns a mapping of all of the application's actions and the key sequences
-   * needed to trigger them.
-   *
-   * @returns {ApplicationKeyMap} The application's key map
-   */
-  getApplicationKeyMap() {
-    return new ApplicationKeyMapBuilder(this._componentTree).build();
+  getComponentTree() {
+    return this._componentTree;
   }
 
   /********************************************************************************
@@ -333,8 +323,6 @@ class AbstractKeyEventStrategy {
         this._actionResolver.findMatchingKeySequenceInComponent(
           componentSearchIndex, this.getKeyHistory(), keyName, keyEventType
         );
-
-      const currentCombination = this.getCurrentCombination();
 
       if (sequenceMatch) {
         const eventSchema = sequenceMatch.events[keyEventType];
