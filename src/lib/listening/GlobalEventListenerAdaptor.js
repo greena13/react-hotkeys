@@ -3,7 +3,7 @@ import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import normalizeEventName from '../../utils/string/normalizeEventName';
 
 class GlobalEventListenerAdaptor {
-  constructor(strategy, {logger, logPrefix}) {
+  constructor(strategy, {logger}) {
     /**
      * Whether the global key event handlers have been bound to document yet or not
      * @type {boolean}
@@ -11,7 +11,6 @@ class GlobalEventListenerAdaptor {
     this._listenersBound = false;
 
     this.logger = logger;
-    this._logPrefix = logPrefix;
 
     this._eventStrategy = strategy;
   }
@@ -48,7 +47,7 @@ class GlobalEventListenerAdaptor {
 
   _logHandlerStateChange(action, eventName, componentId) {
     this.logger.debug(
-      this._logPrefix(componentId, {eventId: false}),
+      this.logger.nonKeyEventPrefix(componentId, {eventId: false}),
       `${action} handler handleGlobal${normalizeEventName(eventName)}() to document.on${eventName}()`
     );
   }

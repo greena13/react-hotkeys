@@ -13,21 +13,25 @@ class EventPropagator {
    * Create a new instance of EventPropagator
    * @param {ComponentOptionsList} componentList List of options of the components
    *        the event is propagating through
-   * @param {Logger} logger The logger instance to use
-   * @param {function} logPrefix Function that returns the appropriate log prefix for
+
    *        each log entry
    * @returns {EventPropagator}
    */
-  constructor(componentList, { logger, logPrefix}) {
+  constructor(componentList) {
     this._componentList = componentList;
 
     this._previousPropagation = null;
 
-    this.logger = logger;
-
-    this._logPrefix = logPrefix;
-
     this._reset();
+  }
+
+  /**
+   * Sets the Logger instance
+   * @param {Logger} logger The logger instance to use
+   * @return {void}
+   */
+  setLogger(logger) {
+    this.logger = logger;
   }
 
   _reset() {
@@ -148,7 +152,7 @@ class EventPropagator {
 
     if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
       this.logger.debug(
-        this._logPrefix(componentId),
+        this.logger.keyEventPrefix(componentId),
         `Ignored repeated ${describeKeyEvent(event, key, KeyEventType.keydown)} event.`
       );
 
@@ -224,7 +228,7 @@ class EventPropagator {
 
     if (this.isIgnoringEvent() && Configuration.option('stopEventPropagationAfterIgnoring')) {
       this.logger.debug(
-        this._logPrefix(this._componentId),
+        this.logger.keyEventPrefix(this._componentId),
         'Stopping further event propagation.'
       );
 
@@ -320,10 +324,8 @@ class EventPropagator {
    ********************************************************************************/
 
   _clone({ copyState = true } = {}) {
-    const cloned = new EventPropagator(this._componentList, {
-      logger: this.logger,
-      logPrefix: this._logPrefix
-    });
+    const cloned = new EventPropagator(this._componentList);
+    cloned.setLogger(this.logger);
 
     if (copyState) {
       Object.assign(cloned, this);

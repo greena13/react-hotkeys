@@ -2,8 +2,6 @@ import KeyEventType from '../../const/KeyEventType';
 import AbstractKeyEventStrategy from './AbstractKeyEventStrategy';
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import KeyEventCounter from '../listening/KeyEventCounter';
-import Logger from '../logging/Logger';
-import isUndefined from '../../utils/isUndefined';
 import getKeyName from '../../helpers/resolving-handlers/getKeyName';
 import Configuration from '../config/Configuration';
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
@@ -14,6 +12,7 @@ import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 import GlobalKeyEventSimulator from '../simulation/GlobalKeyEventSimulator';
 import GlobalEventListenerAdaptor from '../listening/GlobalEventListenerAdaptor';
 import Registry from '../shared/Registry';
+import GlobalLogger from '../logging/GlobalLogger';
 
 /**
  * Defines behaviour for dealing with key maps defined in global HotKey components
@@ -24,11 +23,13 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * Init & Reset
    ********************************************************************************/
 
-  constructor(configuration = {}, keyEventManager) {
+  constructor(options = {}, keyEventManager) {
     /**
      * Set state that gets cleared every time a component gets mounted or unmounted
      */
-    super(configuration, keyEventManager);
+    super(options, keyEventManager);
+
+    this.logger = new GlobalLogger(options.logLevel || 'warn', this);
 
     /**
      * Set state that doesn't get cleared each time a new new component is mounted
@@ -48,9 +49,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     this._simulator = new GlobalKeyEventSimulator(this);
 
-    this._listenerAdaptor = new GlobalEventListenerAdaptor(this,
-      { logger: this.logger, logPrefix: this._keyEventPrefix }
-    );
+    this._listenerAdaptor = new GlobalEventListenerAdaptor(this, { logger: this.logger });
   }
 
   /********************************************************************************
@@ -103,7 +102,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this._componentList.remove(componentId);
 
     this.logger.debug(
-      this._nonKeyEventPrefix(componentId),
+      this.logger.nonKeyEventPrefix(componentId),
       `Unmounted global component ${componentId}`
     );
 
@@ -168,7 +167,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this._howReactAppRespondedTo(event, key, KeyEventType.keydown);
 
     if (reactAppResponse === EventResponse.unseen && this.eventOptions.ignoreEventsCondition(event)) {
-      this._logEventRejectedByFilter(event, key, KeyEventType.keydown);
+      this.logger.logEventRejectedByFilter(event, key, KeyEventType.keydown);
 
       return;
     }
@@ -183,28 +182,24 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this._simulator.handleKeyPressSimulation({event, key});
   }
 
-  _logEventRejectedByFilter(event, key, eventType) {
-    this._logIgnoredKeyEvent(event, key, eventType, 'ignoreEventsFilter rejected it');
-  }
-
   _howReactAppRespondedTo(event, key, keyEventType) {
     const reactAppHistoryWithEvent =
       this.keyEventManager.reactAppHistoryWithEvent(key, keyEventType);
 
     switch(reactAppHistoryWithEvent) {
       case EventResponse.handled:
-        this._logIgnoredKeyEvent(event, key, keyEventType, 'React app has already handled it');
+        this.logger.logIgnoredKeyEvent(event, key, keyEventType, 'React app has already handled it');
 
         break;
 
       case EventResponse.ignored:
-        this._logIgnoredKeyEvent(event, key, keyEventType, 'React app has declared it should be ignored');
+        this.logger.logIgnoredKeyEvent(event, key, keyEventType, 'React app has declared it should be ignored');
 
         break;
 
       case EventResponse.seen:
         this.logger.debug(
-          this._keyEventPrefix(),
+          this.logger.keyEventPrefix(),
           `Received ${describeKeyEvent(event, key, keyEventType)} event (that has already passed through React app).`
         );
 
@@ -214,7 +209,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         KeyEventCounter.incrementId();
 
         this.logger.debug(
-          this._keyEventPrefix(),
+          this.logger.keyEventPrefix(),
           `New ${describeKeyEvent(event, key, keyEventType)} event (that has NOT passed through React app).`
         );
     }
@@ -239,9 +234,10 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     }
 
     const currentCombination = this.getCurrentCombination();
-    const eventIsSimulated = currentCombination.isKeyPressSimulated(key);
 
-    if (this._logEventAlreadySimulated(eventIsSimulated, key, event, KeyEventType.keypress)){
+    if (currentCombination.isKeyPressSimulated(key)){
+      this.logger.logEventAlreadySimulated(event, key, KeyEventType.keypress);
+
       return;
     }
 
@@ -272,7 +268,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this.keyEventManager.closeHangingKeyCombination(key, KeyEventType.keypress);
 
       if (this.eventOptions.ignoreEventsCondition(event)) {
-        this._logEventRejectedByFilter(event, key, KeyEventType.keypress);
+        this.logger.logEventRejectedByFilter(event, key, KeyEventType.keypress);
 
         return;
       }
@@ -300,9 +296,10 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     const key = getKeyName(event);
 
     const currentCombination = this.getCurrentCombination();
-    const eventIsSimulated = currentCombination.isKeyUpSimulated(key);
 
-    if (this._logEventAlreadySimulated(eventIsSimulated, key, event, KeyEventType.keyup)){
+    if (currentCombination.isKeyUpSimulated(key)){
+      this.logger.logEventAlreadySimulated(event, key, KeyEventType.keyup);
+
       return;
     }
 
@@ -331,7 +328,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this.keyEventManager.closeHangingKeyCombination(key, KeyEventType.keyup);
 
       if(this.eventOptions.ignoreEventsCondition(event)) {
-        this._logIgnoredKeyEvent(event, key, KeyEventType.keyup, 'ignoreEventsFilter rejected it');
+        this.logger.logIgnoredKeyEvent(event, key, KeyEventType.keyup, 'ignoreEventsFilter rejected it');
       } else {
         this._callHandlerIfNeeded(reactAppResponse, event, key, KeyEventType.keyup);
       }
@@ -352,19 +349,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         id: currentCombination.describe()
       });
     }
-  }
-
-  _logEventAlreadySimulated(eventIsSimulated, key, event, eventType) {
-    if (eventIsSimulated) {
-      this._logIgnoredKeyEvent(
-        event, key, eventType,
-        'it was not expected, and has already been simulated'
-      );
-
-      return true;
-    }
-
-    return false;
   }
 
   _simulateKeyUpEventsHiddenByCmd(event, key) {
@@ -398,7 +382,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
        * (keydown, keypress, keyup) then skip trying to find a matching handler
        * for the current key combination
        */
-      this._logIgnoredEvent(
+      this.logger.logIgnoredEvent(
         `'${combinationName}' ${eventName}`,
         `it doesn't have any ${eventName} handlers`
       );
@@ -412,7 +396,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * key combination
      */
     this.logger.verbose(
-      this._keyEventPrefix(),
+      this.logger.keyEventPrefix(),
       `Attempting to find action matching '${combinationName}' ${eventName} . . .`
     );
 
@@ -432,7 +416,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       );
 
       if (matchFound) {
-        this.logger.debug(this._keyEventPrefix(), `Searching no further, as handler has been found (and called).`);
+        this.logger.debug(this.logger.keyEventPrefix(), `Searching no further, as handler has been found (and called).`);
 
         return;
       }
@@ -441,7 +425,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
   _stopEventPropagation(event, componentId) {
     this.logger.debug(
-      this._keyEventPrefix(componentId),
+      this.logger.keyEventPrefix(componentId),
       'Stopping further event propagation.'
     );
 
@@ -475,29 +459,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this._updateDocumentHandlers();
 
     return cancel;
-  }
-
-  /********************************************************************************
-   * Logging
-   ********************************************************************************/
-
-  _keyEventPrefix(componentId, options = {}) {
-    const eventIcons = Logger.eventIcons;
-    const componentIcons = Logger.componentIcons;
-
-    let base = 'HotKeys (GLOBAL';
-
-    if (options.eventId !== false) {
-      const eventId = isUndefined(options.eventId) ? KeyEventCounter.getId() : options.eventId;
-
-      base = `${base}-E${eventId}${eventIcons[eventId % eventIcons.length]}`
-    }
-
-    if (isUndefined(componentId)) {
-      return `${base}):`
-    } else {
-      return `${base}-C${componentId}${componentIcons[componentId % componentIcons.length]}):`;
-    }
   }
 }
 

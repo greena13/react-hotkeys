@@ -1,9 +1,6 @@
 import AbstractKeyEventStrategy from './AbstractKeyEventStrategy';
 import KeyEventType from '../../const/KeyEventType';
-import KeyEventCounter from '../listening/KeyEventCounter';
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
-import Logger from '../logging/Logger';
-import isUndefined from '../../utils/isUndefined';
 import getKeyName from '../../helpers/resolving-handlers/getKeyName';
 import isCmdKey from '../../helpers/parsing-key-maps/isCmdKey';
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
@@ -13,6 +10,7 @@ import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 import EventPropagator from '../listening/EventPropagator';
 import FocusOnlyKeyEventSimulator from '../simulation/FocusOnlyKeyEventSimulator';
 import FocusTree from '../listening/FocusTree';
+import FocusOnlyLogger from '../logging/FocusOnlyLogger';
 
 /**
  * Defines behaviour for dealing with key maps defined in focus-only HotKey components
@@ -23,11 +21,14 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * Init & Reset
    ********************************************************************************/
 
-  constructor(configuration = {}, keyEventManager) {
+  constructor(options = {}, keyEventManager) {
     /******************************************************************************
      * Set state that DOES get cleared on each new focus tree
      ******************************************************************************/
-    super(configuration, keyEventManager);
+    super(options, keyEventManager);
+
+    this.logger = new FocusOnlyLogger(options.logLevel || 'warn', this);
+    this.eventPropagator.setLogger(this.logger);
 
     /*****************************************************************************
      * State that doesn't get cleared on each new focus tree
@@ -68,10 +69,8 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this.focusTree.new();
     }
 
-    this.eventPropagator = new EventPropagator(this._componentList, {
-      logger: this.logger,
-      logPrefix: this._keyEventPrefix.bind(this)
-    });
+    this.eventPropagator = new EventPropagator(this._componentList);
+    this.eventPropagator.setLogger(this.logger);
   }
 
   /********************************************************************************
@@ -154,7 +153,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const outstandingEventPropagation = this.eventPropagator.isPendingPropagation();
 
     this.logger.debug(
-      `${this._nonKeyEventPrefix(componentId, {focusTreeId})}`,
+      `${this.logger.nonKeyEventPrefix(componentId, {focusTreeId})}`,
       `Lost focus${outstandingEventPropagation ? ' (Key event has yet to propagate through it)' : '' }.`
     );
 
@@ -190,7 +189,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const key = getKeyName(event);
 
     if (this.focusTree.isOld(focusTreeId)) {
-      this._logIgnoredKeyEvent(
+      this.logger.logIgnoredKeyEvent(
         event, componentId, key, KeyEventType.keydown,
         `it had an old focus tree id: ${focusTreeId}`
       );
@@ -232,7 +231,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       }
 
       this.logger.debug(
-        this._keyEventPrefix(componentId),
+        this.logger.keyEventPrefix(componentId),
         `New ${describeKeyEvent(event, key, keyEventType)} event.`
       );
 
@@ -246,7 +245,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _eventIsToBeIgnored(event, componentId, key, keyEventType){
-    this._logIgnoredKeyEvent(event, componentId, key, keyEventType, `ignoreEventsFilter rejected it`);
+    this.logger.logIgnoredKeyEvent(event, componentId, key, keyEventType, `ignoreEventsFilter rejected it`);
 
     return EventResponse.ignored;
   }
@@ -279,7 +278,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const currentCombination = this.getCurrentCombination();
 
     if (currentCombination.isKeyPressSimulated(key)) {
-      this._logAndIgnoreUnexpectSimulatedEvent(componentId, event, key, KeyEventType.keypress);
+      this.logger.logAlreadySimulatedEvent(componentId, event, key, KeyEventType.keypress);
+
+      this.eventPropagator.ignoreEvent(event);
 
       return false;
     }
@@ -319,15 +320,6 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     return shouldDiscardFocusTreeId;
   }
 
-  _logAndIgnoreUnexpectSimulatedEvent(componentId, event, key, eventType) {
-    this._logIgnoredKeyEvent(
-      componentId, event, key, eventType,
-      'it was not expected, and has already been simulated'
-    );
-
-    this.eventPropagator.ignoreEvent(event);
-  }
-
   /**
    * Records a keyup keyboard event and matches it against the list of pre-registered
    * event handlers, calling the first matching handler with the highest priority if
@@ -352,7 +344,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const currentCombination = this.getCurrentCombination();
 
     if (currentCombination.isKeyUpSimulated(key)) {
-      this._logAndIgnoreUnexpectSimulatedEvent(componentId, event, key, KeyEventType.keyup);
+      this.logger.logAlreadySimulatedEvent(componentId, event, key, KeyEventType.keyup);
+
+      this.eventPropagator.ignoreEvent(event);
 
       return true;
     }
@@ -445,7 +439,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   _stopEventPropagation(event, componentId) {
     if (this.eventPropagator.stop(event)) {
       this.logger.debug(
-        this._keyEventPrefix(componentId),
+        this.logger.keyEventPrefix(componentId),
         'Stopping further event propagation.'
       );
     }
@@ -491,16 +485,16 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const combinationName = this.getCurrentCombination().describe();
 
     if (!this._componentList.anyActionsForEventType(keyEventType)) {
-      this._logIgnoredEvent(componentId, `'${combinationName}' ${eventName}`, `it doesn't have any ${eventName} handlers`);
+      this.logger.logIgnoredEvent(componentId, `'${combinationName}' ${eventName}`, `it doesn't have any ${eventName} handlers`);
 
       return;
     }
 
     if (this.eventPropagator.isHandled()) {
-      this._logIgnoredEvent(componentId, `'${combinationName}' ${eventName}`, 'it has already been handled');
+      this.logger.logIgnoredEvent(componentId, `'${combinationName}' ${eventName}`, 'it has already been handled');
     } else {
       this.logger.verbose(
-        this._keyEventPrefix(componentId, {focusTreeId}),
+        this.logger.keyEventPrefix(componentId, {focusTreeId}),
         `Attempting to find action matching '${combinationName}' ${eventName} . . .`
       );
 
@@ -527,44 +521,12 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * Logging
    ********************************************************************************/
 
-  _logIgnoredKeyEvent(event, componentId, key, eventType, reason) {
-    this._logIgnoredEvent(componentId, describeKeyEvent(event, key, eventType), reason);
+  getFocusTreeId() {
+    return this.focusTree.getId();
   }
 
-  _logIgnoredEvent(componentId, eventDescription, reason) {
-    this.logger.debug(
-      this._keyEventPrefix(componentId),
-      `Ignored ${eventDescription} because ${reason}.`
-    );
-  }
-
-  _keyEventPrefix(componentId, options = {}) {
-    const logIcons = Logger.logIcons;
-    const eventIcons = Logger.eventIcons;
-    const componentIcons = Logger.componentIcons;
-
-    let base = 'HotKeys (';
-
-    if (options.focusTreeId !== false) {
-      const focusTreeId = isUndefined(options.focusTreeId) ? this.focusTree.getId() : options.focusTreeId;
-      base += `F${focusTreeId}${logIcons[focusTreeId % logIcons.length]}-`;
-    }
-
-    if (options.eventId !== false) {
-      const eventId = isUndefined(options.eventId) ? KeyEventCounter.getId() : options.eventId;
-
-      base += `E${eventId}${eventIcons[eventId % eventIcons.length]}-`;
-    }
-
-    base += `C${componentId}${componentIcons[componentId % componentIcons.length]}`;
-
-    const position = this._componentList.getIndexById(componentId);
-
-    if (!isUndefined(position)) {
-      base += `-P${position}${componentIcons[position % componentIcons.length]}:`
-    }
-
-    return `${base})`;
+  getComponentPosition(componentId) {
+    return this._componentList.getIndexById(componentId)
   }
 }
 

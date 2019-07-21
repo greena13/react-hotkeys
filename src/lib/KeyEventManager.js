@@ -43,13 +43,15 @@ class KeyEventManager {
    * will be used with a render tree.
    */
   constructor(configuration = {}) {
-    this.logger = configuration.logger || new Logger(Configuration.option('logLevel'));
+    const logLevel = Configuration.option('logLevel');
+
+    this.logger = configuration.logger || new Logger(logLevel);
 
     this._focusOnlyEventStrategy =
-      new FocusOnlyKeyEventStrategy({ configuration, logger: this.logger }, this);
+      new FocusOnlyKeyEventStrategy({ configuration, logLevel }, this);
 
     this._globalEventStrategy =
-      new GlobalKeyEventStrategy({ configuration, logger: this.logger }, this);
+      new GlobalKeyEventStrategy({ configuration, logLevel }, this);
 
     this.mountedComponentsCount = 0;
   }

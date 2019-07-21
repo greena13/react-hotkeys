@@ -1,7 +1,6 @@
 import KeyEventType from '../../const/KeyEventType';
 import ModifierFlagsDictionary from '../../const/ModifierFlagsDictionary';
 
-import Logger from '../logging/Logger';
 import KeyCombinationSerializer from '../shared/KeyCombinationSerializer';
 import Configuration from '../config/Configuration';
 import KeyHistory from '../listening/KeyHistory';
@@ -18,7 +17,6 @@ import hasKey from '../../utils/object/hasKey';
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import printComponent from '../../helpers/logging/printComponent';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
-import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
 
 const SEQUENCE_ATTRIBUTES = ['sequence', 'action'];
 const KEYMAP_ATTRIBUTES = ['name', 'description', 'group'];
@@ -37,12 +35,11 @@ class AbstractKeyEventStrategy {
    * Creates a new instance of an event strategy (this class is an abstract one and
    * not intended to be instantiated directly).
    * @param {Object} options Options for how event strategy should behave
-   * @param {Logger} options.logger The Logger to use to report event strategy actions
+   * @param {string} options.logLevel The level of severity to log at
    * @param {KeyEventManager} keyEventManager KeyEventManager used for passing
    *        messages between key event strategies
    */
   constructor(options = {}, keyEventManager) {
-    this.logger = options.logger || new Logger('warn');
     /**
      * @typedef {number} ComponentId Unique index associated with every HotKeys component
      * as it becomes active.
@@ -58,6 +55,11 @@ class AbstractKeyEventStrategy {
      * mounted, and de-allocated when it unmounts. The component index counter is never reset
      * back to 0 and just keeps incrementing as new components are mounted.
      */
+
+    /**
+     * Should be overridden by children to set a Logger instance
+     */
+    this.logger = null;
 
     /**
      * Counter to maintain what the next component index should be
@@ -249,7 +251,7 @@ class AbstractKeyEventStrategy {
     this._componentTree.add(this.componentId, keyMap);
 
     this.logger.verbose(
-      this._keyEventPrefix(this.componentId),
+      this.logger.keyEventPrefix(this.componentId),
       'Registered component:\n',
       `${printComponent(this._componentTree.get(this.componentId))}`
     );
@@ -276,7 +278,7 @@ class AbstractKeyEventStrategy {
     this._componentTree.setParent(componentId, parentId);
 
     this.logger.verbose(
-      this._keyEventPrefix(componentId),
+      this.logger.keyEventPrefix(componentId),
       'Registered component mount:\n',
       `${printComponent(this._componentTree.get(componentId))}`
     );
@@ -291,7 +293,7 @@ class AbstractKeyEventStrategy {
     this._componentTree.remove(componentId);
 
     this.logger.verbose(
-      this._keyEventPrefix(componentId),
+      this.logger.keyEventPrefix(componentId),
       'De-registered component. Remaining component Registry:\n',
       `${printComponent(this._componentTree.toJSON())}`
     );
@@ -324,7 +326,8 @@ class AbstractKeyEventStrategy {
 
     this._recalculate();
 
-    this._logNewComponentOptions(componentId, action);
+    this.logger.debug(this.logger.nonKeyEventPrefix(componentId), action);
+    this.logger.logComponentOptions(componentId);
   }
 
   _updateComponent(componentId, actionNameToKeyMap, actionNameToHandlersMap, options) {
@@ -334,7 +337,7 @@ class AbstractKeyEventStrategy {
 
     this._recalculate();
 
-    this._logComponentOptions(componentId);
+    this.logger.logComponentOptions(componentId);
   }
 
   /********************************************************************************
@@ -375,35 +378,28 @@ class AbstractKeyEventStrategy {
 
     if (keyEventType === KeyEventType.keydown) {
       this.logger.verbose(
-        this._keyEventPrefix(),
+        this.logger.keyEventPrefix(),
         `Added '${keyName}' to current combination: '${this.getCurrentCombination().describe()}'.`
       );
     }
 
-    this._logKeyHistory();
+    this.logger.logKeyHistory();
   }
 
   _startAndLogNewKeyCombination(keyName, keyEventState) {
     this.getKeyHistory().startNewKeyCombination(keyName, keyEventState);
 
     this.logger.verbose(
-      this._keyEventPrefix(),
+      this.logger.keyEventPrefix(),
       `Started a new combination with '${keyName}'.`
     );
 
-    this._logKeyHistory();
+    this.logger.logKeyHistory();
   }
 
   _recalculate() {
     this._initHandlerResolutionState();
     this._updateLongestSequence();
-  }
-
-  _logKeyHistory() {
-    this.logger.verbose(
-      this._keyEventPrefix(),
-      `Key history: ${printComponent(this.getKeyHistory().toJSON())}.`
-    );
   }
 
   /********************************************************************************
@@ -420,7 +416,7 @@ class AbstractKeyEventStrategy {
         this._actionResolver.getKeyHistoryMatcher(componentSearchIndex);
 
       this.logger.verbose(
-        this._keyEventPrefix(componentSearchIndex),
+        this.logger.keyEventPrefix(componentSearchIndex),
         'Internal key mapping:\n',
         `${printComponent(keyHistoryMatcher.toJSON())}`
       );
@@ -439,12 +435,12 @@ class AbstractKeyEventStrategy {
           const subMatchDescription = KeyCombinationSerializer.serialize(sequenceMatch.keyDictionary);
 
           this.logger.debug(
-            this._keyEventPrefix(componentSearchIndex),
+            this.logger.keyEventPrefix(componentSearchIndex),
             `Found action that matches '${currentCombination.describe()}' (sub-match: '${subMatchDescription}'): ${eventSchema.actionName}. Calling handler . . .`
           );
         } else {
           this.logger.debug(
-            this._keyEventPrefix(componentSearchIndex),
+            this.logger.keyEventPrefix(componentSearchIndex),
             `Found action that matches '${currentCombination.describe()}': ${eventSchema.actionName}. Calling handler . . .`
           );
         }
@@ -459,12 +455,12 @@ class AbstractKeyEventStrategy {
           const eventName = describeKeyEventType(keyEventType);
 
           this.logger.debug(
-            this._keyEventPrefix(componentSearchIndex),
+            this.logger.keyEventPrefix(componentSearchIndex),
             `No matching actions found for '${currentCombination.describe()}' ${eventName}.`
           );
         } else {
           this.logger.debug(
-            this._keyEventPrefix(componentSearchIndex),
+            this.logger.keyEventPrefix(componentSearchIndex),
             `Doesn't define a handler for '${currentCombination.describe()}' ${describeKeyEventType(keyEventType)}.`
           );
         }
@@ -533,7 +529,7 @@ class AbstractKeyEventStrategy {
 
   _isIgnoringRepeatedEvent(event, key, eventType) {
     if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
-      this._logIgnoredKeyEvent(event, key, eventType, 'it was a repeated event');
+      this.logger.logIgnoredKeyEvent(event, key, eventType, 'it was a repeated event');
 
       return true;
     }
@@ -541,42 +537,8 @@ class AbstractKeyEventStrategy {
     return false;
   }
 
-  /**
-   * Returns a prefix for all log entries related to the current event strategy
-   * @protected
-   * @abstract
-   */
-  _keyEventPrefix() {
-
-  }
-
-  _nonKeyEventPrefix(componentId, options = {}) {
-    this._keyEventPrefix(componentId, { ...options, eventId: false});
-  }
-
-  _logNewComponentOptions(componentId, action) {
-    this.logger.debug(this._nonKeyEventPrefix(componentId), action);
-
-    this._logComponentOptions(componentId);
-  }
-
-  _logComponentOptions(componentId, options = { }) {
-    this.logger.verbose(
-      this._nonKeyEventPrefix(componentId, options),
-      'New component options:\n',
-      printComponent(this._componentList.get(componentId))
-    );
-  }
-
-  _logIgnoredKeyEvent(event, key, eventType, reason) {
-    this._logIgnoredEvent(describeKeyEvent(event, key, eventType), reason)
-  }
-
-  _logIgnoredEvent(eventDescription, reason) {
-    this.logger.debug(
-      this._keyEventPrefix(),
-      `Ignored ${eventDescription} because ${reason}.`
-    );
+  getComponent(componentId) {
+    return this._componentList.get(componentId);
   }
 }
 
