@@ -13,6 +13,7 @@ import GlobalKeyEventSimulator from '../simulation/GlobalKeyEventSimulator';
 import GlobalEventListenerAdaptor from '../listening/GlobalEventListenerAdaptor';
 import Registry from '../shared/Registry';
 import GlobalLogger from '../logging/GlobalLogger';
+import KeyCombinationDecorator from '../listening/KeyCombinationDecorator';
 
 /**
  * Defines behaviour for dealing with key maps defined in global HotKey components
@@ -344,9 +345,11 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this._simulateKeyUpEventsHiddenByCmd(event, key);
 
     if (this.listeners.get('keyCombination') && this.getCurrentCombination().hasEnded()) {
+      const keyCombinationDecorator = new KeyCombinationDecorator(this.getCurrentCombination());
+
       this.listeners.get('keyCombination')({
-        keys: currentCombination.getKeyDictionary(),
-        id: currentCombination.describe()
+        keys: keyCombinationDecorator.asKeyDictionary(),
+        id: keyCombinationDecorator.describe()
       });
     }
   }
@@ -358,7 +361,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
        */
       this.keyEventManager.simulatePendingKeyUpEvents();
 
-      this.getCurrentCombination().forEachKey((keyName) => {
+      const iterator = this.getCurrentCombination().getIterator();
+
+      iterator.forEachKey((keyName) => {
         if (isCmdKey(keyName)) {
           return;
         }
@@ -374,7 +379,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
   _callHandlerIfExists(event, keyName, keyEventType) {
     const eventName = describeKeyEventType(keyEventType);
-    const combinationName = this.getCurrentCombination().describe();
+    const combinationName = this._describeCurrentCombination();
 
     if (!this._componentList.anyActionsForEventType(keyEventType)) {
       /**

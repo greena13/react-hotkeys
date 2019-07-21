@@ -13,6 +13,7 @@ import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import printComponent from '../../helpers/logging/printComponent';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
 import ApplicationKeyMapBuilder from '../definitions/ApplicationKeyMapBuilder';
+import KeyCombinationDecorator from '../listening/KeyCombinationDecorator';
 
 /**
  * Defines common behaviour for key event strategies
@@ -280,11 +281,17 @@ class AbstractKeyEventStrategy {
     if (keyEventType === KeyEventType.keydown) {
       this.logger.verbose(
         this.logger.keyEventPrefix(),
-        `Added '${keyName}' to current combination: '${this.getCurrentCombination().describe()}'.`
+        `Added '${keyName}' to current combination: '${this._describeCurrentCombination()}'.`
       );
     }
 
     this.logger.logKeyHistory();
+  }
+
+  _describeCurrentCombination() {
+    const keyCombinationDecorator = new KeyCombinationDecorator(this.getCurrentCombination());
+
+    return keyCombinationDecorator.describe();
   }
 
   _startAndLogNewKeyCombination(keyName, keyEventState) {
@@ -337,12 +344,12 @@ class AbstractKeyEventStrategy {
 
           this.logger.debug(
             this.logger.keyEventPrefix(componentSearchIndex),
-            `Found action that matches '${currentCombination.describe()}' (sub-match: '${subMatchDescription}'): ${eventSchema.actionName}. Calling handler . . .`
+            `Found action that matches '${this._describeCurrentCombination()}' (sub-match: '${subMatchDescription}'): ${eventSchema.actionName}. Calling handler . . .`
           );
         } else {
           this.logger.debug(
             this.logger.keyEventPrefix(componentSearchIndex),
-            `Found action that matches '${currentCombination.describe()}': ${eventSchema.actionName}. Calling handler . . .`
+            `Found action that matches '${this._describeCurrentCombination()}': ${eventSchema.actionName}. Calling handler . . .`
           );
         }
 
@@ -357,12 +364,12 @@ class AbstractKeyEventStrategy {
 
           this.logger.debug(
             this.logger.keyEventPrefix(componentSearchIndex),
-            `No matching actions found for '${currentCombination.describe()}' ${eventName}.`
+            `No matching actions found for '${this._describeCurrentCombination()}' ${eventName}.`
           );
         } else {
           this.logger.debug(
             this.logger.keyEventPrefix(componentSearchIndex),
-            `Doesn't define a handler for '${currentCombination.describe()}' ${describeKeyEventType(keyEventType)}.`
+            `Doesn't define a handler for '${this._describeCurrentCombination()}' ${describeKeyEventType(keyEventType)}.`
           );
         }
       }

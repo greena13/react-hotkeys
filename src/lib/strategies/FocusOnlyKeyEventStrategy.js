@@ -428,7 +428,9 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
   _simulateKeyUpEventsHiddenByCmd(event, key, focusTreeId, componentId, options) {
     if (isCmdKey(key)) {
-      this.getCurrentCombination().forEachKey((keyName) => {
+      const iterator = this.getCurrentCombination().getIterator();
+
+      iterator.forEachKey((keyName) => {
         if (isCmdKey(keyName)) {
           return;
         }
@@ -484,7 +486,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    */
   _callHandlerIfActionNotHandled(event, keyName, keyEventType, componentId, focusTreeId) {
     const eventName = describeKeyEventType(keyEventType);
-    const combinationName = this.getCurrentCombination().describe();
+    const combinationName = this._describeCurrentCombination();
 
     if (!this._componentList.anyActionsForEventType(keyEventType)) {
       this.logger.logIgnoredEvent(componentId, `'${combinationName}' ${eventName}`, `it doesn't have any ${eventName} handlers`);

@@ -5,9 +5,8 @@ import resolveKeyAlias from '../../helpers/resolving-handlers/resolveKeyAlias';
 import applicableAliasFunctions from '../../helpers/resolving-handlers/applicableAliasFunctions';
 import KeyEventStateArrayManager from '../shared/KeyEventStateArrayManager';
 import isEmpty from '../../utils/collection/isEmpty';
-import size from '../../utils/collection/size';
 import KeyEventState from '../../const/KeyEventState';
-import dictionaryFrom from '../../utils/object/dictionaryFrom';
+import KeyCombinationIterator from './KeyCombinationIterator';
 
 /**
  * Record of one or more keys pressed together, in a combination
@@ -80,21 +79,8 @@ class KeyCombination {
    * Query attributes of entire combination
    *********************************************************************************/
 
-  /**
-   * Number of keys involved in the combination
-   * @returns {number} Number of keys
-   */
-  getNumberOfKeys() {
-    return size(this._keys);
-  }
-
-  /**
-   * Whether there are any keys in the combination
-   * @returns {boolean} true if there is 1 or more keys involved in the combination,
-   *          else false.
-   */
-  any() {
-    return this._getKeys().length > 0;
+  getIterator() {
+    return new KeyCombinationIterator(this);
   }
 
   /**
@@ -161,46 +147,6 @@ class KeyCombination {
    *********************************************************************************/
 
   /**
-   * @callback forEachHandler
-   * @param {ReactKeyName} keyName Name of a key in the combination
-   * @returns {void}
-   */
-
-  /**
-   * Iterates over every key in the combination, calling an function with each
-   * key name
-   * @param {forEachHandler} handler Function to call with the name of each key
-   *        in the combination
-   * @returns {void}
-   */
-  forEachKey(handler){
-    return this._getKeys().forEach(handler);
-  }
-
-  /**
-   * @callback evaluator
-   * @param {ReactKeyName} keyName Name of a key in the combination
-   * @returns {boolean}
-   */
-
-  /**
-   * Whether at least one of the keys causes a evaluator function to return true
-   * @callback {evaluator} evaluator Function to evaluate each key
-   * @returns {boolean} Whether at least one key satisfies the evaluator
-   */
-  some(evaluator) {
-    return this._getKeys().some(evaluator);
-  }
-
-  /**
-   * Dictionary of keys included in the combination record
-   * @returns {Object.<ReactKeyName, boolean>}
-   */
-  getKeyDictionary(){
-    return dictionaryFrom(this._getKeys(), true);
-  }
-
-  /**
    * Returns a new KeyCombination without the keys that have been
    * released (had the keyup event recorded). Essentially, the keys that are
    * currently still pressed down at the time a key event is being handled.
@@ -208,7 +154,7 @@ class KeyCombination {
    *        keys with keyup events omitted
    */
   keysStillPressedDict() {
-    return this._getKeys().reduce((memo, keyName) => {
+    return this.getKeys().reduce((memo, keyName) => {
       if (this.isKeyStillPressed(keyName)) {
         memo[keyName] = this._getKeyState(keyName);
       }
@@ -291,31 +237,6 @@ class KeyCombination {
   }
 
   /********************************************************************************
-   * Presentation
-   *********************************************************************************/
-
-  /**
-   * Return a serialized description of the keys in the combination
-   * @returns {KeySequence}
-   */
-  describe() {
-    return this.getIds()[0];
-  }
-
-  /**
-   * A plain JavaScript representation of the key combination record, useful for
-   * serialization or debugging
-   * @returns {Object} Serialized representation of the combination record
-   */
-  toJSON() {
-    return {
-      keys: this._getKeyStates(),
-      ids: this.getIds(),
-      keyAliases: this.getKeyAliases()
-    };
-  }
-
-  /********************************************************************************
    * Private methods
    *********************************************************************************/
 
@@ -329,12 +250,12 @@ class KeyCombination {
     return this.isEventTriggered(keyName, keyEventType) === KeyEventState.simulated;
   }
 
-  _getKeyStates() {
+  getKeyStates() {
     return this._keys;
   }
 
-  _getKeys() {
-    return Object.keys(this._getKeyStates());
+  getKeys() {
+    return Object.keys(this.getKeyStates());
   }
 
   _getKeyState(keyName) {

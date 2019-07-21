@@ -208,21 +208,23 @@ class KeyCombinationMatcher {
 function canBeMatched(keyCombination, combinationMatcher) {
   const combinationKeysNo = size(combinationMatcher.keyDictionary);
 
+  const iterator = keyCombination.getIterator();
+
   if (Configuration.option('allowCombinationSubmatches') || keyUpIsBeingHidden(keyCombination)) {
-    return keyCombination.getNumberOfKeys() >= combinationKeysNo;
+    return iterator.getNumberOfKeys() >= combinationKeysNo;
   } else {
     /**
      * If sub-matches are not allow, the number of keys in the key state and the
      * number of keys in the combination we are attempting to match, must be
      * exactly the same
      */
-    return keyCombination.getNumberOfKeys() === combinationKeysNo;
+    return iterator.getNumberOfKeys() === combinationKeysNo;
   }
 }
 
 function keyUpIsBeingHidden(keyCombination) {
   if (keyCombination.isKeyStillPressed('Meta')) {
-    return keyCombination.some((keyName) => keyupIsHiddenByCmd(keyName));
+    return keyCombination.getIterator().some((keyName) => keyupIsHiddenByCmd(keyName));
   }
 
   return false;

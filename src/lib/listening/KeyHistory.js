@@ -1,4 +1,5 @@
 import KeyCombination from './KeyCombination';
+import KeyCombinationDecorator from './KeyCombinationDecorator';
 
 /**
  * List of key combinations seen by hot key components
@@ -37,7 +38,7 @@ class KeyHistory {
    * @returns {boolean} true if there is at least one key combination, else false
    */
   any() {
-    return this._combinations.some((keyCombination) => keyCombination.any());
+    return this._combinations.some((keyCombination) => keyCombination.getIterator().any());
   }
 
   /**
@@ -102,7 +103,7 @@ class KeyHistory {
    * @returns {Object[]} Serialized representation of the registry
    */
   toJSON() {
-    return this._combinations.map((keyCombination) => keyCombination.toJSON() );
+    return this._combinations.map((keyCombination) => new KeyCombinationDecorator(keyCombination).toJSON() );
   }
 
   /********************************************************************************
