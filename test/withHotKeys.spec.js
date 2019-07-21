@@ -79,7 +79,7 @@ describe('withHotKeys:', () => {
 
     it('then passes down the onKeyDown prop', function() {
       expect(this.child.prop('onKeyDown')).to.eql(
-        this.wrapper.find(this.wrappedComponent)._handleKeyDown
+        this.wrapper.find(this.wrappedComponent)._recordKeyDown
       );
     });
 

@@ -4,7 +4,6 @@ import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import KeyEventCounter from '../listening/KeyEventCounter';
 import Logger from '../logging/Logger';
 import isUndefined from '../../utils/isUndefined';
-import printComponent from '../../helpers/logging/printComponent';
 import getKeyName from '../../helpers/resolving-handlers/getKeyName';
 import Configuration from '../config/Configuration';
 import describeKeyEvent from '../../helpers/logging/describeKeyEvent';
@@ -90,8 +89,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     this.eventOptions = eventOptions;
 
     this._updateComponent(componentId, keyMap, handlersMap, options);
-
-    this._logComponentOptions(componentId);
   }
 
   /**
@@ -177,15 +174,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     }
 
     if (reactAppResponse !== EventResponse.ignored) {
-      const keyEventState = stateFromEvent(event);
-
-      const currentCombination = this.getCurrentCombination();
-
-      if (currentCombination.isKeyIncluded(key) || currentCombination.isEnding()) {
-        this._startAndLogNewKeyCombination(key, keyEventState);
-      } else {
-        this._addToAndLogCurrentKeyCombination(key, KeyEventType.keydown, keyEventState);
-      }
+      this._recordKeyDown(event, key);
     }
 
     this._callHandlerIfNeeded(reactAppResponse, event, key, KeyEventType.keydown);
@@ -393,37 +382,6 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
         this._simulator.handleKeyUpSimulation({event, key: keyName});
       });
     }
-  }
-
-  _startAndLogNewKeyCombination(keyName, keyEventState) {
-    this.getKeyHistory().startNewKeyCombination(keyName, keyEventState);
-
-    this.logger.verbose(
-      this._keyEventPrefix(),
-      `Started a new combination with '${keyName}'.`
-    );
-
-    this._logKeyHistory();
-  }
-
-  _logKeyHistory() {
-    this.logger.verbose(
-      this._keyEventPrefix(),
-      `Key history: ${printComponent(this.getKeyHistory().toJSON())}.`
-    );
-  }
-
-  _addToAndLogCurrentKeyCombination(keyName, keyEventType, keyEventState) {
-    this.getKeyHistory().addKeyToCurrentCombination(keyName, keyEventType, keyEventState);
-
-    if (keyEventType === KeyEventType.keydown) {
-      this.logger.verbose(
-        this._keyEventPrefix(),
-        `Added '${keyName}' to current combination: '${this.getCurrentCombination().describe()}'.`
-      );
-    }
-
-    this._logKeyHistory();
   }
 
   /********************************************************************************

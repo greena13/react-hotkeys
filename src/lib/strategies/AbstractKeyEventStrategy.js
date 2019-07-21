@@ -333,6 +333,8 @@ class AbstractKeyEventStrategy {
     );
 
     this._recalculate();
+
+    this._logComponentOptions(componentId);
   }
 
   /********************************************************************************
@@ -356,9 +358,52 @@ class AbstractKeyEventStrategy {
     this.getKeyHistory().setMaxLength(this._componentList.getLongestSequence());
   }
 
+  _recordKeyDown(event, key) {
+    const keyEventState = stateFromEvent(event);
+
+    const currentCombination = this.getCurrentCombination();
+
+    if (currentCombination.isKeyIncluded(key) || currentCombination.isEnding()) {
+      this._startAndLogNewKeyCombination(key, keyEventState);
+    } else {
+      this._addToAndLogCurrentKeyCombination(key, KeyEventType.keydown, keyEventState);
+    }
+  }
+
+  _addToAndLogCurrentKeyCombination(keyName, keyEventType, keyEventState) {
+    this.getKeyHistory().addKeyToCurrentCombination(keyName, keyEventType, keyEventState);
+
+    if (keyEventType === KeyEventType.keydown) {
+      this.logger.verbose(
+        this._keyEventPrefix(),
+        `Added '${keyName}' to current combination: '${this.getCurrentCombination().describe()}'.`
+      );
+    }
+
+    this._logKeyHistory();
+  }
+
+  _startAndLogNewKeyCombination(keyName, keyEventState) {
+    this.getKeyHistory().startNewKeyCombination(keyName, keyEventState);
+
+    this.logger.verbose(
+      this._keyEventPrefix(),
+      `Started a new combination with '${keyName}'.`
+    );
+
+    this._logKeyHistory();
+  }
+
   _recalculate() {
     this._initHandlerResolutionState();
     this._updateLongestSequence();
+  }
+
+  _logKeyHistory() {
+    this.logger.verbose(
+      this._keyEventPrefix(),
+      `Key history: ${printComponent(this.getKeyHistory().toJSON())}.`
+    );
   }
 
   /********************************************************************************

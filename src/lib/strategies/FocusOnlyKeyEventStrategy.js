@@ -3,7 +3,6 @@ import KeyEventType from '../../const/KeyEventType';
 import KeyEventCounter from '../listening/KeyEventCounter';
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import Logger from '../logging/Logger';
-import printComponent from '../../helpers/logging/printComponent';
 import isUndefined from '../../utils/isUndefined';
 import getKeyName from '../../helpers/resolving-handlers/getKeyName';
 import isCmdKey from '../../helpers/parsing-key-maps/isCmdKey';
@@ -134,13 +133,11 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *        and handlers are associated and called.
    */
   updateEnabledHotKeys(focusTreeId, componentId, keyMap = {}, handlersMap = {}, options) {
-    if (this.focusTree.isOld(focusTreeId)|| !this._componentList.containsId(componentId)) {
+    if (this.focusTree.isOld(focusTreeId) || !this._componentList.containsId(componentId)) {
       return;
     }
 
     this._updateComponent(componentId, keyMap, handlersMap, options);
-
-    this._logComponentOptions(componentId, { focusTreeId });
   }
 
   /**
@@ -187,7 +184,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * @param {ComponentId} componentId - The id of the component that is currently handling
    *        the keyboard event as it bubbles towards the document root.
    * @param {Object} options - Hash of options that configure how the event is handled.
-   * @returns Whether the event was discarded because it was part of an old focus tree
+   * @returns {boolean} Whether the event was discarded because it was part of an old focus tree
    */
   handleKeyDown(event, focusTreeId, componentId, options = {}) {
     const key = getKeyName(event);
@@ -216,19 +213,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     );
 
     if (responseAction === EventResponse.handled) {
-      const keyEventState = stateFromEvent(event);
-
-      const currentCombination = this.getCurrentCombination();
-
-      if (currentCombination.isKeyIncluded(key) || currentCombination.isEnding()) {
-        this._startAndLogNewKeyCombination(
-          key, focusTreeId, componentId, keyEventState
-        );
-      } else {
-        this._addToAndLogCurrentKeyCombination(
-          key, KeyEventType.keydown, focusTreeId, componentId, keyEventState
-        );
-      }
+      this._recordKeyDown(event, key);
 
       this._callHandlerIfActionNotHandled(event, key, KeyEventType.keydown, componentId, focusTreeId);
     }
@@ -288,7 +273,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const key = getKeyName(event);
 
     if (this._isIgnoringRepeatedEvent(event, key, KeyEventType.keypress)) {
-      return;
+      return false;
     }
 
     const currentCombination = this.getCurrentCombination();
@@ -296,18 +281,11 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     if (currentCombination.isKeyPressSimulated(key)) {
       this._logAndIgnoreUnexpectSimulatedEvent(componentId, event, key, KeyEventType.keypress);
 
-      return true;
+      return false;
     }
 
-    const started = this.eventPropagator.startNewPropagationStep(
-      componentId,
-      event,
-      key,
-      KeyEventType.keypress
-    );
-
-    if (!started) {
-      return;
+    if (!this.eventPropagator.startNewPropagationStep(componentId, event, key, KeyEventType.keypress)) {
+      return false;
     }
 
     const shouldDiscardFocusTreeId = this.focusTree.isOld(focusTreeId);
@@ -317,20 +295,12 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      * order of logging statements)
      */
     const responseAction = this._howToHandleKeyEvent(event,
-      focusTreeId,
-      componentId,
-      key,
-      options,
-      KeyEventType.keypress
+      focusTreeId, componentId, key, options, KeyEventType.keypress
     );
 
     if (this.eventPropagator.isFirstPropagationStep(componentId) && currentCombination.isKeyIncluded(key)) {
       this._addToAndLogCurrentKeyCombination(
-        key,
-        KeyEventType.keypress,
-        focusTreeId,
-        componentId,
-        stateFromEvent(event)
+        key, KeyEventType.keypress, stateFromEvent(event)
       );
     }
 
@@ -340,11 +310,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      */
     if (responseAction === EventResponse.handled) {
       this._callHandlerIfActionNotHandled(
-        event,
-        key,
-        KeyEventType.keypress,
-        componentId,
-        focusTreeId
+        event, key, KeyEventType.keypress, componentId, focusTreeId
       );
     }
 
@@ -409,11 +375,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      * order of logging statements)
      */
     const responseAction = this._howToHandleKeyEvent(event,
-      focusTreeId,
-      componentId,
-      key,
-      options,
-      KeyEventType.keyup
+      focusTreeId, componentId, key, options, KeyEventType.keyup
     );
 
     /**
@@ -423,13 +385,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
      * is not lost (leaving react hotkeys thinking the key is still pressed).
      */
     if (this.eventPropagator.isFirstPropagationStep(componentId) && currentCombination.isKeyIncluded(key)) {
-      this._addToAndLogCurrentKeyCombination(
-        key,
-        KeyEventType.keyup,
-        focusTreeId,
-        componentId,
-        stateFromEvent(event)
-      );
+      this._addToAndLogCurrentKeyCombination(key, KeyEventType.keyup, stateFromEvent(event));
     }
 
     /**
@@ -497,37 +453,6 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
   getEventPropagator() {
     return this.eventPropagator;
-  }
-
-  _startAndLogNewKeyCombination(keyName, focusTreeId, componentId, keyEventState) {
-    this.getKeyHistory().startNewKeyCombination(keyName, keyEventState);
-
-    this.logger.verbose(
-      this._keyEventPrefix(componentId, {focusTreeId}),
-      `Started a new combination with '${keyName}'.`
-    );
-
-    this._logKeyHistory(componentId, focusTreeId);
-  }
-
-  _addToAndLogCurrentKeyCombination(keyName, keyEventType, focusTreeId, componentId, keyEventState) {
-    this.getKeyHistory().addKeyToCurrentCombination(keyName, keyEventType, keyEventState);
-
-    if (keyEventType === KeyEventType.keydown) {
-      this.logger.verbose(
-        this._keyEventPrefix(componentId, {focusTreeId}),
-        `Added '${keyName}' to current combination: '${this.getCurrentCombination().describe()}'.`
-      );
-    }
-
-    this._logKeyHistory(componentId, focusTreeId);
-  }
-
-  _logKeyHistory(componentId, focusTreeId) {
-    this.logger.verbose(
-      this._keyEventPrefix(componentId, {focusTreeId}),
-      `Key history: ${printComponent(this.getKeyHistory().toJSON())}.`
-    );
   }
 
   /********************************************************************************
