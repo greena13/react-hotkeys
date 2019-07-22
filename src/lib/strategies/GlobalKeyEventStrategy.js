@@ -121,9 +121,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     const listenersAreBound = this.isListenersBound();
 
     if (!listenersAreBound && listenersShouldBeBound) {
-      this._listenerAdaptor.bindListeners(this.componentId);
+      this._listenerAdaptor.bindListeners();
     } else if (listenersAreBound && !listenersShouldBeBound) {
-      this._listenerAdaptor.unbindListeners(this.componentId);
+      this._listenerAdaptor.unbindListeners();
     }
   }
 
@@ -254,9 +254,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * Add new key event to key combination history
      */
     if (currentCombination.isKeyIncluded(key)) {
-      this._addToAndLogCurrentKeyCombination(
-        key, KeyEventType.keypress, stateFromEvent(event)
-      );
+      this._addToAndLogCurrentKeyCombination(key, KeyEventType.keypress, stateFromEvent(event));
     }
 
     if (reactAppResponse === EventResponse.unseen) {
@@ -269,7 +267,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this.keyEventManager.closeHangingKeyCombination(key, KeyEventType.keypress);
 
       if (this.eventOptions.ignoreEventsCondition(event)) {
-        this.logger.logEventRejectedByFilter(event, key, KeyEventType.keypress);
+        this.logger.logEventRejectedByFilter(event, key, KeyEventType.keypress, componentId);
 
         return;
       }
@@ -299,7 +297,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     const currentCombination = this.getCurrentCombination();
 
     if (currentCombination.isKeyUpSimulated(key)){
-      this.logger.logEventAlreadySimulated(event, key, KeyEventType.keyup);
+      this.logger.logEventAlreadySimulated(event, key, KeyEventType.keyup, componentId);
 
       return;
     }
@@ -387,10 +385,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
        * (keydown, keypress, keyup) then skip trying to find a matching handler
        * for the current key combination
        */
-      this.logger.logIgnoredEvent(
-        `'${combinationName}' ${eventName}`,
-        `it doesn't have any ${eventName} handlers`
-      );
+      this.logger.logIgnoredEvent(`'${combinationName}' ${eventName}`, `it doesn't have any ${eventName} handlers`);
 
       return;
     }

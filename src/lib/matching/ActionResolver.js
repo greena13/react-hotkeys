@@ -126,8 +126,11 @@ class ActionResolver {
       const keyHistoryMatcher =
         this.getKeyHistoryMatcher(componentSearchIndex);
 
+      const { componentId } =
+        this._eventStrategy.getComponentAtPosition(componentSearchIndex);
+
       this.logger.verbose(
-        this.logger.keyEventPrefix(componentSearchIndex),
+        this.logger.keyEventPrefix(componentId),
         'Internal key mapping:\n',
         `${printComponent(keyHistoryMatcher.toJSON())}`
       );
@@ -149,12 +152,12 @@ class ActionResolver {
           const subMatchDescription = KeyCombinationSerializer.serialize(sequenceMatch.keyDictionary);
 
           this.logger.debug(
-            this.logger.keyEventPrefix(componentSearchIndex),
+            this.logger.keyEventPrefix(componentId),
             `Found action that matches '${keyCombinationDecorator.describe()}' (sub-match: '${subMatchDescription}'): ${eventSchema.actionName}. Calling handler . . .`
           );
         } else {
           this.logger.debug(
-            this.logger.keyEventPrefix(componentSearchIndex),
+            this.logger.keyEventPrefix(componentId),
             `Found action that matches '${keyCombinationDecorator.describe()}': ${eventSchema.actionName}. Calling handler . . .`
           );
         }
@@ -171,12 +174,12 @@ class ActionResolver {
           const eventName = describeKeyEventType(keyEventType);
 
           this.logger.debug(
-            this.logger.keyEventPrefix(componentSearchIndex),
+            this.logger.keyEventPrefix(componentId),
             `No matching actions found for '${keyCombinationDecorator.describe()}' ${eventName}.`
           );
         } else {
           this.logger.debug(
-            this.logger.keyEventPrefix(componentSearchIndex),
+            this.logger.keyEventPrefix(componentId),
             `Doesn't define a handler for '${keyCombinationDecorator.describe()}' ${describeKeyEventType(keyEventType)}.`
           );
         }

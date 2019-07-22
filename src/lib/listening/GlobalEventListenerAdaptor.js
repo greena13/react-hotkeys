@@ -19,19 +19,19 @@ class GlobalEventListenerAdaptor {
     return this._listenersBound
   }
 
-  unbindListeners(componentId) {
+  unbindListeners() {
     Object.values(KeyEventType).forEach((recordIndex) => {
       const eventName = describeKeyEventType(recordIndex);
 
       delete document[`on${eventName}`];
 
-      this._logHandlerStateChange(`Removed`, eventName, componentId);
+      this._logHandlerStateChange(`Removed`, eventName);
     });
 
     this._listenersBound = false;
   }
 
-  bindListeners(componentId) {
+  bindListeners() {
     Object.values(KeyEventType).forEach((recordIndex) => {
       const eventName = describeKeyEventType(recordIndex);
 
@@ -39,15 +39,15 @@ class GlobalEventListenerAdaptor {
         this._eventStrategy[`handle${normalizeEventName(eventName)}`](keyEvent);
       };
 
-      this._logHandlerStateChange(`Bound`, eventName, componentId);
+      this._logHandlerStateChange(`Bound`, eventName);
     });
 
     this._listenersBound = true;
   }
 
-  _logHandlerStateChange(action, eventName, componentId) {
+  _logHandlerStateChange(action, eventName) {
     this.logger.debug(
-      this.logger.nonKeyEventPrefix(componentId, {eventId: false}),
+      this.logger.nonKeyEventPrefix(undefined, {eventId: false}),
       `${action} handler handleGlobal${normalizeEventName(eventName)}() to document.on${eventName}()`
     );
   }

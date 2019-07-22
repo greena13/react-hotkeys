@@ -9,7 +9,7 @@ class EventStrategyLogger extends Logger {
   }
 
   nonKeyEventPrefix(componentId, options = {}) {
-    this.keyEventPrefix(componentId, { ...options, eventId: false});
+    return this.keyEventPrefix(componentId, { ...options, eventId: false});
   }
 
   logComponentOptions(componentId, componentOptions) {
@@ -20,9 +20,9 @@ class EventStrategyLogger extends Logger {
     );
   }
 
-  logKeyHistory(keyHistory) {
+  logKeyHistory(keyHistory, componentId) {
     this.verbose(
-      this.keyEventPrefix(),
+      this.keyEventPrefix(componentId),
       `Key history: ${printComponent(keyHistory.toJSON())}.`
     );
   }

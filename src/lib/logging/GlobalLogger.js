@@ -10,33 +10,33 @@ class GlobalLogger extends EventStrategyLogger {
 
     let base = 'HotKeys (GLOBAL';
 
-    if (options.eventId !== false) {
-      const eventId = isUndefined(options.eventId) ? KeyEventCounter.getId() : options.eventId;
-
-      base = `${base}-E${eventId}${eventIcons[eventId % eventIcons.length]}`
-    }
-
-    if (isUndefined(componentId)) {
-      return `${base}):`
-    } else {
+    if (!isUndefined(componentId)) {
       return `${base}-C${componentId}${componentIcons[componentId % componentIcons.length]}):`;
     }
+
+    if (options.eventId === false) {
+      return `${base}):`
+    } else {
+      const eventId = isUndefined(options.eventId) ? KeyEventCounter.getId() : options.eventId;
+
+      return `${base}-E${eventId}${eventIcons[eventId % eventIcons.length]}):`;
+    }
   }
 
-  logIgnoredKeyEvent(event, key, eventType, reason) {
-    this.logIgnoredEvent(describeKeyEvent(event, key, eventType), reason)
+  logIgnoredKeyEvent(event, key, eventType, reason, componentId) {
+    this.logIgnoredEvent(describeKeyEvent(event, key, eventType), reason, componentId)
   }
 
-  logIgnoredEvent(eventDescription, reason) {
-    this.debug(this.keyEventPrefix(), `Ignored ${eventDescription} because ${reason}.`);
+  logIgnoredEvent(eventDescription, reason, componentId) {
+    this.debug(this.keyEventPrefix(componentId), `Ignored ${eventDescription} because ${reason}.`);
   }
 
-  logEventRejectedByFilter(event, key, eventType) {
-    this.logIgnoredKeyEvent(event, key, eventType, 'ignoreEventsFilter rejected it');
+  logEventRejectedByFilter(event, key, eventType, componentId) {
+    this.logIgnoredKeyEvent(event, key, eventType, 'ignoreEventsFilter rejected it', componentId);
   }
 
-  logEventAlreadySimulated(event, key, eventType) {
-    this.logIgnoredKeyEvent(event, key, eventType, 'it was not expected, and has already been simulated');
+  logEventAlreadySimulated(event, key, eventType, componentId) {
+    this.logIgnoredKeyEvent(event, key, eventType, 'it was not expected, and has already been simulated', componentId);
   }
 }
 

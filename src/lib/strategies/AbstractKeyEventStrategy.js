@@ -144,8 +144,8 @@ class AbstractKeyEventStrategy {
     this._componentTree.add(this.componentId, keyMap);
 
     this.logger.verbose(
-      this.logger.keyEventPrefix(this.componentId),
-      'Registered component:\n',
+      this.logger.nonKeyEventPrefix(this.componentId, { focusTreeId: false }),
+      'Registered component in application key map:\n',
       `${printComponent(this._componentTree.get(this.componentId))}`
     );
 
@@ -171,7 +171,7 @@ class AbstractKeyEventStrategy {
     this._componentTree.setParent(componentId, parentId);
 
     this.logger.verbose(
-      this.logger.keyEventPrefix(componentId),
+      this.logger.nonKeyEventPrefix(componentId),
       'Registered component mount:\n',
       `${printComponent(this._componentTree.get(componentId))}`
     );
@@ -186,7 +186,7 @@ class AbstractKeyEventStrategy {
     this._componentTree.remove(componentId);
 
     this.logger.verbose(
-      this.logger.keyEventPrefix(componentId),
+      this.logger.nonKeyEventPrefix(componentId),
       'De-registered component. Remaining component Registry:\n',
       `${printComponent(this._componentTree.toJSON())}`
     );
@@ -199,6 +199,14 @@ class AbstractKeyEventStrategy {
   /********************************************************************************
    * Registering key maps and handlers
    ********************************************************************************/
+
+  getComponentPosition(componentId) {
+    return this._componentList.getIndexById(componentId)
+  }
+
+  getComponentAtPosition(position) {
+    return this._componentList.getAtPosition(position);
+  }
 
   /**
    * Registers the hotkeys defined by a HotKeys component
@@ -246,49 +254,49 @@ class AbstractKeyEventStrategy {
     return keyCombinationDecorator.describe();
   }
 
-  _recordKeyDown(event, key) {
+  _recordKeyDown(event, key, componentId) {
     const keyEventState = stateFromEvent(event);
 
     const currentCombination = this.getCurrentCombination();
 
     if (currentCombination.isKeyIncluded(key) || currentCombination.isEnding()) {
-      this._startAndLogNewKeyCombination(key, keyEventState);
+      this._startAndLogNewKeyCombination(componentId, key, keyEventState);
     } else {
-      this._addToAndLogCurrentKeyCombination(key, KeyEventType.keydown, keyEventState);
+      this._addToAndLogCurrentKeyCombination(key, KeyEventType.keydown, keyEventState, componentId);
     }
   }
 
-  _startAndLogNewKeyCombination(keyName, keyEventState) {
+  _startAndLogNewKeyCombination(componentId, keyName, keyEventState) {
     this.getKeyHistory().startNewKeyCombination(keyName, keyEventState);
 
     this.logger.verbose(
-      this.logger.keyEventPrefix(),
+      this.logger.keyEventPrefix(componentId),
       `Started a new combination with '${keyName}'.`
     );
 
-    this.logger.logKeyHistory(this.getKeyHistory());
+    this.logger.logKeyHistory(this.getKeyHistory(), componentId);
   }
 
-  _addToAndLogCurrentKeyCombination(keyName, keyEventType, keyEventState) {
+  _addToAndLogCurrentKeyCombination(keyName, keyEventType, keyEventState, componentId) {
     this.getKeyHistory().addKeyToCurrentCombination(keyName, keyEventType, keyEventState);
 
     if (keyEventType === KeyEventType.keydown) {
       this.logger.verbose(
-        this.logger.keyEventPrefix(),
+        this.logger.keyEventPrefix(componentId),
         `Added '${keyName}' to current combination: '${this._describeCurrentCombination()}'.`
       );
     }
 
-    this.logger.logKeyHistory(this.getKeyHistory());
+    this.logger.logKeyHistory(this.getKeyHistory(), componentId);
   }
 
   /********************************************************************************
    * Matching and calling handlers
    ********************************************************************************/
 
-  _isIgnoringRepeatedEvent(event, key, eventType) {
+  _isIgnoringRepeatedEvent(event, key, eventType, componentId) {
     if (event.repeat && Configuration.option('ignoreRepeatedEventsWhenKeyHeldDown')) {
-      this.logger.logIgnoredKeyEvent(event, key, eventType, 'it was a repeated event');
+      this.logger.logIgnoredKeyEvent(event, key, eventType, 'it was a repeated event', componentId);
 
       return true;
     }
