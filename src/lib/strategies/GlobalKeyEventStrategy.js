@@ -267,7 +267,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this.keyEventManager.closeHangingKeyCombination(key, KeyEventType.keypress);
 
       if (this.eventOptions.ignoreEventsCondition(event)) {
-        this.logger.logEventRejectedByFilter(event, key, KeyEventType.keypress, componentId);
+        this.logger.logEventRejectedByFilter(event, key, KeyEventType.keypress);
 
         return;
       }
@@ -297,7 +297,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     const currentCombination = this.getCurrentCombination();
 
     if (currentCombination.isKeyUpSimulated(key)){
-      this.logger.logEventAlreadySimulated(event, key, KeyEventType.keyup, componentId);
+      this.logger.logEventAlreadySimulated(event, key, KeyEventType.keyup);
 
       return;
     }
