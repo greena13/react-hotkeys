@@ -27,7 +27,7 @@ class AbstractKeyEventSimulator {
 
   _shouldSimulate(eventType, keyName) {
     const keyHasNativeKeyPress = hasKeyPressEvent(keyName);
-    const currentCombination = this._keyEventStrategy.getCurrentCombination();
+    const currentCombination = this._keyEventStrategy.currentCombination;
 
     if (eventType === KeyEventType.keypress) {
       return !keyHasNativeKeyPress || (keyHasNativeKeyPress && currentCombination.isKeyStillPressed('Meta'));

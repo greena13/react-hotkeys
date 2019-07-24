@@ -1,18 +1,14 @@
 class FocusTree {
   constructor() {
-    this._id = 0;
-  }
-
-  getId() {
-    return this._id;
+    this.id = 0;
   }
 
   isOld(id) {
-    return this._id !== id;
+    return this.id !== id;
   }
 
   new() {
-    this._id += 1;
+    this.id += 1;
   }
 }
 

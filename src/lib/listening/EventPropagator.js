@@ -26,21 +26,12 @@ class EventPropagator {
     this._reset();
   }
 
-  /**
-   * Sets the Logger instance
-   * @param {Logger} logger The logger instance to use
-   * @return {void}
-   */
-  setLogger(logger) {
-    this.logger = logger;
-  }
-
   _reset() {
     /**
      * Position of the component that the event last propagated through
      * @type {number}
      */
-    this._previousPosition = -1;
+    this.previousPosition = -1;
 
     /**
      * Position of the current component the event is propagating through
@@ -102,7 +93,7 @@ class EventPropagator {
    * @returns {boolean} true if this is the first propagation step
    */
   isFirstPropagationStep() {
-    const previousPosition = this.getPreviousPosition();
+    const { previousPosition } = this;
 
     return previousPosition === -1 || previousPosition >= this._position;
   }
@@ -174,7 +165,7 @@ class EventPropagator {
       this._previousPropagation = this._clone();
       this._reset();
     } else {
-      this._previousPosition = this._position;
+      this.previousPosition = this._position;
     }
   }
 
@@ -185,19 +176,10 @@ class EventPropagator {
   /**
    * The previous event propagation, either for an earlier event type of the same key
    * or a different key's event propagation
-   * @returns {EventPropagator} The propagator for the previous event propagation
+   * @type {EventPropagator} The propagator for the previous event propagation
    */
-  getPreviousPropagation() {
+  get previousPropagation() {
     return lazyLoadAttribute(this, '_previousPropagation', () => this._clone({copyState: false}));
-  }
-
-  /**
-   * The position of the component that last had the current propagating event
-   * propagate through it
-   * @returns {number}
-   */
-  getPreviousPosition() {
-    return this._previousPosition;
   }
 
   /********************************************************************************
@@ -221,7 +203,7 @@ class EventPropagator {
    *          otherwise false.
    */
   ignoreEvent(event) {
-    this.setIgnoreEvent(true);
+    this._ignoreEvent = true;
 
     if (this.isIgnoringEvent() && Configuration.option('stopEventPropagationAfterIgnoring')) {
       this.logger.debug(
@@ -236,16 +218,6 @@ class EventPropagator {
     }
 
     return false;
-  }
-
-  /**
-   * Set the ignore event flag, to ignore the current event for the rest of its
-   * propagation
-   * @param {boolean} ignore true to ignore the event, or false to not ignore it
-   * @returns {void}
-   */
-  setIgnoreEvent(ignore) {
-    this._ignoreEvent = ignore;
   }
 
   /**
@@ -295,7 +267,7 @@ class EventPropagator {
    *          before being complete.
    */
   isPendingPropagation() {
-    const previousPosition = this.getPreviousPosition();
+    const { previousPosition } = this;
     return previousPosition !== -1 && (previousPosition + 1) < this._position;
   }
 
@@ -322,7 +294,7 @@ class EventPropagator {
 
   _clone({ copyState = true } = {}) {
     const cloned = new EventPropagator(this._componentList);
-    cloned.setLogger(this.logger);
+    cloned.logger = this.logger;
 
     if (copyState) {
       Object.assign(cloned, this);

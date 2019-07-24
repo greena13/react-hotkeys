@@ -142,7 +142,7 @@ function withHotKeys(Component, hotKeysOptions = {}) {
        *
        * @see https://reactjs.org/docs/context.html#caveats
        */
-      this._childContext = { hotKeysParentId: this._manager.getId() };
+      this._childContext = { hotKeysParentId: this._manager.id };
     }
 
     componentDidMount() {

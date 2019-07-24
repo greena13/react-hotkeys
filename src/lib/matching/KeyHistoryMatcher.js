@@ -45,8 +45,8 @@ class KeyHistoryMatcher {
      * Record the longest sequence length so we know to only check for sequences
      * of that length or shorter for a particular component
      */
-    if (!this._longestSequence || this._longestSequence < actionConfig.sequenceLength) {
-      this._longestSequence = actionConfig.sequenceLength;
+    if (!this.longestSequence || this.longestSequence < actionConfig.sequenceLength) {
+      this.longestSequence = actionConfig.sequenceLength;
     }
   }
 
@@ -64,8 +64,8 @@ class KeyHistoryMatcher {
 
     if (combinationMatcher) {
       return combinationMatcher.findMatch(
-        keyHistory.getCurrentCombination(),
-        keyHistory.getCurrentCombination().getNormalizedKeyName(key),
+        keyHistory.currentCombination,
+        keyHistory.currentCombination.getNormalizedKeyName(key),
         keyEventType
       )
     }
@@ -81,15 +81,6 @@ class KeyHistoryMatcher {
    */
   hasMatchesForEventType(eventType) {
     return !!this._eventRecord[eventType];
-  }
-
-  /**
-   * The number of combinations involved for the ActionConfiguration with the longest
-   * key sequence
-   * @returns {number} Number of combinations in the longest sequence
-   */
-  getLongestSequence() {
-    return this._longestSequence;
   }
 
   /********************************************************************************
@@ -121,7 +112,7 @@ class KeyHistoryMatcher {
 
   _findCombinationMatcher(keyHistory) {
     const previousCombinations =
-      keyHistory.getPreviousCombinations(this.getLongestSequence() - 1);
+      keyHistory.getPreviousCombinations(this.longestSequence - 1);
 
     if (previousCombinations.length) {
       /**
@@ -130,7 +121,7 @@ class KeyHistoryMatcher {
        */
 
       const sequenceIds =
-        previousCombinations.map((keyCombination) => keyCombination.getIds());
+        previousCombinations.map((keyCombination) => keyCombination.ids);
 
       const idSizes = sequenceIds.map((ids) => ids.length);
 

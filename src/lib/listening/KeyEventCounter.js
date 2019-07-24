@@ -1,4 +1,5 @@
 import isUndefined from '../../utils/isUndefined';
+import lazyLoadAttribute from '../../utils/object/lazyLoadAttribute';
 
 /**
  * Manages the incrementing of a globally unique event id
@@ -14,10 +15,8 @@ class KeyEventCounter {
    * Get the current event id
    * @returns {EventId} The current event ID
    */
-  static getId() {
-    if (isUndefined(this._id)){
-      this._id = 0;
-    }
+  static get id() {
+    lazyLoadAttribute(this, '_id', 0);
 
     return this._id;
   }
@@ -26,7 +25,7 @@ class KeyEventCounter {
    * Increment the current event id
    */
   static incrementId(){
-    this._id = this.getId() + 1;
+    this._id = this.id + 1;
   }
 }
 

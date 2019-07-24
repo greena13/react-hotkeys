@@ -10,7 +10,7 @@ class KeyCombinationDecorator {
    * @returns {KeySequence}
    */
   describe() {
-    return this._keyCombination.getIds()[0];
+    return this._keyCombination.ids[0];
   }
 
   /**
@@ -18,7 +18,7 @@ class KeyCombinationDecorator {
    * @returns {Object.<ReactKeyName, boolean>}
    */
   asKeyDictionary(){
-    return dictionaryFrom(this._keyCombination.getKeys(), true);
+    return dictionaryFrom(this._keyCombination.keys, true);
   }
 
   /**
@@ -28,9 +28,9 @@ class KeyCombinationDecorator {
    */
   toJSON() {
     return {
-      keys: this._keyCombination.getKeyStates(),
-      ids: this._keyCombination.getIds(),
-      keyAliases: this._keyCombination.getKeyAliases()
+      keys: this._keyCombination.keyStates,
+      ids: this._keyCombination.ids,
+      keyAliases: this._keyCombination.keyAliases
     };
   }
 }

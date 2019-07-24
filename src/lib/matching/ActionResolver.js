@@ -52,7 +52,7 @@ class ActionResolver {
      */
     this._keySequencesDictionary = {};
 
-    const iterator = componentList.getNewIterator();
+    const iterator = componentList.iterator;
 
     while(iterator.next()) {
       const { handlers } = iterator.getComponent();
@@ -61,7 +61,7 @@ class ActionResolver {
     }
 
     this._componentList = componentList;
-    this._componentListIterator = componentList.getNewIterator();
+    this._componentListIterator = componentList.iterator;
   }
 
   /**
@@ -135,8 +135,8 @@ class ActionResolver {
         `${printComponent(keyHistoryMatcher.toJSON())}`
       );
 
-      const keyHistory = this._eventStrategy.getKeyHistory();
-      const currentCombination = keyHistory.getCurrentCombination();
+      const keyHistory = this._eventStrategy.keyHistory;
+      const currentCombination = keyHistory.currentCombination;
 
       const keyCombinationDecorator = new KeyCombinationDecorator(currentCombination);
 
@@ -288,7 +288,7 @@ class ActionResolver {
   _addHandler(actionName) {
     lazyLoadAttribute(this._handlersDictionary, actionName, []);
 
-    this._handlersDictionary[actionName].push(this._componentListIterator.getPosition());
+    this._handlersDictionary[actionName].push(this._componentListIterator.position);
   }
 
   _addKeySequence(keySequence, value) {

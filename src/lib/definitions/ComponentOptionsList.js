@@ -67,7 +67,7 @@ class ComponentOptionsList {
      * Counter for the length of the longest sequence currently enabled.
      * @type {number}
      */
-    this._longestSequence = 1;
+    this.longestSequence = 1;
 
     /**
      * The id of the component with the longest key sequence
@@ -87,7 +87,7 @@ class ComponentOptionsList {
    * Return a new iterator that can be used to enumerate the list
    * @returns {ComponentOptionsListIterator}
    */
-  getNewIterator() {
+  get iterator() {
     return new ComponentOptionsListIterator(this);
   }
 
@@ -167,7 +167,7 @@ class ComponentOptionsList {
     const isUpdatingLongestSequenceComponent =
       this._isUpdatingComponentWithLongestSequence(componentId);
 
-    const longestSequenceBefore = this.getLongestSequence();
+    const longestSequenceBefore = this.longestSequence;
 
     const componentOptions = this._build(
       componentId, actionNameToKeyMap, actionNameToHandlersMap, options
@@ -184,7 +184,7 @@ class ComponentOptionsList {
          * The same component has registered a longer sequence, so we just
          * need to update the sequence length to the new, larger number
          */
-        this._longestSequence = componentOptions.sequenceLength;
+        this.longestSequence = componentOptions.sequenceLength;
       } else {
         /**
          * The component may no longer have the longest sequence, so we need to
@@ -218,7 +218,7 @@ class ComponentOptionsList {
    * @returns {boolean} true if the list has one or more options in it
    */
   any() {
-    return this.getLength() !== 0;
+    return this.length !== 0;
   }
 
   /**
@@ -227,15 +227,7 @@ class ComponentOptionsList {
    * @returns {boolean} true if the component is the last in the list
    */
   isRoot(id) {
-    return this.getIndexById(id) >= this.getLength() - 1;
-  }
-
-  /**
-   * The length of the longest sequence currently defined.
-   * @returns {number} The sequence length
-   */
-  getLongestSequence() {
-    return this._longestSequence;
+    return this.getIndexById(id) >= this.length - 1;
   }
 
   /**
@@ -251,9 +243,9 @@ class ComponentOptionsList {
 
   /**
    * The number of components in the list
-   * @returns {number} Number of components in the list
+   * @type {number} Number of components in the list
    */
-  getLength() {
+  get length() {
     return this._list.length;
   }
 
@@ -276,7 +268,7 @@ class ComponentOptionsList {
 
     let counter = position;
 
-    while(counter < this.getLength()) {
+    while(counter < this.length) {
       this._idToIndex[this.getAtPosition(counter).componentId] = counter;
       counter++;
     }
@@ -296,7 +288,7 @@ class ComponentOptionsList {
    ********************************************************************************/
 
   _getLastIndex() {
-    return this.getLength() - 1;
+    return this.length - 1;
   }
 
   /**
@@ -339,14 +331,14 @@ class ComponentOptionsList {
   }
 
   _recalculateLongestSequence() {
-    const iterator = this.getNewIterator();
+    const iterator = this.iterator;
 
     while(iterator.next()) {
       const {longestSequence, componentId } = iterator.getComponent();
 
-      if (longestSequence > this.getLongestSequence()) {
+      if (longestSequence > this.longestSequence) {
         this._longestSequenceComponentId = componentId;
-        this._longestSequence = longestSequence;
+        this.longestSequence = longestSequence;
       }
     }
   }
@@ -389,8 +381,8 @@ class ComponentOptionsList {
   _addActionOptions(memo, componentId, actionName, keySequence, keyEventType) {
     const {sequence, combination} = KeySequenceParser.parse(keySequence, {keyEventType});
 
-    if (sequence.size > this.getLongestSequence()) {
-      this._longestSequence = sequence.size;
+    if (sequence.size > this.longestSequence) {
+      this.longestSequence = sequence.size;
       this._longestSequenceComponentId = componentId;
     }
 

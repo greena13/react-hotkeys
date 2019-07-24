@@ -28,7 +28,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     super(options, keyEventManager);
 
     this.logger = new FocusOnlyLogger(options.logLevel || 'warn', this);
-    this.eventPropagator.setLogger(this.logger);
+    this.eventPropagator.logger = this.logger;
 
     /*****************************************************************************
      * State that doesn't get cleared on each new focus tree
@@ -70,7 +70,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     }
 
     this.eventPropagator = new EventPropagator(this._componentList);
-    this.eventPropagator.setLogger(this.logger);
+    this.eventPropagator.logger = this.logger;
   }
 
   /********************************************************************************
@@ -115,7 +115,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       componentId, actionNameToKeyMap, actionNameToHandlersMap, 'Focused', options
     );
 
-    return this.focusTree.getId();
+    return this.focusTree.id;
   }
 
   /**
@@ -232,7 +232,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         `New ${describeKeyEvent(event, key, keyEventType)} event.`
       );
 
-      this.getCurrentCombination().resolveModifierFlagDiscrepancies(event, key, keyEventType);
+      this.currentCombination.resolveModifierFlagDiscrepancies(event, key, keyEventType);
 
     } else if (this.eventPropagator.isIgnoringEvent()) {
       return this._eventIsToBeIgnored(event, componentId, key, keyEventType);
@@ -272,7 +272,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       return false;
     }
 
-    const currentCombination = this.getCurrentCombination();
+    const currentCombination = this.currentCombination;
 
     if (currentCombination.isKeyPressSimulated(key)) {
       this._ignoreAlreadySimulatedEvent(event, key, KeyEventType.keypress, componentId);
@@ -334,7 +334,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   handleKeyUp(event, focusTreeId, componentId, options) {
     const key = getKeyName(event);
 
-    const currentCombination = this.getCurrentCombination();
+    const currentCombination = this.currentCombination;
 
     if (currentCombination.isKeyUpSimulated(key)) {
       this._ignoreAlreadySimulatedEvent(event, key, KeyEventType.keyup, componentId);
@@ -407,7 +407,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *        up to.
    */
   closeHangingKeyCombination(keyName, recordIndex) {
-    const currentCombination = this.getCurrentCombination();
+    const currentCombination = this.currentCombination;
 
     if (currentCombination.isKeyIncluded(keyName) &&
       !currentCombination.isEventTriggered(keyName, recordIndex)) {
@@ -423,7 +423,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
   _simulateKeyUpEventsHiddenByCmd(event, key, focusTreeId, componentId, options) {
     if (isCmdKey(key)) {
-      const iterator = this.getCurrentCombination().getIterator();
+      const iterator = this.currentCombination.iterator;
 
       iterator.forEachKey((keyName) => {
         if (isCmdKey(keyName)) {
@@ -442,10 +442,6 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         'Stopping further event propagation.'
       );
     }
-  }
-
-  getEventPropagator() {
-    return this.eventPropagator;
   }
 
   /********************************************************************************
@@ -497,14 +493,14 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
         `Attempting to find action matching '${combinationName}' ${eventName} . . .`
       );
 
-      const previousComponentPosition = this.eventPropagator.getPreviousPosition();
+      const { previousPosition } = this.eventPropagator;
 
       const componentPosition = this._componentList.getIndexById(componentId);
 
       const handlerWasCalled =
-        this.getActionResolver().callClosestMatchingHandler(
+        this.actionResolver.callClosestMatchingHandler(
           event, keyName, keyEventType, componentPosition,
-          previousComponentPosition === -1 ? 0 : previousComponentPosition
+          previousPosition === -1 ? 0 : previousPosition
         );
 
       if (handlerWasCalled) {
@@ -518,7 +514,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    ********************************************************************************/
 
   getFocusTreeId() {
-    return this.focusTree.getId();
+    return this.focusTree.id;
   }
 }
 

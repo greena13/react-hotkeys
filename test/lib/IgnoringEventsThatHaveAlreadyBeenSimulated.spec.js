@@ -10,11 +10,11 @@ import MockSyntheticEvent from '../support/MockSyntheticEvent';
 describe('Ignoring events that have already been simulated:', function () {
   [
     {
-      strategyKey: '_focusOnlyEventStrategy',
+      strategyKey: 'focusOnlyEventStrategy',
       strategyName: 'FocusOnlyEventStrategy'
     },
     {
-      strategyKey: '_globalEventStrategy',
+      strategyKey: 'globalEventStrategy',
       strategyName: 'GlobalEventStrategy'
     }
   ].forEach(({strategyKey, strategyName}) => {
@@ -51,7 +51,7 @@ describe('Ignoring events that have already been simulated:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Meta': [
@@ -71,7 +71,7 @@ describe('Ignoring events that have already been simulated:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Meta': [
@@ -97,7 +97,7 @@ describe('Ignoring events that have already been simulated:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Meta': [
@@ -155,7 +155,7 @@ describe('Ignoring events that have already been simulated:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Meta': [
@@ -175,7 +175,7 @@ describe('Ignoring events that have already been simulated:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Meta': [
@@ -199,7 +199,7 @@ describe('Ignoring events that have already been simulated:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Meta': [
@@ -225,7 +225,7 @@ describe('Ignoring events that have already been simulated:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Meta': [

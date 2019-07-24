@@ -207,23 +207,23 @@ class KeyCombinationMatcher {
 function canBeMatched(keyCombination, combinationMatcher) {
   const combinationKeysNo = size(combinationMatcher.keyDictionary);
 
-  const iterator = keyCombination.getIterator();
+  const iterator = keyCombination.iterator;
 
   if (Configuration.option('allowCombinationSubmatches') || keyUpIsBeingHidden(keyCombination)) {
-    return iterator.getNumberOfKeys() >= combinationKeysNo;
+    return iterator.numberOfKeys >= combinationKeysNo;
   } else {
     /**
      * If sub-matches are not allow, the number of keys in the key state and the
      * number of keys in the combination we are attempting to match, must be
      * exactly the same
      */
-    return iterator.getNumberOfKeys() === combinationKeysNo;
+    return iterator.numberOfKeys === combinationKeysNo;
   }
 }
 
 function keyUpIsBeingHidden(keyCombination) {
   if (keyCombination.isKeyStillPressed('Meta')) {
-    return keyCombination.getIterator().some((keyName) => keyupIsHiddenByCmd(keyName));
+    return keyCombination.iterator.some((keyName) => keyupIsHiddenByCmd(keyName));
   }
 
   return false;

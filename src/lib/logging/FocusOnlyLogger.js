@@ -12,7 +12,7 @@ class FocusOnlyLogger extends EventStrategyLogger {
     let base = 'HotKeys (';
 
     if (options.focusTreeId !== false) {
-      const focusTreeId = isUndefined(options.focusTreeId) ? this._eventStrategy.getFocusTreeId() : options.focusTreeId;
+      const focusTreeId = isUndefined(options.focusTreeId) ? this._eventStrategy.focusTreeId : options.focusTreeId;
       base += `F${focusTreeId}${logIcons[focusTreeId % logIcons.length]}-`;
     }
 
@@ -25,7 +25,7 @@ class FocusOnlyLogger extends EventStrategyLogger {
     }
 
     if (options.eventId !== false) {
-      const eventId = isUndefined(options.eventId) ? KeyEventCounter.getId() : options.eventId;
+      const eventId = isUndefined(options.eventId) ? KeyEventCounter.id : options.eventId;
 
       base += `-E${eventId}${eventIcons[eventId % eventIcons.length]}`;
     }

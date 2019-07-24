@@ -17,7 +17,7 @@ class GlobalLogger extends EventStrategyLogger {
     if (options.eventId === false) {
       return `${base}):`
     } else {
-      const eventId = isUndefined(options.eventId) ? KeyEventCounter.getId() : options.eventId;
+      const eventId = isUndefined(options.eventId) ? KeyEventCounter.id : options.eventId;
 
       return `${base}-E${eventId}${eventIcons[eventId % eventIcons.length]}):`;
     }

@@ -65,7 +65,7 @@ class AbstractKeyEventStrategy {
      */
     this.keyEventManager = keyEventManager;
 
-    this._componentTree = new ComponentTree();
+    this.componentTree = new ComponentTree();
 
     this._reset();
 
@@ -85,14 +85,14 @@ class AbstractKeyEventStrategy {
   _recalculate() {
     this._actionResolver = null;
 
-    this.getKeyHistory().setMaxLength(this._componentList.getLongestSequence());
+    this.keyHistory.maxLength = this._componentList.longestSequence;
   }
 
-  getKeyHistory() {
+  get keyHistory() {
     return lazyLoadAttribute(this, '_keyHistory', () => this._newKeyHistory());
   }
 
-  getActionResolver() {
+  get actionResolver() {
     return lazyLoadAttribute(this, '_actionResolver', () => new ActionResolver(this._componentList, this, this.logger));
   }
 
@@ -107,10 +107,10 @@ class AbstractKeyEventStrategy {
       this._simulator.clear();
     }
 
-    if (this.getKeyHistory().any() && !options.force) {
+    if (this.keyHistory.any() && !options.force) {
       this._keyHistory = new KeyHistory(
-        { maxLength: this._componentList.getLongestSequence() },
-        new KeyCombination(this.getCurrentCombination().keysStillPressedDict())
+        { maxLength: this._componentList.longestSequence },
+        new KeyCombination(this)
       );
     } else {
       this._keyHistory = this._newKeyHistory();
@@ -119,12 +119,8 @@ class AbstractKeyEventStrategy {
 
   _newKeyHistory() {
     return new KeyHistory({
-      maxLength: this._componentList.getLongestSequence()
+      maxLength: this._componentList.longestSequence
     });
-  }
-
-  getComponentTree() {
-    return this._componentTree;
   }
 
   /********************************************************************************
@@ -141,12 +137,12 @@ class AbstractKeyEventStrategy {
   registerKeyMap(keyMap) {
     this.componentId += 1;
 
-    this._componentTree.add(this.componentId, keyMap);
+    this.componentTree.add(this.componentId, keyMap);
 
     this.logger.verbose(
       this.logger.nonKeyEventPrefix(this.componentId, { focusTreeId: false }),
       'Registered component in application key map:\n',
-      `${printComponent(this._componentTree.get(this.componentId))}`
+      `${printComponent(this.componentTree.get(this.componentId))}`
     );
 
     return this.componentId;
@@ -158,7 +154,7 @@ class AbstractKeyEventStrategy {
    * @param {KeyMap} keyMap - Map of actions to key expressions
    */
   reregisterKeyMap(componentId, keyMap) {
-    this._componentTree.update(componentId, keyMap);
+    this.componentTree.update(componentId, keyMap);
   }
 
   /**
@@ -168,12 +164,12 @@ class AbstractKeyEventStrategy {
    * @param {ComponentId} parentId - Id of the parent hot keys component
    */
   registerComponentMount(componentId, parentId) {
-    this._componentTree.setParent(componentId, parentId);
+    this.componentTree.setParent(componentId, parentId);
 
     this.logger.verbose(
       this.logger.nonKeyEventPrefix(componentId),
       'Registered component mount:\n',
-      `${printComponent(this._componentTree.get(componentId))}`
+      `${printComponent(this.componentTree.get(componentId))}`
     );
   }
 
@@ -183,16 +179,16 @@ class AbstractKeyEventStrategy {
    *        belongs to
    */
   deregisterKeyMap(componentId) {
-    this._componentTree.remove(componentId);
+    this.componentTree.remove(componentId);
 
     this.logger.verbose(
       this.logger.nonKeyEventPrefix(componentId),
       'De-registered component. Remaining component Registry:\n',
-      `${printComponent(this._componentTree.toJSON())}`
+      `${printComponent(this.componentTree.toJSON())}`
     );
 
-    if (this._componentTree.isRootId(componentId)) {
-      this._componentTree.clearRootId();
+    if (this.componentTree.isRootId(componentId)) {
+      this.componentTree.clearRootId();
     }
   }
 
@@ -245,19 +241,19 @@ class AbstractKeyEventStrategy {
    * Recording key events
    ********************************************************************************/
 
-  getCurrentCombination() {
-    return this.getKeyHistory().getCurrentCombination();
+  get currentCombination() {
+    return this.keyHistory.currentCombination;
   }
 
   _describeCurrentCombination() {
-    const keyCombinationDecorator = new KeyCombinationDecorator(this.getCurrentCombination());
+    const keyCombinationDecorator = new KeyCombinationDecorator(this.currentCombination);
     return keyCombinationDecorator.describe();
   }
 
   _recordKeyDown(event, key, componentId) {
     const keyEventState = stateFromEvent(event);
 
-    const currentCombination = this.getCurrentCombination();
+    const currentCombination = this.currentCombination;
 
     if (currentCombination.isKeyIncluded(key) || currentCombination.isEnding()) {
       this._startAndLogNewKeyCombination(componentId, key, keyEventState);
@@ -267,18 +263,18 @@ class AbstractKeyEventStrategy {
   }
 
   _startAndLogNewKeyCombination(componentId, keyName, keyEventState) {
-    this.getKeyHistory().startNewKeyCombination(keyName, keyEventState);
+    this.keyHistory.startNewKeyCombination(keyName, keyEventState);
 
     this.logger.verbose(
       this.logger.keyEventPrefix(componentId),
       `Started a new combination with '${keyName}'.`
     );
 
-    this.logger.logKeyHistory(this.getKeyHistory(), componentId);
+    this.logger.logKeyHistory(this.keyHistory, componentId);
   }
 
   _addToAndLogCurrentKeyCombination(keyName, keyEventType, keyEventState, componentId) {
-    this.getKeyHistory().addKeyToCurrentCombination(keyName, keyEventType, keyEventState);
+    this.keyHistory.addKeyToCurrentCombination(keyName, keyEventType, keyEventState);
 
     if (keyEventType === KeyEventType.keydown) {
       this.logger.verbose(
@@ -287,7 +283,7 @@ class AbstractKeyEventStrategy {
       );
     }
 
-    this.logger.logKeyHistory(this.getKeyHistory(), componentId);
+    this.logger.logKeyHistory(this.keyHistory, componentId);
   }
 
   /********************************************************************************

@@ -9,11 +9,11 @@ import MockSyntheticEvent from '../support/MockSyntheticEvent';
 describe('Correcting for missed keyup events for modifier keys:', function () {
   [
     {
-      strategyKey: '_focusOnlyEventStrategy',
+      strategyKey: 'focusOnlyEventStrategy',
       strategyName: 'FocusOnlyEventStrategy'
     },
     {
-      strategyKey: '_globalEventStrategy',
+      strategyKey: 'globalEventStrategy',
       strategyName: 'GlobalEventStrategy'
     }
   ].forEach(({strategyKey, strategyName}) => {
@@ -65,7 +65,7 @@ describe('Correcting for missed keyup events for modifier keys:', function () {
               this.eventOptions
             );
 
-            expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
+            expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
               {
                 'keys': {
                   [key]: [

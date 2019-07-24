@@ -25,11 +25,11 @@ class KeyEventManager {
   }
 
   static getFocusOnlyEventStrategy() {
-    return this.getInstance().getFocusOnlyEventStrategy();
+    return this.getInstance().focusOnlyEventStrategy;
   }
 
   static getGlobalEventStrategy() {
-    return this.getInstance().getGlobalEventStrategy()
+    return this.getInstance().globalEventStrategy
   }
 
   static clear() {
@@ -45,21 +45,13 @@ class KeyEventManager {
 
     this.logger = configuration.logger || new Logger(logLevel);
 
-    this._focusOnlyEventStrategy =
+    this.focusOnlyEventStrategy =
       new FocusOnlyKeyEventStrategy({ configuration, logLevel }, this);
 
-    this._globalEventStrategy =
+    this.globalEventStrategy =
       new GlobalKeyEventStrategy({ configuration, logLevel }, this);
 
     this.mountedComponentsCount = 0;
-  }
-
-  getFocusOnlyEventStrategy() {
-    return this._focusOnlyEventStrategy;
-  }
-
-  getGlobalEventStrategy() {
-    return this._globalEventStrategy;
   }
 
   /********************************************************************************
@@ -70,11 +62,11 @@ class KeyEventManager {
    * Returns a mapping of all of the application's actions and the key sequences
    * needed to trigger them.
    *
-   * @returns {ApplicationKeyMap} The application's key map
+   * @type {ApplicationKeyMap} The application's key map
    */
-  getApplicationKeyMap() {
-    return [this.getGlobalEventStrategy(), this.getFocusOnlyEventStrategy()].reduce((memo, strategy) => {
-      const builder = new ApplicationKeyMapBuilder(strategy.getComponentTree());
+  get applicationKeyMap() {
+    return [this.globalEventStrategy, this.focusOnlyEventStrategy].reduce((memo, strategy) => {
+      const builder = new ApplicationKeyMapBuilder(strategy.componentTree);
       const keyMap = builder.build();
 
       return { ...memo, ...keyMap };
@@ -94,7 +86,7 @@ class KeyEventManager {
   registerComponentMount(componentId, parentId) {
     this._incrementComponentCount();
 
-    return this.getFocusOnlyEventStrategy().registerComponentMount(componentId, parentId);
+    return this.focusOnlyEventStrategy.registerComponentMount(componentId, parentId);
   }
 
   registerComponentUnmount() {
@@ -122,8 +114,8 @@ class KeyEventManager {
   _clearKeyHistory() {
     this.logger.info('HotKeys: Window focused - clearing key history');
 
-    this.getFocusOnlyEventStrategy().resetKeyHistory({ force: true });
-    this.getGlobalEventStrategy().resetKeyHistory({ force: true });
+    this.focusOnlyEventStrategy.resetKeyHistory({ force: true });
+    this.globalEventStrategy.resetKeyHistory({ force: true });
   }
 
   registerGlobalComponentUnmount() {
@@ -139,7 +131,7 @@ class KeyEventManager {
   registerGlobalComponentMount(componentId, parentId) {
     this._incrementComponentCount();
 
-    return this.getGlobalEventStrategy().registerComponentMount(componentId, parentId);
+    return this.globalEventStrategy.registerComponentMount(componentId, parentId);
   }
 
   /********************************************************************************
@@ -152,7 +144,7 @@ class KeyEventManager {
    * @returns {function} Function to call to cancel listening to the next key combination
    */
   addKeyCombinationListener(callbackFunction) {
-    return this.getGlobalEventStrategy().addKeyCombinationListener(callbackFunction);
+    return this.globalEventStrategy.addKeyCombinationListener(callbackFunction);
   }
 
   /********************************************************************************
@@ -166,7 +158,7 @@ class KeyEventManager {
    * @see Configuration.ignoreEventsCondition
    */
   ignoreEvent(event) {
-    this.getFocusOnlyEventStrategy().getEventPropagator().ignoreEvent(event);
+    this.focusOnlyEventStrategy.eventPropagator.ignoreEvent(event);
   }
 
   /**
@@ -176,7 +168,7 @@ class KeyEventManager {
    * @see Configuration.ignoreEventsCondition
    */
   observeIgnoredEvents(event) {
-    this.getFocusOnlyEventStrategy().getEventPropagator().observeIgnoredEvents(event);
+    this.focusOnlyEventStrategy.eventPropagator.observeIgnoredEvents(event);
   }
 
   /**
@@ -188,12 +180,12 @@ class KeyEventManager {
    *        up to.
    */
   closeHangingKeyCombination(keyName, recordIndex) {
-    this.getFocusOnlyEventStrategy().closeHangingKeyCombination(keyName, recordIndex);
+    this.focusOnlyEventStrategy.closeHangingKeyCombination(keyName, recordIndex);
   }
 
   reactAppHistoryWithEvent(key, type) {
     const previousPropagation =
-      this.getFocusOnlyEventStrategy().eventPropagator.getPreviousPropagation();
+      this.focusOnlyEventStrategy.eventPropagator.previousPropagation;
 
     if (previousPropagation.isForKey(key) && previousPropagation.isForEventType(type)) {
       if (previousPropagation.isHandled()) {
@@ -209,15 +201,15 @@ class KeyEventManager {
   }
 
   simulatePendingKeyPressEvents() {
-    this.getFocusOnlyEventStrategy().simulatePendingKeyPressEvents();
+    this.focusOnlyEventStrategy.simulatePendingKeyPressEvents();
   }
 
   simulatePendingKeyUpEvents() {
-    this.getFocusOnlyEventStrategy().simulatePendingKeyUpEvents();
+    this.focusOnlyEventStrategy.simulatePendingKeyUpEvents();
   }
 
   isGlobalListenersBound() {
-    return this.getGlobalEventStrategy().isListenersBound();
+    return this.globalEventStrategy.isListenersBound();
   }
 }
 

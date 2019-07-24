@@ -9,11 +9,11 @@ import MockSyntheticEvent from '../support/MockSyntheticEvent';
 describe('Simulating keypress events hidden by cmd:', function () {
   [
     {
-      strategyKey: '_focusOnlyEventStrategy',
+      strategyKey: 'focusOnlyEventStrategy',
       strategyName: 'FocusOnlyEventStrategy'
     },
     {
-      strategyKey: '_globalEventStrategy',
+      strategyKey: 'globalEventStrategy',
       strategyName: 'GlobalEventStrategy'
     }
   ].forEach(({strategyKey, strategyName}) => {
@@ -40,7 +40,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Meta': [
@@ -60,7 +60,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Meta': [
@@ -84,7 +84,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Meta': [
@@ -125,7 +125,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Meta': [
@@ -145,7 +145,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Meta': [
@@ -169,7 +169,7 @@ describe('Simulating keypress events hidden by cmd:', function () {
             this.eventOptions
           );
 
-          expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'Meta': [

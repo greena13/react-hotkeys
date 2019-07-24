@@ -38,23 +38,23 @@ class KeyHistory {
    * @returns {boolean} true if there is at least one key combination, else false
    */
   any() {
-    return this._combinations.some((keyCombination) => keyCombination.getIterator().any());
+    return this._combinations.some((keyCombination) => keyCombination.iterator.any());
   }
 
   /**
    * The number of key combinations in the history (limited by the max length)
-   * @returns {number} Number of key combinations
+   * @type {number} Number of key combinations
    */
-  getLength() {
+  get length() {
     return this._combinations.length;
   }
 
   /**
    * Most recent or current key combination
-   * @returns {KeyCombination} Key combination record
+   * @type {KeyCombination} Key combination record
    */
-  getCurrentCombination() {
-    return this._combinations[this.getLength() - 1];
+  get currentCombination() {
+    return this._combinations[this.length - 1];
   }
 
   /**
@@ -67,7 +67,7 @@ class KeyHistory {
   addKeyToCurrentCombination(keyName, recordIndex, keyEventState) {
     this._ensureInitialKeyCombination();
 
-    this.getCurrentCombination().setKeyState(keyName, recordIndex, keyEventState);
+    this.currentCombination.setKeyState(keyName, recordIndex, keyEventState);
   }
 
   /**
@@ -75,7 +75,7 @@ class KeyHistory {
    * key combinations exceeds this length, the oldest is dropped.
    * @param {Number} length New maximum length of the key history
    */
-  setMaxLength(length) {
+  set maxLength(length) {
     this._maxLength = length;
     this._trimHistory();
   }
@@ -90,7 +90,7 @@ class KeyHistory {
     this._ensureInitialKeyCombination();
 
     const newCombinationRecord =
-      new KeyCombination(this.getCurrentCombination().keysStillPressedDict());
+      new KeyCombination(this.currentCombination.keysStillPressedDict());
 
     newCombinationRecord.addKey(keyName, keyEventState);
 
@@ -111,7 +111,7 @@ class KeyHistory {
    ********************************************************************************/
 
   _ensureInitialKeyCombination() {
-    if (this.getLength() === 0) {
+    if (this.length === 0) {
       this._push(new KeyCombination())
     }
   }
@@ -123,7 +123,7 @@ class KeyHistory {
   }
 
   _trimHistory() {
-    while (this.getLength() > this._maxLength) {
+    while (this.length > this._maxLength) {
       /**
        * We know the longest key sequence registered for the currently focused
        * components, so we don't need to keep a record of history longer than

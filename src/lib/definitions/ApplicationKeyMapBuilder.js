@@ -16,7 +16,7 @@ class ApplicationKeyMapBuilder {
       return {};
     }
 
-    return this._build([this._componentTree.getRootId()], {});
+    return this._build([this._componentTree.rootId], {});
   }
 
   _build(componentIds, keyMapSummary) {

@@ -162,7 +162,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       return;
     }
 
-    this.getCurrentCombination().resolveModifierFlagDiscrepancies(event, key, KeyEventType.keydown);
+    this.currentCombination.resolveModifierFlagDiscrepancies(event, key, KeyEventType.keydown);
 
     const reactAppResponse =
       this._howReactAppRespondedTo(event, key, KeyEventType.keydown);
@@ -234,7 +234,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       return;
     }
 
-    const currentCombination = this.getCurrentCombination();
+    const currentCombination = this.currentCombination;
 
     if (currentCombination.isKeyPressSimulated(key)){
       this.logger.logEventAlreadySimulated(event, key, KeyEventType.keypress);
@@ -294,7 +294,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   handleKeyUp(event) {
     const key = getKeyName(event);
 
-    const currentCombination = this.getCurrentCombination();
+    const currentCombination = this.currentCombination;
 
     if (currentCombination.isKeyUpSimulated(key)){
       this.logger.logEventAlreadySimulated(event, key, KeyEventType.keyup);
@@ -342,8 +342,8 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      */
     this._simulateKeyUpEventsHiddenByCmd(event, key);
 
-    if (this.listeners.get('keyCombination') && this.getCurrentCombination().hasEnded()) {
-      const keyCombinationDecorator = new KeyCombinationDecorator(this.getCurrentCombination());
+    if (this.listeners.get('keyCombination') && this.currentCombination.hasEnded()) {
+      const keyCombinationDecorator = new KeyCombinationDecorator(this.currentCombination);
 
       this.listeners.get('keyCombination')({
         keys: keyCombinationDecorator.asKeyDictionary(),
@@ -359,7 +359,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
        */
       this.keyEventManager.simulatePendingKeyUpEvents();
 
-      const iterator = this.getCurrentCombination().getIterator();
+      const iterator = this.currentCombination.iterator;
 
       iterator.forEachKey((keyName) => {
         if (isCmdKey(keyName)) {
@@ -404,12 +404,12 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _callClosestMatchingHandler(event, keyName, keyEventType) {
-    const componentListIterator = this._componentList.getNewIterator();
+    const componentListIterator = this._componentList.iterator;
 
     while (componentListIterator.next()) {
-      const matchFound = this.getActionResolver().callClosestMatchingHandler(
+      const matchFound = this.actionResolver.callClosestMatchingHandler(
         event, keyName, keyEventType,
-        componentListIterator.getPosition(),
+        componentListIterator.position,
         0
       );
 

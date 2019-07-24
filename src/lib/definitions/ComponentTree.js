@@ -19,20 +19,16 @@ class ComponentTree extends Registry {
     this.clearRootId();
   }
 
-  getRootId() {
-    return this._rootId;
-  }
-
   hasRoot() {
     return !this.isRootId(null);
   }
 
   isRootId(componentId) {
-    return componentId === this.getRootId()
+    return componentId === this.rootId
   }
 
   clearRootId() {
-    this._rootId = null;
+    this.rootId = null;
   }
 
   /**
@@ -71,7 +67,7 @@ class ComponentTree extends Registry {
       this.get(componentId).parentId = parentId;
       this._addChildId(parentId, componentId);
     } else {
-      this._rootId = componentId;
+      this.rootId = componentId;
     }
   }
 

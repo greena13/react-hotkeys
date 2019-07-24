@@ -9,15 +9,7 @@ class ComponentOptionsListIterator {
    */
   constructor(list) {
     this._list = list;
-    this._position = -1;
-  }
-
-  /**
-   * The position the iterator is currently at
-   * @returns {number} The current position
-   */
-  getPosition() {
-    return this._position;
+    this.position = -1;
   }
 
   /**
@@ -25,7 +17,7 @@ class ComponentOptionsListIterator {
    * @returns {ComponentOptions} The current component options
    */
   getComponent() {
-    return this._list.getAtPosition(this.getPosition());
+    return this._list.getAtPosition(this.position);
   }
 
   /**
@@ -36,8 +28,8 @@ class ComponentOptionsListIterator {
    *        is returned.
    */
   next() {
-    if (this.getPosition() + 1 < this._list.getLength()) {
-      this._position++;
+    if (this.position + 1 < this._list.length) {
+      this.position++;
 
       return this.getComponent();
     } else {

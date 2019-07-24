@@ -11,7 +11,7 @@ import KeyEventManager from './lib/KeyEventManager';
  * @returns {ApplicationKeyMap} The application's key map
  */
 function getApplicationKeyMap() {
-  return KeyEventManager.getInstance().getApplicationKeyMap();
+  return KeyEventManager.getInstance().applicationKeyMap;
 }
 
 export default getApplicationKeyMap;

@@ -17,7 +17,7 @@
  */
 function getEventCharCode(nativeEvent) {
   let charCode;
-  const keyCode = nativeEvent.keyCode;
+  const { keyCode } = nativeEvent
 
   if ('charCode' in nativeEvent) {
     charCode = nativeEvent.charCode;

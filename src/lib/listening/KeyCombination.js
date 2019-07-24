@@ -33,9 +33,9 @@ class KeyCombination {
 
   /**
    * List of ids (serialized representations) for the keys involved in the combination
-   * @returns {KeySequence[]} List of combination ids
+   * @type {KeySequence[]} List of combination ids
    */
-  getIds() {
+  get ids() {
     return lazyLoadAttribute(this, '_ids', () => KeyCombinationSerializer.serialize(this._keys));
   }
 
@@ -44,7 +44,7 @@ class KeyCombination {
    * "alted" key characters.
    * @returns {Object.<ReactKeyName, ReactKeyName[]>}
    */
-  getKeyAliases() {
+  get keyAliases() {
     return lazyLoadAttribute(this, '_keyAliases', () => buildKeyAliases(this._keys));
   }
 
@@ -60,7 +60,7 @@ class KeyCombination {
     if (keyState) {
       return keyName;
     } else {
-      const keyAlias = this.getKeyAliases()[keyName];
+      const keyAlias = this.keyAliases[keyName];
 
       if (keyAlias) {
         return keyAlias;
@@ -74,7 +74,7 @@ class KeyCombination {
    * Query attributes of entire combination
    *********************************************************************************/
 
-  getIterator() {
+  get iterator() {
     return new KeyCombinationIterator(this);
   }
 
@@ -149,7 +149,7 @@ class KeyCombination {
    *        keys with keyup events omitted
    */
   keysStillPressedDict() {
-    return this.getKeys().reduce((memo, keyName) => {
+    return this.keys.reduce((memo, keyName) => {
       if (this.isKeyStillPressed(keyName)) {
         memo[keyName] = this._getKeyState(keyName);
       }
@@ -286,12 +286,12 @@ class KeyCombination {
     return this.isEventTriggered(keyName, keyEventType) === KeyEventState.simulated;
   }
 
-  getKeyStates() {
+  get keyStates() {
     return this._keys;
   }
 
-  getKeys() {
-    return Object.keys(this.getKeyStates());
+  get keys() {
+    return Object.keys(this.keyStates);
   }
 
   _getKeyState(keyName) {
@@ -300,7 +300,7 @@ class KeyCombination {
     if (keyState) {
       return keyState;
     } else {
-      const keyAlias = this.getKeyAliases()[keyName];
+      const keyAlias = this.keyAliases[keyName];
 
       if (keyAlias) {
         return this._keys[keyAlias];

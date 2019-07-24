@@ -16,9 +16,9 @@ class KeyCombinationIterator {
 
   /**
    * Number of keys involved in the combination
-   * @returns {number} Number of keys
+   * @type {number} Number of keys
    */
-  getNumberOfKeys() {
+  get numberOfKeys() {
     return size(this._getKeys());
   }
 
@@ -55,7 +55,7 @@ class KeyCombinationIterator {
   }
 
   _getKeys() {
-    return this._keyCombination.getKeys();
+    return this._keyCombination.keys;
   }
 }
 

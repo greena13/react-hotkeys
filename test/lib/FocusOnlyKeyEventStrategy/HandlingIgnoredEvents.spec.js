@@ -10,7 +10,7 @@ describe('Handling ignored events:', function () {
   context('when the FocusOnlyKeyEventStrategy receives', () => {
     beforeEach(function () {
       this.keyEventManager = new KeyEventManager();
-      this.eventStrategy = this.keyEventManager.getFocusOnlyEventStrategy();
+      this.eventStrategy = this.keyEventManager.focusOnlyEventStrategy;
 
       this.handler = sinon.spy();
 
@@ -45,7 +45,7 @@ describe('Handling ignored events:', function () {
         });
 
         it('then the key is added to the current key combination', function () {
-          expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
             {
               'keys': {
                 'a': [
@@ -87,7 +87,7 @@ describe('Handling ignored events:', function () {
         });
 
         it('then the key is NOT added to the current key combination', function () {
-          expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([EmptyKeyCombination]);
+          expect(this.eventStrategy.keyHistory.toJSON()).to.eql([EmptyKeyCombination]);
         });
 
         it('then does NOT call any matching handlers', function() {
@@ -134,7 +134,7 @@ describe('Handling ignored events:', function () {
           });
 
           it('then the key is added to the current key combination', function () {
-            expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
+            expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
               {
                 'keys': {
                   'a': [
@@ -164,7 +164,7 @@ describe('Handling ignored events:', function () {
           });
 
           it('then the key is NOT added to the current key combination', function () {
-            expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([EmptyKeyCombination]);
+            expect(this.eventStrategy.keyHistory.toJSON()).to.eql([EmptyKeyCombination]);
           });
 
           it('then does NOT call any matching handlers', function() {
@@ -206,7 +206,7 @@ describe('Handling ignored events:', function () {
           });
 
           it('then the key is added to the current key combination', function () {
-            expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
+            expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
               {
                 'keys': {
                   'a': [
@@ -236,7 +236,7 @@ describe('Handling ignored events:', function () {
           });
 
           it('then the key is NOT added to the current key combination', function () {
-            expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([EmptyKeyCombination]);
+            expect(this.eventStrategy.keyHistory.toJSON()).to.eql([EmptyKeyCombination]);
           });
 
           it('then does NOT call any matching handlers', function() {
@@ -291,7 +291,7 @@ describe('Handling ignored events:', function () {
           });
 
           it('then the key is added to the current key combination', function () {
-            expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
+            expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
               {
                 'keys': {
                   'a': [
@@ -321,7 +321,7 @@ describe('Handling ignored events:', function () {
           });
 
           it('then the key is NOT added to the current key combination', function () {
-            expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([EmptyKeyCombination]);
+            expect(this.eventStrategy.keyHistory.toJSON()).to.eql([EmptyKeyCombination]);
           });
 
           it('then does NOT call any matching handlers', function() {
@@ -370,7 +370,7 @@ describe('Handling ignored events:', function () {
           });
 
           it('then the key is added to the current key combination', function () {
-            expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([
+            expect(this.eventStrategy.keyHistory.toJSON()).to.eql([
               {
                 'keys': {
                   'a': [
@@ -400,7 +400,7 @@ describe('Handling ignored events:', function () {
           });
 
           it('then the key is NOT added to the current key combination', function () {
-            expect(this.eventStrategy.getKeyHistory().toJSON()).to.eql([EmptyKeyCombination]);
+            expect(this.eventStrategy.keyHistory.toJSON()).to.eql([EmptyKeyCombination]);
           });
 
           it('then does NOT call any matching handlers', function() {
