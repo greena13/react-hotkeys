@@ -6,6 +6,27 @@ import arrayFrom from '../../utils/array/arrayFrom';
 const SEQUENCE_ATTRIBUTES = ['sequence', 'action'];
 const KEYMAP_ATTRIBUTES = ['name', 'description', 'group'];
 
+function createSequenceFromConfig(keyMapConfig) {
+  return arrayFrom(keyMapConfig).map((sequenceOrKeyMapOptions) => {
+    if (isObject(sequenceOrKeyMapOptions)) {
+      /**
+       * Support syntax:
+       * [
+       *   { sequence: 'a+b', action: 'keyup' },
+       *   { sequence: 'c' }
+       * ]
+       */
+      return copyAttributes(sequenceOrKeyMapOptions, {}, SEQUENCE_ATTRIBUTES);
+    } else {
+      /**
+       * Support syntax:
+       * 'a+b'
+       */
+      return { sequence: sequenceOrKeyMapOptions };
+    }
+  })
+}
+
 class ApplicationKeyMapBuilder {
   constructor(componentTree) {
     this._componentTree = componentTree;
@@ -47,7 +68,7 @@ class ApplicationKeyMapBuilder {
               );
 
               keyMapSummary[actionName].sequences =
-                this._createSequenceFromConfig(keyMapConfig.sequences);
+                createSequenceFromConfig(keyMapConfig.sequences);
             } else {
               /**
                * Support syntax:
@@ -66,7 +87,7 @@ class ApplicationKeyMapBuilder {
             }
           } else {
             keyMapSummary[actionName].sequences =
-              this._createSequenceFromConfig(keyMapConfig)
+              createSequenceFromConfig(keyMapConfig)
           }
         });
       }
@@ -75,27 +96,6 @@ class ApplicationKeyMapBuilder {
     });
 
     return keyMapSummary;
-  }
-
-  _createSequenceFromConfig(keyMapConfig) {
-    return arrayFrom(keyMapConfig).map((sequenceOrKeyMapOptions) => {
-      if (isObject(sequenceOrKeyMapOptions)) {
-        /**
-         * Support syntax:
-         * [
-         *   { sequence: 'a+b', action: 'keyup' },
-         *   { sequence: 'c' }
-         * ]
-         */
-        return copyAttributes(sequenceOrKeyMapOptions, {}, SEQUENCE_ATTRIBUTES);
-      } else {
-        /**
-         * Support syntax:
-         * 'a+b'
-         */
-        return { sequence: sequenceOrKeyMapOptions };
-      }
-    })
   }
 }
 
