@@ -2,8 +2,6 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import backwardsCompatibleContext from './utils/backwardsCompatibleContext';
 import ComponentManager from './lib/ComponentManager';
-import printComponent from './helpers/logging/printComponent';
-
 
 const propTypes = {
   /**

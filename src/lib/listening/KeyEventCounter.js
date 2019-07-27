@@ -1,4 +1,3 @@
-import isUndefined from '../../utils/isUndefined';
 import lazyLoadAttribute from '../../utils/object/lazyLoadAttribute';
 
 /**
