@@ -4,6 +4,31 @@ import KeyCombinationMatcher from './KeyCombinationMatcher';
 import KeyEventState from '../../const/KeyEventState';
 import lazyLoadAttribute from '../../utils/object/lazyLoadAttribute';
 
+function updateIndexCounters(indexCounters, idSizes) {
+  /**
+   * Cycle through the list of different combination aliases
+   */
+
+  let incrementer = 0;
+  let carry = true;
+
+  while (carry && incrementer < indexCounters.length) {
+    const count = indexFromEnd(indexCounters, incrementer);
+
+    const newIndex = (count + 1) % (indexFromEnd(idSizes, incrementer) || 1);
+
+    indexCounters[indexCounters.length - (incrementer + 1)] = newIndex;
+
+    carry = newIndex === 0;
+
+    if (carry) {
+      incrementer++;
+    }
+  }
+
+  return incrementer === indexCounters.length;
+}
+
 /**
  * Matches a KeyHistory to a list of pre-registered ActionConfiguration and
  * their corresponding handler functions
@@ -116,8 +141,9 @@ class KeyHistoryMatcher {
 
     if (previousCombinations.length) {
       /**
-       * We need to match a sequence, and therefore try different combination
-       * permutations leading up the final, most recent one
+       * We need to match a sequence, and therefore try all the aliases involved in
+       * each key combination that makes up the sequence, to be sure there isn't a
+       * match
        */
 
       const sequenceIds =
@@ -131,9 +157,7 @@ class KeyHistoryMatcher {
        */
       const indexCounters = new Array(sequenceIds.length).fill(0);
 
-      let triedAllPossiblePermutations = false;
-
-      while (!triedAllPossiblePermutations) {
+      do {
         const sequenceIdPermutation = indexCounters.map((sequenceIdIndex, index) => {
           return sequenceIds[index][sequenceIdIndex];
         });
@@ -143,30 +167,7 @@ class KeyHistoryMatcher {
         if (this._combinationMatchers[candidateId]) {
           return this._combinationMatchers[candidateId];
         }
-
-        /**
-         * Cycle through the list of different combination aliases
-         */
-
-        let incrementer = 0;
-        let carry = true;
-
-        while (carry && incrementer < indexCounters.length) {
-          const count = indexFromEnd(indexCounters, incrementer);
-
-          const newIndex = (count + 1) % (indexFromEnd(idSizes, incrementer) || 1);
-
-          indexCounters[indexCounters.length - (incrementer + 1)] = newIndex;
-
-          carry = newIndex === 0;
-
-          if (carry) {
-            incrementer++;
-          }
-        }
-
-        triedAllPossiblePermutations = incrementer === indexCounters.length;
-      }
+      } while(!updateIndexCounters(indexCounters, idSizes));
     }
 
     return this._combinationMatchers[''];

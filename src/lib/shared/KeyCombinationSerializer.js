@@ -13,24 +13,24 @@ import distinct from '../../utils/array/distinct';
 function buildShiftedKeyAliases(combinationIncludesAlt, keyName) {
   if (combinationIncludesAlt) {
     return [
-      keyName,
+      ...resolveAltShiftedAlias(keyName),
       ...resolveUnaltShiftedAlias(keyName),
-      ...resolveAltShiftedAlias(keyName)
+      keyName
     ];
   } else {
     return [
-      keyName,
+      ...resolveShiftedAlias(keyName),
       ...resolveUnshiftedAlias(keyName),
-      ...resolveShiftedAlias(keyName)
+      keyName
     ];
   }
 }
 
 function buildAltKeyAliases(keyName) {
   return [
-    keyName,
+    ...resolveAltedAlias(keyName),
     ...resolveUnaltedAlias(keyName),
-    ...resolveAltedAlias(keyName)
+    keyName
   ];
 }
 
@@ -100,7 +100,7 @@ class KeyCombinationSerializer {
     const combinationDictionary =
       buildKeyCombinationPermutations(keyCombination);
 
-    return combinationDictionary.map(normalizedCombinationId).sort();
+    return combinationDictionary.map(normalizedCombinationId);
   }
 
   /**
