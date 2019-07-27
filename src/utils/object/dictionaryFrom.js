@@ -5,6 +5,8 @@
  * @returns {*} The adapted value to use as a dictionary key
  */
 
+import arrayFrom from '../array/arrayFrom';
+
 /**
  * Create a dictionary (map) from an array of values
  * @param {*[]} array Array of values
@@ -24,7 +26,7 @@ function dictionaryFrom(array, valueOrAdaptor = true, keyAdaptor = nop, initValu
     return () => { return valueOrAdaptor };
   })();
 
-  return array.reduce((memo, element) => {
+  return arrayFrom(array).reduce((memo, element) => {
     memo[keyAdaptor(element)] = _valueAdaptor(element);
 
     return memo;

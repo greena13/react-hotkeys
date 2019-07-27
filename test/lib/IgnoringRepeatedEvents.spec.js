@@ -93,7 +93,7 @@ describe('Ignoring repeated events:', function () {
                   [KeyEventState.seen, KeyEventState.seen, KeyEventState.unseen]
                 ]
               },
-              'ids': ['Shift+a', 'A+Shift'],
+              'ids': ['Shift+A', 'Shift+a'],
               'keyAliases': {
                 'A': 'a'
               }

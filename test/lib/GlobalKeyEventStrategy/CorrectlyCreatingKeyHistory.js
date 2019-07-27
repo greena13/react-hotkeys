@@ -48,7 +48,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "A+Shift",
+                "Shift+A",
                 "Shift+a"
               ],
               "keyAliases": { 'a': 'A' }
@@ -70,7 +70,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "A+Shift",
+                "Shift+A",
                 "Shift+a"
               ],
               "keyAliases": { 'a': 'A' }
@@ -92,7 +92,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "A+Shift",
+                "Shift+A",
                 "Shift+a"
               ],
               "keyAliases": { 'a': 'A' }
@@ -114,7 +114,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "A+Shift",
+                "Shift+A",
                 "Shift+a"
               ],
               "keyAliases": { 'a': 'A' }
@@ -140,7 +140,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "A+Shift",
+                "Shift+A",
                 "Shift+a"
               ],
               "keyAliases": { 'a': 'A' }
@@ -162,7 +162,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "A+Shift",
+                "Shift+A",
                 "Shift+a"
               ],
               "keyAliases": { 'a': 'A' }
@@ -184,7 +184,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "A+Shift",
+                "Shift+A",
                 "Shift+a"
               ],
               "keyAliases": { 'a': 'A' }
@@ -206,7 +206,7 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "A+Shift",
+                "Shift+A",
                 "Shift+a"
               ],
               "keyAliases": { 'a': 'A' }
@@ -254,8 +254,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "Shift+a",
-                "A+Shift"
+                "Shift+A",
+                "Shift+a"
               ],
               "keyAliases": { 'A': 'a' }
             }
@@ -276,8 +276,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "Shift+a",
-                "A+Shift"
+                "Shift+A",
+                "Shift+a"
               ],
               "keyAliases": { 'A': 'a' }
             }
@@ -298,8 +298,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "Shift+a",
-                "A+Shift"
+                "Shift+A",
+                "Shift+a"
               ],
               "keyAliases": { 'A': 'a' }
             }
@@ -324,8 +324,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "Shift+a",
-                "A+Shift"
+                "Shift+A",
+                "Shift+a"
               ],
               "keyAliases": { 'A': 'a' }
             }
@@ -346,8 +346,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "Shift+a",
-                "A+Shift"
+                "Shift+A",
+                "Shift+a"
               ],
               "keyAliases": { 'A': 'a' }
             }
@@ -368,8 +368,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "Shift+a",
-                "A+Shift"
+                "Shift+A",
+                "Shift+a"
               ],
               "keyAliases": { 'A': 'a' }
             }
@@ -417,8 +417,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "Alt+å",
-                "Alt+a"
+                "Alt+a",
+                "Alt+å"
               ],
               "keyAliases": { 'a': 'å' }
             }
@@ -439,8 +439,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "Alt+å",
-                "Alt+a"
+                "Alt+a",
+                "Alt+å"
               ],
               "keyAliases": { 'a': 'å' }
             }
@@ -461,8 +461,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "Alt+å",
-                "Alt+a"
+                "Alt+a",
+                "Alt+å"
               ],
               "keyAliases": { 'a': 'å' }
             }
@@ -483,8 +483,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "Alt+å",
-                "Alt+a"
+                "Alt+a",
+                "Alt+å"
               ],
               "keyAliases": { 'a': 'å' }
             }
@@ -509,8 +509,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "Alt+å",
-                "Alt+a"
+                "Alt+a",
+                "Alt+å"
               ],
               "keyAliases": { 'a': 'å' }
             }
@@ -531,8 +531,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "Alt+å",
-                "Alt+a"
+                "Alt+a",
+                "Alt+å"
               ],
               "keyAliases": { 'a': 'å' }
             }
@@ -553,8 +553,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "Alt+å",
-                "Alt+a"
+                "Alt+a",
+                "Alt+å"
               ],
               "keyAliases": { 'a': 'å' }
             }
@@ -575,8 +575,8 @@ describe('Correctly creating key history for GlobalKeyEventStrategy:', function 
                 ]
               },
               "ids": [
-                "Alt+å",
-                "Alt+a"
+                "Alt+a",
+                "Alt+å"
               ],
               "keyAliases": { 'a': 'å' }
             }

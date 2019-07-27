@@ -7,6 +7,78 @@ import resolveAltedAlias from '../../helpers/resolving-handlers/resolveAltedAlia
 import resolveUnaltShiftedAlias from '../../helpers/resolving-handlers/resolveUnaltShiftedAlias';
 import resolveAltShiftedAlias from '../../helpers/resolving-handlers/resolveAltShiftedAlias';
 import normalizedCombinationId from '../../helpers/parsing-key-maps/normalizedCombinationId';
+import size from '../../utils/collection/size';
+import distinct from '../../utils/array/distinct';
+
+function buildShiftedKeyAliases(combinationIncludesAlt, keyName) {
+  if (combinationIncludesAlt) {
+    return [
+      keyName,
+      ...resolveUnaltShiftedAlias(keyName),
+      ...resolveAltShiftedAlias(keyName)
+    ];
+  } else {
+    return [
+      keyName,
+      ...resolveUnshiftedAlias(keyName),
+      ...resolveShiftedAlias(keyName)
+    ];
+  }
+}
+
+function buildAltKeyAliases(keyName) {
+  return [
+    keyName,
+    ...resolveUnaltedAlias(keyName),
+    ...resolveAltedAlias(keyName)
+  ];
+}
+
+function buildOSAndKeyboardLayoutAliases(keyName) {
+  const osAndLayoutAliases = KeyOSAndLayoutAliasesDictionary[keyName];
+
+  if (osAndLayoutAliases) {
+    return [
+      keyName,
+      ...osAndLayoutAliases,
+    ];
+  }
+
+  return [keyName];
+}
+
+function buildKeyAliasList(keyCombination, keyName) {
+  const combinationIncludesShift = keyCombination['Shift'];
+  const combinationIncludesAlt = keyCombination['Alt'];
+
+  const aliases = (()=> {
+    if (combinationIncludesShift) {
+      return buildShiftedKeyAliases(combinationIncludesAlt, keyName);
+    } else if (combinationIncludesAlt) {
+      return buildAltKeyAliases(keyName);
+    } else {
+      return buildOSAndKeyboardLayoutAliases(keyName);
+    }
+  })();
+
+  return distinct(aliases);
+}
+
+function buildKeyCombinationPermutations(keyCombination) {
+  return Object.keys(keyCombination).reduce((allCombinations, keyName) => {
+    const keyAliasList = buildKeyAliasList(keyCombination, keyName);
+
+    if (size(allCombinations) === 0) {
+      return keyAliasList.map((keyAlias) => { return { [keyAlias]: true } });
+    }
+
+    return keyAliasList.reduce((keyAliasCombinations, keyAlias) => {
+      return keyAliasCombinations.concat(
+        allCombinations.map((keyDictionary) => {return { ...keyDictionary, [keyAlias]: true };})
+      );
+    }, []);
+  }, []);
+}
 
 /**
  * Serializes instances of KeyCombination to KeyCombinationString.
@@ -21,85 +93,14 @@ class KeyCombinationSerializer {
    * @returns {string[]} Serialization of KeyCombination
    */
   static serialize(keyCombination) {
-    const combinationIncludesShift = keyCombination['Shift'];
-    const combinationIncludesAlt = keyCombination['Alt'];
-    const keyCombinationIdDict = {};
-
     /**
      * List of key names in alphabetical order
      * @type {string[]}
      */
-    const sortedKeys = Object.keys(keyCombination).sort();
+    const combinationDictionary =
+      buildKeyCombinationPermutations(keyCombination);
 
-    sortedKeys.forEach((keyName) => {
-      let keyAliases = [];
-
-      if (combinationIncludesShift) {
-        if (combinationIncludesAlt) {
-          const unaltShiftedKeyNames = resolveUnaltShiftedAlias(keyName);
-          const altShiftedKeyNames = resolveAltShiftedAlias(keyName);
-
-          keyAliases = [
-            ...keyAliases,
-            keyName,
-            ...unaltShiftedKeyNames,
-            ...altShiftedKeyNames
-          ];
-        } else {
-          const unshiftedKeyNames = resolveUnshiftedAlias(keyName);
-          const shiftedKeyNames = resolveShiftedAlias(keyName);
-
-          keyAliases = [
-            ...keyAliases,
-            keyName,
-            ...unshiftedKeyNames,
-            ...shiftedKeyNames
-          ];
-        }
-      } else if (combinationIncludesAlt) {
-        const unaltedKeyNames = resolveUnaltedAlias(keyName);
-        const altedKeyNames = resolveAltedAlias(keyName);
-
-        keyAliases = [
-          ...keyAliases,
-          keyName,
-          ...unaltedKeyNames,
-          ...altedKeyNames
-        ];
-      } else {
-        keyAliases.push(keyName);
-
-        const keyAlias = KeyOSAndLayoutAliasesDictionary[keyName];
-
-        if (keyAlias) {
-          keyAliases = [
-            ...keyAliases,
-            ...keyAlias,
-          ];
-        }
-      }
-
-      const keyCombinationIds = Object.keys(keyCombinationIdDict);
-
-      if (keyCombinationIds.length > 0) {
-        keyCombinationIds.forEach((keyCombinationId) => {
-          keyAliases.forEach((keyAlias) => {
-            keyCombinationIdDict[keyCombinationId + `+${keyAlias}`] = {
-              ...keyCombinationIdDict[keyCombinationId],
-              [keyAlias]: true
-            };
-          });
-
-          delete keyCombinationIdDict[keyCombinationId];
-        });
-      } else {
-        keyAliases.forEach((keyAlias) => {
-          keyCombinationIdDict[keyAlias] = { [keyAlias]: true };
-        });
-      }
-    });
-
-    return Object.values(keyCombinationIdDict).map(normalizedCombinationId);
+    return combinationDictionary.map(normalizedCombinationId).sort();
   }
 
   /**
