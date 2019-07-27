@@ -125,8 +125,6 @@ export class GlobalHotKeys extends React.Component<GlobalHotKeysProps, {}> { }
  */
 export declare function withHotKeys(Component: React.ComponentClass, hotKeysOptions: HotKeysEnabledProps): HotKeysEnabled;
 
-export declare function deprecatedWithHotKeys(keyMap: { [key: string]: KeySequence }): HotKeys;
-
 export type ListOfKeys = string | Array<string>;
 
 /**
