@@ -60,9 +60,7 @@ class ComponentManager {
   _shouldBindKeyListeners(props) {
     const keyMap = this._getKeyMap(props);
 
-    return !isEmpty(keyMap) || props.root || (
-      Configuration.option('enableHardSequences') && this._handlersIncludeHardSequences(keyMap, this._getHandlers(props))
-    );
+    return !isEmpty(keyMap) || props.root;
   }
 
   /************************************************************************************
@@ -159,12 +157,6 @@ class ComponentManager {
 
   _componentIsFocused() {
     return this._focused === true;
-  }
-
-  _handlersIncludeHardSequences(keyMap, handlers) {
-    return Object.keys(handlers).some((action) => {
-      return !keyMap[action] && KeyCombinationSerializer.isValidKeySerialization(action);
-    });
   }
 
   _focusTreeIdsPush(componentId) {

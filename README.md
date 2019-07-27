@@ -556,26 +556,6 @@ const handlers = {
 </HotKeys>;
 ```
 
-#### DEPRECATED: Hard Sequence Handlers
-
-Handlers associated to actions with names that are valid key sequence strings implicitly define actions that are matched by the corresponding key sequence. This means you do not have to define the key maps in order for these handlers to "just work".
-
-This functionality is not advised and exists mainly for backwards compatibility. It is generally advisable to explicitly define an action in a key map rather than rely on this behaviour.
-
-To use hard sequence handlers, you must first enable them using the `enableHardSequences` [configuration option](#Configuration).
-
-```javascript
-/**
- * If no named 'up' action has been defined in a key map and it is a valid
- * key sequence, react-hotkeys assumes it's a hard sequence handler and
- * implicitly defines an action for it
- */
-
-const handlers = {
-  up: event => console.log("up key called")
-};
-```
-
 ## Interaction with React
 
 Rather than re-invent the wheel, `react-hotkeys` piggy-backs of the React SyntheticEvent and event propagation, so all of the normal React behaviour that you expect still applies.
@@ -1228,13 +1208,6 @@ configure({
    * @type {Function<KeyboardEvent>}
    */
   ignoreEventsCondition: function,
-
-  /**
-   * Whether to allow hard sequences, or the binding of handlers to actions
-   * that have names that are valid key sequences, which implicitly define
-   * actions that are triggered by that key sequence
-   */
-  enableHardSequences: false,
 
   /**
    * Whether to ignore changes to keyMap and handlers props by default

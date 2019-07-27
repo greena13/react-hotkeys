@@ -1,6 +1,5 @@
 import removeAtIndex from '../../utils/array/removeAtIndex';
 import KeyEventStateArrayManager from '../shared/KeyEventStateArrayManager';
-import Configuration from '../config/Configuration';
 import isObject from '../../utils/object/isObject';
 import hasKey from '../../utils/object/hasKey';
 import arrayFrom from '../../utils/array/arrayFrom';
@@ -9,7 +8,6 @@ import KeyEventType from '../../const/KeyEventType';
 import KeySequenceParser from '../shared/KeySequenceParser';
 import KeyEventState from '../../const/KeyEventState';
 import ComponentOptionsListIterator from './ComponentOptionsListIterator';
-import HardSequencer from './HardSequencer';
 
 /**
  * @typedef {Object} ComponentOptions a hotkeys component's options in a normalized
@@ -302,23 +300,11 @@ class ComponentOptionsList {
    * @private
    */
   _build(componentId, actionNameToKeyMap, actionNameToHandlersMap, options){
-    const { keyMap: hardSequenceKeyMap, handlers: includingHardSequenceHandlers } = (() => {
-      if (Configuration.option('enableHardSequences')) {
-        return HardSequencer.apply(actionNameToKeyMap, actionNameToHandlersMap);
-      } else {
-        return {
-          keyMap: actionNameToKeyMap,
-          handlers: actionNameToHandlersMap
-        };
-      }
-    })();
-
-    const actions = this._buildActionDictionary(
-      { ...actionNameToKeyMap, ...hardSequenceKeyMap }, options, componentId
-    );
+    const actions =
+      this._buildActionDictionary(actionNameToKeyMap, options, componentId);
 
     return {
-      actions, handlers: includingHardSequenceHandlers, componentId, options
+      actions, handlers: actionNameToHandlersMap, componentId, options
     };
   }
 

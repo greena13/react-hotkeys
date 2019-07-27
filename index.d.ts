@@ -261,13 +261,6 @@ export interface ConfigurationOptions {
   ignoreTags?: Array<string>,
 
   /**
-   * Whether to allow hard sequences, or the binding of handlers to actions that have
-   * names that are valid key sequences, which implicitly define actions that are
-   * triggered by that key sequence
-   */
-  enableHardSequences?: boolean,
-
-  /**
    * Whether to ignore changes to keyMap and handlers props by default (this reduces
    * a significant amount of unnecessarily resetting internal state)
    */
