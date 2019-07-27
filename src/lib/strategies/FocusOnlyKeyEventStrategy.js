@@ -509,14 +509,6 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       }
     }
   }
-
-  /********************************************************************************
-   * Logging
-   ********************************************************************************/
-
-  getFocusTreeId() {
-    return this.focusTree.id;
-  }
 }
 
 export default FocusOnlyKeyEventStrategy;
