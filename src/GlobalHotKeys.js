@@ -67,8 +67,8 @@ class GlobalHotKeys extends Component {
         this._id,
         keyMap,
         handlers,
-        this._getComponentOptions(),
-        this._getEventOptions()
+        GlobalHotKeys._getComponentOptions(),
+        GlobalHotKeys._getEventOptions()
       );
     }
   }
@@ -83,8 +83,8 @@ class GlobalHotKeys extends Component {
       this._id,
       keyMap,
       handlers,
-      this._getComponentOptions(),
-      this._getEventOptions()
+      GlobalHotKeys._getComponentOptions(),
+      GlobalHotKeys._getEventOptions()
     );
   }
 
@@ -97,13 +97,13 @@ class GlobalHotKeys extends Component {
     KeyEventManager.getInstance().registerGlobalComponentUnmount();
   }
 
-  _getComponentOptions() {
+  static _getComponentOptions() {
     return {
       defaultKeyEvent: Configuration.option('defaultKeyEvent')
     };
   }
 
-  _getEventOptions() {
+  static _getEventOptions() {
     return {
       ignoreEventsCondition: Configuration.option('ignoreEventsCondition')
     };
