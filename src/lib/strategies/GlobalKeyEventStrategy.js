@@ -153,7 +153,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    *
    * This method is called once when a keyboard event bubbles up to document, and checks
    * the keymaps for all of the mounted global HotKey components.
-   * @param {KeyboardEvent} event - Event containing the key name and state
+   * @param {SyntheticKeyboardEvent} event - Event containing the key name and state
    */
   handleKeyDown(event) {
     const key = getKeyName(event);
@@ -225,7 +225,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    *
    * This method is called once when a keyboard event bubbles up to document, and checks
    * the keymaps for all of the mounted global HotKey components.
-   * @param {KeyboardEvent} event - Event containing the key name and state
+   * @param {SyntheticKeyboardEvent} event - Event containing the key name and state
    */
   handleKeyPress(event) {
     const key = getKeyName(event);
@@ -289,7 +289,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    *
    * This method is called once when a keyboard event bubbles up to document, and checks
    * the keymaps for all of the mounted global HotKey components.
-   * @param {KeyboardEvent} event - Event containing the key name and state
+   * @param {SyntheticKeyboardEvent} event - Event containing the key name and state
    */
   handleKeyUp(event) {
     const key = getKeyName(event);

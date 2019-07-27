@@ -166,6 +166,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
   /**
    * @typedef {KeyboardEvent} SyntheticKeyboardEvent
+   * @property {KeyboardEvent} nativeEvent The native event the SyntheticEvent is wrapping
    * @property {function} persist
    */
 
@@ -256,7 +257,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * render tree. The event is only registered the first time it is seen and results
    * of some calculations are cached. The event is matched against the handlers registered
    * at each component level, to ensure the proper handler declaration scoping.
-   * @param {KeyboardEvent} event - Event containing the key name and state
+   * @param {SyntheticKeyboardEvent} event - Event containing the key name and state
    * @param {FocusTreeId} focusTreeId Id - of focus tree component thinks it's apart of
    * @param {ComponentId} componentId - The index of the component that is currently handling
    *        the keyboard event as it bubbles towards the document root.
@@ -322,7 +323,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    * render tree. The event is only registered the first time it is seen and results
    * of some calculations are cached. The event is matched against the handlers registered
    * at each component level, to ensure the proper handler declaration scoping.
-   * @param {KeyboardEvent} event Event containing the key name and state
+   * @param {SyntheticKeyboardEvent} event Event containing the key name and state
    * @param {FocusTreeId} focusTreeId Id of focus tree component thinks it's apart of
    * @param {ComponentId} componentId The index of the component that is currently handling
    *        the keyboard event as it bubbles towards the document root.
@@ -467,7 +468,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   /**
    * Calls the first handler that matches the current key event if the action has not
    * already been handled in a more deeply nested component
-   * @param {KeyboardEvent} event Keyboard event object to be passed to the handler
+   * @param {SyntheticKeyboardEvent} event Keyboard event object to be passed to the handler
    * @param {NormalizedKeyName} keyName Normalized key name
    * @param {KeyEventType} keyEventType The record index of the current key event type
    * @param {FocusTreeId} focusTreeId Id of focus tree component thinks it's apart of

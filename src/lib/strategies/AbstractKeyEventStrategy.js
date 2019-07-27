@@ -67,6 +67,13 @@ class AbstractKeyEventStrategy {
 
     this.componentTree = new ComponentTree();
 
+    /**
+     * Expected to be overridden by child class
+     * @type {AbstractKeyEventSimulator}
+     * @abstract
+     */
+    this._simulator = null;
+
     this._reset();
 
     this.resetKeyHistory();

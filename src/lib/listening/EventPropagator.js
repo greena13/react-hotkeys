@@ -125,7 +125,7 @@ class EventPropagator {
    * after an event has propagated to a new hot keys component
    * @param {ComponentId} componentId The id of the component that has just had the
    *        event propagate up to it
-   * @param {KeyboardEvent} event The actual KeyboardEvent that is propagating
+   * @param {SyntheticKeyboardEvent} event The actual KeyboardEvent that is propagating
    * @param {ReactKeyName} key The name of the key the event relates to
    * @param {KeyEventType} type The type of keyboard event
    * @returns {boolean} true if the event should be observed, otherwise false if it
@@ -198,7 +198,7 @@ class EventPropagator {
   /**
    * Record that an event is being ignored for the rest of its propagation and, if
    * enabled, stop it from further propagation entirely.
-   * @param {KeyboardEvent} event Event to ignore
+   * @param {SyntheticKeyboardEvent} event Event to ignore
    * @returns {boolean} true if the event was stopped from further propagation,
    *          otherwise false.
    */
@@ -242,7 +242,7 @@ class EventPropagator {
 
   /**
    * Stop an event from further propagation
-   * @param {KeyboardEvent} event Event to call stopPropagation() on
+   * @param {SyntheticKeyboardEvent} event Event to call stopPropagation() on
    * @returns {boolean} true if the event was stopped and false if it was already
    *          stopped
    */

@@ -234,7 +234,7 @@ class KeyCombination {
   /**
    * Synchronises the key combination history to match the modifier key flag attributes
    * on new key events
-   * @param {KeyboardEvent} event - Event to check the modifier flags for
+   * @param {KeyboardEvent|SyntheticKeyboardEvent} event - Event to check the modifier flags for
    * @param {string} key - Name of key that events relates to
    * @param {KeyEventType} keyEventType - The record index of the current
    *        key event type

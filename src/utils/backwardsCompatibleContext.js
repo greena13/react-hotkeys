@@ -36,6 +36,7 @@ function backwardsCompatibleContext(
      * available until React v17.*
      */
 
+    // noinspection JSUndefinedPropertyAssignment
     /**
      * The contextTypes and childContextTypes are the same as each react hotkeys component
      * that uses context, both consumes its most direct ancestor's context and modifies
@@ -43,17 +44,23 @@ function backwardsCompatibleContext(
      * most direct ancestor
      */
     Component.contextTypes = contextTypes;
+    // noinspection JSUndefinedPropertyAssignment
     Component.childContextTypes = childContextTypes;
 
+    // noinspection JSUnresolvedVariable
     Component.prototype.getChildContext = function() {
       return this._childContext;
     };
   } else {
+    // noinspection UnnecessaryLocalVariableJS
     const context = React.createContext(contextType);
 
+    // noinspection JSUndefinedPropertyAssignment
     Component.contextType = context;
+    // noinspection JSUnresolvedVariable
     Component.prototype._originalRender = Component.prototype.render;
 
+    // noinspection JSUnresolvedVariable
     /**
      * We unfortunately have to wrap the original render method of the Component to
      * dynamically add the context Provider component.

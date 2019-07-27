@@ -154,7 +154,7 @@ class KeyEventManager {
   /**
    * Ignores the next keyboard event immediately, rather than waiting for it to
    * match the ignoreEventsCondition
-   * @param {KeyboardEvent} event keyboard event to ignore
+   * @param {SyntheticKeyboardEvent} event keyboard event to ignore
    * @see Configuration.ignoreEventsCondition
    */
   ignoreEvent(event) {
@@ -164,7 +164,7 @@ class KeyEventManager {
   /**
    * Forces the observation of the next keyboard event immediately, disregarding whether
    * the event matches the ignoreKeyEventsCondition
-   * @param {KeyboardEvent} event keyboard event to force the observation of
+   * @param {SyntheticKeyboardEvent} event keyboard event to force the observation of
    * @see Configuration.ignoreEventsCondition
    */
   observeIgnoredEvents(event) {

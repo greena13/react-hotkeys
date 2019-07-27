@@ -9,12 +9,13 @@ import hasKey from '../../utils/object/hasKey';
 
 /**
  * Returns key name from native or React keyboard event
- * @param {KeyboardEvent} event - Event containing the key name
+ * @param {SyntheticKeyboardEvent} event - Event containing the key name
  * @returns {NormalizedKeyName} Normalized name of the key
  */
 function getKeyName(event) {
   const keyName = function(){
     const customKeyCodes = Configuration.option('customKeyCodes');
+    // noinspection JSDeprecatedSymbols
     const keyCode = event.keyCode || event.charCode;
 
     if (hasKey(customKeyCodes, keyCode)) {

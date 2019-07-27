@@ -160,6 +160,7 @@ class Configuration {
       configuration._customKeyNamesDict = dictionaryFrom(Object.values(configuration.customKeyCodes));
     }
 
+    // noinspection JSUnresolvedVariable
     if (process.env.NODE_ENV === 'production') {
       if (['verbose', 'debug', 'info'].indexOf(configuration.logLevel) !== -1) {
         console.warn(
