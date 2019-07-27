@@ -204,7 +204,7 @@ class AbstractKeyEventStrategy {
    ********************************************************************************/
 
   getComponentPosition(componentId) {
-    return this._componentList.getIndexById(componentId)
+    return this._componentList.getPositionById(componentId)
   }
 
   getComponentAtPosition(position) {
@@ -231,7 +231,7 @@ class AbstractKeyEventStrategy {
     this._recalculate();
 
     this.logger.debug(this.logger.nonKeyEventPrefix(componentId), action);
-    this.logger.logComponentOptions(componentId, this._componentList.get(componentId));
+    this.logger.logComponentOptions(componentId, this._componentList.getById(componentId));
   }
 
   _updateComponent(componentId, actionNameToKeyMap, actionNameToHandlersMap, options) {
@@ -241,7 +241,7 @@ class AbstractKeyEventStrategy {
 
     this._recalculate();
 
-    this.logger.logComponentOptions(componentId, this._componentList.get(componentId));
+    this.logger.logComponentOptions(componentId, this._componentList.getById(componentId));
   }
 
   /********************************************************************************

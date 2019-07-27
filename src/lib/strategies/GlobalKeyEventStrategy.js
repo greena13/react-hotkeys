@@ -139,7 +139,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * @private
    */
   _shouldListenersBeBound() {
-    return this._componentList.any() || this.listeners.get('keyCombination');
+    return this._componentList.length !== 0 || this.listeners.get('keyCombination');
   }
 
   /********************************************************************************

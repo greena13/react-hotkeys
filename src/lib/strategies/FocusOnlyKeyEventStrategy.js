@@ -496,7 +496,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
       const { previousPosition } = this.eventPropagator;
 
-      const componentPosition = this._componentList.getIndexById(componentId);
+      const componentPosition = this._componentList.getPositionById(componentId);
 
       const handlerWasCalled =
         this.actionResolver.callClosestMatchingHandler(

@@ -132,7 +132,7 @@ class EventPropagator {
    *        should be ignored.
    */
   startNewPropagationStep(componentId, event, key, type) {
-    this._position = this._componentList.getIndexById(componentId);
+    this._position = this._componentList.getPositionById(componentId);
     this._componentId = componentId;
 
     if (this.isFirstPropagationStep()) {

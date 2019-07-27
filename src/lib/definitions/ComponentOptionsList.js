@@ -113,7 +113,7 @@ class ComponentOptionsList {
 
     this._list.push(componentOptions);
 
-    const newIndex = this._getLastIndex();
+    const newIndex = this.length - 1;
     return this._idToIndex[componentId] = newIndex;
   }
 
@@ -124,7 +124,7 @@ class ComponentOptionsList {
    *        specified id
    */
   containsId(id) {
-    return !!this.get(id);
+    return !!this.getById(id);
   }
 
   /**
@@ -132,8 +132,8 @@ class ComponentOptionsList {
    * @param {ComponentId} id Id of the component to retrieve the options for
    * @returns {ComponentOptions} Options for the component with the specified id
    */
-  get(id) {
-    return this.getAtPosition(this.getIndexById(id));
+  getById(id) {
+    return this.getAtPosition(this.getPositionById(id));
   }
 
   /**
@@ -142,7 +142,7 @@ class ComponentOptionsList {
    * @param {ComponentId} id Id of the component to retrieve the options for
    * @returns {number} The position of the component options in the list.
    */
-  getIndexById(id) {
+  getPositionById(id) {
     return this._idToIndex[id];
   }
 
@@ -192,7 +192,7 @@ class ComponentOptionsList {
       }
     }
 
-    this._list[this.getIndexById(componentId)] = componentOptions;
+    this._list[this.getPositionById(componentId)] = componentOptions;
   }
 
   /**
@@ -204,19 +204,11 @@ class ComponentOptionsList {
     const isUpdatingLongestSequenceComponent =
       this._isUpdatingComponentWithLongestSequence(id);
 
-    this.removeAtPosition(this.getIndexById(id));
+    this.removeAtPosition(this.getPositionById(id));
 
     if (isUpdatingLongestSequenceComponent) {
       this._recalculateLongestSequence();
     }
-  }
-
-  /**
-   * Whether the list has any options in it (non-empty)
-   * @returns {boolean} true if the list has one or more options in it
-   */
-  any() {
-    return this.length !== 0;
   }
 
   /**
@@ -225,7 +217,7 @@ class ComponentOptionsList {
    * @returns {boolean} true if the component is the last in the list
    */
   isRoot(id) {
-    return this.getIndexById(id) >= this.length - 1;
+    return this.getPositionById(id) >= this.length - 1;
   }
 
   /**
@@ -280,15 +272,7 @@ class ComponentOptionsList {
   toJSON() {
     return this._list;
   }
-
-  /********************************************************************************
-   * Private methods
-   ********************************************************************************/
-
-  _getLastIndex() {
-    return this.length - 1;
-  }
-
+  
   /**
    * Builds the internal representation that described the options passed to a hot keys
    * component
