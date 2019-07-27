@@ -47,7 +47,7 @@ function backwardsCompatibleContext(
     // noinspection JSUndefinedPropertyAssignment
     Component.childContextTypes = childContextTypes;
 
-    // noinspection JSUnresolvedVariable
+    // noinspection JSUnresolvedVariable,JSUnusedGlobalSymbols
     Component.prototype.getChildContext = function() {
       return this._childContext;
     };
