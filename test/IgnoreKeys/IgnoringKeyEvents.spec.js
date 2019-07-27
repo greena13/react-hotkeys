@@ -1,11 +1,11 @@
 import React from 'react';
-import {mount} from 'enzyme';
-import {expect} from 'chai';
+import { mount } from 'enzyme';
+import { expect } from 'chai';
 import sinon from 'sinon';
 
 import FocusableElement from '../support/FocusableElement';
 
-import {HotKeys, IgnoreKeys} from '../../src/';
+import { HotKeys, IgnoreKeys } from '../../src/';
 import Key from '../support/Key';
 
 describe('Ignoring key events using IgnoreKeys:', function () {
@@ -32,7 +32,7 @@ describe('Ignoring key events using IgnoreKeys:', function () {
       this.wrapper = mount(
         <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
           <IgnoreKeys>
-            <div className="childElement" />
+            <div className="childElement"/>
           </IgnoreKeys>
         </HotKeys>
       );
@@ -41,7 +41,7 @@ describe('Ignoring key events using IgnoreKeys:', function () {
       this.targetElement.focus();
     });
 
-    it('then ignores all key events', function() {
+    it('then ignores all key events', function () {
       this.targetElement.keyDown(Key.A);
       this.targetElement.keyPress(Key.A);
       this.targetElement.keyUp(Key.A);
@@ -61,7 +61,7 @@ describe('Ignoring key events using IgnoreKeys:', function () {
       this.wrapper = mount(
         <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
           <IgnoreKeys only={'a'}>
-            <div className="childElement" />
+            <div className="childElement"/>
           </IgnoreKeys>
         </HotKeys>
       );
@@ -70,7 +70,7 @@ describe('Ignoring key events using IgnoreKeys:', function () {
       this.targetElement.focus();
     });
 
-    it('then ignores all key events that match keys in the only option', function() {
+    it('then ignores all key events that match keys in the only option', function () {
       this.targetElement.keyDown(Key.A);
       this.targetElement.keyPress(Key.A);
       this.targetElement.keyUp(Key.A);
@@ -90,7 +90,7 @@ describe('Ignoring key events using IgnoreKeys:', function () {
       this.wrapper = mount(
         <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
           <IgnoreKeys except={'b'}>
-            <div className="childElement" />
+            <div className="childElement"/>
           </IgnoreKeys>
         </HotKeys>
       );
@@ -99,7 +99,7 @@ describe('Ignoring key events using IgnoreKeys:', function () {
       this.targetElement.focus();
     });
 
-    it('then ignores all key events that DON\'T match keys in the except option', function() {
+    it('then ignores all key events that DON\'T match keys in the except option', function () {
       this.targetElement.keyDown(Key.A);
       this.targetElement.keyPress(Key.A);
       this.targetElement.keyUp(Key.A);
@@ -131,8 +131,8 @@ describe('Ignoring key events using IgnoreKeys:', function () {
 
       this.wrapper = mount(
         <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
-          <IgnoreKeys except={["Backspace"]}>
-            <div className="childElement" />
+          <IgnoreKeys except={['Backspace']}>
+            <div className="childElement"/>
           </IgnoreKeys>
         </HotKeys>
       );
@@ -142,7 +142,7 @@ describe('Ignoring key events using IgnoreKeys:', function () {
     });
 
     it('then ignores all key events except Backspace \
-       (https://github.com/greena13/react-hotkeys/issues/172)', function() {
+       (https://github.com/greena13/react-hotkeys/issues/172)', function () {
       this.targetElement.keyDown(Key.A);
       this.targetElement.keyPress(Key.A);
       this.targetElement.keyUp(Key.A);
@@ -162,7 +162,7 @@ describe('Ignoring key events using IgnoreKeys:', function () {
       this.wrapper = mount(
         <HotKeys keyMap={this.keyMap} handlers={this.handlers}>
           <IgnoreKeys only={'a'} except={'b'}>
-            <div className="childElement" />
+            <div className="childElement"/>
           </IgnoreKeys>
         </HotKeys>
       );
@@ -171,7 +171,7 @@ describe('Ignoring key events using IgnoreKeys:', function () {
       this.targetElement.focus();
     });
 
-    it('then ignores all key events are in the only option and NOT in the except option', function() {
+    it('then ignores all key events are in the only option and NOT in the except option', function () {
       this.targetElement.keyDown(Key.A);
       this.targetElement.keyPress(Key.A);
       this.targetElement.keyUp(Key.A);

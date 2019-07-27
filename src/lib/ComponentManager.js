@@ -2,7 +2,6 @@ import Configuration from './config/Configuration';
 import isUndefined from '../utils/isUndefined';
 import KeyEventManager from './KeyEventManager';
 import isEmpty from '../utils/collection/isEmpty';
-import KeyCombinationSerializer from './shared/KeyCombinationSerializer';
 
 function wrapPropInFunction(prop, func){
   if (typeof prop === 'function') {
