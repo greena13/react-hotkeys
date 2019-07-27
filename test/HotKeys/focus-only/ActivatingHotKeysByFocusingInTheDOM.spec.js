@@ -1,15 +1,15 @@
 import React from 'react';
-import {mount} from 'enzyme';
-import {expect} from 'chai';
+import { mount } from 'enzyme';
+import { expect } from 'chai';
 import sinon from 'sinon';
 
-import {HotKeys} from '../../../src/';
+import { HotKeys } from '../../../src/';
 import KeyCode from '../../support/Key';
 import FocusableElement from '../../support/FocusableElement';
 import KeyEventManager from '../../../src/lib/KeyEventManager';
 
 beforeEach(function() {
-  KeyEventManager.clear();
+  delete KeyEventManager.instance;
 });
 
 describe('Activating hotkeys by focusing in the DOM:', () => {

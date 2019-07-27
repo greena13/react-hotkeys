@@ -31,11 +31,7 @@ class KeyEventManager {
   static getGlobalEventStrategy() {
     return this.getInstance().globalEventStrategy
   }
-
-  static clear() {
-    delete this.instance;
-  }
-
+  
   /**
    * Creates a new KeyEventManager instance. It is expected that only a single instance
    * will be used with a render tree.

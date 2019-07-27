@@ -1,17 +1,17 @@
 import React from 'react';
-import {mount} from 'enzyme';
-import {expect} from 'chai';
+import { mount } from 'enzyme';
+import { expect } from 'chai';
 import sinon from 'sinon';
 
-import {GlobalHotKeys} from '../../src';
-import {HotKeys} from '../../src/';
+import { GlobalHotKeys } from '../../src';
+import { HotKeys } from '../../src/';
 import KeyCode from '../support/Key';
 import FocusableElement from '../support/FocusableElement';
 import KeyEventManager from '../../src/lib/KeyEventManager';
 
 describe('Global shortcuts:', () => {
   beforeEach(function() {
-    KeyEventManager.clear();
+    delete KeyEventManager.instance;
   });
 
   before(function () {
