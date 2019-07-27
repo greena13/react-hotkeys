@@ -1,5 +1,6 @@
 import KeyCombination from './KeyCombination';
 import KeyCombinationDecorator from './KeyCombinationDecorator';
+import KeyCombinationIterator from './KeyCombinationIterator';
 
 /**
  * List of key combinations seen by hot key components
@@ -38,7 +39,7 @@ class KeyHistory {
    * @returns {boolean} true if there is at least one key combination, else false
    */
   any() {
-    return this._combinations.some((keyCombination) => keyCombination.iterator.any());
+    return this._combinations.some((keyCombination) => new KeyCombinationIterator(keyCombination).any());
   }
 
   /**

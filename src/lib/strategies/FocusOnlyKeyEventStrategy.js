@@ -11,6 +11,7 @@ import EventPropagator from '../listening/EventPropagator';
 import FocusOnlyKeyEventSimulator from '../simulation/FocusOnlyKeyEventSimulator';
 import FocusTree from '../listening/FocusTree';
 import FocusOnlyLogger from '../logging/FocusOnlyLogger';
+import KeyCombinationIterator from '../listening/KeyCombinationIterator';
 
 /**
  * Defines behaviour for dealing with key maps defined in focus-only HotKey components
@@ -424,7 +425,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
   _simulateKeyUpEventsHiddenByCmd(event, key, focusTreeId, componentId, options) {
     if (isCmdKey(key)) {
-      const iterator = this.currentCombination.iterator;
+      const iterator = new KeyCombinationIterator(this.currentCombination);
 
       iterator.forEachKey((keyName) => {
         if (isCmdKey(keyName)) {

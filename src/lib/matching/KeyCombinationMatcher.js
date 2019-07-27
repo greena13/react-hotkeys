@@ -2,6 +2,7 @@ import Configuration from '../config/Configuration';
 import size from '../../utils/collection/size';
 import keyupIsHiddenByCmd from '../../helpers/resolving-handlers/keyupIsHiddenByCmd';
 import lazyLoadAttribute from '../../utils/object/lazyLoadAttribute';
+import KeyCombinationIterator from '../listening/KeyCombinationIterator';
 
 /**
  * Object containing all information necessary to match a handler to a history of
@@ -207,7 +208,7 @@ class KeyCombinationMatcher {
 function canBeMatched(keyCombination, combinationMatcher) {
   const combinationKeysNo = size(combinationMatcher.keyDictionary);
 
-  const iterator = keyCombination.iterator;
+  const iterator = new KeyCombinationIterator(keyCombination);
 
   if (Configuration.option('allowCombinationSubmatches') || keyUpIsBeingHidden(keyCombination)) {
     return iterator.numberOfKeys >= combinationKeysNo;
@@ -223,7 +224,7 @@ function canBeMatched(keyCombination, combinationMatcher) {
 
 function keyUpIsBeingHidden(keyCombination) {
   if (keyCombination.isKeyStillPressed('Meta')) {
-    return keyCombination.iterator.some((keyName) => keyupIsHiddenByCmd(keyName));
+    return new KeyCombinationIterator(keyCombination).some((keyName) => keyupIsHiddenByCmd(keyName));
   }
 
   return false;

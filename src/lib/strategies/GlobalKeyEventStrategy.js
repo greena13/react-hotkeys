@@ -14,6 +14,7 @@ import GlobalEventListenerAdaptor from '../listening/GlobalEventListenerAdaptor'
 import Registry from '../shared/Registry';
 import GlobalLogger from '../logging/GlobalLogger';
 import KeyCombinationDecorator from '../listening/KeyCombinationDecorator';
+import KeyCombinationIterator from '../listening/KeyCombinationIterator';
 
 /**
  * Defines behaviour for dealing with key maps defined in global HotKey components
@@ -359,7 +360,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
        */
       this.keyEventManager.simulatePendingKeyUpEvents();
 
-      const iterator = this.currentCombination.iterator;
+      const iterator = new KeyCombinationIterator(this.currentCombination);
 
       iterator.forEachKey((keyName) => {
         if (isCmdKey(keyName)) {

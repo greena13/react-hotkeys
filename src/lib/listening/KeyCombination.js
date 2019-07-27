@@ -6,7 +6,6 @@ import applicableAliasFunctions from '../../helpers/resolving-handlers/applicabl
 import KeyEventStateArrayManager from '../shared/KeyEventStateArrayManager';
 import isEmpty from '../../utils/collection/isEmpty';
 import KeyEventState from '../../const/KeyEventState';
-import KeyCombinationIterator from './KeyCombinationIterator';
 import lazyLoadAttribute from '../../utils/object/lazyLoadAttribute';
 import ModifierFlagsDictionary from '../../const/ModifierFlagsDictionary';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
@@ -81,10 +80,6 @@ class KeyCombination {
   /********************************************************************************
    * Query attributes of entire combination
    *********************************************************************************/
-
-  get iterator() {
-    return new KeyCombinationIterator(this);
-  }
 
   /**
    * Whether there are any keys in the current combination still being pressed
@@ -218,7 +213,7 @@ class KeyCombination {
    *        key
    */
   isKeyPressSimulated(keyName) {
-    return this._isKeyEventSimulated(keyName, KeyEventType.keypress);
+    return this.isEventTriggered(keyName, KeyEventType.keypress) === KeyEventState.simulated;
   }
 
   /**
@@ -228,7 +223,7 @@ class KeyCombination {
    *        key
    */
   isKeyUpSimulated(keyName) {
-    return this._isKeyEventSimulated(keyName, KeyEventType.keyup);
+    return this.isEventTriggered(keyName, KeyEventType.keyup) === KeyEventState.simulated;
   }
 
   /**
@@ -284,10 +279,6 @@ class KeyCombination {
     const keyState = this._getKeyState(keyName);
 
     return keyState && keyState[keyStage][keyEventType];
-  }
-
-  _isKeyEventSimulated(keyName, keyEventType){
-    return this.isEventTriggered(keyName, keyEventType) === KeyEventState.simulated;
   }
 
   _getKeyState(keyName) {
