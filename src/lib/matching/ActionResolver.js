@@ -138,57 +138,65 @@ class ActionResolver {
       const keyHistory = this._eventStrategy.keyHistory;
       const currentCombination = keyHistory.currentCombination;
 
-      const keyCombinationDecorator = new KeyCombinationDecorator(currentCombination);
-
       const sequenceMatch =
         this.findMatchingKeySequenceInComponent(
           componentSearchIndex, keyHistory, keyName, keyEventType
         );
 
       if (sequenceMatch) {
-        const eventSchema = sequenceMatch.events[keyEventType];
-
-        if (Configuration.option('allowCombinationSubmatches')) {
-          const subMatchDescription = KeyCombinationSerializer.serialize(sequenceMatch.keyDictionary);
-
-          this.logger.debug(
-            this.logger.keyEventPrefix(componentId),
-            `Found action that matches '${keyCombinationDecorator.describe()}' (sub-match: '${subMatchDescription}'): ${eventSchema.actionName}. Calling handler . . .`
-          );
-        } else {
-          this.logger.debug(
-            this.logger.keyEventPrefix(componentId),
-            `Found action that matches '${keyCombinationDecorator.describe()}': ${eventSchema.actionName}. Calling handler . . .`
-          );
-        }
-
-        eventSchema.handler(event);
-
-        if (Configuration.option('stopEventPropagationAfterHandling')) {
-          this._eventStrategy.stopEventPropagation(event, componentSearchIndex);
-        }
+        this._handleMatchFound(currentCombination, sequenceMatch, keyEventType, componentId, event, componentSearchIndex);
 
         return true;
-      } else {
-        if (this.componentHasActionsBoundToEventType(componentSearchIndex, keyEventType)) {
-          const eventName = describeKeyEventType(keyEventType);
-
-          this.logger.debug(
-            this.logger.keyEventPrefix(componentId),
-            `No matching actions found for '${keyCombinationDecorator.describe()}' ${eventName}.`
-          );
-        } else {
-          this.logger.debug(
-            this.logger.keyEventPrefix(componentId),
-            `Doesn't define a handler for '${keyCombinationDecorator.describe()}' ${describeKeyEventType(keyEventType)}.`
-          );
-        }
       }
+
+      this._handleMatchNotFound(currentCombination, componentSearchIndex, keyEventType, componentId);
 
       componentSearchIndex++;
     }
   }
 
+  _handleMatchNotFound(currentCombination, componentSearchIndex, keyEventType, componentId) {
+    const keyCombinationDecorator = new KeyCombinationDecorator(currentCombination);
+
+    if (this.componentHasActionsBoundToEventType(componentSearchIndex, keyEventType)) {
+      const eventName = describeKeyEventType(keyEventType);
+
+      this.logger.debug(
+        this.logger.keyEventPrefix(componentId),
+        `No matching actions found for '${keyCombinationDecorator.describe()}' ${eventName}.`
+      );
+    } else {
+      this.logger.debug(
+        this.logger.keyEventPrefix(componentId),
+        `Doesn't define a handler for '${keyCombinationDecorator.describe()}' ${describeKeyEventType(keyEventType)}.`
+      );
+    }
+  }
+
+  _handleMatchFound(currentCombination, sequenceMatch, keyEventType, componentId, event, componentSearchIndex) {
+    const keyCombinationDecorator = new KeyCombinationDecorator(currentCombination);
+    const eventSchema = sequenceMatch.events[keyEventType];
+
+    if (Configuration.option('allowCombinationSubmatches')) {
+      const subMatchDescription = KeyCombinationSerializer.serialize(sequenceMatch.keyDictionary);
+
+      this.logger.debug(
+        this.logger.keyEventPrefix(componentId),
+        `Found action that matches '${keyCombinationDecorator.describe()}' (sub-match: '${subMatchDescription}'): ${eventSchema.actionName}. Calling handler . . .`
+      );
+    } else {
+      this.logger.debug(
+        this.logger.keyEventPrefix(componentId),
+        `Found action that matches '${keyCombinationDecorator.describe()}': ${eventSchema.actionName}. Calling handler . . .`
+      );
+    }
+
+    eventSchema.handler(event);
+
+    if (Configuration.option('stopEventPropagationAfterHandling')) {
+      this._eventStrategy.stopEventPropagation(event, componentSearchIndex);
+    }
+  }
 
   /********************************************************************************
    * Private methods
