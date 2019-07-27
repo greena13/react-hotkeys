@@ -139,38 +139,38 @@ class KeyHistoryMatcher {
     const previousCombinations =
       keyHistory.getPreviousCombinations(this.longestSequence - 1);
 
-    if (previousCombinations.length) {
-      /**
-       * We need to match a sequence, and therefore try all the aliases involved in
-       * each key combination that makes up the sequence, to be sure there isn't a
-       * match
-       */
-
-      const sequenceIds =
-        previousCombinations.map((keyCombination) => keyCombination.ids);
-
-      const idSizes = sequenceIds.map((ids) => ids.length);
-
-      /**
-       * List of counters
-       * @type {number[]}
-       */
-      const indexCounters = new Array(sequenceIds.length).fill(0);
-
-      do {
-        const sequenceIdPermutation = indexCounters.map((sequenceIdIndex, index) => {
-          return sequenceIds[index][sequenceIdIndex];
-        });
-
-        const candidateId = sequenceIdPermutation.join(' ');
-
-        if (this._combinationMatchers[candidateId]) {
-          return this._combinationMatchers[candidateId];
-        }
-      } while(!updateIndexCounters(indexCounters, idSizes));
+    if (previousCombinations.length === 0) {
+      return this._combinationMatchers[''];
     }
 
-    return this._combinationMatchers[''];
+    /**
+     * We need to match a sequence, and therefore try all the aliases involved in
+     * each key combination that makes up the sequence, to be sure there isn't a
+     * match
+     */
+
+    const sequenceIds =
+      previousCombinations.map((keyCombination) => keyCombination.ids);
+
+    const idSizes = sequenceIds.map((ids) => ids.length);
+
+    /**
+     * List of counters
+     * @type {number[]}
+     */
+    const indexCounters = new Array(sequenceIds.length).fill(0);
+
+    do {
+      const sequenceIdPermutation = indexCounters.map((sequenceIdIndex, index) => {
+        return sequenceIds[index][sequenceIdIndex];
+      });
+
+      const candidateId = sequenceIdPermutation.join(' ');
+
+      if (this._combinationMatchers[candidateId]) {
+        return this._combinationMatchers[candidateId];
+      }
+    } while(!updateIndexCounters(indexCounters, idSizes));
   }
 }
 
