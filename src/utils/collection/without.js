@@ -14,7 +14,7 @@ import isObject from '../object/isObject';
  * @returns {Object|Array} Copied collection without the specified elements
  */
 function without(target, exclusions = [], options = {}) {
-  const omitDict = dictionaryFrom(arrayFrom(exclusions));
+  const omitDict = dictionaryFrom(arrayFrom(exclusions), (value) => { return { value } });
 
   if (Array.isArray(target)) {
     return target.reduce((memo, element) => {

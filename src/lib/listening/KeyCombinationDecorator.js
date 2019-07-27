@@ -18,7 +18,7 @@ class KeyCombinationDecorator {
    * @returns {Object.<ReactKeyName, boolean>}
    */
   asKeyDictionary(){
-    return dictionaryFrom(this._keyCombination.keys, true);
+    return dictionaryFrom(this._keyCombination.keys);
   }
 
   /**

@@ -130,7 +130,7 @@ const _configuration = {
 /**
  * Turn our array of tags to ignore into a dictionary, for faster lookup
  */
-_configuration._ignoreTagsDict = dictionaryFrom(_configuration.ignoreTags, true);
+_configuration._ignoreTagsDict = dictionaryFrom(_configuration.ignoreTags);
 
 /**
  * Handles getting and setting global configuration values, that affect how

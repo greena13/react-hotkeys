@@ -134,7 +134,7 @@ function keyDictionary(list) {
       resolveUnshiftedAlias,
       resolveAltedAlias,
       resolveUnaltedAlias
-    ], true, memo, (func) => func(finalKeyName));
+    ], true, (func) => func(finalKeyName), memo);
 
     return memo;
   }, {});
