@@ -255,7 +255,7 @@ class AbstractKeyEventStrategy {
 
     const currentCombination = this.currentCombination;
 
-    if (currentCombination.isKeyIncluded(key) || currentCombination.isEnding()) {
+    if (currentCombination.isKeyIncluded(key) || currentCombination.isEnding) {
       this._startAndLogNewKeyCombination(componentId, key, keyEventState);
     } else {
       this._addToAndLogCurrentKeyCombination(key, KeyEventType.keydown, keyEventState, componentId);

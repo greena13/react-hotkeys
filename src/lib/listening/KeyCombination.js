@@ -23,8 +23,16 @@ class KeyCombination {
    * @returns {KeyCombination}
    */
   constructor(keys = {}) {
-    this._keys = keys;
-    this._includesKeyUp = false;
+    this.keyStates = keys;
+
+    /**
+     * Whether combination includes key up
+     * @type {boolean}
+     */
+    this.isEnding = false;
+
+    this._keyAliases = undefined;
+    this._ids = undefined;
   }
 
   /********************************************************************************
@@ -36,7 +44,7 @@ class KeyCombination {
    * @type {KeySequence[]} List of combination ids
    */
   get ids() {
-    return lazyLoadAttribute(this, '_ids', () => KeyCombinationSerializer.serialize(this._keys));
+    return lazyLoadAttribute(this, '_ids', () => KeyCombinationSerializer.serialize(this.keyStates));
   }
 
   /**
@@ -45,7 +53,7 @@ class KeyCombination {
    * @returns {Object.<ReactKeyName, ReactKeyName[]>}
    */
   get keyAliases() {
-    return lazyLoadAttribute(this, '_keyAliases', () => buildKeyAliases(this._keys));
+    return lazyLoadAttribute(this, '_keyAliases', () => buildKeyAliases(this.keyStates));
   }
 
   /**
@@ -55,7 +63,7 @@ class KeyCombination {
    * @returns {ReactKeyName} Normalized key name
    */
   getNormalizedKeyName(keyName) {
-    const keyState = this._keys[keyName];
+    const keyState = this.keyStates[keyName];
 
     if (keyState) {
       return keyName;
@@ -76,14 +84,6 @@ class KeyCombination {
 
   get iterator() {
     return new KeyCombinationIterator(this);
-  }
-
-  /**
-   * Whether any of the keys in the combination have been released
-   * @returns {boolean} true if at least 1 key has been released in the combination
-   */
-  isEnding() {
-    return this._includesKeyUp;
   }
 
   /**
@@ -133,7 +133,7 @@ class KeyCombination {
     }
 
     if (recordIndex === KeyEventType.keyup) {
-      this._includesKeyUp = true;
+      this.isEnding = true;
     }
   }
 
@@ -272,6 +272,10 @@ class KeyCombination {
     })
   }
 
+  get keys() {
+    return Object.keys(this.keyStates);
+  }
+
   /********************************************************************************
    * Private methods
    *********************************************************************************/
@@ -286,16 +290,8 @@ class KeyCombination {
     return this.isEventTriggered(keyName, keyEventType) === KeyEventState.simulated;
   }
 
-  get keyStates() {
-    return this._keys;
-  }
-
-  get keys() {
-    return Object.keys(this.keyStates);
-  }
-
   _getKeyState(keyName) {
-    const keyState = this._keys[keyName];
+    const keyState = this.keyStates[keyName];
 
     if (keyState) {
       return keyState;
@@ -303,7 +299,7 @@ class KeyCombination {
       const keyAlias = this.keyAliases[keyName];
 
       if (keyAlias) {
-        return this._keys[keyAlias];
+        return this.keyStates[keyAlias];
       }
     }
   }
@@ -311,7 +307,7 @@ class KeyCombination {
   _setKeyState(keyName, keyState) {
     const keyAlias = this.getNormalizedKeyName(keyName);
 
-    this._keys[keyAlias] = keyState;
+    this.keyStates[keyAlias] = keyState;
 
     delete this._keyAliases;
     delete this._ids;
