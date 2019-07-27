@@ -101,7 +101,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * Manually update the registered key map state, usually reset using
      * _resetRegisteredKeyMapsState() method
      */
-    this._componentList.remove(componentId);
+    this.componentList.remove(componentId);
 
     this.logger.debug(
       this.logger.nonKeyEventPrefix(componentId),
@@ -140,7 +140,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
    * @private
    */
   _shouldListenersBeBound() {
-    return this._componentList.length !== 0 || this.listeners.get('keyCombination');
+    return this.componentList.length !== 0 || this.listeners.get('keyCombination');
   }
 
   /********************************************************************************
@@ -380,7 +380,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     const eventName = describeKeyEventType(keyEventType);
     const combinationName = this._describeCurrentCombination();
 
-    if (!this._componentList.anyActionsForEventType(keyEventType)) {
+    if (!this.componentList.anyActionsForEventType(keyEventType)) {
       /**
        * If there are no handlers registered for the particular key event type
        * (keydown, keypress, keyup) then skip trying to find a matching handler
@@ -405,7 +405,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   }
 
   _callClosestMatchingHandler(event, keyName, keyEventType) {
-    const componentListIterator = this._componentList.iterator;
+    const componentListIterator = this.componentList.iterator;
 
     while (componentListIterator.next()) {
       const matchFound = this.actionResolver.callClosestMatchingHandler(

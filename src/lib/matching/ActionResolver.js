@@ -127,7 +127,7 @@ class ActionResolver {
         this.getKeyHistoryMatcher(componentSearchIndex);
 
       const { componentId } =
-        this._eventStrategy.getComponentAtPosition(componentSearchIndex);
+        this._eventStrategy.componentList.getAtPosition(componentSearchIndex);
 
       this.logger.verbose(
         this.logger.keyEventPrefix(componentId),

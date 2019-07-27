@@ -18,7 +18,7 @@ class FocusOnlyLogger extends EventStrategyLogger {
 
     base += `C${componentId}${componentIcons[componentId % componentIcons.length]}`;
 
-    const position = this._eventStrategy.getComponentPosition(componentId);
+    const position = this._eventStrategy.componentList.getPositionById(componentId);
 
     if (!isUndefined(position)) {
       base += `-P${position}${componentIcons[position % componentIcons.length]}`

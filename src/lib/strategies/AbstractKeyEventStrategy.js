@@ -84,7 +84,7 @@ class AbstractKeyEventStrategy {
    * @protected
    */
   _reset() {
-    this._componentList = new ComponentOptionsList();
+    this.componentList = new ComponentOptionsList();
 
     this._actionResolver = null;
   }
@@ -92,7 +92,7 @@ class AbstractKeyEventStrategy {
   _recalculate() {
     this._actionResolver = null;
 
-    this.keyHistory.maxLength = this._componentList.longestSequence;
+    this.keyHistory.maxLength = this.componentList.longestSequence;
   }
 
   get keyHistory() {
@@ -100,7 +100,7 @@ class AbstractKeyEventStrategy {
   }
 
   get actionResolver() {
-    return lazyLoadAttribute(this, '_actionResolver', () => new ActionResolver(this._componentList, this, this.logger));
+    return lazyLoadAttribute(this, '_actionResolver', () => new ActionResolver(this.componentList, this, this.logger));
   }
 
   /**
@@ -116,7 +116,7 @@ class AbstractKeyEventStrategy {
 
     if (this.keyHistory.any() && !options.force) {
       this._keyHistory = new KeyHistory(
-        { maxLength: this._componentList.longestSequence },
+        { maxLength: this.componentList.longestSequence },
         new KeyCombination(this)
       );
     } else {
@@ -126,7 +126,7 @@ class AbstractKeyEventStrategy {
 
   _newKeyHistory() {
     return new KeyHistory({
-      maxLength: this._componentList.longestSequence
+      maxLength: this.componentList.longestSequence
     });
   }
 
@@ -198,19 +198,7 @@ class AbstractKeyEventStrategy {
       this.componentTree.clearRootId();
     }
   }
-
-  /********************************************************************************
-   * Registering key maps and handlers
-   ********************************************************************************/
-
-  getComponentPosition(componentId) {
-    return this._componentList.getPositionById(componentId)
-  }
-
-  getComponentAtPosition(position) {
-    return this._componentList.getAtPosition(position);
-  }
-
+  
   /**
    * Registers the hotkeys defined by a HotKeys component
    * @param {ComponentId} componentId - Index of the component
@@ -224,24 +212,24 @@ class AbstractKeyEventStrategy {
    * @protected
    */
   _addComponent(componentId, actionNameToKeyMap = {}, actionNameToHandlersMap = {}, action, options) {
-    this._componentList.add(componentId,
+    this.componentList.add(componentId,
       actionNameToKeyMap, actionNameToHandlersMap, options
     );
 
     this._recalculate();
 
     this.logger.debug(this.logger.nonKeyEventPrefix(componentId), action);
-    this.logger.logComponentOptions(componentId, this._componentList.getById(componentId));
+    this.logger.logComponentOptions(componentId, this.componentList.getById(componentId));
   }
 
   _updateComponent(componentId, actionNameToKeyMap, actionNameToHandlersMap, options) {
-    this._componentList.update(
+    this.componentList.update(
       componentId, actionNameToKeyMap, actionNameToHandlersMap, options
     );
 
     this._recalculate();
 
-    this.logger.logComponentOptions(componentId, this._componentList.getById(componentId));
+    this.logger.logComponentOptions(componentId, this.componentList.getById(componentId));
   }
 
   /********************************************************************************

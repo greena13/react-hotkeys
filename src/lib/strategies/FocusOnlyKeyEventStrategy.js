@@ -70,7 +70,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this.focusTree.new();
     }
 
-    this.eventPropagator = new EventPropagator(this._componentList);
+    this.eventPropagator = new EventPropagator(this.componentList);
     this.eventPropagator.logger = this.logger;
   }
 
@@ -101,7 +101,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
       this.resetOnNextFocus = false;
     }
 
-    if (this._componentList.containsId(componentId)) {
+    if (this.componentList.containsId(componentId)) {
       /**
        * The <tt>componentId</tt> has already been registered - this occurs when the
        * same component has somehow managed to be focused twice, without being blurred
@@ -133,7 +133,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *        and handlers are associated and called.
    */
   updateEnabledHotKeys(focusTreeId, componentId, keyMap = {}, handlersMap = {}, options) {
-    if (this.focusTree.isOld(focusTreeId) || !this._componentList.containsId(componentId)) {
+    if (this.focusTree.isOld(focusTreeId) || !this.componentList.containsId(componentId)) {
       return;
     }
 
@@ -481,7 +481,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
     const eventName = describeKeyEventType(keyEventType);
     const combinationName = this._describeCurrentCombination();
 
-    if (!this._componentList.anyActionsForEventType(keyEventType)) {
+    if (!this.componentList.anyActionsForEventType(keyEventType)) {
       this.logger.logIgnoredEvent(`'${combinationName}' ${eventName}`, `it doesn't have any ${eventName} handlers`, componentId);
 
       return;
@@ -497,7 +497,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
       const { previousPosition } = this.eventPropagator;
 
-      const componentPosition = this._componentList.getPositionById(componentId);
+      const componentPosition = this.componentList.getPositionById(componentId);
 
       const handlerWasCalled =
         this.actionResolver.callClosestMatchingHandler(

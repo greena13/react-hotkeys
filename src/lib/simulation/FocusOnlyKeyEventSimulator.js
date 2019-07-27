@@ -34,7 +34,7 @@ class FocusOnlyKeyEventSimulator extends AbstractKeyEventSimulator{
       });
     }
 
-    if (this._keyEventStrategy._componentList.isRoot(componentId) || this._keyEventStrategy.eventPropagator.isStopped()) {
+    if (this._keyEventStrategy.componentList.isRoot(componentId) || this._keyEventStrategy.eventPropagator.isStopped()) {
       if (this._shouldSimulateEventsImmediately()) {
         this._keyEventStrategy[handlerName]();
       }
