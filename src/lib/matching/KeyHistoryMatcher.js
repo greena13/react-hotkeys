@@ -171,6 +171,8 @@ class KeyHistoryMatcher {
         return this._combinationMatchers[candidateId];
       }
     } while(!updateIndexCounters(indexCounters, idSizes));
+
+    return this._combinationMatchers[''];
   }
 }
 
