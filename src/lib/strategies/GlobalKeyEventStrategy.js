@@ -316,7 +316,9 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * is not lost (leaving react hotkeys thinking the key is still pressed).
      */
     if (currentCombination.isKeyIncluded(key)) {
-      this._addToAndLogCurrentKeyCombination(key, KeyEventType.keyup, stateFromEvent(event));
+      this._addToAndLogCurrentKeyCombination(
+        key, KeyEventType.keyup, stateFromEvent(event)
+      );
     }
 
     if (reactAppResponse === EventResponse.unseen){
@@ -328,11 +330,12 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       this.keyEventManager.closeHangingKeyCombination(key, KeyEventType.keyup);
 
       if(this.eventOptions.ignoreEventsCondition(event)) {
-        this.logger.logIgnoredKeyEvent(event, key, KeyEventType.keyup, 'ignoreEventsFilter rejected it');
+        this.logger.logIgnoredKeyEvent(
+          event, key, KeyEventType.keyup, 'ignoreEventsFilter rejected it'
+        );
       } else {
         this._callHandlerIfNeeded(reactAppResponse, event, key, KeyEventType.keyup);
       }
-
     } else {
       this._callHandlerIfNeeded(reactAppResponse, event, key, KeyEventType.keyup);
     }
@@ -343,14 +346,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      */
     this._simulateKeyUpEventsHiddenByCmd(event, key);
 
-    if (this.listeners.get('keyCombination') && this.currentCombination.hasEnded()) {
-      const keyCombinationDecorator = new KeyCombinationDecorator(this.currentCombination);
-
-      this.listeners.get('keyCombination')({
-        keys: keyCombinationDecorator.asKeyDictionary(),
-        id: keyCombinationDecorator.describe()
-      });
-    }
+    this._callKeyCombinationCallbackIfDefined();
   }
 
   _simulateKeyUpEventsHiddenByCmd(event, key) {
@@ -371,6 +367,18 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
       });
     }
   }
+
+  _callKeyCombinationCallbackIfDefined() {
+    if (this.listeners.get('keyCombination') && this.currentCombination.hasEnded()) {
+      const keyCombinationDecorator = new KeyCombinationDecorator(this.currentCombination);
+
+      this.listeners.get('keyCombination')({
+        keys: keyCombinationDecorator.asKeyDictionary(),
+        id: keyCombinationDecorator.describe()
+      });
+    }
+  }
+
 
   /********************************************************************************
    * Matching and calling handlers
