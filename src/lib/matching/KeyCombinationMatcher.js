@@ -111,15 +111,8 @@ class KeyCombinationMatcher {
    * Private methods
    ********************************************************************************/
 
-  _matchesActionConfig(keyCombination, keyName, keyEventType, actionOptions) {
-    if (!canBeMatched(keyCombination, actionOptions)) {
-      return false;
-    }
-
-    const combinationHasHandlerForEventType =
-      actionOptions.events[keyEventType];
-
-    if (!combinationHasHandlerForEventType) {
+  _matchesActionConfig(keyCombination, keyName, eventType, actionOptions) {
+    if (!canBeMatched(keyCombination, actionOptions) || !actionOptions.events[eventType]) {
       /**
        * If the combination does not have any actions bound to the key event we are
        * currently processing, we skip checking if it matches the current keys being
@@ -130,17 +123,21 @@ class KeyCombinationMatcher {
 
     let keyCompletesCombination = false;
 
-    const combinationMatchesKeysPressed = Object.keys(actionOptions.keyDictionary).every((candidateKeyName) => {
-      if (keyCombination.isEventTriggered(candidateKeyName, keyEventType)) {
+    const combinationKeys = Object.keys(actionOptions.keyDictionary);
+
+    const combinationMatchesKeysPressed =
+      combinationKeys.every((candidateKeyName) => {
+        if (!keyCombination.isEventTriggered(candidateKeyName, eventType)) {
+          return false;
+        }
+
         if (keyName && (keyName === keyCombination.getNormalizedKeyName(candidateKeyName))) {
-          keyCompletesCombination = !keyCombination.wasEventPreviouslyTriggered(candidateKeyName, keyEventType);
+          keyCompletesCombination =
+            !keyCombination.wasEventPreviouslyTriggered(candidateKeyName, eventType);
         }
 
         return true;
-      } else {
-        return false;
-      }
-    });
+      });
 
     return combinationMatchesKeysPressed && keyCompletesCombination;
   }
