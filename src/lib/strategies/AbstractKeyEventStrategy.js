@@ -198,7 +198,7 @@ class AbstractKeyEventStrategy {
       this.componentTree.clearRootId();
     }
   }
-  
+
   /**
    * Registers the hotkeys defined by a HotKeys component
    * @param {ComponentId} componentId - Index of the component
@@ -253,7 +253,7 @@ class AbstractKeyEventStrategy {
     if (currentCombination.isKeyIncluded(key) || currentCombination.isEnding) {
       this._startAndLogNewKeyCombination(componentId, key, keyEventState);
     } else {
-      this._addToAndLogCurrentKeyCombination(key, KeyEventType.keydown, keyEventState, componentId);
+      this._recordNewKeyInCombination(key, KeyEventType.keydown, keyEventState, componentId);
     }
   }
 
@@ -268,7 +268,7 @@ class AbstractKeyEventStrategy {
     this.logger.logKeyHistory(this.keyHistory, componentId);
   }
 
-  _addToAndLogCurrentKeyCombination(keyName, keyEventType, keyEventState, componentId) {
+  _recordNewKeyInCombination(keyName, keyEventType, keyEventState, componentId) {
     this.keyHistory.addKeyToCurrentCombination(keyName, keyEventType, keyEventState);
 
     if (keyEventType === KeyEventType.keydown) {

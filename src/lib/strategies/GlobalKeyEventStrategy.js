@@ -255,7 +255,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * Add new key event to key combination history
      */
     if (currentCombination.isKeyIncluded(key)) {
-      this._addToAndLogCurrentKeyCombination(key, KeyEventType.keypress, stateFromEvent(event));
+      this._recordNewKeyInCombination(key, KeyEventType.keypress, stateFromEvent(event));
     }
 
     if (reactAppResponse === EventResponse.unseen) {
@@ -316,7 +316,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * is not lost (leaving react hotkeys thinking the key is still pressed).
      */
     if (currentCombination.isKeyIncluded(key)) {
-      this._addToAndLogCurrentKeyCombination(
+      this._recordNewKeyInCombination(
         key, KeyEventType.keyup, stateFromEvent(event)
       );
     }

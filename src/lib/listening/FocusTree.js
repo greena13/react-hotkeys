@@ -3,7 +3,7 @@ class FocusTree {
     this.id = 0;
   }
 
-  isOld(id) {
+  isNewerThan(id) {
     return this.id !== id;
   }
 

@@ -133,7 +133,7 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
    *        and handlers are associated and called.
    */
   updateEnabledHotKeys(focusTreeId, componentId, keyMap = {}, handlersMap = {}, options) {
-    if (this.focusTree.isOld(focusTreeId) || !this.componentList.containsId(componentId)) {
+    if (this.focusTree.isNewerThan(focusTreeId) || !this.componentList.containsId(componentId)) {
       return;
     }
 
@@ -190,35 +190,36 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   handleKeyDown(event, focusTreeId, componentId, options = {}) {
     const key = getKeyName(event);
 
-    if (this.focusTree.isOld(focusTreeId)) {
-      this.logger.logIgnoredKeyEvent(event, key, KeyEventType.keydown, `it had an old focus tree id: ${focusTreeId}`, componentId);
+    if (this.focusTree.isNewerThan(focusTreeId)) {
+      this.logger.logIgnoredKeyEvent(
+        event, key, KeyEventType.keydown,
+        `it had an old focus tree id: ${focusTreeId}`,
+        componentId
+      );
 
       this.eventPropagator.ignoreEvent(event);
 
       return true;
-    }
 
-    if (this._isIgnoringRepeatedEvent(event, key, KeyEventType.keydown, componentId)) {
+    } else if (this._isIgnoringRepeatedEvent(event, key, KeyEventType.keydown, componentId)) {
       return false;
     }
 
-    if (!this.eventPropagator.startNewPropagationStep(componentId, event, key, KeyEventType.keydown)) {
-      return false;
+    if (this.eventPropagator.startNewPropagationStep(componentId, event, key, KeyEventType.keydown)) {
+      const responseAction = this._howToHandleKeyEvent(
+        event, focusTreeId, componentId, key, options, KeyEventType.keydown
+      );
+
+      if (responseAction === EventResponse.handled) {
+        this._recordKeyDown(event, key, componentId);
+
+        this._callHandlerIfActionNotHandled(event, key, KeyEventType.keydown, componentId, focusTreeId);
+      }
+
+      this._simulator.handleKeyPressSimulation({event, key, focusTreeId, componentId, options});
+
+      this.eventPropagator.finishPropagationStep();
     }
-
-    const responseAction = this._howToHandleKeyEvent(
-      event, focusTreeId, componentId, key, options, KeyEventType.keydown
-    );
-
-    if (responseAction === EventResponse.handled) {
-      this._recordKeyDown(event, key, componentId);
-
-      this._callHandlerIfActionNotHandled(event, key, KeyEventType.keydown, componentId, focusTreeId);
-    }
-
-    this._simulator.handleKeyPressSimulation({event, key, focusTreeId, componentId, options});
-
-    this.eventPropagator.finishPropagationStep();
 
     return false;
   }
@@ -272,45 +273,39 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
 
     if (this._isIgnoringRepeatedEvent(event, key, KeyEventType.keypress, componentId)) {
       return false;
-    }
-
-    const currentCombination = this.currentCombination;
-
-    if (currentCombination.isKeyPressSimulated(key)) {
+    } else if (this.currentCombination.isKeyPressSimulated(key)) {
       this._ignoreAlreadySimulatedEvent(event, key, KeyEventType.keypress, componentId);
 
       return false;
     }
 
-    if (!this.eventPropagator.startNewPropagationStep(componentId, event, key, KeyEventType.keypress)) {
-      return false;
-    }
+    const shouldDiscardFocusTreeId = this.focusTree.isNewerThan(focusTreeId);
 
-    const shouldDiscardFocusTreeId = this.focusTree.isOld(focusTreeId);
-
-    /**
-     * We first decide if the keypress event should be handled (to ensure the correct
-     * order of logging statements)
-     */
-    const responseAction = this._howToHandleKeyEvent(event,
-      focusTreeId, componentId, key, options, KeyEventType.keypress
-    );
-
-    if (this.eventPropagator.isFirstPropagationStep(componentId) && currentCombination.isKeyIncluded(key)) {
-      this._addToAndLogCurrentKeyCombination(key, KeyEventType.keypress, stateFromEvent(event), componentId);
-    }
-
-    /**
-     * We attempt to find a handler of the event, only if it has not already
-     * been handled and should not be ignored
-     */
-    if (responseAction === EventResponse.handled) {
-      this._callHandlerIfActionNotHandled(
-        event, key, KeyEventType.keypress, componentId, focusTreeId
+    if (this.eventPropagator.startNewPropagationStep(componentId, event, key, KeyEventType.keypress)) {
+      /**
+       * We first decide if the keypress event should be handled (to ensure the correct
+       * order of logging statements)
+       */
+      const responseAction = this._howToHandleKeyEvent(event,
+        focusTreeId, componentId, key, options, KeyEventType.keypress
       );
-    }
 
-    this.eventPropagator.finishPropagationStep();
+      if (this.eventPropagator.isFirstPropagationStep(componentId) && this.currentCombination.isKeyIncluded(key)) {
+        this._recordNewKeyInCombination(key, KeyEventType.keypress, stateFromEvent(event), componentId);
+      }
+
+      /**
+       * We attempt to find a handler of the event, only if it has not already been
+       * handled and should not be ignored
+       */
+      if (responseAction === EventResponse.handled) {
+        this._callHandlerIfActionNotHandled(
+          event, key, KeyEventType.keypress, componentId, focusTreeId
+        );
+      }
+
+      this.eventPropagator.finishPropagationStep();
+    }
 
     return shouldDiscardFocusTreeId;
   }
@@ -336,60 +331,51 @@ class FocusOnlyKeyEventStrategy extends AbstractKeyEventStrategy {
   handleKeyUp(event, focusTreeId, componentId, options) {
     const key = getKeyName(event);
 
-    const currentCombination = this.currentCombination;
-
-    if (currentCombination.isKeyUpSimulated(key)) {
+    if (this.currentCombination.isKeyUpSimulated(key)) {
       this._ignoreAlreadySimulatedEvent(event, key, KeyEventType.keyup, componentId);
 
-      return true;
+      return false;
     }
 
-    const started = this.eventPropagator.startNewPropagationStep(
-      componentId,
-      event,
-      key,
-      KeyEventType.keyup
-    );
+    const shouldDiscardFocusId = this.focusTree.isNewerThan(focusTreeId);
+    const propagator = this.eventPropagator;
 
-    if (!started) {
-      return;
+    if (propagator.startNewPropagationStep(componentId, event, key, KeyEventType.keyup)) {
+
+      /**
+       * We first decide if the keyup event should be handled (to ensure the correct
+       * order of logging statements)
+       */
+      const responseAction = this._howToHandleKeyEvent(event,
+        focusTreeId, componentId, key, options, KeyEventType.keyup
+      );
+
+      /**
+       * We then add the keyup to our current combination - regardless of whether
+       * it's to be handled or not. We need to do this to ensure that if a handler
+       * function changes focus to a context that ignored events, the keyup event
+       * is not lost (leaving react hotkeys thinking the key is still pressed).
+       */
+      if (propagator.isFirstPropagationStep(componentId) && this.currentCombination.isKeyIncluded(key)) {
+        this._recordNewKeyInCombination(key, KeyEventType.keyup, stateFromEvent(event), componentId);
+      }
+
+      /**
+       * We attempt to find a handler of the event, only if it has not already been
+       * handled and should not be ignored
+       */
+      if (responseAction === EventResponse.handled) {
+        this._callHandlerIfActionNotHandled(event, key, KeyEventType.keyup, componentId, focusTreeId);
+      }
+
+      /**
+       * We simulate any hidden keyup events hidden by the command key, regardless
+       * of whether the event should be ignored or not
+       */
+      this._simulateKeyUpEventsHiddenByCmd(event, key, focusTreeId, componentId, options);
+
+      propagator.finishPropagationStep();
     }
-
-    const shouldDiscardFocusId = this.focusTree.isOld(focusTreeId);
-
-    /**
-     * We first decide if the keyup event should be handled (to ensure the correct
-     * order of logging statements)
-     */
-    const responseAction = this._howToHandleKeyEvent(event,
-      focusTreeId, componentId, key, options, KeyEventType.keyup
-    );
-
-    /**
-     * We then add the keyup to our current combination - regardless of whether
-     * it's to be handled or not. We need to do this to ensure that if a handler
-     * function changes focus to a context that ignored events, the keyup event
-     * is not lost (leaving react hotkeys thinking the key is still pressed).
-     */
-    if (this.eventPropagator.isFirstPropagationStep(componentId) && currentCombination.isKeyIncluded(key)) {
-      this._addToAndLogCurrentKeyCombination(key, KeyEventType.keyup, stateFromEvent(event), componentId);
-    }
-
-    /**
-     * We attempt to find a handler of the event, only if it has not already
-     * been handled and should not be ignored
-     */
-    if (responseAction === EventResponse.handled) {
-      this._callHandlerIfActionNotHandled(event, key, KeyEventType.keyup, componentId, focusTreeId);
-    }
-
-    /**
-     * We simulate any hidden keyup events hidden by the command key, regardless
-     * of whether the event should be ignored or not
-     */
-    this._simulateKeyUpEventsHiddenByCmd(event, key, focusTreeId, componentId, options);
-
-    this.eventPropagator.finishPropagationStep();
 
     return shouldDiscardFocusId;
   }
