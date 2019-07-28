@@ -27,6 +27,52 @@ function createSequenceFromConfig(keyMapConfig) {
   })
 }
 
+function normalizeActionDefinition(keyMap, actionName, keyMapSummary) {
+  const keyMapConfig = keyMap[actionName];
+
+  keyMapSummary[actionName] = {};
+
+  if (isObject(keyMapConfig)) {
+    if (hasKey(keyMapConfig, 'sequences')) {
+      /**
+       * Support syntax:
+       *  {
+       *    sequences: [ {sequence: 'a+b', action: 'keyup' }],
+       *    name: 'My keymap',
+       *    description: 'Key to press for something special',
+       *    group: 'Vanity'
+       *  }
+       */
+      copyAttributes(
+        keyMapConfig,
+        keyMapSummary[actionName],
+        KEYMAP_ATTRIBUTES
+      );
+
+      keyMapSummary[actionName].sequences =
+        createSequenceFromConfig(keyMapConfig.sequences);
+    } else {
+      /**
+       * Support syntax:
+       * {
+       *   sequence: 'a+b', action: 'keyup',
+       *   name: 'My keymap',
+       *   description: 'Key to press for something special',
+       *   group: 'Vanity'
+       * }
+       */
+      copyAttributes(keyMapConfig, keyMapSummary[actionName], KEYMAP_ATTRIBUTES);
+
+      keyMapSummary[actionName].sequences = [
+        copyAttributes(keyMapConfig, {}, SEQUENCE_ATTRIBUTES)
+      ];
+    }
+  } else {
+    keyMapSummary[actionName].sequences =
+      createSequenceFromConfig(keyMapConfig);
+  }
+}
+
 class ApplicationKeyMapBuilder {
   constructor(componentTree) {
     this._componentTree = componentTree;
@@ -46,49 +92,7 @@ class ApplicationKeyMapBuilder {
 
       if (keyMap) {
         Object.keys(keyMap).forEach((actionName) => {
-          const keyMapConfig = keyMap[actionName];
-
-          keyMapSummary[actionName] = {};
-
-          if (isObject(keyMapConfig)) {
-            if (hasKey(keyMapConfig, 'sequences')) {
-              /**
-               * Support syntax:
-               *  {
-               *    sequences: [ {sequence: 'a+b', action: 'keyup' }],
-               *    name: 'My keymap',
-               *    description: 'Key to press for something special',
-               *    group: 'Vanity'
-               *  }
-               */
-              copyAttributes(
-                keyMapConfig,
-                keyMapSummary[actionName],
-                KEYMAP_ATTRIBUTES
-              );
-
-              keyMapSummary[actionName].sequences =
-                createSequenceFromConfig(keyMapConfig.sequences);
-            } else {
-              /**
-               * Support syntax:
-               * {
-               *   sequence: 'a+b', action: 'keyup',
-               *   name: 'My keymap',
-               *   description: 'Key to press for something special',
-               *   group: 'Vanity'
-               * }
-               */
-              copyAttributes(keyMapConfig, keyMapSummary[actionName], KEYMAP_ATTRIBUTES);
-
-              keyMapSummary[actionName].sequences = [
-                copyAttributes(keyMapConfig, {}, SEQUENCE_ATTRIBUTES)
-              ]
-            }
-          } else {
-            keyMapSummary[actionName].sequences =
-              createSequenceFromConfig(keyMapConfig)
-          }
+          normalizeActionDefinition(keyMap, actionName, keyMapSummary);
         });
       }
 
