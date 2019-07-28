@@ -6,6 +6,7 @@
  */
 
 import arrayFrom from '../array/arrayFrom';
+import nop from '../function/nop';
 
 /**
  * Create a dictionary (map) from an array of values
@@ -32,7 +33,5 @@ function dictionaryFrom(array, valueOrAdaptor = true, keyAdaptor = nop, initValu
     return memo;
   }, initValue);
 }
-
-function nop(element) { return element; }
 
 export default dictionaryFrom;

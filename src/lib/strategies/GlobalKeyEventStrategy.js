@@ -233,11 +233,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
 
     if (this._isIgnoringRepeatedEvent(event, key, KeyEventType.keypress)) {
       return;
-    }
-
-    const currentCombination = this.currentCombination;
-
-    if (currentCombination.isKeyPressSimulated(key)){
+    } else if (this.currentCombination.isKeyPressSimulated(key)){
       this.logger.logEventAlreadySimulated(event, key, KeyEventType.keypress);
 
       return;
@@ -254,7 +250,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
     /**
      * Add new key event to key combination history
      */
-    if (currentCombination.isKeyIncluded(key)) {
+    if (this.currentCombination.isKeyIncluded(key)) {
       this._recordNewKeyInCombination(key, KeyEventType.keypress, stateFromEvent(event));
     }
 
@@ -295,9 +291,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
   handleKeyUp(event) {
     const key = getKeyName(event);
 
-    const currentCombination = this.currentCombination;
-
-    if (currentCombination.isKeyUpSimulated(key)){
+    if (this.currentCombination.isKeyUpSimulated(key)){
       this.logger.logEventAlreadySimulated(event, key, KeyEventType.keyup);
 
       return;
@@ -315,7 +309,7 @@ class GlobalKeyEventStrategy extends AbstractKeyEventStrategy {
      * function changes focus to a context that ignored events, the keyup event
      * is not lost (leaving react hotkeys thinking the key is still pressed).
      */
-    if (currentCombination.isKeyIncluded(key)) {
+    if (this.currentCombination.isKeyIncluded(key)) {
       this._recordNewKeyInCombination(
         key, KeyEventType.keyup, stateFromEvent(event)
       );

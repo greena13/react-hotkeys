@@ -9,17 +9,20 @@ function applicableAliasFunctions(keyDictionary){
   if (keyDictionary['Shift']) {
     if (keyDictionary['Alt']) {
       return [resolveAltShiftedAlias, resolveUnaltShiftedAlias];
-    } else {
-      return [resolveShiftedAlias, resolveUnshiftedAlias];
     }
-  } else {
-    if (keyDictionary['Alt']) {
-      return [resolveAltedAlias, resolveUnaltedAlias];
-    } else {
-      const nop = (keyName) => [keyName];
-      return [nop, nop];
-    }
+
+    return [resolveShiftedAlias, resolveUnshiftedAlias];
   }
+
+  if (keyDictionary['Alt']) {
+    return [resolveAltedAlias, resolveUnaltedAlias];
+  }
+
+  return [nop, nop];
+}
+
+function nop(keyName){
+  return [keyName]
 }
 
 export default applicableAliasFunctions;

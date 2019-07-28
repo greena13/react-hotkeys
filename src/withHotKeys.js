@@ -116,14 +116,14 @@ function provideWithContext(HotKeysEnabled) {
  * @returns {React.ComponentClass} Wrapped component that is passed all of the React hotkeys
  * props in a single value, hotkeys.
  */
-function withHotKeys(Component, hotKeysOptions = {}) {
+function componentFactory(Component, hotKeysOptions = {}) {
   /**
    * Component that listens to key events when one of its children are in focus and
    * selectively triggers actions (that may be handled by handler functions) when a
    * sequence of events matches a list of pre-defined sequences or combinations
    * @class
    */
-  class HotKeysEnabled extends PureComponent {
+  return class HotKeysEnabled extends PureComponent {
     static propTypes = propTypes;
 
     constructor(props) {
@@ -155,8 +155,12 @@ function withHotKeys(Component, hotKeysOptions = {}) {
       );
     }
   }
+}
 
-  return provideWithContext(HotKeysEnabled);
+function withHotKeys(Component, hotKeysOptions = {}) {
+  return provideWithContext(
+    componentFactory(Component, hotKeysOptions)
+  );
 }
 
 export default withHotKeys;

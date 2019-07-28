@@ -13,7 +13,7 @@ import resolveAltedAlias from './helpers/resolving-handlers/resolveAltedAlias';
 import resolveUnaltedAlias from './helpers/resolving-handlers/resolveUnaltedAlias';
 import hasKey from './utils/object/hasKey';
 import dictionaryFrom from './utils/object/dictionaryFrom';
-import HotKeysIgnoreOverrideManager from './lib/HotKeysIgnoreOverrideManager';
+import HotKeysIgnoreOverrideManager from './lib/metal/HotKeysIgnoreOverrideManager';
 
 const propTypes = {
   /**
