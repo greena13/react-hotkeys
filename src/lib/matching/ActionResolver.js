@@ -215,70 +215,68 @@ class ActionResolver {
      * handlers
      */
     Object.keys(actions).forEach((actionName) => {
-      const handlerComponentIndexArray = this._getHandlers(actionName);
-
-      if (handlerComponentIndexArray) {
-        /**
-         * Get action handler closest to the event target
-         */
-        const handlerComponentIndex = handlerComponentIndexArray[0];
-
-        const handler =
-          this._componentList.getAtPosition(handlerComponentIndex).handlers[actionName];
-
-        /**
-         * Get key map that corresponds with the component that defines the handler
-         * closest to the event target
-         */
-        const keyMapMatcher = this._getKeyHistoryMatcher(handlerComponentIndex);
-
-        /**
-         * At least one child HotKeys component (or the component itself) has
-         * defined a handler for the action, so now we need to associate them
-         */
-        const actionOptionsList = actions[actionName];
-
-        actionOptionsList.forEach((actionOptions) => {
-          const keySequence = [actionOptions.prefix, actionOptions.id].join(' ');
-
-          if (this._isClosestHandlerFound(keySequence, actionOptions)) {
-            /**
-             * Return if there is already a component with handlers for the current
-             * key sequence closer to the event target
-             */
-            return;
-          }
-
-          keyMapMatcher.addMatch(actionOptions, handler);
-
-          this._addKeySequence(keySequence, [
-            handlerComponentIndex,
-            actionOptions.keyEventType
-          ]);
-        });
-
-        handlerComponentIndexArray.forEach((handlerComponentIndex) => {
-          const handlerComponentStatus =
-            this._getUnmatchedHandlerStatus(handlerComponentIndex);
-
-          if (!handlerComponentStatus[1][actionName]) {
-            handlerComponentStatus[1][actionName] = true;
-
-            /**
-             * Decrement the number of remaining unmatched handlers for the
-             * component currently handling the propagating key event, so we know
-             * when all handlers have been matched to sequences and we can move on
-             * to matching them against the current key event
-             */
-            handlerComponentStatus[0]--;
-          }
-        });
-      }
+      this._buildActionMatchers(actionName, actions[actionName]);
     });
   }
 
-  _getHandlers(actionName) {
+  _buildActionMatchers(actionName, listOfActionDefinitions) {
+    const handlerPositions = this._positionsOfComponentsWithHandlersFor(actionName);
+
+    if (!handlerPositions) {
+      return false;
+    }
+
+    this._registerActionWithMatcher(
+      handlerPositions, actionName, listOfActionDefinitions
+    );
+
+    handlerPositions.forEach((componentPosition) => {
+      const handlerStatus = this._getUnmatchedHandlerStatus(componentPosition);
+      const matchedActionsDictionary = handlerStatus[1];
+
+      if (!matchedActionsDictionary[actionName]) {
+        matchedActionsDictionary[actionName] = true;
+
+        /**
+         * Decrement the number of remaining unmatched handlers for the
+         * component currently handling the propagating key event, so we know
+         * when all handlers have been matched to sequences and we can move on
+         * to matching them against the current key event
+         */
+        handlerStatus[0]--;
+      }
+    });
+
+    return true;
+  }
+
+  _positionsOfComponentsWithHandlersFor(actionName) {
     return this._handlersDictionary[actionName];
+  }
+
+  _registerActionWithMatcher(handlerPositions, actionName, listOfActionDefinitions) {
+    const positionOfClosestHandler = handlerPositions[0];
+
+    const closestHandler =
+      this._componentList.getAtPosition(positionOfClosestHandler).handlers[actionName];
+
+    const closestKeyMatcher = this._getKeyHistoryMatcher(positionOfClosestHandler);
+
+    listOfActionDefinitions.forEach((actionDefinition) => {
+      const {prefix, id, keyEventType} = actionDefinition;
+
+      const sequenceId = [prefix, id].join(' ');
+
+      if (this._isClosestHandlerAlreadyFoundFor(sequenceId, keyEventType)) {
+        return false;
+      }
+
+      closestKeyMatcher.addMatch(actionDefinition, closestHandler);
+
+      this._recordHandlerFoundFor(sequenceId, [positionOfClosestHandler, keyEventType]);
+    });
+
+    return true;
   }
 
   _addHandlersFromComponent() {
@@ -299,7 +297,7 @@ class ActionResolver {
     this._handlersDictionary[actionName].push(this._componentListIterator.position);
   }
 
-  _addKeySequence(keySequence, value) {
+  _recordHandlerFoundFor(keySequence, value) {
     /**
      * Record that we have already found a handler for the current action so
      * that we do not override handlers for an action closest to the event target
@@ -318,11 +316,10 @@ class ActionResolver {
     return this._unmatchedHandlerStatus[index];
   }
 
-  _isClosestHandlerFound(keySequence, keyMatcher) {
-    return this._keySequencesDictionary[keySequence] &&
-    this._keySequencesDictionary[keySequence].some((dictEntry) => {
-      return dictEntry[1] === keyMatcher.keyEventType
-    });
+  _isClosestHandlerAlreadyFoundFor(keySequenceId, keyEventType) {
+    const keySequence = this._keySequencesDictionary[keySequenceId] || [];
+
+    return keySequence.some((dictEntry) => dictEntry[1] === keyEventType);
   }
 }
 
