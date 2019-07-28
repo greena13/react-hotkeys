@@ -49,7 +49,7 @@ function backwardsCompatibleContext(
 
     // noinspection JSUnresolvedVariable,JSUnusedGlobalSymbols
     Component.prototype.getChildContext = function() {
-      return this._childContext;
+      return this._manager.childContext;
     };
   } else {
     // noinspection UnnecessaryLocalVariableJS
@@ -73,7 +73,7 @@ function backwardsCompatibleContext(
 
       if (result) {
         return (
-          <context.Provider value={ this._childContext }>
+          <context.Provider value={ this._manager.childContext }>
             { result }
           </context.Provider>
         )

@@ -1,7 +1,7 @@
-import Configuration from './config/Configuration';
-import isUndefined from '../utils/isUndefined';
-import KeyEventManager from './KeyEventManager';
-import isEmpty from '../utils/collection/isEmpty';
+import Configuration from '../config/Configuration';
+import isUndefined from '../../utils/isUndefined';
+import KeyEventManager from '../KeyEventManager';
+import isEmpty from '../../utils/collection/isEmpty';
 
 function wrapPropInFunction(prop, func){
   if (typeof prop === 'function') {
@@ -27,11 +27,22 @@ function getEventOptions() {
   };
 }
 
-class ComponentManager {
+class FocusOnlyComponentManager {
   constructor(hotKeysOptions, {keyMap}) {
     this._hotKeysOptions = hotKeysOptions;
 
     this.id = KeyEventManager.getFocusOnlyEventStrategy().registerKeyMap(keyMap);
+
+    /**
+     * We maintain a separate instance variable to contain context that will be
+     * passed down to descendants of this component so we can have a consistent
+     * reference to the same object, rather than instantiating a new one on each
+     * render, causing unnecessary re-rendering of descendant components that
+     * consume the context.
+     *
+     * @see https://reactjs.org/docs/context.html#caveats
+     */
+    this.childContext = { hotKeysParentId: this.id };
 
     this._focusTreeIds = [];
   }
@@ -200,4 +211,4 @@ class ComponentManager {
   }
 }
 
-export default ComponentManager;
+export default FocusOnlyComponentManager;

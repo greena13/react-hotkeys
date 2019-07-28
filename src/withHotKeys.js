@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import backwardsCompatibleContext from './utils/backwardsCompatibleContext';
-import ComponentManager from './lib/ComponentManager';
+import FocusOnlyComponentManager from './lib/metal/FocusOnlyComponentManager';
 
 const propTypes = {
   /**
@@ -129,23 +129,11 @@ function withHotKeys(Component, hotKeysOptions = {}) {
     constructor(props) {
       super(props);
 
-      this._manager = new ComponentManager(hotKeysOptions, props);
-
-      /**
-       * We maintain a separate instance variable to contain context that will be
-       * passed down to descendants of this component so we can have a consistent
-       * reference to the same object, rather than instantiating a new one on each
-       * render, causing unnecessary re-rendering of descendant components that
-       * consume the context.
-       *
-       * @see https://reactjs.org/docs/context.html#caveats
-       */
-      this._childContext = { hotKeysParentId: this._manager.id };
+      this._manager = new FocusOnlyComponentManager(hotKeysOptions, props);
     }
 
     componentDidMount() {
-      const {hotKeysParentId} = this.context;
-      this._manager.addHotKeys(hotKeysParentId);
+      this._manager.addHotKeys(this.context.hotKeysParentId);
     }
 
     componentDidUpdate() {
