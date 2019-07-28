@@ -3,6 +3,26 @@ import hasKey from '../object/hasKey';
 import isString from '../string/isString';
 import isUndefined from '../isUndefined';
 
+function findableCollectionContains(collection, item, options) {
+  if (options.stringifyFirst) {
+
+    return !isUndefined(
+      collection.find((collectionItem) => collectionItem.toString() === item.toString())
+    );
+
+  } else {
+    return collection.indexOf(item) !== -1;
+  }
+}
+
+function nonCollectionContains(collection, item, options) {
+  if (options.stringifyFirst) {
+    return collection.toString() === item.toString();
+  } else {
+    return collection === item;
+  }
+}
+
 /**
  * Whether a collection contains an item
  * @param {Object|Array} collection The collection query
@@ -14,24 +34,14 @@ import isUndefined from '../isUndefined';
  */
 function contains(collection, item, options = {}) {
   if (Array.isArray(collection) || isString(collection)) {
-    if (options.stringifyFirst) {
-
-      return !isUndefined(
-        collection.find((collectionItem) => collectionItem.toString() === item.toString())
-      );
-
-    } else {
-      return collection.indexOf(item) !== -1;
-    }
-  } else if (isObject(collection)) {
-    return hasKey(collection, item);
-  } else {
-    if (options.stringifyFirst) {
-      return collection.toString() === item.toString();
-    } else {
-      return collection === item;
-    }
+    return findableCollectionContains(collection, item, options);
   }
+
+  if (isObject(collection)) {
+    return hasKey(collection, item);
+  }
+
+  return nonCollectionContains(collection, item, options);
 }
 
 export default contains;
