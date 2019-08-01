@@ -66,8 +66,12 @@ import { HotKeys } from "react-hotkeys";
 import React from 'react';
 
 const MyNode = () => {
+  const deleteNode = React.useCallback(() => {
+    // logic here
+  }, [])
+  
   const handlers = {
-    DELETE_NODE: this.deleteNode
+    DELETE_NODE: deleteNode
   };
 
   return <HotKeys handlers={handlers}>Node contents</HotKeys>;
