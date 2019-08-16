@@ -94,7 +94,8 @@ class KeyEventManager {
     this.mountedComponentsCount += 1;
 
     if (preMountedComponentCount === 0 && this.mountedComponentsCount === 1) {
-      window.onblur = () => this._clearKeyHistory();
+      const addEventListener = window && (window.on || window.addEventListener);
+      addEventListener && addEventListener.call(window, 'blur', () => this._clearKeyHistory());
     }
   }
 
@@ -103,7 +104,7 @@ class KeyEventManager {
     this.mountedComponentsCount -= 1;
 
     if (preMountedComponentCount === 1 && this.mountedComponentsCount === 0) {
-      delete window.onblur;
+      // TODO(shaheen): figure out how to remove blur listener
     }
   }
 
