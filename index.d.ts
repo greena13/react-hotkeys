@@ -28,7 +28,7 @@ export type KeyMap = { [key in ActionName]: KeySequence };
  * selectively triggers actions (that may be handled by handler functions) when a
  * sequence of events matches a list of pre-defined sequences or combinations
  */
-export interface HotKeysEnabled extends React.Component<HotKeysProps, {}> { }
+export type HotKeysEnabled = React.ComponentType<HotKeysProps> { }
 
 export interface GlobalHotKeysProps extends React.HTMLAttributes<HotKeys> {
   /**
