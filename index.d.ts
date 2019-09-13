@@ -123,7 +123,7 @@ export class GlobalHotKeys extends React.Component<GlobalHotKeysProps, {}> { }
  * the wrapped component (e.g. div, span, input, etc) in order for the key events
  * to be recorded.
  */
-export declare function withHotKeys(Component: React.ComponentClass, hotKeysOptions: HotKeysEnabledProps): HotKeysEnabled;
+export declare function withHotKeys(Component: React.ComponentType, hotKeysOptions: HotKeysEnabledProps): HotKeysEnabled;
 
 export type ListOfKeys = string | Array<string>;
 
