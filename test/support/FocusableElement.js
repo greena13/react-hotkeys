@@ -57,6 +57,6 @@ export default class FocusableElement {
   }
 
   getInstance() {
-    lazyLoadAttribute(this, 'instance', () => this.element.getDOOMNode());
+    lazyLoadAttribute(this, 'instance', () => this.element.getDOMNode());
   }
 };
