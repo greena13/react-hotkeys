@@ -48,6 +48,8 @@ class KeyEventManager {
       new GlobalKeyEventStrategy({ configuration, logLevel }, this);
 
     this.mountedComponentsCount = 0;
+
+    this._blurHandler = this._clearKeyHistory.bind(this);
   }
 
   /********************************************************************************
@@ -94,7 +96,7 @@ class KeyEventManager {
     this.mountedComponentsCount += 1;
 
     if (preMountedComponentCount === 0 && this.mountedComponentsCount === 1) {
-      window.onblur = () => this._clearKeyHistory();
+      window.addEventListener('blur', this._blurHandler);
     }
   }
 
@@ -103,7 +105,7 @@ class KeyEventManager {
     this.mountedComponentsCount -= 1;
 
     if (preMountedComponentCount === 1 && this.mountedComponentsCount === 0) {
-      delete window.onblur;
+      window.removeEventListener('blur', this._blurHandler);
     }
   }
 
