@@ -101,7 +101,6 @@ export default MyNode;
     - [Defining custom key codes](#defining-custom-key-codes)
     - [Setting dynamic hotkeys at runtime](#setting-dynamic-hotkeys-at-runtime)
 - [Defining Handlers](#defining-handlers)
-    - [DEPRECATED: Hard Sequence Handlers](#deprecated-hard-sequence-handlers)
 - [Interaction with React](#interaction-with-react)
 - [HotKeys components](#hotkeys-components)
 - [HotKeys component API](#hotkeys-component-api)
