@@ -28,7 +28,7 @@ export type KeyMap = { [key in ActionName]: KeySequence };
  * selectively triggers actions (that may be handled by handler functions) when a
  * sequence of events matches a list of pre-defined sequences or combinations
  */
-export interface HotKeysEnabled extends React.Component<HotKeysProps, {}> { }
+export type HotKeysEnabled = React.ComponentType<HotKeysProps> { }
 
 export interface GlobalHotKeysProps extends React.HTMLAttributes<HotKeys> {
   /**
@@ -123,7 +123,7 @@ export class GlobalHotKeys extends React.Component<GlobalHotKeysProps, {}> { }
  * the wrapped component (e.g. div, span, input, etc) in order for the key events
  * to be recorded.
  */
-export declare function withHotKeys(Component: React.ComponentClass, hotKeysOptions: HotKeysEnabledProps): HotKeysEnabled;
+export declare function withHotKeys(Component: React.ComponentType, hotKeysOptions?: HotKeysEnabledProps): HotKeysEnabled;
 
 export type ListOfKeys = string | Array<string>;
 
