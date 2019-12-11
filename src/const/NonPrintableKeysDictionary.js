@@ -3,8 +3,9 @@
  */
 import dictionaryFrom from '../utils/object/dictionaryFrom';
 import translateToKey from '../vendor/react-dom/translateToKey';
+import objectValues from '../utils/object/values';
 
 const NonPrintableKeysDictionary =
-  dictionaryFrom(Object.values(translateToKey));
+  dictionaryFrom(objectValues(translateToKey));
 
 export default NonPrintableKeysDictionary;

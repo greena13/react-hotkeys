@@ -1,4 +1,5 @@
 import dictionaryFrom from '../../utils/object/dictionaryFrom';
+import objectValues from '../../utils/object/values';
 
 /**
  * Default configuration values
@@ -150,7 +151,7 @@ class Configuration {
     }
 
     if (customKeyCodes) {
-      configuration._customKeyNamesDict = dictionaryFrom(Object.values(configuration.customKeyCodes));
+      configuration._customKeyNamesDict = dictionaryFrom(objectValues(configuration.customKeyCodes));
     }
 
     // noinspection JSUnresolvedVariable
