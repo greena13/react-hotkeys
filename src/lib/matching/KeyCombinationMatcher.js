@@ -2,6 +2,7 @@ import Configuration from '../config/Configuration';
 import size from '../../utils/collection/size';
 import keyupIsHiddenByCmd from '../../helpers/resolving-handlers/keyupIsHiddenByCmd';
 import lazyLoadAttribute from '../../utils/object/lazyLoadAttribute';
+import objectValues from '../../utils/object/values';
 import KeyCombinationIterator from '../listening/KeyCombinationIterator';
 
 /**
@@ -149,7 +150,7 @@ class KeyCombinationMatcher {
      * size so that they may be applied in the correct priority order
      */
 
-    const combinationsPartitionedBySize = Object.values(this._actionConfigs).reduce((memo, {id, size}) => {
+    const combinationsPartitionedBySize = objectValues(this._actionConfigs).reduce((memo, {id, size}) => {
       if (!memo[size]) {
         memo[size] = [];
       }

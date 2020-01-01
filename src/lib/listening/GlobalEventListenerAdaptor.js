@@ -1,6 +1,8 @@
 import KeyEventType from '../../const/KeyEventType';
 import describeKeyEventType from '../../helpers/logging/describeKeyEventType';
 import normalizeEventName from '../../utils/string/normalizeEventName';
+import objectValues from '../../utils/object/values';
+
 
 class GlobalEventListenerAdaptor {
   constructor(strategy, {logger}) {
@@ -20,7 +22,7 @@ class GlobalEventListenerAdaptor {
   }
 
   unbindListeners() {
-    Object.values(KeyEventType).forEach((recordIndex) => {
+    objectValues(KeyEventType).forEach((recordIndex) => {
       const eventName = describeKeyEventType(recordIndex);
 
       delete document[`on${eventName}`];
@@ -32,7 +34,7 @@ class GlobalEventListenerAdaptor {
   }
 
   bindListeners() {
-    Object.values(KeyEventType).forEach((recordIndex) => {
+    objectValues(KeyEventType).forEach((recordIndex) => {
       const eventName = describeKeyEventType(recordIndex);
 
       document[`on${eventName}`] = (keyEvent) => {
