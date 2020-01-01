@@ -15,6 +15,10 @@ A declarative library for handling hotkeys and focus areas in React applications
 
 See the [upgrade notes](https://github.com/greena13/react-hotkeys/releases/tag/v2.0.0).
 
+## Looking for new maintainers
+
+This package has been more or less unmaintained for over 6 months and is search of new maintainers to help address the many outstanding issues. If you are interested in helping out in any capacity, please [get in touch](https://github.com/greena13/react-hotkeys/issues/247).
+
 ## Feature Overview
 
 - Minimal declarative [JSX](#HotKeys-component-API) and [HoC](#withHotKeys-HoC-API) APIs
