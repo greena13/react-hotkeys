@@ -39,7 +39,7 @@ export interface GlobalHotKeysProps extends React.HTMLAttributes<HotKeys> {
   /**
    * A map from action names to event handler functions
    */
-  handlers?: { [key: string]: (keyEvent?: KeyboardEvent) => void };
+  handlers?: { [key: string]: (keyEvent?: React.KeyboardEvent) => void };
 
   /**
    * Whether the keyMap or handlers are permitted to change after the
@@ -271,7 +271,7 @@ export interface ConfigurationOptions {
    * Hotkeys. By default, keyboard events originating elements with a tag name in
    * ignoreTags, or a isContentEditable property of true, are ignored.
    */
-  ignoreEventsCondition?: (keyEvent: KeyboardEvent) => boolean,
+  ignoreEventsCondition?: (keyEvent: React.KeyboardEvent) => boolean,
 
   /**
    * Whether to ignore repeated keyboard events when a key is being held down
