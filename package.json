@@ -72,7 +72,7 @@
     "lint": "eslint .",
     "tests": "mocha",
     "watch-tests": "mocha --watch",
-    "prepublish": "npm run build-cjs && npm run build-es && npm run build-umd",
+    "prepare": "npm run build-cjs && npm run build-es && npm run build-umd",
     "build-cjs": "rm -rf cjs && npm run build-development && npm run build-production",
     "build-es": "rm -rf es && npm run build-es-development && npm run build-es-production",
     "build-umd": "rm -rf umd && npm run build-umd-development && npm run build-umd-production",
