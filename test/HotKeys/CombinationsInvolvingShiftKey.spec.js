@@ -54,5 +54,72 @@ describe('Combinations involving shift key:', function () {
         })
       });
     });
-  })
+  });
+
+  /**
+   * This test scenario is created to verify the bug with "Shift+Space" and "Shift+Enter" combinations:
+   * https://github.com/greena13/react-hotkeys/issues/300
+   */
+  describe('and there are handlers defined for "Shift+Space", "Shift+Enter" and "Shift+R"', () => {
+    beforeEach(function () {
+      this.keyMap = {
+        'ACTION1': 'shift+space',
+        'ACTION2': 'shift+enter',
+        'ACTION3': 'shift+r'
+      };
+
+      this.handler1 = sinon.spy();
+      this.handler2 = sinon.spy();
+      this.handler3 = sinon.spy();
+
+      const handlers = {
+        'ACTION1': this.handler1,
+        'ACTION2': this.handler2,
+        'ACTION3': this.handler3
+      };
+
+      this.wrapper = mount(
+        <HotKeys keyMap={this.keyMap} handlers={handlers}>
+          <div className="childElement" />
+        </HotKeys>
+      );
+
+      this.targetElement = new FocusableElement(this.wrapper, '.childElement');
+      this.targetElement.focus();
+    });
+
+    it(`then calls the handler for "Shift+Space" and press "Shift"`, function() {
+      this.targetElement.keyDown('Shift');
+      this.targetElement.keyDown(' ');
+
+      this.targetElement.focus();
+      this.targetElement.keyDown('Shift');
+      this.targetElement.keyUp('Shift');
+      expect(this.handler1).to.have.been.calledOnce;
+    });
+
+    it(`then calls the handler for "Shift+Enter" and press "Shift"`, function() {
+      this.targetElement.keyDown('Shift');
+      this.targetElement.keyDown('Enter');
+
+      this.targetElement.focus();
+      this.targetElement.keyDown('Shift');
+      this.targetElement.keyUp('Shift');
+      expect(this.handler2).to.have.been.calledOnce;
+    });
+
+    it(`then calls the handler for "Shift+Space" and "Shift+R"`, function() {
+      this.targetElement.keyDown('Shift');
+      this.targetElement.keyDown(' ');
+
+      this.targetElement.focus();
+      this.targetElement.keyDown('Shift');
+      this.targetElement.keyDown('r');
+      this.targetElement.keyUp('r');
+      this.targetElement.keyUp('Shift');
+      expect(this.handler3).to.have.been.called;
+
+    });
+
+  });
 });
