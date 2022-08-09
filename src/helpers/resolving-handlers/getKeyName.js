@@ -9,6 +9,7 @@ import hasKey from '../../utils/object/hasKey';
 
 function keyNameFromEvent(event) {
   const customKeyCodes = Configuration.option('customKeyCodes');
+  const customLocationPrefixes = Configuration.option('customLocationPrefixes');
 
   // noinspection JSDeprecatedSymbols
   const keyCode = event.keyCode || event.charCode;
@@ -17,10 +18,17 @@ function keyNameFromEvent(event) {
     return customKeyCodes[keyCode];
   }
 
+  const location = event.location;
+
+  let locationPrefix = "";
+  if (customLocationPrefixes && hasKey(customLocationPrefixes, location)) {
+    locationPrefix = customLocationPrefixes[location]
+  }
+
   if (event.nativeEvent) {
-    return event.key;
+    return locationPrefix + event.key;
   } else {
-    return reactsGetEventKey(event);
+    return locationPrefix + reactsGetEventKey(event);
   }
 }
 

@@ -16,6 +16,7 @@ export interface ExtendedKeyMapOptions extends KeyMapOptions {
   sequences: Array<MouseTrapKeySequence> | Array<KeyMapOptions>;
   name?: string;
   group?: string;
+  extraData?: string;
   description?: string;
 }
 
@@ -318,6 +319,12 @@ export interface ConfigurationOptions {
    * key sequences
    */
   customKeyCodes?: { [key: number]: string },
+
+  /**
+   * A mapping of custom prefixes to prepend to key names according to event.location,
+   * where 0 = Default, 1 = Left, 2 = Right, 3 = Numpad
+   */
+  customLocationPrefixes?: { [key: 0 | 1 | 2 | 3]: string },
 }
 
 /**

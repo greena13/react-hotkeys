@@ -122,6 +122,13 @@ const _defaultConfiguration = {
    * @type {Object.<Number, KeyName>}
    */
   customKeyCodes: {},
+
+  /**
+   * A mapping of custom prefixes to prepend to key names according to event.location,
+   * where 0 = Default, 1 = Left, 2 = Right, 3 = Numpad
+   * @type {Object.<Number, String>}
+   */
+  customLocationPrefixes: {},
 };
 
 const _configuration = {
@@ -144,7 +151,7 @@ class Configuration {
    * @see _configuration
    */
   static init(configuration) {
-    const {ignoreTags, customKeyCodes } = configuration;
+    const {ignoreTags, customKeyCodes, customLocationPrefixes} = configuration;
 
     if (ignoreTags) {
       configuration._ignoreTagsDict = dictionaryFrom(configuration.ignoreTags);
@@ -152,6 +159,9 @@ class Configuration {
 
     if (customKeyCodes) {
       configuration._customKeyNamesDict = dictionaryFrom(objectValues(configuration.customKeyCodes));
+    }
+    if (customLocationPrefixes) {
+      configuration._customLocationPrefixesDict = dictionaryFrom(configuration.customLocationPrefixes);
     }
 
     // noinspection JSUnresolvedVariable
