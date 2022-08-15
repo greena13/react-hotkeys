@@ -22,14 +22,14 @@ export interface ExtendedKeyMapOptions extends KeyMapOptions {
 
 export type KeySequence = MouseTrapKeySequence | KeyMapOptions | ExtendedKeyMapOptions | Array<MouseTrapKeySequence> | Array<KeyMapOptions>;
 
-export type KeyMap = { [key in ActionName]: KeySequence };
+export type KeyMap = { [key: ActionName]: KeySequence };
 
 /**
  * Component that listens to key events when one of its children are in focus and
  * selectively triggers actions (that may be handled by handler functions) when a
  * sequence of events matches a list of pre-defined sequences or combinations
  */
-export type HotKeysEnabled = React.ComponentType<HotKeysProps> { }
+export type HotKeysEnabled = React.ComponentType<HotKeysProps>;
 
 export interface GlobalHotKeysProps extends React.HTMLAttributes<HotKeys> {
   /**
@@ -324,7 +324,7 @@ export interface ConfigurationOptions {
    * A mapping of custom prefixes to prepend to key names according to event.location,
    * where 0 = Default, 1 = Left, 2 = Right, 3 = Numpad
    */
-  customLocationPrefixes?: { [key: 0 | 1 | 2 | 3]: string },
+  customLocationPrefixes?: { [key in 0 | 1 | 2 | 3]: string },
 }
 
 /**
