@@ -4,7 +4,7 @@ import copyAttributes from '../../utils/object/copyAttributes';
 import arrayFrom from '../../utils/array/arrayFrom';
 
 const SEQUENCE_ATTRIBUTES = ['sequence', 'action'];
-const KEYMAP_ATTRIBUTES = ['name', 'description', 'group'];
+const KEYMAP_ATTRIBUTES = ['name', 'description', 'group', 'extraData'];
 
 function createSequenceFromConfig(keyMapConfig) {
   return arrayFrom(keyMapConfig).map((sequenceOrKeyMapOptions) => {

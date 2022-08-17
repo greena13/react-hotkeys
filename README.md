@@ -73,7 +73,7 @@ const MyNode = () => {
   const deleteNode = React.useCallback(() => {
     // logic here
   }, [])
-  
+
   const handlers = {
     DELETE_NODE: deleteNode
   };
@@ -162,7 +162,7 @@ export default MyNode;
 
 ## Licenses
 
-`react-hotkeys` is released under the [ISC License](/LICENSE). 
+`react-hotkeys` is released under the [ISC License](/LICENSE).
 
 However, please note: the source code found in the lib/vendor directory is under the MIT License - please see the license file for each directory for more information.
 
@@ -171,7 +171,7 @@ However, please note: the source code found in the lib/vendor directory is under
 If you use React Hotkeys and it has saved you time or money, please consider contributing.  You will be supporting `react-hotkeys` by supporting its maintainer.
 
 Please see my [Patreon Page](https://www.patreon.com/aleckgreenham) for details of why your support is needed, and how it will be used.
- 
+
 For recurring and publicly acknowledged support:
 
 | Payment Option | Link/Address |
@@ -330,10 +330,10 @@ You can specify data used to display the application's key maps using the object
 
 ```javascript
   {
-    SHOW_DIALOG: { 
-        name: 'Display keyboard shortcuts', 
-        sequence: 'shift+?', 
-        action: 'keyup' 
+    SHOW_DIALOG: {
+        name: 'Display keyboard shortcuts',
+        sequence: 'shift+?',
+        action: 'keyup'
       }
   }
 ```
@@ -342,10 +342,10 @@ If you want to also provide alternative key sequences for the same action, use t
 
 ```javascript
   {
-    SHOW_DIALOG: { 
-        name: 'Display keyboard shortcuts', 
-        sequences: ['shift+?', { sequence: '`', action: 'keyup' }], 
-        action: 'keyup' 
+    SHOW_DIALOG: {
+        name: 'Display keyboard shortcuts',
+        sequences: ['shift+?', { sequence: '`', action: 'keyup' }],
+        action: 'keyup'
       }
   }
 ```
@@ -357,11 +357,11 @@ As a general rule, you should use the syntax that is the most brief, but still a
 
 | Syntax Type                  | Use when you ...                                                                                                    |
 | :--------------------------- | :------------------------------------------------------------------------------------------------------------------ |
-| String                       | Have a single key sequence and don't have any special requirements (Default case)                                   | 
+| String                       | Have a single key sequence and don't have any special requirements (Default case)                                   |
 | Array of strings             | Need alternative key maps that trigger the same action, and are happy with them triggering on the default key event |
-| Array of objects             | Need alternative key maps that trigger the same action, and want to them to trigger on a different key event        | 
-| Object                       | Have a single key sequence and want to specify a different key event or display data                                | 
-| Object (sequences attribute) | Have multiple key sequences that trigger the same action, and want to specify a different key event or display data | 
+| Array of objects             | Need alternative key maps that trigger the same action, and want to them to trigger on a different key event        |
+| Object                       | Have a single key sequence and want to specify a different key event or display data                                |
+| Object (sequences attribute) | Have multiple key sequences that trigger the same action, and want to specify a different key event or display data |
 
 #### Defining custom key codes
 
@@ -373,8 +373,8 @@ import {configure} from 'react-hotkeys';
 
 configure({
   customKeyCodes: {
-    10009: 'BackTV'    
-  }
+    10009: 'BackTV'
+  },
 })
 ```
 
@@ -386,13 +386,30 @@ const keyMap = {
 };
 ```
 
+#### Handling different key locations
+
+To distinguish between left/right variants of the same keys (e.g Ctrl, Shift, Numpad etc.), you can set a custom prefix for each location key as below:
+
+```javascript
+configure({
+  customLocationPrefixes: {
+    1: "Left",
+    2: "Right",
+    3: "Numpad",
+  }
+})
+```
+
+KeyNames will then be prefixed according to the location, e.g, `shift` becomes `leftshift`
+
+
 #### Setting dynamic hotkeys at runtime
 
 `react-hotkeys` has basic support for setting dynamic hotkeys - i.e. letting the user set their own keyboard shortcuts at runtime. Once you have set up the necessary UI for [viewing the current keyboard shortcuts](#displaying-a-list-of-available-hot-keys) (and opting to change them), you can then use the `recordKeyCombination` function to capture the keys the user wishes to use.
 
 `recordKeyCombination` accepts a callback function that will be called on the last `keyup` of the next key combination - immediately after the user has pressed the key combination they wish to assign. The callback then unbinds itself, so you do not have to worry about tidying up after it.
 
-`recordKeyCombination` returns a function you can call at any time after binding the listener, to cancel listening without waiting for the key combination to complete. 
+`recordKeyCombination` returns a function you can call at any time after binding the listener, to cancel listening without waiting for the key combination to complete.
 
 The callback function receives a single argument with the following schema:
 
@@ -400,7 +417,7 @@ The callback function receives a single argument with the following schema:
 {
   /**
    * Combination ID that can be passed to the keyMap prop to (re)define an
-   * action's key sequence 
+   * action's key sequence
    */
   id: '',
   /**
@@ -412,17 +429,17 @@ The callback function receives a single argument with the following schema:
 // Example:
 
 {
-  id: 'a', 
+  id: 'a',
   keys: { a: true }
 }
 ```
 
 If you are updating hotkeys without changing focus or remounting the component that defines them, you will need to make sure you use the [`allowChanges` prop](#hotkeys-component-api) to ensure the new keymaps are honoured immediately.
- 
-An example, rendering two dialogs: 
+
+An example, rendering two dialogs:
 
 * One for displaying the application's key maps using the [getApplicationKeyMap](#displaying-a-list-of-available-hot-keys) function
-* Another for telling the user when to press the keys they want to bind to an action, meanwhile listening with `recordKeyCombination()` 
+* Another for telling the user when to press the keys they want to bind to an action, meanwhile listening with `recordKeyCombination()`
 
 ```javascript
 import { recordKeyCombination } from 'react-hotkeys';
@@ -440,10 +457,10 @@ renderDialog(){
 
         <table>
           <tbody>
-          { 
+          {
             Object.keys(keyMap).reduce((memo, actionName) => {
               const { sequences, name } = keyMap[actionName];
-              
+
               memo.push(
                 <tr key={name || actionName}>
                   <td style={styles.KEYMAP_TABLE_CELL}>
@@ -459,7 +476,7 @@ renderDialog(){
                   </td>
                 </tr>
               );
-              
+
               return memo;
             })
           }
@@ -469,18 +486,18 @@ renderDialog(){
     );
   } else if (this.state.changingActionShortcut) {
     const { cancel } = this.state.changingActionShortcut;
-    
+
     const keyMap = getApplicationKeyMap();
     const { name } = keyMap[this.state.changingActionShortcut];
-    
+
     return (
       <div style={styles.DIALOG}>
         Press the keys you would like to bind to #{name}.
-        
+
         <button onClick={cancel}>
           Cancel
         </button>
-      </div>       
+      </div>
     );
   }
 }
@@ -492,24 +509,24 @@ showChangeShortcutDialog(actionName) {
         changingActionShortcut: null,
         keyMap: {
           ...this.state.keyMap,
-          [actionName]: id      
+          [actionName]: id
         }
-      }); 
+      });
   });
-  
+
   this.setState({
     showShortcutsDialog: false,
     changingActionShortcut: {
       cancel: () => {
         cancelListening();
-        
+
         this.setState({
           showShortcutsDialog: true,
           changingActionShortcut: null
-        }); 
+        });
       }
     }
-  });    
+  });
 }
 ```
 
@@ -629,9 +646,9 @@ However, it [does require that its children be wrapped in a DOM-mounted node](#h
    * to get a reference to the node, so you can call .focus() on it
    */
   innerRef: {undefined}
-  
+
   /**
-   * Whether this is the root HotKeys node - this enables some special 
+   * Whether this is the root HotKeys node - this enables some special
    * behaviour
    */
   root={false}
@@ -791,7 +808,7 @@ The GlobalHotKeys component provides a declarative and native JSX syntax for def
 
 ### How nested key maps are matched
 
-For keymaps defined with `<HotKeys/>` components, how close your `<HotKeys/>` component is to the element currently focused in the DOM has the greatest affect on how actions are resolved. Whenever a key event occurs (`keydown`, `keypress` or `keyup`), `react-hotkeys` starts at the `<HotKeys/>` component closest to the event's target (the focused element in the browser) and searches up through the hierarchy of focused `<HotKeys/>` components, examining each `keyMap` for actions for which the current key completes the specified combination or sequence. 
+For keymaps defined with `<HotKeys/>` components, how close your `<HotKeys/>` component is to the element currently focused in the DOM has the greatest affect on how actions are resolved. Whenever a key event occurs (`keydown`, `keypress` or `keyup`), `react-hotkeys` starts at the `<HotKeys/>` component closest to the event's target (the focused element in the browser) and searches up through the hierarchy of focused `<HotKeys/>` components, examining each `keyMap` for actions for which the current key completes the specified combination or sequence.
 
 Regardless of where `<GlobalHotKeys>` components appear in the render tree, they are matched with key events after the event has finished propagating through the React app (if the event originated in the React at all). This means if your React app is in focus and it handles a key event, it will be ignored by the `<GlobalHotKeys>` components.
 
@@ -803,11 +820,11 @@ It is recommended to use `<HotKeys>` components whenever possible for better per
 
 ### How combinations and sequences are matched
 
-For key combinations, the action only matches if the key is the last one needed to complete the combination. For sequences, the action matches for the last key to complete the last combination in the sequence. 
+For key combinations, the action only matches if the key is the last one needed to complete the combination. For sequences, the action matches for the last key to complete the last combination in the sequence.
 
 By default, sub-matches are disabled so if you have two actions bound to `cmd+a` and `a`, and you press the `cmd` key and then the `a` key (without releasing the `cmd` key), then the `cmd+a` combination is matched. This allows you to define longer, application-wide key combinations at the top of your app, without them being hidden by shorter context-dependent combinations in different parts of your app. However, it does depend on the order the keys are pressed: in the above example, if `a` was pressed first and then `cmd`, the `a` action would be matched. The trade-off for this behaviour is that combinations are not permitted to overlap: if you have two actions bound to `a` and `b` and the user presses `a` and then `b` without first releasing `a`, only the action associated with `a` will be called (because there are no actions associated with `a+b`). If you want allow sub-matches, you can use the [`allowCombinationSubmatches` configuration option](#configuration).
 
-The match occurs on the key event you have specified when defining your keymap (the default is `keydown` if you have not overridden the [`defaultKeyEvent` configuration option](#configuration)).   
+The match occurs on the key event you have specified when defining your keymap (the default is `keydown` if you have not overridden the [`defaultKeyEvent` configuration option](#configuration)).
 
 Once a matching action is found, `react-hotkeys` then searches for the corresponding action handler.
 
@@ -839,11 +856,11 @@ Regardless of which syntax you used to define the keymap, they always appear in 
     /**
      * Optional attributes - only present if you defined them
      */
-     
+
     name: 'name',
     group: 'group',
     description: 'description',
-    
+
     /**
      * Attributes always present
      * /
@@ -855,7 +872,7 @@ Regardless of which syntax you used to define the keymap, they always appear in 
       // ...
     ]
   },
-  // ... 
+  // ...
 }
 ```
 
@@ -881,7 +898,7 @@ renderDialog(){
           <tbody>
           { Object.keys(keyMap).reduce((memo, actionName) => {
               const { sequences, name } = keyMap[actionName];
-              
+
               memo.push(
                 <tr key={name || actionName}>
                   <td style={styles.KEYMAP_TABLE_CELL}>
@@ -892,7 +909,7 @@ renderDialog(){
                   </td>
                 </tr>
               );
-              
+
               return memo;
             })
            }
@@ -1229,7 +1246,7 @@ configure({
    * @type {boolean}
    */
   ignoreRepeatedEventsWhenKeyHeldDown: true,
-  
+
   /**
    * Whether React HotKeys should simulate keypress events for the keys that do not
    * natively emit them.
@@ -1258,14 +1275,14 @@ configure({
    * allowed to propagate any further through the Render tree).
    */
    stopEventPropagationAfterIgnoring: true,
-   
+
    /**
-   * Whether to allow combination submatches - e.g. if there is an action 
+   * Whether to allow combination submatches - e.g. if there is an action
    * bound to cmd, pressing shift+cmd will *not* trigger that action when
    * allowCombinationSubmatches is false.
    */
   allowCombinationSubmatches: false,
-  
+
   /**
    * A mapping of custom key codes to key names that you can then use in your
    * key sequences

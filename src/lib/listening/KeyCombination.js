@@ -9,6 +9,7 @@ import KeyEventState from '../../const/KeyEventState';
 import lazyLoadAttribute from '../../utils/object/lazyLoadAttribute';
 import ModifierFlagsDictionary from '../../const/ModifierFlagsDictionary';
 import stateFromEvent from '../../helpers/parsing-key-maps/stateFromEvent';
+import Configuration from "../config/Configuration"
 
 /**
  * Record of one or more keys pressed together, in a combination
@@ -248,6 +249,11 @@ class KeyCombination {
        * If this the case, we want to handle it using the main algorithm and skip the
        * reconciliation algorithm.
        */
+
+      const locationPrefix = Configuration.option('_customLocationPrefixesDict')[event.location];
+      if (locationPrefix && locationPrefix.length){
+        key = key.substring(locationPrefix.length)
+      }
       if (key === modifierKey && keyEventType === KeyEventType.keyup) {
         return;
       }
